@@ -20,27 +20,19 @@
 /* Package Name */
 
 INSTALLDIR	= ../../lib
-LIBNAME		= Anlib
+LIBNAME		= JSFAnlib
 SONAME		= lib$(LIBNAME).$(SOEXT).$(SOREV)
 JSFSOLIB	= $(SONAME)
 
 /* Headers */
 
-INCPATH	= -I.
+INCPATH	= -I. -I$(ANLIBROOT)/include -I$(SATELLITESROOT)/include
 
 /* Routines to compile */
 
-OBJS		= ANLJetFinder.$(ObjSuf) \
-		  ANLEventShape.$(ObjSuf) \
-		  ANLPairCombiner.$(ObjSuf) \
-		  ANLTrack.$(ObjSuf) \
-		  Lockable.$(ObjSuf) \
-		  ANL2DVector.$(ObjSuf) \
-		  ANL3DVector.$(ObjSuf) \
-		  ANL4DVector.$(ObjSuf) \
+OBJS		= ANLTrack.$(ObjSuf) \
 		  ANLVTXTagger.$(ObjSuf) \
 		  FlavourGetter.$(ObjSuf) \
-		  ANL2DSpline.$(ObjSuf) \
 		  ANLCheatedJetFinder.$(ObjSuf) \
 		  ANLGVTXTagger.$(ObjSuf)
 
@@ -53,6 +45,8 @@ ALLOBJS 	= $(OBJS) $(DICTNAME).$(ObjSuf)
 SRCS		= $(subst .$(ObjSuf),.$(SrcSuf),$(ALLOBJS))
 
 HDRS		= $(subst .$(ObjSuf),.h,$(OBJS))
+
+CXXFLAGS       += $(INCPATH)
 
 /* Make Targets */
 
@@ -81,4 +75,5 @@ distclean:: clean
 $(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
 	@echo "Generating dictionary ..."
 	rootcint -f $(DICTNAME).$(SrcSuf) \
- 		-c -I$(JSFROOT)/include $(RCINTDEFINES) $(HDRS) LinkDef.h
+ 		-c -I$(JSFROOT)/include -I$(ANLIBROOT)/include \
+		   -I$(SATELLITESROOT)/include $(RCINTDEFINES) $(HDRS) LinkDef.h

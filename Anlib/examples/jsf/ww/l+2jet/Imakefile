@@ -17,7 +17,8 @@ XCOMM ##########################################################################
  *
  */
 
-INCPATH	= -I. -I../../../../src
+INCPATH	= -I. -I../../../../src \
+	  -I$(ANLIBROOT)/include -I$(SATELLITESROOT)/include
 EXTRACXXOPT = $(INCPATH)
 
 /*

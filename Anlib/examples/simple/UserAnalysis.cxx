@@ -1,7 +1,5 @@
-#include "TROOT.h"
+#include "TApplication.h"
 #include "Anlib.h"
-
-TROOT UserAnalysisTest("UserAnalysis", "Test UserAnalysis classes");
 
 //_____________________________________________________________________
 //*------------------------*//
@@ -109,10 +107,10 @@ void UserAnalysis()
    while ( (jet = (ANLJet *)nextjet()) ) jet->DebugPrint();
 }
 
-int main ()
+int main (int argc, char **argv)
 {
-	UserAnalysis();
-	return 0;
+   TApplication("App", &argc, argv);
+
+   UserAnalysis();
+   return 0;
 }
-
-

@@ -27,12 +27,16 @@ int anlL4J()
 
   if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
     if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
+      gSystem->Load("libS4Utils.sl");
       gSystem->Load("libAnlib.sl");
+      gSystem->Load("libJSFAnlib.sl");
       gSystem->Load("../../../../../top/TTStudy/prod/TTSpring.sl");
       gSystem->Load("libTTL4JAnalysis.sl");
     }
     else {
+      gSystem->Load("libS4Utils.so");
       gSystem->Load("libAnlib.so");
+      gSystem->Load("libJSFAnlib.so");
       gSystem->Load("../../../../../top/TTStudy/prod/TTSpring.so");
       gSystem->Load("libTTL4JAnalysis.so");
    }

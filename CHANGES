@@ -1,4 +1,13 @@
 -------------------------------------------------------------------------------
+2004/11/23	K.Fujii		Physsim-2004a-1
+-------------------------------------------------------------------------------
+1) Separated JSF-independent part of Anlib and renamed those that depend on
+   JSF as JSFAnlib.
+   Imakefiles, jsf.conf's, xxx.C have been modified to load both of
+   libJSFAnlib.so and libAnlib.so.
+   The modification was done with bin/sepanlib.
+
+-------------------------------------------------------------------------------
 2001/05/25	K.Fujii		Physsim-2001a-1
 -------------------------------------------------------------------------------
 1) MacOS X support + bug fixes found in porting to MacOS X.

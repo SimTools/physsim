@@ -12,12 +12,16 @@ int anl4J()
 
   if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
     if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
+      gSystem->Load("libS4Utils.sl");
       gSystem->Load("libAnlib.sl");
+      gSystem->Load("libJSFAnlib.sl");
       gSystem->Load("../../../../../susy/XCXCStudy/prod/XCXCSpring.sl");
       gSystem->Load("libXCXC4JAnalysis.sl");
     }
     else {
+      gSystem->Load("libS4Utils.so");
       gSystem->Load("libAnlib.so");
+      gSystem->Load("libJSFAnlib.so");
       gSystem->Load("../../../../../susy/XCXCStudy/prod/XCXCSpring.so");
       gSystem->Load("libXCXC4JAnalysis.so");
    }

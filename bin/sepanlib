@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+#-------------------------------------------------------------------------------
+# ---------
+# sepanlib
+# ---------
+# (Function)
+#    Separate the original Anlib into Anlib and JSFAnlib.
+# (Usage)
+#    Just type
+#    	./sepanlib hoge
+# (Update Record)
+#   04/11/23	K.Fujii		Original version
+#-------------------------------------------------------------------------------
+#--
+#  Open input file.
+#--
+$infile = $ARGV[0];
+print "Processing $infile \n";
+
+#--
+#  jsf.conf
+#--
+if ($infile =~ /jsf.conf/) {
+   jsf_conf($infile);
+#--
+#  hoge.C
+#--
+} elsif ($infile =~ /.*\.C/) {
+   hoge_C($infile);
+} elsif ($infile =~ /Imakefile/) {
+   imakefile($infile);
+}
+#--
+#  That's it, folks!
+#--
+exit 0;
+
+#------------------------------------------------------------------------------
+#  jsf.conf Processor
+#------------------------------------------------------------------------------
+sub jsf_conf {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   $o = "$i".".mod";
+   open(OUTFILE,">$o");
+   while (<INFILE>) {
+      if (/libAnlib.so/) {
+         s/libAnlib.so/libS4Utils.so:libAnlib.so:libJSFAnlib.so/;
+      }
+      print OUTFILE;
+   }
+   close(INFILE);
+   close(OUTFILE);
+
+   unlink($i);
+   rename($o,$i);
+}
+
+#------------------------------------------------------------------------------
+#  hoge.C Processor
+#------------------------------------------------------------------------------
+sub hoge_C {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   $o = "$i".".mod";
+   open(OUTFILE,">$o");
+   while (<INFILE>) {
+      if (/gSystem->Load\("libAnlib/) {
+         $tmp = $_;
+         s/libAnlib/libS4Utils/;
+         print OUTFILE;
+         $_ = $tmp;
+         print OUTFILE;
+         s/libAnlib/libJSFAnlib/;
+      }
+      print OUTFILE;
+      print;
+   }
+   close(INFILE);
+   close(OUTFILE);
+
+   unlink($i);
+   rename($o,$i);
+}
+
+#------------------------------------------------------------------------------
+#  Imakefile Processor
+#------------------------------------------------------------------------------
+sub imakefile {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   $o = "$i".".mod";
+   open(OUTFILE,">$o");
+   while (<INFILE>) {
+      if (/INCPATH *\t*=/) {
+         s/$/ \\/;
+         print OUTFILE;
+         print OUTFILE "\t  -I\$(ANLIBROOT)\/include -I\$(SATELLITESROOT)\/include\n";
+      } else {
+         print OUTFILE;
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+
+   unlink($i);
+   rename($o,$i);
+}
