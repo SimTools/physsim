@@ -20,7 +20,6 @@ XCOMM ##########################################################################
  */
 #define CXXPACKAGE
 #include "config/kflib.tmpl"
-#include "include/JSFConfig.h"
 
 /*
  * Headers
