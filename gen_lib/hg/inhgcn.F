@@ -2,36 +2,22 @@ C* (Update Record)
 C*   96/07/23  K.Fujii		Added Charm and Tau modes.
 C*				TAUON = 0 switches off tau mode.
 C*
-      SUBROUTINE INHGCN
- 
+      SUBROUTINE INHGCN(ZM,WM,TNBET,ALPHA, SHM, GHM)
       IMPLICIT    REAL*4 ( A-H, O-Z    )
 C--
-#include "../hg/include/HGCONS.inc"
 #include "../sm/include/SMCONS.inc"
 #include "../sm/include/SMPTAB.inc"
 #include "../ss/include/SSCONS.inc"
+      REAL*4 SHM(4), GHM(4)
 C--
-      REAL*8   AMA8, TNBET8, AMSQ8, AMSU8, AT8, AB8, XMU8,
-     .         AMASS8(6), ALPHA8
-      REAL*8   GV2PB8, ALF08, ALF8, S2W8, AMZ8, GMZ8, GMW8, AMH8, AMT8
       EXTERNAL BLKDAT
 C--
-      DATA AMSUSY / 1000. / 
 C
 C========< Entry Point >================================================
 C
 C--
 C  Initialize Higgs masses and mixing angles.
 C--
-      GV2PB8 = xGV2PB
-      ALF08  = 1/137.035989D0
-      ALF8   = xALF
-      S2W8   = xSIN2W
-      AMZ8   = AMZ
-      GMZ8   = GMZTOT
-      GMW8   = GMWTOT
-      AMH8   = AMH
-      AMT8   = AMF(3,1,2)
 C--
 C  Local R*4 parameters.
 C--
@@ -40,42 +26,30 @@ C--
       AMSC   = AMF(2,1,2)
       AMSB   = AMF(3,2,2)
       AMST   = AMF(3,1,2)
-      AMSZ   = AMZ
-      AMSW   = AMW
+      AMSZ   = ZM
+      AMSW   = WM
+      write(*,*) amstu,amss,amsc,amsb,amst,amsz,amsw
       COLOR  = 3
-      TAUON  = 1
-C>>>
-C      TAUON  = 0
 C      AMSB   = 5
 C>>>
 C--      
-      AMA8   = xAMA
-      TNBET8 = xTANB
-C--
-      AMSQ8  = AMSUSY
-      AMSU8  = AMSUSY
-      AT8    = AMSUSY
-      AB8    = AMSUSY
-      XMU8   = xAMU
-C--
-      CALL EWINIT(GV2PB8,ALF08,ALF8,S2W8,AMZ8,GMZ8,GMW8,AMH8,AMT8)
-      CALL MHIGGS(AMA8, TNBET8, AMT8, AMSQ8, AMSU8, AT8, AB8, XMU8,
-     .            AMASS8 , ALPHA8 )
 C--
 C  Set /HGCONS/.
 C--
-      AMA    = xAMA
-      AMHL   = AMASS8(1)
-      AMHH   = AMASS8(2)
-      AMHM   = SQRT(AMA**2+AMW**2)
-      BETA   = ATAN(TNBET8)
-      SNALF  = SIN(ALPHA8)
-      CSALF  = COS(ALPHA8)
-      TNBET  = TNBET8
-      SNBET  = SIN(BETA)
-      CSBET  = COS(BETA)
-      CSAMB  = CSALF*CSBET + SNALF*SNBET
-      SNAMB  = SNALF*CSBET - CSALF*SNBET
+
+      AMHL  =  SHM(1)
+      AMHH  =  SHM(2)
+      AMA   =  SHM(3)
+      AMHM  =  SHM(4)
+      BETA  =  ATAN(TNBET)
+C      ALPHA =  ATAN(TNALP)
+      TNALP=TAN(ALPHA)
+      SNALF =  SIN(ALPHA)
+      CSALF =  COS(ALPHA)
+      SNBET = SIN(BETA)
+      CSBET = COS(BETA)
+      CSAMB = CSALF*CSBET + SNALF*SNBET
+      SNAMB = SNALF*CSBET - CSALF*SNBET
 C--
 C  Print out SUSY parameters.
 C--
@@ -104,12 +78,12 @@ C--
       CALL GMH2VV(AMHL,AMSW,AMSZ,GMH2W)
       CALL GMH2VV(AMHL,AMSZ,AMSZ,GMH2Z)
       C      = COLOR
-      GMH2TU = TAUON*GMH2TU*(SNALF/CSBET)**2
+      GMH2TU = GMH2TU*(SNALF/CSBET)**2
       GMH2C  = C*GMH2C*(CSALF/SNBET)**2
       GMH2B  = C*GMH2B*(SNALF/CSBET)**2
       GMH2T  = C*GMH2T*(CSALF/SNBET)**2
-      GMH2W  = 2*GMH2W*(SIN(ALPHA8-BETA))**2
-      GMH2Z  = GMH2Z*(SIN(ALPHA8-BETA))**2
+      GMH2W  = 2*GMH2W*(SIN(ALPHA-BETA))**2
+      GMH2Z  = GMH2Z*(SIN(ALPHA-BETA))**2
       GMHL   = GMH2TU + GMH2C + GMH2B + GMH2T + GMH2W + GMH2Z
       AMH    = AMHL
       GMHTOT = GMHL
@@ -133,12 +107,12 @@ C--
       CALL GMH2VV(AMHH,AMSW,AMSZ,GMH2W)
       CALL GMH2VV(AMHH,AMSZ,AMSZ,GMH2Z)
       C      = COLOR
-      GMH2TU = TAUON*GMH2TU*(CSALF/CSBET)**2
+      GMH2TU = GMH2TU*(CSALF/CSBET)**2
       GMH2C  = C*GMH2C*(SNALF/SNBET)**2
       GMH2B  = C*GMH2B*(CSALF/CSBET)**2
       GMH2T  = C*GMH2T*(SNALF/SNBET)**2
-      GMH2W  = 2*GMH2W*(COS(ALPHA8-BETA))**2
-      GMH2Z  = GMH2Z*(COS(ALPHA8-BETA))**2
+      GMH2W  = 2*GMH2W*(COS(ALPHA-BETA))**2
+      GMH2Z  = GMH2Z*(COS(ALPHA-BETA))**2
       GMHH   = GMH2TU + GMH2C + GMH2B + GMH2T + GMH2W + GMH2Z
 C--
       PRINT *, '        '
@@ -158,7 +132,7 @@ C--
       CALL GMA2FF(AMA,AMSB,AMSZ,GMH2B)
       CALL GMA2FF(AMA,AMST,AMSZ,GMH2T)
       C      = COLOR
-      GMH2TU = TAUON*GMH2TU*TNBET**2
+      GMH2TU = GMH2TU*TNBET**2
       GMH2C  = C*GMH2C/TNBET**2
       GMH2B  = C*GMH2B*TNBET**2
       GMH2T  = C*GMH2T/TNBET**2
@@ -182,7 +156,7 @@ C--
       CALL GMH2UD(AMHM,AMSC,AMSB,AMSZ,TNBET,GMHCB)
       CALL GMH2UD(AMHM,AMSC,AMSS,AMSZ,TNBET,GMHCS)
       C      = COLOR
-      GMHTU  = TAUON*GMHTU
+      GMHTU  = GMHTU
       GMHTB  = C*GMHTB*VTB**2
       GMHCB  = C*GMHCB*VCB**2
       GMHCS  = C*GMHCS*VCS**2
@@ -195,6 +169,14 @@ C--
       PRINT *, '    BR(tb) = ', GMHTB/GMHM
       PRINT *, '    BR(cb) = ', GMHCB/GMHM
       PRINT *, '    BR(cs) = ', GMHCS/GMHM
+C--
+C       PUT DECAY WITDTH INTO OUTPUT GHM(I)
+C--
+      GHM(1) = GMHL
+      GHM(2) = GMHH
+      GHM(3) = GMA
+      GHM(4) = GMHM
+
 C--
 C  Modifiy top width by including t --> bH+ mode.
 C--
