@@ -1,4 +1,10 @@
 -------------------------------------------------------------------------------
+2000/08/29	K.Fujii		Physsim-2000a-5
+-------------------------------------------------------------------------------
+1) Removed dynamic loading of shared libraries from bases.C and sim.C
+   since they are now handled by JSF through jsf.conf.
+
+-------------------------------------------------------------------------------
 2000/08/24	K.Fujii		Physsim-2000a-4
 -------------------------------------------------------------------------------
 1) Now uses the standard gui.C, since shared library loading can be
@@ -52,3 +58,18 @@ wz/EEWWStudy  OK
   /ZZStudy    OK (ampzz.f had to be renamed to ampzz.F. decay mode hist. for
   		  spring is half-empty, though corresponding BS's is OK.)
 
+-------------------------------------------------------------------------------
+1999/10/08	K.Fujii		Physsim-99a-1
+-------------------------------------------------------------------------------
+
+1) A temporary JSF version with C++ wrappers to be replaced in future by
+   a fully C++ version.
+   A C++ analysis utility package (Anlib) has been added together with some
+   sample analysis programs using it.
+
+-------------------------------------------------------------------------------
+1999/05/24	K.Fujii		Physsim-98a-1
+-------------------------------------------------------------------------------
+
+1) A temporary JSF version with C++ wrappers to be replaced in future by
+   a fully C++ version.

@@ -1,31 +1,22 @@
 ------------------------------------------------------------------------
-   Physics study libraries				2000/08/24
+   Physics study libraries				2000/08/29
 ------------------------------------------------------------------------
  
 [1] Version Information
 
    Version: 2000a
-   Release: 4
+   Release: 5
 
-[2] Update Record
+[2] Version History
 
-    2000/08/24  K.Fujii		Now used the standard gui.C.
-    				This version requires root v.2.25.02
-				or later.
-    2000/07/13  K.Fujii		Userin() call removed from XXBases' ctor.
-    				This version requires jsf-1-15 or later.
-    2000/06/26  K.Fujii		A temporary JSF version (2000a-2)
-    				This version uses Bases++ and requires
-				JSF-1-14 or later.
-    1999/10/08  K.Fujii		A temporary JSF version (99a-1)
-				with C++ wrappers to be replaced
-				in future by a fully C++ version.
-				A C++ analysis utility package (Anlib)
-				has been added together with some
-				sample analysis programs using it.
-    1999/05/24  K.Fujii		A temporary JSF version (98a-1)
-				with C++ wrappers to be replaced
-				in future by a fully C++ version.
+    2000/08/29  K.Fujii		2000a-5
+    2000/08/24  K.Fujii		2000a-4
+    2000/07/13  K.Fujii		2000a-3
+    2000/06/26  K.Fujii		2000a-2
+    1999/10/08  K.Fujii		99a-1
+    1999/05/24  K.Fujii		98a-1
+
+   See CHANGES for update records.
 
 [3] How to Install the Libraries
 
