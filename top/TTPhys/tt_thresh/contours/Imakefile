@@ -39,10 +39,10 @@ OBJS	      = mhbeth.o \
 #--
 #ifdef HPArchitecture
 	LDDIRFLAG = -Wl,-L
-	EXTRALIBS = -lU77 -lm
+	EXTRALIBS = $(CERNLIBS) -lU77 -lm
 #else
 	LDDIRFLAG = -L
-	EXTRALIBS =
+	EXTRALIBS = $(CERNLIBS)
 #endif
 #--
 #  Libraries to link.
