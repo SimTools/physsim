@@ -27,6 +27,8 @@ Char_t *inputfile = "../../../../../higgs/ZHStudy/prod/zhsim.root";	// Input sim
 
 int anlzh4j()
 {
+  jsf  = new JSFSteer();			// Create JSF object
+
   gSystem->Load(utils_so);
   gSystem->Load(anlib_so);
   gSystem->Load(jsfanlib_so);
@@ -36,7 +38,6 @@ int anlzh4j()
   file = new TFile(outputfile,"RECREATE");	// Outputfile
   fin  = new TFile(inputfile);			// Input simulator data
 
-  jsf  = new JSFSteer();			// Create JSF object
   jsf->SetInput(*fin);
   jsf->SetOutput(*file);
 

@@ -19,9 +19,7 @@ int anlL4J()
 {
   TFile *file;
   TFile *fin;
-  JSFSteer *jsf;
-
-  jsf  = new JSFSteer();			// Create JSF object
+  JSFSteer *jsf  = new JSFSteer();			// Create JSF object
 
   Char_t *outputfile="jsf.root";  // A file to output histograms
   Char_t *inputfile="../../../../../top/TTStudy/prod/ttsim.root";

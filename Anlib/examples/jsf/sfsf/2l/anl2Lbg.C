@@ -17,7 +17,7 @@ int anl2Lbg()
 {
   TFile *file;
   TFile *fin;
-  JSFSteer *jsf;
+  JSFSteer *jsf  = new JSFSteer();			// Create JSF object
 
   Char_t *outputfile="jsfwwbg.root";  // A file to output histograms
   // Char_t *inputfile="../../../../../wz/WWStudy/prod/wwsim.p+0.90.mutauonly.root";
@@ -30,7 +30,6 @@ int anl2Lbg()
   file = new TFile(outputfile,"RECREATE");  	// Output file
   fin  = new TFile(inputfile);            	// Input simulator data
 
-  jsf  = new JSFSteer();			// Create JSF object
   jsf->SetInput(*fin);
   jsf->SetOutput(*file);
 
