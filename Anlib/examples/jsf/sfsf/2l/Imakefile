@@ -1,0 +1,79 @@
+XCOMM ############################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for ttbar analysis.
+XCOMM ## (Update Record)
+XCOMM ##    99/08/03  K.Fujii   Original version.
+XCOMM ##
+XCOMM ## $Id$
+XCOMM ############################################################################
+
+/*
+ * Template Files
+ *
+ */
+
+#define CXXPACKAGE
+#include "config/kflib.tmpl"
+
+/*
+ * Headers
+ *
+ */
+
+INCPATH	= -I. -I../../../../src
+EXTRACXXOPT = $(INCPATH)
+
+/*
+ * Package Name
+ *
+ */
+
+LIBNAME	= SFSF2LAnalysis
+
+OBJS		= $(LIBNAME).$(ObjSuf)
+SONAME		= lib$(LIBNAME).$(DllSuf).$(SOREV)
+JSFSOLIB	= $(SONAME)
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+
+DICTNAME	= $(LIBNAME)Dict
+
+ALLOBJS 	= $(OBJS) $(DICTNAME).$(ObjSuf)
+
+SRCS		= $(subst .$(ObjSuf),.$(SrcSuf),$(ALLOBJS))
+
+HDRS		= $(LIBNAME).h
+
+/*
+ * Make Targets
+ *
+ */
+
+all:: $(JSFSOLIB)
+
+$(JSFSOLIB): $(ALLOBJS)
+	$(LD) -o $@ $(SOFLAGS) $(ALLOBJS)
+	$(RM) $(subst .$(SOREV),,$@)
+	$(LN) $@ $(subst .$(SOREV),,$@)
+
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+
+depend:: $(SRCS) $(HDRS)
+	for i in $(SRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
+
+clean::
+	@rm -f *.$(ObjSuf) core $(DICTNAME)*
+
+distclean:: clean
+	@rm -f Makefile $(JSFSOLIB) *.$(SOEXT)
+	@rm -f *.root *.tdr *.out *~ core
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I$(JSFROOT)/include $(INCPATH) $(RCINTDEFINES) \
+		$(HDRS) LinkDef.h
