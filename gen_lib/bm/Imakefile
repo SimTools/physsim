@@ -75,6 +75,6 @@ blkdbm.F: include/BEMCNS.inc
 	sed -e 's/^C=/  /' include/BEMCNS.inc >> blkdbm.F
 	echo "      end" >> blkdbm.F
 
-distclean: clean
+distclean:: clean
 	rm -f Makefile
 

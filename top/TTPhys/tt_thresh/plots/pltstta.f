@@ -47,7 +47,8 @@ C*
 C*
       IMPLICIT REAL*8 ( A-H, O-Z )
 C>>>
-      PARAMETER     ( NPT = 50 )
+C     PARAMETER     ( NPT = 50 )
+      PARAMETER     ( NPT = 30 )
 C     PARAMETER     ( NPT = 200 )
 C>>>
       REAL*8        RDATA(2,0:NPT,0:10)
@@ -61,7 +62,8 @@ C--
 C  Set parameters.
 C--
 C     AMT    = 150.D0
-      AMT    = 170.D0
+C     AMT    = 170.D0
+      AMT    = 175.D0
       VTB2   = 1
       AMH    = 1.D10
       BTH    = 1
@@ -73,8 +75,8 @@ C--
       ALFSMX = 0.13D0
       DA     = (ALFSMX-ALFSMN)/NA
 C--
-C     NA     = 0
-C     ALFSMN = 0.12D0
+      NA     = 0
+      ALFSMN = 0.12D0
 C--
 C  Energy range.
 C--
@@ -87,6 +89,8 @@ C     RSMN = 2*AMT - 10
 C     RSMX = 2*AMT + 4
 C>>>
       DRS  = (RSMX-RSMN)/NPT
+C--
+C     CALL ISRINT(0,2*AMT)
 C--
 C  Production cross section.
 C--

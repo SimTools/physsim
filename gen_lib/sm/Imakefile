@@ -52,6 +52,6 @@ blkdat.F: include/SMPTAB.inc	Imakefile
 	sed -e 's/^C=/  /' include/SMPTAB.inc >> blkdat.F
 	echo "      end" >> blkdat.F
 
-distclean: clean
+distclean:: clean
 	rm -f Makefile
 

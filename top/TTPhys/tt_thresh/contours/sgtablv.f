@@ -17,23 +17,34 @@ C--
 C  Set parameters.
 C--
 C     AMT    = 150.D0
-      AMT    = 170.D0
+C     AMT    = 170.D0
+      AMT    = 175.D0
       ALFS   = 0.12D0
       AMH    = 1.D10
       BTH    = 1
 C--
 C  !V_tb!^2 range.
 C--
-      NAL    = 10
-      ALMN   = 0.510D0
-      ALMX   = 1.490D0
+C>>>
+C     NAL    = 10
+C     ALMN   = 0.510D0
+C     ALMX   = 1.490D0
+      NAL    = 14
+      ALMN   = 0.300D0
+      ALMX   = 1.700D0
+C>>>
       DAL    = (ALMX-ALMN)/NAL
 C--
 C  m_t range.
 C--
-      NAM    = 20
-      AMMN   = AMT - 0.2D0
-      AMMX   = AMT + 0.2D0
+C>>>
+C     NAM    = 20
+C     AMMN   = AMT - 0.2D0
+C     AMMX   = AMT + 0.2D0
+      NAM    = 40
+      AMMN   = AMT - 0.4D0
+      AMMX   = AMT + 0.4D0
+C>>>
       DAM    = (AMMX-AMMN)/NAM
 C--
 C  Energy range.

@@ -19,7 +19,7 @@ clean:
 	(cd sm;  make clean)
 	(cd ss;  make clean)
 
-distclean: clean
+distclean:: clean
 	(cd bm;  make distclean)
 	(cd kn;  make distclean)
 	(cd hg;  make distclean)

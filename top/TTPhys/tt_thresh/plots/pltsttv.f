@@ -5,7 +5,7 @@ C*    8/22/91  K.Fujii       Original version for !V_tb!^2 dependence.
 C*
 C*
       IMPLICIT REAL*8 ( A-H, O-Z )
-      PARAMETER     ( NPT = 50 )
+      PARAMETER     ( NPT = 30 )
       REAL*8        RDATA(2,0:NPT,0:10)
       CHARACTER*8   JOIN(0:3)
       DATA JOIN     / 'DOTDASH', 'SOLID', 'DASH', 'DOT' /
@@ -17,7 +17,8 @@ C--
 C  Set parameters.
 C--
 C     AMT    = 150.D0
-      AMT    = 170.D0
+C     AMT    = 170.D0
+      AMT    = 175.D0
       ALFS   = 0.12D0
       AMH    = 1.D10
       BTH    = 1
@@ -71,7 +72,7 @@ C--
       WRITE(LOUNIT,'(''SET INTENSITY 4'')')
       WRITE(LOUNIT,'(''SET FONT DUPLEX'')')
       WRITE(LOUNIT,'(''SET WINDOW X  2. 12. Y 1.8  9.2'')')
-      WRITE(LOUNIT,'(''SET LIMITS X '',2F9.0,'' Y 0 1.5'')') RSMN, RSMX
+      WRITE(LOUNIT,'(''SET LIMITS X '',2F9.0,'' Y 0 0.7'')') RSMN, RSMX
       WRITE(LOUNIT,'(''SET LABELS SIZE 3.0'')')
       WRITE(LOUNIT,'(''('')')
       WRITE(LOUNIT,'(''TITLE 0.5 5.0 ANGLE 90 SIZE 4 ''''S0tt1(pb)'')')

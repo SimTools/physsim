@@ -30,14 +30,17 @@ C*   91/09/02  K.Fujii       Original version for Finland conference.
 C*                           This version draws m_t-!Vtb!^2 contours.
 C*
       IMPLICIT  REAL*8 ( A-H, O-Y )
-      PARAMETER   ( MXxAM = 20, MXxLM = 10, MXxCNT = 3 )
+C     PARAMETER   ( MXxAM = 20, MXxLM = 10, MXxCNT = 3 )
+      PARAMETER   ( MXxAM = 40, MXxLM = 14, MXxCNT = 3 )
       REAL*8       RDATA(3,0:MXxAM,0:MXxLM), CHICNT(MXxCNT)
 C--
       PARAMETER   ( MXxRS = 11 )
       REAL*8       EXPCND(4,MXxRS)
 C--
-      DATA AMTMN / 169.8D0 / AMTMX / 170.2D0 /
-      DATA ALFMN / 0.510D0 / ALFMX / 1.490D0 /
+C170      DATA AMTMN / 169.8D0 / AMTMX / 170.2D0 /
+C170      DATA ALFMN / 0.510D0 / ALFMX / 1.490D0 /
+      DATA AMTMN / 174.6D0 / AMTMX / 175.4D0 /
+      DATA ALFMN / 0.300D0 / ALFMX / 1.700D0 /
       DATA (EXPCND(1,I),I=1,MXxRS) /  -7.D0, -6.D0, -5.D0,
      .                                -4.D0, -3.D0, -2.D0,
      .                                -1.D0,  0.D0,  1.D0,
@@ -58,7 +61,8 @@ C--
 C  Nominal m_t and lambda.
 C--
 C     AMT   = 150
-      AMT   = 170
+C     AMT   = 170
+      AMT   = 175
       ALFS  = 0.12D0
 C--
 C  Initialize sqrt(s).
@@ -154,10 +158,11 @@ C--
       INTEGER*4    MODE, NRS
       REAL*8       AMT, ALFS, VTB2, AMH, BTH, EXPCND(4,NRS), CHI2
 C>>>
-      PARAMETER    ( MXxRS = 10, MXxAM = 20, MXxAL = 10 )
+C     PARAMETER    ( MXxRS = 10, MXxAM = 20, MXxAL = 10 )
+      PARAMETER    ( MXxRS = 10, MXxAM = 40, MXxAL = 14 )
 C>>>
       REAL*8       SGDAT(4,0:MXxRS,0:MXxAM,0:MXxAL)
-      REAL*8       SGOBS(2,MXxRS)
+      REAL*8       SGOBS(2,MXxRS+1)
 C>>>  For MT-ALFS
 C     DATA ISEED   / 31414927 /
 C     DATA ISEED   / 1        /
@@ -167,7 +172,8 @@ C>>>  For MH-BTH2
 C     DATA ISEED   / 31414927 /
 C>>>
       DATA ZERO    / 1.D-4  /
-      DATA LIU     / 8 /
+C     DATA LIU     / 8 /
+      DATA LIU     / 5 /
 C
 C========< Entry Point >================================================
 C
@@ -206,8 +212,8 @@ C>>>
             SGOBS(1,IRS) = ENOBS/SLM/ACC
             SGOBS(2,IRS) = ENERR/SLM/ACC
 C>>>
-C           PRINT *, ' RS = ', RS, ' SGTH = ', SGD,
-C    .               ' SGEXP = ', SGOBS(1,IRS), '+/-', SGOBS(2,IRS)
+            PRINT *, ' RS = ', RS, ' SGTH = ', SGD,
+     .               ' SGEXP = ', SGOBS(1,IRS), '+/-', SGOBS(2,IRS)
             WRITE(20,'(''('',4E15.5)') RS, SGOBS(1,IRS), SGOBS(2,IRS),
      .                                 ENOBS
 C>>>
@@ -217,6 +223,7 @@ C>>>
 C--
 C  Read in cross section data.
 C--
+         PRINT *, 'Reading cross section data'
          DO 2000 IAL = 0, MXxAL
             DO 200 IAM = 0, MXxAM
                DO 20 IRS = 0, MXxRS

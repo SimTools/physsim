@@ -47,6 +47,6 @@ InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
 NormalLibraryTarget($(LIBNAME), $(ALLOBJ) )
 InstallLibrary($(LIBNAME),$(INSTALLDIR))
 
-distclean: clean
+distclean:: clean
 	rm -f Makefile
 

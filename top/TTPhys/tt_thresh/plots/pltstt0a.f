@@ -81,7 +81,8 @@ C*                           W/o radiative correction.
 C*
       IMPLICIT  REAL*8 ( A-H, O-Z )
 C     PARAMETER     ( NPT = 200 )
-      PARAMETER     ( NPT = 60 )
+      PARAMETER     ( NPT = 30 )
+C     PARAMETER     ( NPT = 40 )
       REAL*8        RDATA(2,0:NPT,0:10)
       CHARACTER*8   JOIN(0:3)
       DATA JOIN     / 'DOTDASH', 'SOLID', 'DASH', 'DOT' /
@@ -100,7 +101,8 @@ C--
       AMB  = 5.D0
 C--
 C     AMT  = 150.D0
-      AMT  = 170.D0
+C     AMT  = 170.D0
+      AMT  = 175.D0
       VFF  = 1.D0
 C     VFF  = SQRT(0.1D0)
       AMH  = 1.D10
@@ -120,7 +122,7 @@ C--
 C  Energy range.
 C--
 C     RSMN = 2*AMT - 10
-C     RSMX = 2*AMT + 4
+C     RSMX = 2*AMT + 6
       RSMN = 2*AMT - 8
       RSMX = 2*AMT + 4
 C     RSMN = 2*AMT - 4
@@ -141,8 +143,8 @@ C--
      .                  AMH,BTH,   RS,SG)
             SG = SG
 C>>>
-C           RDATA(1,I,IA) = RS
-            RDATA(1,I,IA) = RS - 2*AMT
+            RDATA(1,I,IA) = RS
+C           RDATA(1,I,IA) = RS - 2*AMT
 C>>>
             RDATA(2,I,IA) = SG
 C>>>
@@ -161,14 +163,14 @@ C--
       WRITE(LOUNIT,'(''SET INTENSITY 4'')')
       WRITE(LOUNIT,'(''SET FONT DUPLEX'')')
       WRITE(LOUNIT,'(''SET WINDOW X  2. 12. Y 1.8  9.2'')')
-C     WRITE(LOUNIT,'(''SET LIMITS X '',2F9.0,'' Y 0 2.5'')') RSMN, RSMX
-      WRITE(LOUNIT,'(''SET LIMITS X '',2F9.0,'' Y 0 2.5'')') EMN, EMX
+      WRITE(LOUNIT,'(''SET LIMITS X '',2F9.0,'' Y 0 1.0'')') RSMN, RSMX
+C     WRITE(LOUNIT,'(''SET LIMITS X '',2F9.0,'' Y 0 2.5'')') EMN, EMX
       WRITE(LOUNIT,'(''SET TITLE SIZE 3'')')
       WRITE(LOUNIT,'(''TITLE 0.5 5.0 ANGLE 90 SIZE 4 ''''S0tt1(pb)'')')
       WRITE(LOUNIT,'(''CASE                          ''''GX  X    '')')
-C     WRITE(LOUNIT,'(''TITLE 6.0 0.8 SIZE 4 ''''2s0O (GeV)'')')
-C     WRITE(LOUNIT,'(''CASE                       ''''M UD'')')
-      WRITE(LOUNIT,'(''TITLE 6.0 0.8 SIZE 4 ''''E (GeV)'')')
+      WRITE(LOUNIT,'(''TITLE 6.0 0.8 SIZE 4 ''''2s0O (GeV)'')')
+      WRITE(LOUNIT,'(''CASE                       ''''M UD'')')
+C     WRITE(LOUNIT,'(''TITLE 6.0 0.8 SIZE 4 ''''E (GeV)'')')
       WRITE(LOUNIT,'(''('')')
       WRITE(LOUNIT,'(''SET LABELS SIZE 2.5'')')
       WRITE(LOUNIT,'(''SET ORDER X Y'')')
