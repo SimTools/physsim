@@ -12,6 +12,9 @@
 //* 	class ANL4DVector
 //* (Update Recored)
 //*    1999/09/05  K.Ikematsu	Original version.
+//*    2000/03/23  K.Ikematsu   Added Get3D method.
+//*    2000/03/23  K.Ikematsu   Added GetTheta method.
+//*    2000/03/28  K.Ikematsu   Added Acol method.
 //*
 //*************************************************************************
 //

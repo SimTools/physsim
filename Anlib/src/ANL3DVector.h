@@ -14,6 +14,9 @@
 //* 	class ANL3DVector
 //* (Update Recored)
 //*    1999/09/13  K.Ikematsu	Original version.
+//*    2000/03/23  K.Ikematsu	Added GetNorm method.
+//*    2000/03/23  K.Ikematsu	Added GetTheta method.
+//*    2000/03/28  K.Ikematsu	Added Acol method.
 //*
 //*************************************************************************
 //
@@ -78,7 +81,7 @@ public:
    }
    inline friend Double_t operator* (const ANL3DVector &q1,
 				     const ANL3DVector &q2) {
-       return ( q1(1)*q2(1) + q1(2)*q2(2) + q1(3)*q2(3) );
+     return ( q1(1)*q2(1) + q1(2)*q2(2) + q1(3)*q2(3) );
    }
 
 
@@ -94,12 +97,27 @@ public:
                                        + operator()(3)*operator()(3) ); }
    inline Double_t GetPt()    const { return TMath::Sqrt( GetPt2() );       }
    inline Double_t GetMag()   const { return TMath::Sqrt( GetMag2() );      }
+   inline Double_t GetTheta() const { return (180.*(TMath::ACos(CosTheta()))/TMath::Pi()); }
+   inline Double_t GetTheta(const ANL3DVector &q) const {
+     return (180.*(TMath::ACos(CosTheta(q)))/TMath::Pi());
+   }
 
+   inline ANL3DVector GetNorm() const {
+     ANL3DVector n(operator()(1)/GetMag(),
+		   operator()(2)/GetMag(),
+		   operator()(3)/GetMag());
+     return n;
+   }
+
+   inline Double_t Acol(const ANL3DVector &q) const {
+     return (180.*(TMath::Pi()-TMath::ACos(CosTheta(q)))/TMath::Pi());
+   }
    inline Double_t Acop(const ANL3DVector &q) const {
-     Double_t c = (operator()(1)*q(1)+operator()(2)*q(2)+operator()(3)*q(3))
-                  /(GetMag()*q.GetMag());
+     Double_t c = (operator()(1)*q(1)+operator()(2)*q(2))
+                  /(GetPt()*q.GetPt());
      return (180.*(TMath::Pi()-TMath::ACos(c))/TMath::Pi());
    }
+
    inline Double_t CosTheta() const { return TVector3::CosTheta(); }
    inline Double_t CosTheta(const ANL3DVector &q) const {
      return (operator()(1)*q(1)+operator()(2)*q(2)+operator()(3)*q(3))

@@ -14,16 +14,19 @@
 //*	class JSFSIMDST, etc.
 //* (Provides)
 //*     class ANLVTXTagger
-//* (To do)
-//*     Ks, Lambda removal.
 //* (Update Recored)
 //*    1999/10/09  K.Fujii	Original version.
+//*    1999/10/18  K.Ikematsu   Impliment Ks, Lambda, Sigma removal.
+//*    2000/03/18  K.Ikematsu   Added SetNsig and SetNoff method.
+//*    2000/03/18  K.Ikematsu   Added GetNsig and GetNoff method.
 //*
 //*************************************************************************
 //
 #include "JSFSteer.h"
 #include "JSFModule.h"
 #include "JSFSIMDST.h"
+#include "JSFGeneratorParticle.h"
+#include "JSFCDCTrack.h"
 #include "ANLJetFinder.h"
 #include "ANLTrack.h"
 //_____________________________________________________________________
@@ -33,7 +36,7 @@
 //
 class ANLVTXTagger {
 public:
-  ANLVTXTagger(Double_t nsig=3., Int_t noff=3)
+  ANLVTXTagger(Double_t nsig=0., Int_t noff=1)
             : fNsigCut(nsig), fNoffVTracks(noff) {
     JSFSIMDST     *sds     = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
     JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
@@ -42,9 +45,14 @@ public:
   }                                                // default constructor
 
   virtual ~ANLVTXTagger(){}                        // default destructor
-  Bool_t operator()(const ANLJet &jet);
 
-private:
+  Bool_t   operator()(const ANLJet &jet);
+  Double_t GetNsig() const { return fNsigCut; }
+  Int_t    GetNoff() const { return fNoffVTracks; }
+  void     SetNsig(Double_t nsig);                 // sets nsig
+  void     SetNoff(Int_t noff);                    // sets noff
+
+  //private:
   Double_t Getbnorm(const ANLTrack &t);
 
 private:
@@ -57,4 +65,3 @@ private:
 };
 
 #endif
-

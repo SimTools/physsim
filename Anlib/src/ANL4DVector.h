@@ -14,11 +14,15 @@
 //* 	class ANL4DVector
 //* (Update Recored)
 //*    1999/09/05  K.Ikematsu	Original version.
+//*    2000/03/23  K.Ikematsu	Added Get3D method.
+//*    2000/03/23  K.Ikematsu	Added GetTheta method.
+//*    2000/03/28  K.Ikematsu	Added Acol method.
 //*
 //*************************************************************************
 //
 #include <iostream.h>
 #include "Lockable.h"
+#include "ANL3DVector.h"
 #include "TLorentzVector.h"
 //_____________________________________________________________________
 //  -----------------------
@@ -80,11 +84,16 @@ public:
    }
    inline friend ANL4DVector operator+ (const ANL4DVector &q1) { return q1; }
    inline friend ANL4DVector operator- (const ANL4DVector &q1) {
-       ANL4DVector ans(-q1(0),-q1(1),-q1(2),-q1(3)); return ans;
+     ANL4DVector ans(-q1(0),-q1(1),-q1(2),-q1(3)); return ans;
    }
    inline friend Double_t operator* (const ANL4DVector &q1,
 				     const ANL4DVector &q2) {
-       return ( q1(0)*q2(0) - q1(1)*q2(1) - q1(2)*q2(2) - q1(3)*q2(3) );
+     return ( q1(0)*q2(0) - q1(1)*q2(1) - q1(2)*q2(2) - q1(3)*q2(3) );
+   }
+
+   inline ANL3DVector Get3D() const {
+     ANL3DVector vec(operator()(1),operator()(2),operator()(3));
+     return vec;
    }
 
    inline Double_t GetPt2()   const { return ( operator()(1)*operator()(1) 
@@ -96,13 +105,19 @@ public:
    inline Double_t GetMass2() const { return ( operator()(0)*operator()(0) 
                                        - GetMag2() );   }
    inline Double_t GetMass() const {
-      return ( GetMass2() < 0  ? (-TMath::Sqrt(-GetMass2()))
+     return ( GetMass2() < 0  ? (-TMath::Sqrt(-GetMass2()))
                                : ( TMath::Sqrt( GetMass2())) );
    }
-
+   inline Double_t GetTheta() const { return (180.*(TMath::ACos(CosTheta()))/TMath::Pi()); }
+   inline Double_t GetTheta(const ANL4DVector &q) const {
+     return (180.*(TMath::ACos(CosTheta(q)))/TMath::Pi());
+   }
+   inline Double_t Acol(const ANL4DVector &q) const {
+     return (180.*(TMath::Pi()-TMath::ACos(CosTheta(q)))/TMath::Pi());
+   }
    inline Double_t Acop(const ANL4DVector &q) const {
-     Double_t c = (operator()(1)*q(1)+operator()(2)*q(2)+operator()(3)*q(3))
-                  /(GetMag()*q.GetMag());
+     Double_t c = (operator()(1)*q(1)+operator()(2)*q(2))
+                  /(GetPt()*q.GetPt());
      return (180.*(TMath::Pi()-TMath::ACos(c))/TMath::Pi());
    }
 #if 0

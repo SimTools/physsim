@@ -45,6 +45,7 @@
 //*    1999/08/14  K.Fujii	Modified GetYmass as suggested by M.Iwasaki.
 //*    1999/09/05  K.Ikematsu   Replaced LockableLVector with ANL4DVector.
 //*    1999/09/14  K.Ikematsu   Added GetYmax method.
+//*    2000/03/28  K.Ikematsu   Bug fixed about fYmassMax
 //*
 //*************************************************************************
 //
@@ -277,8 +278,10 @@ void ANLJetFinder::FindJets() {
 	    jm = j;
          }
       }
-      if (minmass > masscut) break;
-      if (minmass > fYmassMax) fYmassMax = minmass;
+      if (minmass > masscut) {
+	fYmassMax = minmass;
+	break;
+      }
       //
       // Pair (im,jm) accepted.
       //

@@ -5,6 +5,9 @@ Version: 	0.8c
 Description:	C++ library for physics analysis, containing
 		4-vectors, combiners, jet finders, ....
 UpdateRecord:	
+  2000/05/16	K.Ikemtasu	Many bug fixes. Enhanced ANLVTXTagger
+  		(v.0.9a)	and ANL4(3)DVector classes.
+				Added FlavourGetter class.
   1999/10/09	K.Fujii(v.0.8c)	Added ANLVTXTagger class.
   1999/09/13	K.Ikematsu	Renamed ANLLVector to ANL4DVector.
 		(v.0.8b)	Added ANL3DVector and ANLTrack classes.

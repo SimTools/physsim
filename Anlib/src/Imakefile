@@ -33,8 +33,9 @@ OBJS		= ANLJetFinder.$(ObjSuf) \
 		  Lockable.$(ObjSuf) \
 		  ANL3DVector.$(ObjSuf) \
 		  ANL4DVector.$(ObjSuf) \
-		  ANLVTXTagger.$(ObjSuf)
-
+		  ANLVTXTagger.$(ObjSuf) \
+		  FlavourGetter.$(ObjSuf)
+	
 /* You don't have to edit anything below here */
 
 DICTNAME	= $(LIBNAME)Dict
@@ -62,7 +63,8 @@ clean::
 	@rm -f *.$(ObjSuf) core $(DICTNAME).$(SrcSuf) $(DICTNAME).h
 
 depend:: $(SRCS) $(HDRS)
-	makedepend -- -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) -- $(SRCS)
+	for i in $(SRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
 
 distclean:: clean
 	@rm -f $(JSFSOLIB) *.$(SOEXT) Makefile

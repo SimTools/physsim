@@ -17,5 +17,6 @@
 #pragma link C++ class ANLEventShape;
 #pragma link C++ class ANLTrack;
 #pragma link C++ class ANLVTXTagger;
+#pragma link C++ class FlavourGetter;
 
 #endif

@@ -20,6 +20,7 @@
 //* 	class ANLVTXTagger
 //* 	class ANLCut			: not yet :-)
 //* 	class ANLCutSet : Stack<Cut>	: not yet :-)
+//* 	class FlavourGetter
 //* (Update Recored)
 //*    1999/06/05  K.Fujii	Original version.
 //*    1999/07/30  K.Fujii	Added jet finder classes.
@@ -28,6 +29,7 @@
 //*    1999/09/05  K.Ikematsu   Replaced LockableLVector with ANL4DVector.
 //*    1999/08/13  K.Ikematsu	Added ANL3DVector class.
 //*    1999/10/09  K.Fujii	Added ANLVTXTagger class.
+//*    2000/02/13  K.Ikematsu   Added FlavourGetter class.
 //*
 //*************************************************************************
 //
@@ -39,5 +41,6 @@
 #include "ANLEventShape.h"
 #include "ANLTrack.h"
 #include "ANLVTXTagger.h"
+#include "FlavourGetter.h"
 
 #endif

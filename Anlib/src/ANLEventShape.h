@@ -104,7 +104,7 @@ private:
 	TVector3 m_EigenVector3;
 	Double_t m_dEigenValue1;
 	Double_t m_dEigenValue2;
-	Double_t m_dEigneValue3;
+	Double_t m_dEigenValue3;
 	
 	static Int_t m_maxpart;
 
