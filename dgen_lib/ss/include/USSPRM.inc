@@ -1,2 +1,2 @@
       COMMON /USSPRM/ AM0, AMU, AM2, TANB, AMA, ASFT(3)
-      REAL*8          AM0, AMU, AM2, TANB, AMA, ASFT
+      REAL*4          AM0, AMU, AM2, TANB, AMA, ASFT
