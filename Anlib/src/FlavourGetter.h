@@ -29,6 +29,7 @@
 //*************************************************************************
 //
 #include <stdlib.h>
+#include <stdlib.h>
 #include "JSFSteer.h"
 #include "JSFModule.h"
 #include "JSFSIMDST.h"

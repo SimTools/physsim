@@ -31,6 +31,7 @@
 //*************************************************************************
 //
 #include <iostream.h>
+#include <stdlib.h>
 #include "JSFLTKCLTrack.h"
 #include "JSFSteer.h"
 #include "JSFModule.h"
