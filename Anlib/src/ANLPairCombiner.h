@@ -91,7 +91,7 @@ public:
 
    virtual void Delete() { delete fP[0]; delete fP[1]; }
    
-   void DebugPrint(const Char_t *opt = "Brief")
+   void DebugPrint(const Char_t *opt = "Brief") const
    {
    	if (opt == "Brief") {
            cerr << (void *)this << ": ";
@@ -154,7 +154,7 @@ public:
    TObject * Next ()       { return fPair.Next(); }
    void      Reset()       { fPair.Reset();  }
    
-   void DebugPrint(const Char_t *opt = "Brief")
+   void DebugPrint(const Char_t *opt = "Brief") const
    {
    	TObjArrayIter next(&fPairs);
    	ANLPair *p;

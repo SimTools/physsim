@@ -83,7 +83,7 @@ public:
    void Merge(ANLJet *jet);
    void	Remove(TObject *part);
 
-   void DebugPrint(const Char_t *opt = "Brief");
+   void DebugPrint(const Char_t *opt = "Brief") const;
 
 private:
    TObjArray fParts;

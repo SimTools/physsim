@@ -105,7 +105,7 @@ void ANLJet::Remove(TObject *part) {
 //*--
 //*  Misc. Services
 //*--
-void ANLJet::DebugPrint(const Char_t *opt) {
+void ANLJet::DebugPrint(const Char_t *opt) const {
    cerr << "Number of particles in jets = " << GetNparticles() << endl;
    ANL4DVector::DebugPrint(opt);
    if (opt == "Detailed") {
