@@ -42,7 +42,7 @@ C----------------------------------------------------------------------C
           STOP
         ENDIF
 1     CONTINUE
- 
+C      write(*,*) alphe, 'alphe in couplsub'
       PI = ACOS(0.)*2.
       SQRT2 = SQRT(2.)
  
@@ -144,6 +144,9 @@ C----------------------------------------------------------------------C
      &                    GNNSNL, GNESEL, GNESER,
      &                    GNUSUL, GNUSUR, GNDSDL, GNDSDR )
 C----------------------------------------------------------------------C
+C modified by M. M. Nojiri Aug.1 1996
+C  neutralino-uquark suquark is corrected
+C  some typo in comment like are corrected 
 C purpose : give couplings for Ino -fermion -Sfermion
 C Input  : ALPHE  e**2/4/pi
 C          SIN2W (real*4)  weak mixing angle
@@ -153,7 +156,7 @@ C               ( charged-lepton, up-type, down-type )
 C          TANB  (real*4)  SUSY parameter tan(beta)=v2/v1
 C          PHIL, PHIR      chargino mix. angle
 C          ER              chargino mix. phase
-C          ON(i,j) (real*4)(i,j=1..4)diagonalizing matrix for chargino
+C          ON(i,j) (real*4)(i,j=1..4)diagonalizing matrix for neutralino
 C          ETA(i)  (complex*8) (i=1..4)    phase factor
 C Output :
 C    GCESNL(i,j) (i=1..2, j=1..2 ) / chargino(j)-electron-Sneutrino_L
@@ -166,10 +169,10 @@ C    GCUSDR(i,j) (i=1..2, j=1..2 ) / chargino(j)-u_quark-Sd_quark_R
 C    GNNSNL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-neutrino-Sneutrino_L
 C    GNESEL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-electron-Selectron_L
 C    GNESER(i,j) (i=1..2, j=1..4 ) / neutralino(j)-electron-Selectron_R
-C    GNUSEL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_L
-C    GNUSER(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_R
-C    GNDSEL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_L
-C    GNDSER(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_R
+C    GNUSUL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_L
+C    GNUSUR(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_R
+C    GNDSDL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_L
+C    GNDSDR(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_R
 C              i=1/left-handed-coupling,  i=2/right-handed
 C----------------------------------------------------------------------C
       REAL*4 ON(4,4)
@@ -209,6 +212,9 @@ C---
 C Chargino-fermion-Sfermion
 C---
 C chargino-electron-Sneutrino
+      write(*,*) 'chargino-electron-sneutrino coupling'
+      write(*,*) phil,phir
+      write(*,*) gweak, cospr, cospl
       GCESNL(1,1) = -GWEAK*COSPR
       GCESNL(2,1) =  GWEAK*EMAS*SINPL/WSQ2CB
       GCESNL(1,2) =  GWEAK*ER*SINPR
@@ -257,18 +263,11 @@ C       GNNSNL(1,I) = CONJG(ETA(I))*(ON(I,2))
         GNESEL(2,I) = ETA(I)*EMAS*ON(I,3)/WMCOSB
         GNESER(1,I) = CONJG(ETA(I))*EMAS*ON(I,3)/WMCOSB
         GNESER(2,I) = 2.*ETA(I)*ON(I,1)*TANW
-C>>> 96/08/01  Bug fixup due to nojirim
-C        GNUSUL(1,I) = CONJG(ETA(I))
-C     &               *( ON(I,2)+(2.*UCHRG-1.)*ON(I,1)*TANW )
-C        GNUSUL(2,I) = ETA(I)*UMAS*ON(I,3)/WMSINB
-C        GNUSUR(1,I) = CONJG(ETA(I))*UMAS*ON(I,3)/WMSINB
-C        GNUSUR(2,I) =-2.*ETA(I)*UCHRG*TANW*ON(I,1)
         GNUSUL(1,I) = CONJG(ETA(I))
      &               *( ON(I,2)+(2.*UCHRG-1.)*ON(I,1)*TANW )
         GNUSUL(2,I) = ETA(I)*UMAS*ON(I,4)/WMSINB
         GNUSUR(1,I) = CONJG(ETA(I))*UMAS*ON(I,4)/WMSINB
         GNUSUR(2,I) =-2.*ETA(I)*UCHRG*TANW*ON(I,1)
-C>>>
         GNDSDL(1,I) = CONJG(ETA(I))
      &               *(-ON(I,2)+(2.*DCHRG+1.)*ON(I,1)*TANW )
         GNDSDL(2,I) = ETA(I)*DMAS*ON(I,3)/WMCOSB
@@ -298,6 +297,8 @@ C----------------------------------------------------------------------C
      &                    GHHWW, GH02W2, GH0HWZ, GH0HWA,
      &                    GHHZZ, GH02Z2, GHHZA, GHHAA )
 C----------------------------------------------------------------------C
+C corrected by M. M. Nojiri Aug. 1st 1996
+C definition of signd was wrong. 
 C purpose : give  Higss- Gauge_boson couplings
 C inputs  : ALPHE, SIN2W, WM / S.M. parameters
 C           TANB / ratio of vev. ( v2/v1 )
@@ -353,10 +354,7 @@ C     DELT = ALPHA-BETA
 C     COSD = COS(DELT)
 C     SIND = SIN(DELT)
       COSD = COSA*COSB + SINA*SINB
-C>>> 96/08/01  Bug fixup due to nojirim
-C      SIND = SINA*COSB + COSA*SINB
       SIND = SINA*COSB - COSA*SINB
-C>>>
  
       GH0WW(1) = -GWEAK*SIND *WM
       GH0WW(2) =  GWEAK*COSD *WM
@@ -418,6 +416,7 @@ C----------------------------------------------------------------------C
       PI = ACOS(0.)*2.
       SQRT2 = SQRT(2.)
       GWEAK = SQRT(ALPHE*4.*PI/SIN2W)
+C      write(*,*) 'gweak from ino-higgs routine' , gweak
       COS2W = 1.-SIN2W
       SINW  = SQRT(SIN2W)
       COSW  = SQRT(COS2W)
@@ -509,12 +508,13 @@ C---
      &               +COSPR*ONI21T )*CONJG(ETA(I))
        GCNH(2,2,I) = SINB*(-SINPL*ON(I,3) -COSPL*ONI21T )*ETA(I)
 10    CONTINUE
- 
+C      write(*,*) 'i,j,k, gcnh'
       DO 15 I=1,2
       DO 15 J=1,2
       DO 15 K=1,4
-15    GCNH(I,J,K) = GCNH(I,J,K) * (-GWEAK)
- 
+      GCNH(I,J,K) = GCNH(I,J,K) * (-GWEAK)
+      write(*,*) i,j,k, gcnh(i,j,k)
+ 15   CONTINUE
 C---
 C Neutralino-Neutralino-Higgs
 C---
@@ -575,3 +575,7 @@ C---
  
       RETURN
       END
+
+
+
+

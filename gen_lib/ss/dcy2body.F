@@ -54,6 +54,43 @@ C----------------------------------------------------------------------C
  
       RETURN
       END
+C--------------
+      SUBROUTINE SC1SC2V(SCMAS1,SCMAS2,VMAS, GV, DCYWDT )
+C Purpose
+C     calculate the decay widthes of
+C       Scaler_1 ---> Scaler_2 + V
+C Inputs ( note that GL,GR are complex*8 )
+C     SCMAS1  (Real*4) :    mass of scaler1 (GeV)
+C     SCMAS2  (Real*4) :    mass of scaler_2  (GeV)
+C     VMAS  (Real*4) :    mass of vector  (GeV)
+C     GV (complex*8) :   coupling of  scaler1 - scaler2 - V
+C                       
+C Output
+C     DCYWDT : decay width (GeV)
+C         
+C----------------------------------------------------------------------C
+      COMPLEX*8 GV
+C----------------------------------------------------------------------C
+      IF( SCMAS1 .LE. SCMAS2+VMAs) THEN
+        DCYWDT = 0.
+        RETURN
+      ENDIF
+ 
+      PI = ACOS(0.)*2.
+      SCMS12 = SCMAS1**2
+      SCMS22 = SCMAS2**2
+      VMAS2 = VMAS**2
+      BETA2 = ( 1. - (SCMAS2 + VMAS)**2/SCMS12)*
+     &         ( 1. - (SCMAS2 - VMAS)**2/SCMS12)
+      BETA =SQRT(BETA2)
+      TMAT2= (SCMS12 - SCMS22)**2/VMAS2 -1.5*(SCMS12+SCMS22) 
+     & + 0.5*VMAS2
+      DCYWDT = BETA * TMAT2 * ABS(GV)**2/16./PI/SCMAS1
+ 
+ 
+      RETURN
+      END
+
 C----------------------------------------------------------------------C
       SUBROUTINE SCF1F2( SCMAS, F1MAS, F2MAS, GL, GR, DCYWDT )
 C----------------------------------------------------------------------C

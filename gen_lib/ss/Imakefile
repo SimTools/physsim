@@ -19,29 +19,28 @@ XCOMM #
 XCOMM # Routines to compile.
 XCOMM #
 OBJS = couplsub.o \
-                couplsub2.o \
-                dcy2body.o \
-                gmxfsf.o \
-                gtsfms.o \
-                gtsfms3.o \
-                helasc.o \
-                hgsmix.o \
-                hoqrvd.o \
-                inodcy.o \
-                inomix.o \
-                inomix3.o \
-                inmass.o \
-                insscn.o \
-                insusy.o \
-                modgam.o \
-                sf2br.o \
-                sfmass.o \
-                sfmmas.o \
-                sfmmix.o \
-                swpelm.o \
-                xcmass.o \
-                xnmass.o
-
+		couplsub2.o \
+		dcy2body.o \
+		gmxfsf.o \
+		gtsfms.o \
+		gtsfms3.o \
+		helasc.o \
+		hgsmix.o \
+		hoqrvd.o \
+		inodcy.o \
+		inomix.o \
+		inomix3.o \
+		inmass.o \
+		insscn.o \
+		insusy.o \
+		modgam.o \
+		sf2br.o \
+		sfmass.o \
+		sfmmas.o \
+		sfmmix.o \
+		swpelm.o \
+		xcmass.o \
+		xnmass.o
 XCOMM #--
 XCOMM #  Library
 XCOMM #--
