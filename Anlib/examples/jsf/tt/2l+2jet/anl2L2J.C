@@ -74,6 +74,6 @@ int anl2L2J()
 
   jsf->Terminate();				// Terminate analysis.
 
-  file->Write();
+  //file->Write();
   return 0;
 }
