@@ -22,14 +22,7 @@ POTHIG      = POTHIG
 
 /* ROOT Related Libraries */
 
-ROOTLIBS = $(LDDIRFLAG)$(ROOTSYS)/lib -lNew -lBase -lCint -lClib -lCont \
-	-lFunc -lEGPythia -lEG \
-	-lGraf -lGraf3d -lHist -lHtml -lMatrix -lMeta -lMinuit -lNet \
-	-lPhysics -lPostscript -lProof -lTree -lUnix -lZip \
-	-Wl,-u,pytest_ \
-	$(CERNLIBS)
-
-ROOTGLIBS = -lGpad -lGui -lGX11 -lX3d
+ROOTLIBS     += -lEGPythia -lEG -Wl,-u,pytest_ $(CERNLIBS)
 
 #endif
 
