@@ -13,6 +13,7 @@
 //* 	class Lockable
 //* (Update Recored)
 //*    1999/06/05  K.Fujii	Original very primitive version.
+//*    2003/04/21  K.Ikematsu	Don't save fStatus data member.
 //*
 //*************************************************************************
 //
@@ -30,9 +31,9 @@ public:
    virtual void   Lock();
    virtual void   Unlock();
 private:
-   Bool_t fStatus;	 // lock byte
+   Bool_t fStatus;	 //! lock byte
 
-   ClassDef(Lockable,1)  // Base class for lockable objects
+   ClassDef(Lockable,1)  //  Base class for lockable objects
 };
 
 #endif
