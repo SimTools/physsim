@@ -9,6 +9,7 @@
 //*     class TVector
 //*     class JSFLTKCLTrack
 //*     class ANL4DVector
+//*     class JSFSIMDST, etc
 //* (Provides)
 //*     class ANLTrack
 //* (Update Recored)
@@ -20,6 +21,7 @@
 //*                             method to virtual.
 //*    2001/10/21  K.Ikematsu   Added SetColorSingletID method and
 //*                             fColorSingletID member.
+//*    2001/10/22  K.Ikematsu   Added TObjNum class from FlavourGetter class.
 //*
 //* $Id$
 //*************************************************************************
@@ -99,29 +101,10 @@ void ANLTrack::SetColorSingletID() {
   JSFLTKCLTrack *ctp = GetLTKCLTrack();
 
 #ifdef __DEBUG__
-  ////if (fDEBUG) {
-    if ( ctp->GetType() == 1 ) {
-      cerr << "Combined track type : pure gamma" << endl;
-    } else if ( ctp->GetType() == 2 ) {
-      cerr << "Combined track type : gamma in mixed EMC cluster" << endl;
-    } else if ( ctp->GetType() == 3 ) {
-      cerr << "Combined track type : pure nutral hadron" << endl;
-    } else if ( ctp->GetType() == 4 ) {
-      cerr << "Combined track type : hadron in mixed HDC cluster" << endl;
-    } else if ( ctp->GetType() == 5 ) {
-      cerr << "Combined track type : pure charged hadron" << endl;
-    } else if ( ctp->GetType() == 11 ) {
-      cerr << "Combined track type : electron candidate" << endl;
-    } else if ( ctp->GetType() == 13 ) {
-      cerr << "Combined track type : muon candidate" << endl;
-    } else if ( ctp->GetType() == 6 ) {
-      cerr << "Combined track type : unmatched track" << endl;
-    } else {
-      cerr << "illegal track type !!!" << endl;
-    }
-    cerr << "  CDCEntries   = " << ctp->GetCDCEntries() << endl;
-    cerr << "  EMGenEntries = " << ctp->GetEMGenEntries() << endl;
-  ////}
+  cerr << "  Track type : " << ctp->GetType()
+       << " , " << ctp->GetTypeName() << endl
+       << "  CDCEntries   = " << ctp->GetCDCEntries() << endl
+       << "  EMGenEntries = " << ctp->GetEMGenEntries() << endl;
 #endif
 
   // Should be weighted in charged tracks in cheating !!!
@@ -133,9 +116,6 @@ void ANLTrack::SetColorSingletID() {
   // If track charge in mixed CAL cluster = 0,
   // Don't use CDCTrack pointer because of subtracted track-information !!
   if ( ncdctrk > 0 && ctp->GetCharge() != 0 ) {
-#ifdef __DEBUG__
-    cerr << "# of charged tracks = " << ncdctrk << endl;
-#endif
     Double_t egen = 0.;
     for ( Int_t i = 0; i < ncdctrk; i++ ) {
       if ( GetEGeneratorParticle(kECDC, ctp, i) > egen ) {
@@ -147,17 +127,11 @@ void ANLTrack::SetColorSingletID() {
     TIter nextid(&fMSNPriHad);
     TObjNum *idp;
     while ((idp = (TObjNum *)nextid())) {
-#ifdef __DEBUG__
-      cerr << "ANLTrack::SetColorSingletID() : id = " << idp->GetNum() << endl;
-#endif
       fColorSingletID = idp->GetNum();
     }
     // If ncdctrk > 0 && nemgen > 0 such as electron candidate,
     // should not scan generator particles in EMC cluster.
   } else if ( nemgen > 0 ) {
-#ifdef __DEBUG__
-    cerr << "# of neutral tracks in EMC = " << nemgen << endl;
-#endif
     Double_t egen = 0.;
     for ( Int_t i = 0; i < nemgen; i++ ) {
       if ( GetEGeneratorParticle(kEEMC, ctp, i) > egen ) {
@@ -169,9 +143,6 @@ void ANLTrack::SetColorSingletID() {
     TIter nextid(&fMSNPriHad);
     TObjNum *idp;
     while ((idp = (TObjNum *)nextid())) {
-#ifdef __DEBUG__
-      cerr << "ANLTrack::SetColorSingletID() : id = " << idp->GetNum() << endl;
-#endif
       fColorSingletID = idp->GetNum();
     }
   }
@@ -207,16 +178,16 @@ void ANLTrack::ScanThroughDecayChain(EFlavourGetterDetectorID id,
     ////gdln = g->GetDecayLength();
 
 #ifdef __DEBUG__
-    ////if (fDEBUG) cerr << "(PID, S.N, M.S.N, DLength) = ("
-    ////                 << gpid << ","
-    ////                 << gsn  << ","
-    ////                 << gmsn << ","
-    ////                 << gdln << ")" << endl;
+    ////    cerr << "(PID, S.N, M.S.N, DLength) = ("
+    ////	 << gpid << ","
+    ////	 << gsn  << ","
+    ////	 << gmsn << ","
+    ////	 << gdln << ")" << endl;
 #endif
 
     ////if ( gdln > 0 ) {
 #ifdef __DEBUG__
-    ////  if (fDEBUG) cerr << "This generator particle has a finite decay length." << endl;
+    ////    cerr << "This generator particle has a finite decay length." << endl;
 #endif
     ////  gpidoffvt = gpid;
     ////  gsnoffvt  = gsn;
@@ -224,12 +195,11 @@ void ANLTrack::ScanThroughDecayChain(EFlavourGetterDetectorID id,
   }
 #ifdef __DEBUG__
   /*
-  if (fDEBUG) cerr << "-- Search ended --" << endl;
+  cerr << "-- Search ended --" << endl;
   if (TMath::Abs(gpidoffvt) == 310  || TMath::Abs(gpidoffvt) == 3122 ||
       TMath::Abs(gpidoffvt) == 3112 || TMath::Abs(gpidoffvt) == 3222 ||
       TMath::Abs(gpidoffvt) == 3322 || TMath::Abs(gpidoffvt) == 3334)
-    if (fDEBUG) cerr << "This off-vertex generator particle is weak decaying had
-ron." << endl;
+    cerr << "This off-vertex generator particle is weak decaying hadron." << endl;
   */
 #endif
   /*
