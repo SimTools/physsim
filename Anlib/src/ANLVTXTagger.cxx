@@ -13,10 +13,13 @@
 //*     class ANLVTXTagger
 //* (Update Recored)
 //*    1999/10/09  K.Fujii      Original version.
-//*    1999/10/18  K.Ikematsu   Impliment Ks, Lambda, Sigma removal.
+//*    1999/10/18  K.Ikematsu   Implement Ks, Lambda, Sigma removal.
 //*    2000/03/18  K.Ikematsu   Added SetNsig and SetNoff method.
 //*    2000/03/18  K.Ikematsu   Added GetNsig and GetNoff method.
 //*    2001/07/13  K.Ikematsu   Added public Getb method.
+//*    2001/07/31  K.Ikematsu   Removed CDCTrack pointer
+//*                             from neutral track in mixed CAL cluster.
+//*                             (This causes double count of helix tracks)
 //*
 //* $Id$
 //*************************************************************************
@@ -67,9 +70,16 @@ Bool_t   ANLVTXTagger::operator()(const ANLJet &jet){
 
 //_____________________________________________________________________
 Double_t ANLVTXTagger::Getb(const ANLTrack &t){
-  JSFCDCTrack *cdctp = t.GetLTKCLTrack()->GetCDC();
-  if (!cdctp) {
-    return -9999.;
+
+  JSFLTKCLTrack *ct  = t.GetLTKCLTrack();
+  JSFCDCTrack *cdctp = ct->GetCDC();
+
+  if ( !cdctp ) {
+    return -9999;
+    // Protection for double count of CDCTrack pointer
+    // from neutral track in mixed CAL cluster.
+  } else if ( (ct->GetType()==2||ct->GetType()==4) && ct->GetCharge() == 0 ) {
+    return -9999;
   } else {
 
     Int_t gsn  = t.GetLTKCLTrack()->GetCDC()->GetGenID();
@@ -108,9 +118,16 @@ Double_t ANLVTXTagger::Getb(const ANLTrack &t){
 
 //_____________________________________________________________________
 Double_t ANLVTXTagger::Getbnorm(const ANLTrack &t){
-  JSFCDCTrack *cdctp = t.GetLTKCLTrack()->GetCDC();
-  if (!cdctp) {
-    return -9999.;
+
+  JSFLTKCLTrack *ct  = t.GetLTKCLTrack();
+  JSFCDCTrack *cdctp = ct->GetCDC();
+
+  if ( !cdctp ) {
+    return -9999;
+    // Protection for double count of CDCTrack pointer
+    // from neutral track in mixed CAL cluster.
+  } else if ( (ct->GetType()==2||ct->GetType()==4) && ct->GetCharge() == 0 ) {
+    return -9999;
   } else {
 
     Int_t gsn  = t.GetLTKCLTrack()->GetCDC()->GetGenID();

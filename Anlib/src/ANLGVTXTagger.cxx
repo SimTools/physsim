@@ -14,6 +14,9 @@
 //* (Update Recored)
 //*    2001/07/07  K.Ikematsu    Original version
 //*    2001/07/13  K.Ikematsu    Added public Getb method
+//*    2001/07/31  K.Ikematsu    Removed CDCTrack pointer
+//*                              from neutral track in mixed CAL cluster
+//*                              (This causes double count of helix tracks)
 //*
 //* $Id$
 //*************************************************************************
@@ -76,9 +79,24 @@ Bool_t   ANLGVTXTagger::operator()(const ANLJet &jet){
 
 //_____________________________________________________________________
 Double_t ANLGVTXTagger::Getb(const ANLTrack &t){
-  JSFCDCTrack *cdctp = t.GetLTKCLTrack()->GetCDC();
-  if (!cdctp) {
-    return -9999.;
+
+  JSFLTKCLTrack *ct  = t.GetLTKCLTrack();
+  JSFCDCTrack *cdctp = ct->GetCDC();
+
+  if (fDEBUG) {
+    cerr << "----------" << endl;
+    if ( ct->GetType() == 2 || ct->GetType() == 4 )
+      cerr << "Combined track in mixed CAL cluster : Charge = "
+	   << ct->GetCharge() << endl;
+  }
+
+  if ( !cdctp ) {
+    return -9999;
+#if 1 // Protection for double count of CDCTrack pointer
+      // from neutral track in mixed CAL cluster.
+  } else if ( (ct->GetType()==2||ct->GetType()==4) && ct->GetCharge() == 0 ) {
+    return -9999;
+#endif
   } else {
 
     Int_t gsn  = t.GetLTKCLTrack()->GetCDC()->GetGenID();
@@ -88,8 +106,7 @@ Double_t ANLGVTXTagger::Getb(const ANLTrack &t){
     //                                                                  ^^^^^
     Int_t gmsn = g->GetMother();
 
-    if (fDEBUG) cerr << "----------" << endl
-                     << "S.N. = " << gsn << "  PID = " << g->GetID()
+    if (fDEBUG) cerr << "S.N. = " << gsn << "  PID = " << g->GetID()
                      << " Mother S.N.  = " << gmsn << endl;
 
     // If this generator particle comes from SpringParton directly,
@@ -153,6 +170,7 @@ Double_t ANLGVTXTagger::Getb(const ANLTrack &t){
 
 //_____________________________________________________________________
 Double_t ANLGVTXTagger::Getbnorm(const ANLTrack &t){
+
   JSFCDCTrack *cdctp = t.GetLTKCLTrack()->GetCDC();
   if (!cdctp) {
     return -9999.;

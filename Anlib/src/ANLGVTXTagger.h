@@ -16,6 +16,9 @@
 //* (Update Recored)
 //*    2001/07/07  K.Ikematsu    Original version
 //*    2001/07/13  K.Ikematsu    Added public Getb method
+//*    2001/07/31  K.Ikematsu    Removed CDCTrack pointer
+//*                              from neutral track in mixed CAL cluster
+//*                              (This causes double count of helix tracks)
 //*
 //* $Id$
 //*************************************************************************

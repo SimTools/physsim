@@ -15,10 +15,13 @@
 //*     class ANLVTXTagger
 //* (Update Recored)
 //*    1999/10/09  K.Fujii      Original version.
-//*    1999/10/18  K.Ikematsu   Impliment Ks, Lambda, Sigma removal.
+//*    1999/10/18  K.Ikematsu   Implement Ks, Lambda, Sigma removal.
 //*    2000/03/18  K.Ikematsu   Added SetNsig and SetNoff method.
 //*    2000/03/18  K.Ikematsu   Added GetNsig and GetNoff method.
 //*    2001/07/13  K.Ikematsu   Added public Getb method.
+//*    2001/07/31  K.Ikematsu   Removed CDCTrack pointer
+//*                             from neutral track in mixed CAL cluster.
+//*                             (This causes double count of helix tracks)
 //*
 //* $Id$
 //*************************************************************************
