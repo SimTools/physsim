@@ -71,7 +71,7 @@ public:
    	((ANL4DVector *)fP[0])->Unlock();
    	((ANL4DVector *)fP[1])->Unlock();
    }
-   Bool_t IsLocked()
+   Bool_t IsLocked() const
    {
    	return ((ANL4DVector *)fP[0])->IsLocked() ||
    	       ((ANL4DVector *)fP[1])->IsLocked() ||
