@@ -73,4 +73,4 @@ distclean:: clean
 $(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
 	@echo "Generating dictionary ..."
 	rootcint -f $(DICTNAME).$(SrcSuf) \
- 		-c -I$(JSFROOT)/include $(HDRS) LinkDef.h
+ 		-c -I$(JSFROOT)/include $(RCINTDEFINES) $(HDRS) LinkDef.h
