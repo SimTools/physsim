@@ -55,7 +55,7 @@ ANALLIB       = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
 	CERNLIBS = $(LDDIRFLAG)$(CERN_ROOT)/lib -ljetset74 -lpacklib
 
 # if defined(MacOSXArchitecture) || defined(DarwinArchitecture)
-	SOFLAGS += -install_name $(SONAME)
+	/* SOFLAGS += -install_name $(SONAME) */
 
 #  ifdef InstallSharedLibrary
 #  undef InstallSharedLibrary
