@@ -39,10 +39,10 @@ OBJS	      = mhbeth.o \
 #--
 #ifdef HPArchitecture
 	LDDIRFLAG = -Wl,-L
-	EXTRALIBS = $(CERNLIBS) -lU77 -lm
+	EXTRALIBS = $(LDDIRFLAG)$(CERN_ROOT)/lib -lmathlib -lpacklib -lU77 -lm
 #else
 	LDDIRFLAG = -L
-	EXTRALIBS = $(CERNLIBS)
+	EXTRALIBS = $(LDDIRFLAG)$(CERN_ROOT)/lib -lmathlib -lpacklib
 #endif
 #--
 #  Libraries to link.
@@ -84,7 +84,7 @@ all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) \
 
 $(PROGRAM1):    $(PROGRAM1).o
 		@echo "Linking $(PROGRAM1) ..."
-		@$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) $(ANLLIB) \
+		$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) $(ANLLIB) \
 		-o $(GODIR)/$(PROGRAM1).exe
 		@echo "done"
 

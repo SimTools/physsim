@@ -39,13 +39,16 @@ C--
 C--
 C170      DATA AMTMN / 169.8D0 / AMTMX / 170.2D0 /
 C170      DATA ALFMN / 0.510D0 / ALFMX / 1.490D0 /
-      DATA AMTMN / 174.6D0 / AMTMX / 175.4D0 /
+C175      DATA AMTMN / 174.6D0 / AMTMX / 175.4D0 /
+C175      DATA ALFMN / 0.300D0 / ALFMX / 1.700D0 /
+      DATA AMTMN / 164.8D0 / AMTMX / 165.2D0 /
       DATA ALFMN / 0.300D0 / ALFMX / 1.700D0 /
       DATA (EXPCND(1,I),I=1,MXxRS) /  -7.D0, -6.D0, -5.D0,
      .                                -4.D0, -3.D0, -2.D0,
      .                                -1.D0,  0.D0,  1.D0,
      .                                 2.D0,  3.D0/
-      DATA (EXPCND(2,I),I=1,MXxRS) / MXxRS*1.000D+3  /
+C     DATA (EXPCND(2,I),I=1,MXxRS) / MXxRS*1.000D+3  /
+      DATA (EXPCND(2,I),I=1,MXxRS) / MXxRS*5.000D+3  /
       DATA (EXPCND(3,I),I=1,MXxRS) / MXxRS*0.260D+0  /
       DATA (EXPCND(4,I),I=1,MXxRS) / MXxRS*0.852D-2  /
 C--
@@ -62,13 +65,20 @@ C  Nominal m_t and lambda.
 C--
 C     AMT   = 150
 C     AMT   = 170
-      AMT   = 175
+C     AMT   = 175
+      AMT   = 165
       ALFS  = 0.12D0
+      AMZ   = 91.1876D0
+C--
+C  MMODE = (0,1) = (onshell,msbar)
+C--
+      MMODE = 1
 C--
 C  Initialize sqrt(s).
 C--
+      AMTP = AMTPOL(MMODE,AMT,ALFS,AMZ)
       DO 1 IRS = 1, MXxRS
-         EXPCND(1,IRS) = EXPCND(1,IRS) + 2*AMT
+         EXPCND(1,IRS) = EXPCND(1,IRS) + 2*AMTP
 1     CONTINUE
 C--
 C  Initialization.
@@ -87,7 +97,7 @@ C--
 C>>>
       PRINT *, ' First create MC data.'
 C>>>
-      CALL GTCHI2(-1,AMT,ALFS,VTB2,AMH,BTH,MXxRS,EXPCND,CHI2)
+      CALL GTCHI2(-1,AMTP,ALFS,VTB2,AMH,BTH,MXxRS,EXPCND,CHI2)
 C>>>
       PRINT *, '    CHI2ST = ', CHI2
 C--
@@ -101,15 +111,16 @@ C>>>
          VTB2 = ALMN + DLM*ILM
          MODE = 0
          DO 10 IAM = 0, NAM
-            AMT = AMN + DAM*IAM
-            CALL GTCHI2(MODE,AMT,ALFS,VTB2,AMH,BTH,MXxRS,EXPCND,CHI2)
+            AMT  = AMN + DAM*IAM
+            AMTP = AMTPOL(MMODE,AMT,ALFS,AMZ)
+            CALL GTCHI2(MODE,AMTP,ALFS,VTB2,AMH,BTH,MXxRS,EXPCND,CHI2)
             RDATA(1,IAM,ILM) = VTB2
             RDATA(2,IAM,ILM) = AMT
             RDATA(3,IAM,ILM) = CHI2
 C>>>
             WRITE(LOU,'(''(  '',3F15.6)')  AMT, VTB2, CHI2
 C>>>
-C           PRINT *, ' AMT, VTB2, CHI2 = ', AMT, VTB2, CHI2
+            PRINT *, ' AMT, VTB2, CHI2 = ', AMT, VTB2, CHI2
 C>>>
             IF ( CHI2.LT.CHI2MN ) THEN
                XMN    = AMT
@@ -167,7 +178,8 @@ C>>>  For MT-ALFS
 C     DATA ISEED   / 31414927 /
 C     DATA ISEED   / 1        /
 C>>>  For MT-VTB2
-      DATA ISEED   / 3        /
+C     DATA ISEED   / 3        /
+      DATA ISEED   / 31415    /
 C>>>  For MH-BTH2
 C     DATA ISEED   / 31414927 /
 C>>>
@@ -194,6 +206,11 @@ C>>>
          PRINT *, '  AMH  = ', AMH
          PRINT *, '  BTH  = ', BTH
 C>>>
+         ISD = ISEED
+         DO 1 I = 1, ISEED
+            DUMMY = RANN(ISD)
+1        CONTINUE
+
          CHI2 = 0
          DO 10 IRS = 1, NRS
             RS    = EXPCND(1,IRS)
@@ -223,6 +240,7 @@ C>>>
 C--
 C  Read in cross section data.
 C--
+         OPEN(UNIT=LIU,FILE='tabv',STATUS='OLD')
          PRINT *, 'Reading cross section data'
          DO 2000 IAL = 0, MXxAL
             DO 200 IAM = 0, MXxAM
@@ -278,3 +296,4 @@ C  That's it.
 C--
       RETURN
       END
+

@@ -268,7 +268,7 @@ void UserAnalysis()
   // Cut on m_ll.
 
   hMll->Fill(fMll);
-  if ( (( kMassW - xMll ) < fMll) && (fMll < ( kMassW + xMll )) ) return;
+  if ( (( kMassZ - xMll ) < fMll) && (fMll < ( kMassZ + xMll )) ) return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"M_ll > %g",xMll);

@@ -32,8 +32,8 @@ C--
 C  m_t range.
 C--
       NAM    = 80
-      AMMN   = AMT - 1
-      AMMX   = AMT + 1
+      AMMN   = AMT - 0.5
+      AMMX   = AMT + 0.5
       DAM    = (AMMX-AMMN)/NAM
 C--
 C  Energy range.

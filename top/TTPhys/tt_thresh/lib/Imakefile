@@ -20,7 +20,8 @@ LIBNAME3 = $(POTHIG)
 #--
 #  Routines to compile.
 #--
-OBJS1	    = 	F1.o \
+OBJS1	    = 	AMTPOL.o \
+                F1.o \
 		F2.o \
 		F3.o \
 		FH.o \

@@ -1,0 +1,4 @@
+      COMMON /SSMIX/ PHIL,PHIR,ER,ON, ETA
+      REAL   *4  PHIL, PHIR, ER
+      REAL   *4  ON(4,4)
+      COMPLEX*8  ETA(4)
