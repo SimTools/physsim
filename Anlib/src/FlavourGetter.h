@@ -22,6 +22,7 @@
 //*    2001/07/31  K.Ikematsu   Supported to search generator particles
 //*                             contributing to the EM cluster (gamma)
 //*    2001/08/02  K.Ikematsu   Added fPIDOffVT and fSNOffVT members
+//*    2001/10/23  K.Ikematsu   Moved TObjNum class to ANLTrack class
 //*
 //* $Id$
 //*************************************************************************
@@ -31,10 +32,10 @@
 #include "JSFModule.h"
 #include "JSFSIMDST.h"
 #include "JSFGeneratorParticle.h"
-#include "JSFCDCTrack.h"
 #include "JSFSpring.h"
-#include "Anlib.h"
-typedef enum EFlavourGetterDetectorID {kECDC,kEEMC};
+#include "ANLTrack.h"
+#include "ANLJetFinder.h"
+////typedef enum FlavourGetter::EFlavourGetterDetectorID {kECDC,kEEMC};
 //_____________________________________________________________________
 //  -------------------
 //  FlavourGetter Class
@@ -113,37 +114,6 @@ private:
   TClonesArray     *fSpgen;       //! Pointer to SpringParton
 
   ClassDef(TTL4JFlavourGetter, 2) //  TTL4JFlavourGetter class
-};
-
-//_____________________________________________________________________
-//  -------------
-//  TObjNum Class
-//  -------------
-//
-// TObjNum is a simple container for an integer.
-class TObjNum : public TObject {
-private:
-  int  num;
-
-public:
-  TObjNum(int i = 0) : num(i) { }
-  ~TObjNum() {
-#ifdef __DEBUG__
-    cerr << "~TObjNum = " << num << endl;
-#endif
-  }
-  void    SetNum(int i) { num = i; }
-  int     GetNum() { return num; }
-  void    Print(Option_t *) const { Printf("TObjNum = %d", num); }
-  ULong_t Hash() const { return num; }
-  Bool_t  IsEqual(const TObject *obj) const { return num == ((TObjNum*)obj)->num; }
-  Bool_t  IsSortable() const { return kTRUE; }
-  Int_t   Compare(const TObject *obj) const { if (num > ((TObjNum*)obj)->num)
-    return 1;
-  else if (num < ((TObjNum*)obj)->num)
-    return -1;
-  else
-    return 0; }
 };
 
 #endif

@@ -180,6 +180,23 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
   }
 #endif
 
+  // Should be weighted in charged tracks in cheating !!!
+  // because 4-momentum is decided by charged track if there is.
+
+  Int_t ncdctrk = ctp->GetCDCEntries();
+  // If track charge in mixed CAL cluster = 0,
+  // Don't use CDCTrack pointer because of subtracted track-information !!
+  if ( ncdctrk > 0 && ctp->GetCharge() != 0 ) {
+#ifdef __DEBUG__
+    if (fDEBUG) cerr << "# of charged tracks = " << ncdctrk << endl;
+#endif
+    for (Int_t i = 0; i < ncdctrk; i++ ) {
+      ScanThroughDecayChain(kECDC, ctp, i);
+    }
+    return; // If ncdctrk > 0 && nemgen > 0 such as electron candidate,
+            // should not scan generator particles in EMC cluster.
+  }
+
   Int_t nemgen = ctp->GetEMGenEntries();
   if ( nemgen > 0 ) {
 #ifdef __DEBUG__
@@ -188,28 +205,7 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
     for (Int_t i = 0; i < nemgen; i++ ) {
       ScanThroughDecayChain(kEEMC, ctp, i);
     }
-  }
-
-  Int_t ncdctrk = ctp->GetCDCEntries();
-  if ( ncdctrk > 0 ) {
-#ifdef __DEBUG__
-    if (fDEBUG) cerr << "# of charged tracks = " << ncdctrk << endl;
-#endif
-    if ( (ctp->GetType()==2||ctp->GetType()==4) && ctp->GetCharge() == 0 ) {
-#ifdef __DEBUG__
-      if (fDEBUG) cerr << "Charge of this track in mixed CAL cluster = "
-		       << ctp->GetCharge() << endl
-		       << "Don't use these CDCTrack pointer !" << endl;
-#endif
-      return;
-    }
-#if 0
-    for (Int_t i = 0; i < ncdctrk; i++ ) {
-#else // temporary treatment
-    for (Int_t i = 0; i < 1; i++ ) {
-#endif
-      ScanThroughDecayChain(kECDC, ctp, i);
-    }
+    return;
   }
 }
 
