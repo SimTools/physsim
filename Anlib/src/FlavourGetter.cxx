@@ -4,17 +4,20 @@
 //* =====================
 //*
 //* (Description)
-//*    A very primitive flavour of jets getting class.
+//*    A flavour of jets getting class
 //* (Requires)
 //*     class ANLJetFinder
 //*     class ANLTrack
-//*     class JSFSIMDST, etc.
+//*     class JSFSIMDST, etc
 //* (Provides)
 //*     class FlavourGetter
 //* (Update Recored)
-//*    2000/02/13  K.Ikematsu   Original version.
-//*    2000/04/28  K.Ikemtasu   Modified GetPrimaryHadronPID method.
+//*    2000/02/13  K.Ikematsu   Original version
+//*    2000/04/28  K.Ikemtasu   Modified GetPrimaryHadronPID method
+//*    2001/07/20  K.Ikemtasu   Added GetPrimaryHadronSN method
+//*    2001/07/20  K.Ikemtasu   Added GetPartonID method
 //*
+//* $Id$
 //*************************************************************************
 //
 #include "FlavourGetter.h"
@@ -59,17 +62,47 @@ Int_t   FlavourGetter::operator()(const ANLJet &jet){
 
 //_____________________________________________________________________
 Int_t FlavourGetter::GetPrimaryHadronPID(const ANLTrack &t){
+  SearchPrimaryHadron(t);
+  return fGpid;
+}
+
+Int_t FlavourGetter::GetPrimaryHadronSN(const ANLTrack &t){
+  SearchPrimaryHadron(t);
+  return fGsn;
+}
+
+Int_t FlavourGetter::GetPartonID(const ANLTrack &t){
+  SearchPrimaryHadron(t);
+  return fGmsn;
+}
+
+//_____________________________________________________________________
+void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t){
 
   JSFCDCTrack *cdctp = t.GetLTKCLTrack()->GetCDC();
-  if (!cdctp) return 0;
-
-  Int_t gsn  = t.GetLTKCLTrack()->GetCDC()->GetGenID();
-  Int_t gpid = 0;
-  while ( gsn > 0 ) {
-    JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(gsn-1);
-    gpid = g->GetID();
-    Int_t gmsn = g->GetMother();
-    gsn = gmsn;
+  if (!cdctp) {
+    //cerr << "No pointer to JSFCDCTrack !" << endl;
+    fGsn  = 0;
+    fGpid = 0;
+    fGmsn = 0;
+    return;
   }
-  return gpid;
+
+  fGsn = 0;
+  fGsn = t.GetLTKCLTrack()->GetCDC()->GetGenID();
+  fGpid = 0;
+  while ( fGsn > 0 ) {
+    JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(fGsn-1);
+    fGpid = g->GetID();
+    fGmsn = g->GetMother();
+
+    /*
+    cerr << "(PID, S.N, M.S.N) = ("
+         << fGpid << ","
+         << fGsn  << ","
+         << fGmsn << ")" << endl;
+    */
+    fGsn = fGmsn;
+  }
+  //cerr << "-- Search ended --" << endl;
 }

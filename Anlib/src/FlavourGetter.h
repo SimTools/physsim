@@ -6,17 +6,20 @@
 //* =====================
 //*
 //* (Description)
-//*    A very primitive flavour of jets getting class.
+//*    A flavour of jets getting class
 //* (Requires)
 //*     class ANLJetFinder
 //*     class ANLTrack
-//*     class JSFSIMDST, etc.
+//*     class JSFSIMDST, etc
 //* (Provides)
 //*     class FlavourGetter
 //* (Update Recored)
-//*    2000/02/13  K.Ikematsu   Original version.
-//*    2000/04/28  K.Ikemtasu   Modified GetPrimaryHadronPID method.
+//*    2000/02/13  K.Ikematsu   Original version
+//*    2000/04/28  K.Ikemtasu   Modified GetPrimaryHadronPID method
+//*    2001/07/20  K.Ikemtasu   Added GetPrimaryHadronSN method
+//*    2001/07/20  K.Ikemtasu   Added GetPartonID method
 //*
+//* $Id$
 //*************************************************************************
 //
 #include "JSFSteer.h"
@@ -36,14 +39,25 @@ public:
     JSFSIMDST     *sds     = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
     JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
     fGen   = evt->GetGeneratorParticles();
+    fGpid = 0; fGsn = 0; fGmsn = 0;
   }                                                // default constructor
 
   virtual ~FlavourGetter() {}                      // default destructor
   Int_t operator()(const ANLJet &jet);
+
+  //private:
   Int_t GetPrimaryHadronPID(const ANLTrack &t);
+  Int_t GetPrimaryHadronSN(const ANLTrack &t);
+  Int_t GetPartonID(const ANLTrack &t);
 
 private:
-  TClonesArray     *fGen;         //! Pointer to GeneratorParticle
+  void SearchPrimaryHadron(const ANLTrack &t);
+
+private:
+  TClonesArray     *fGen;         //! Pointer to GeneratorParticles Array
+  Int_t             fGpid;        //  PID of GeneratorParticle
+  Int_t             fGsn;         //  S.N of GeneratorParticle
+  Int_t             fGmsn;        //  Mother S.N of GeneratorParticle
 
   ClassDef(FlavourGetter, 1)      //  FlavourGetter Example
 };
