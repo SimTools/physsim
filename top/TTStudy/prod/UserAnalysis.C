@@ -289,15 +289,14 @@ void UserAnalysis()
   Double_t cosjmax = 0.;
   Int_t nj = 0;
   while ((jetp = (ANLJet *)nextjet())) {
-    ANLJet &jet = *jetp;
     if (gDEBUG) {
        cerr << "Jet " << ++nj << " : ";
-       jet.DebugPrint();
+       jetp->DebugPrint();
     }
-    Double_t ejet = jet().E();
+    Double_t ejet = jetp->E();
     if (ejet < ejetmin) ejetmin = ejet;
     hEjet->Fill(ejet);			// Ejet
-    Double_t cosj = jet.CosTheta();
+    Double_t cosj = jetp->CosTheta();
     if (TMath::Abs(cosj) > TMath::Abs(cosjmax)) cosjmax = cosj;
     hCosjet->Fill(cosj);		// cos(theta_jet)
   }
@@ -337,42 +336,35 @@ void UserAnalysis()
   ANLPair *w1p, *w2p, *bbp;
   while ((w1p = (ANLPair *)w1candidates())) {
     ANLPairCombiner *w2candidp = 0;
-    ANLPair &w1 = *w1p;
-    Double_t w1mass = w1().GetMass();
+    Double_t w1mass = w1p->GetMass();
     if (TMath::Abs(w1mass - kMassW) > xM2j) continue;	// w1 candidate found
-    w1.LockChildren();					// now lock w1 daughters
+    w1p->LockChildren();				// now lock w1 daughters
     w2candidp = new ANLPairCombiner(w1candidates);	// w2 after w1
-    ANLPairCombiner &w2candidates = *w2candidp;
     if (gDEBUG) {
       cerr << "-- w2candidates:" << endl;
-      w2candidates.DebugPrint();
+      w2candidp->DebugPrint();
     }
-    while ((w2p = (ANLPair *)w2candidates())) {
-    ANLPairCombiner *bbcandidp = 0;
-      ANLPair &w2 = *w2p;
-      if (w2.IsLocked()) continue;			// skip if locked
-      Double_t w2mass = w2().GetMass();
+    while ((w2p = (ANLPair *)(*w2candidp)())) {
+      ANLPairCombiner *bbcandidp = 0;
+      if (w2p->IsLocked()) continue;			// skip if locked
+      Double_t w2mass = w2p->GetMass();
       if (TMath::Abs(w2mass - kMassW) > xM2j) continue;	// w2 candidate found
-      w2.LockChildren();				// now lock w2 daughters
-    bbcandidp = new ANLPairCombiner(w2candidates);	// w2 after w1
-    ANLPairCombiner &bbcandidates = *bbcandidp;
-      bbcandidates.Reset();				// bb can be before w1/2
+      w2p->LockChildren();				// now lock w2 daughters
+      bbcandidp = new ANLPairCombiner(*w2candidp);	// w2 after w1
+      bbcandidp->Reset();				// bb can be before w1/2
       if (gDEBUG) {
         cerr << "---- bbcandidates:" << endl;
-        bbcandidates.DebugPrint();
+        bbcandidp->DebugPrint();
       }
-      while ((bbp = (ANLPair *)bbcandidates())) {
-        ANLPair &bb = *bbp;
-        if (bb.IsLocked()) continue;			// skip if locked
+      while ((bbp = (ANLPair *)(*bbcandidp)())) {
+        if (bbp->IsLocked()) continue;			// skip if locked
         for (Int_t i = 0; i < 2; i++) {
-          ANL4DVector *b1p = (ANL4DVector *)bb[i];	// b for w1
-          ANL4DVector *b2p = (ANL4DVector *)bb[1-i];	// b for w2
+          ANL4DVector *b1p = (ANL4DVector *)(*bbp)[i];	// b for w1
+          ANL4DVector *b2p = (ANL4DVector *)(*bbp)[1-i];// b for w2
           ANLPair *bw1p = new ANLPair(b1p,w1p);
           ANLPair *bw2p = new ANLPair(b2p,w2p);
-          ANLPair &bw1  = *bw1p;
-          ANLPair &bw2  = *bw2p;
-          Double_t t1mass = bw1().GetMass();
-          Double_t t2mass = bw2().GetMass();
+          Double_t t1mass = bw1p->GetMass();
+          Double_t t2mass = bw2p->GetMass();
           if (TMath::Abs(t1mass - kMasst) > xM3j ||
               TMath::Abs(t2mass - kMasst) > xM3j ) {
             delete bw1p;
@@ -386,33 +378,33 @@ void UserAnalysis()
           ANLPair *solp = new ANLPair(bw1p,bw2p,chi2);
           solutions.Add(solp);	// save this solution
           if (gDEBUG) { 
-            Double_t cosbw1 = b1p->CosTheta(w1());
-            Double_t cosbw2 = b2p->CosTheta(w2());
+            Double_t cosbw1 = b1p->CosTheta(*w1p);
+            Double_t cosbw2 = b2p->CosTheta(*w2p);
             cerr << " Solution ---" << ++nsol << " Chi2 = " << chi2 << endl;
             cerr << " (cosbw1,cosbw2) = (" << cosbw1 << ", " << cosbw2 << ")";
-            cerr << " M_bb = " << bb().GetMass() << endl;
+            cerr << " M_bb = " << bbp->GetMass() << endl;
             cerr << " (M_w1,M_w2) = (" << w1mass << ", " << w2mass << ")";
             cerr << " (M_t1,M_t2) = (" << t1mass << ", " << t2mass << ")" << endl;
             cerr << " b1:"; b1p->DebugPrint();
             cerr << " b2:"; b2p->DebugPrint();
-            cerr << " w1:"; w1().DebugPrint();
-            cerr << " w2:"; w2().DebugPrint();
+            cerr << " w1:"; w1p->DebugPrint();
+            cerr << " w2:"; w2p->DebugPrint();
             // cerr << " b1p = " << ((void *)b1p) << " b2p = " << ((void *)b2p);
             // cerr << " w1p = " << ((void *)w1p) << " w2p = " << ((void *)w2p);
             // cerr << endl;
-        }
+          }
 #if 0
-          hEw1Ew2->Fill(w1().E(),w2().E(),1.0);
+          hEw1Ew2->Fill(w1p->E(),w2p->E(),1.0);
           hMw1Mw2->Fill(w1mass,w2mass,1.0);
           hMt1Mt2->Fill(t1mass,t2mass,1.0);
 #endif
         }
       }
     if (bbcandidp) delete bbcandidp;
-      w2.UnlockChildren();
+      w2p->UnlockChildren();
     }
     if (w2candidp) delete w2candidp;
-    w1.UnlockChildren();
+    w1p->UnlockChildren();
   }
   
   // Cut on No. of solutions.
@@ -431,25 +423,20 @@ void UserAnalysis()
   TIter nextsol(&solutions);			// iterator for solutions
   ANLPair *solp;
   while ((solp = (ANLPair *)nextsol())) {
-    ANLPair &sol = *solp;
-    ANLPair &bbww1 = *((ANLPair *)sol[0]);
-    ANLPair &bbww2 = *((ANLPair *)sol[1]);
-    ANL4DVector &bb1 = *(ANL4DVector *)bbww1[0]; // Dunno why, but had to
-    ANL4DVector &ww1 = *(ANL4DVector *)bbww1[1]; // use new refs instead
-    ANL4DVector &bb2  = *(ANL4DVector *)bbww2[0];// of b1, b2, w1, and w2
-    ANL4DVector &ww2 = *(ANL4DVector *)bbww2[1]; // here in RCINT????
-    Double_t cosbw1 = bb1.CosTheta(ww1);		 // Looks like the refs
-    Double_t cosbw2 = bb2.CosTheta(ww2);		 // are in global scope??
-    hCosbw1Cosbw2->Fill(cosbw1,cosbw2,1.0);
+    ANLPair *bw1p    = (ANLPair *)(*solp)[0];
+    ANLPair *bw2p    = (ANLPair *)(*solp)[1];
+    ANL4DVector *b1p = (ANL4DVector *)(*bw1p)[0]; // Dunno why, but had to
+    ANLPair *w1p     = (ANLPair *)(*bw1p)[1]; 	  // stick to using pointers
+    ANL4DVector *b2p = (ANL4DVector *)(*bw2p)[0]; // of b1, b2, w1, and w2
+    ANLPair *w2p     = (ANLPair *)(*bw2p)[1]; 	  // here in RCINT????
+    Double_t cosbw1 = b1p->CosTheta(*w1p);	  // Looks like the heap
+    Double_t cosbw2 = b2p->CosTheta(*w2p);	  // objects are deletec
+    hCosbw1Cosbw2->Fill(cosbw1,cosbw2,1.0);	  // when refs are deleted???
     if (cosbw1 > xCosbw || cosbw2 > xCosbw) {
       solutions.Remove(solp);			// discard this solution
       delete solp;
     }
     if (gDEBUG) {
-            ANL4DVector *b1p = (ANL4DVector *)bbww1[0];
-            ANLPair         *w1p = (ANLPair *)bbww1[1];
-            ANL4DVector *b2p = (ANL4DVector *)bbww2[0];
-            ANLPair         *w2p = (ANLPair *)bbww2[1];
             cerr << " Solution ---" << ++nsol << endl;
             cerr << " b1p = " << ((void *)b1p) << " b2p = " << ((void *)b2p);
             cerr << " w1p = " << ((void *)w1p) << " w2p = " << ((void *)w2p);
@@ -507,19 +494,18 @@ void UserAnalysis()
   Int_t nsols = 0;
   while ((solp = (ANLPair *)nextsol())) {
     if ( nsols++ ) break;				// choose the best
-    ANLPair &sol = *solp;
-    ANLPair &bbbwww1 = *((ANLPair *)sol[0]);
-    ANLPair &bbbwww2 = *((ANLPair *)sol[1]);
-    ANL4DVector &www1 = *(ANL4DVector *)bbbwww1[1];
-    ANL4DVector &www2 = *(ANL4DVector *)bbbwww2[1];
-    Double_t chi2   = sol.GetQuality();
-    Double_t w1mass = www1.GetMass();
-    Double_t w2mass = www2.GetMass();
-    Double_t t1mass = bbbwww1().GetMass();
-    Double_t t2mass = bbbwww2().GetMass();
+    ANLPair *bw1p   = (ANLPair *)(*solp)[0];
+    ANLPair *bw2p   = (ANLPair *)(*solp)[1];
+    ANLPair *w1p    = (ANLPair *)(*bw1p)[1];
+    ANLPair *w2p    = (ANLPair *)(*bw2p)[1];
+    Double_t chi2   = solp->GetQuality();
+    Double_t w1mass = w1p->GetMass();
+    Double_t w2mass = w2p->GetMass();
+    Double_t t1mass = bw1p->GetMass();
+    Double_t t2mass = bw2p->GetMass();
           hChi2->Fill(chi2);
 #if 1
-          hEw1Ew2->Fill(www1.E(),www2.E(),1.0);
+          hEw1Ew2->Fill(w1p->E(),w2p->E(),1.0);
           hMw1Mw2->Fill(w1mass,w2mass,1.0);
           hMt1Mt2->Fill(t1mass,t2mass,1.0);
 #endif
