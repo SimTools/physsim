@@ -198,9 +198,9 @@ void ZZBases::PrintParameters()
   printf("       = 1 ; None\n");
   printf("       = 2 ; ISR only\n");
   printf("       = 3 ; ISR + BM\n");
-  printf("  W- Decey Mode Lo =%d\n",fZ1ModesLo);
+  printf("  Z1 Decey Mode Lo =%d\n",fZ1ModesLo);
   printf("                Hi =%d\n",fZ1ModesHi);
-  printf("  W+ Decey Mode Lo =%d\n",fZ2ModesLo);
+  printf("  Z2 Decey Mode Lo =%d\n",fZ2ModesLo);
   printf("                Hi =%d\n",fZ2ModesHi);
 
   printf("  Bases integration parameters..\n");
