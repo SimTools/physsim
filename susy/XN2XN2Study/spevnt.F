@@ -248,7 +248,7 @@ C--
          RBUF(14) =   2
          RBUF(17) =   IHLCMB(IPT)
          RBUF(18) =   5
-         RBUF(19) =   (LQ-1)*101
+         RBUF(19) =   (LQ-1)*201
          CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
          IF ( NEVENT.LE.NPRINT ) THEN
             CALL SLPRNT(NEVENT,NPT,RBUF(1))

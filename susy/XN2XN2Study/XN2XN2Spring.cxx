@@ -194,6 +194,10 @@ XN2XN2Bases::XN2XN2Bases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("XN2XN2Bases.Roots","500."),"%lg",&fRoots);
   sscanf(gJSF->Env()->GetValue("XN2XN2Bases.PolElectron","0."),"%lg",&fPolElectron);
   sscanf(gJSF->Env()->GetValue("XN2XN2Bases.SigmaEbeam","0.005"),"%lg",&fSigmaEbeam);
+  sscanf(gJSF->Env()->GetValue("XN2XN2Bases.Z1ModesLo","1"),"%d",&fZ1ModesLo);
+  sscanf(gJSF->Env()->GetValue("XN2XN2Bases.Z1ModesHi","12"),"%d",&fZ1ModesHi);
+  sscanf(gJSF->Env()->GetValue("XN2XN2Bases.Z2ModesLo","1"),"%d",&fZ2ModesLo);
+  sscanf(gJSF->Env()->GetValue("XN2XN2Bases.Z2ModesHi","12"),"%d",&fZ2ModesHi);
   sscanf(gJSF->Env()->GetValue("XN2XN2Bases.Alphai","128."),"%lg",&fAlphai);
   sscanf(gJSF->Env()->GetValue("XN2XN2Bases.Alphas","0.120"),"%lg",&fAlphas);
   sscanf(gJSF->Env()->GetValue("XN2XN2Bases.MassW","80.0"),"%lg",&fMassW);
@@ -228,6 +232,10 @@ void XN2XN2Bases::PrintParameters()
   printf("       = 2 ; ISR only\n");
   printf("       = 3 ; ISR + BM\n");
   printf("  XN_2 width = %g\n",fWidthChin2);
+  printf("  Z1 Decey Mode Lo =%d\n",fZ1ModesLo);
+  printf("                Hi =%d\n",fZ1ModesHi);
+  printf("  Z2 Decey Mode Lo =%d\n",fZ2ModesLo);
+  printf("                Hi =%d\n",fZ2ModesHi);
 
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
@@ -283,6 +291,10 @@ void XN2XN2Bases::Userin()
   usrprm_.polebm = fPolElectron;
   usrprm_.sgmebm = fSigmaEbeam;
   usrprm_.isrb   = fISRBM;
+  usrprm_.imd1lo = fZ1ModesLo;
+  usrprm_.imd1hi = fZ1ModesHi;
+  usrprm_.imd2lo = fZ2ModesLo;
+  usrprm_.imd2hi = fZ2ModesHi;
   usrprm_.gamsz2 = fWidthChin2;
 
   // Copy class data member into common /bshufl/

@@ -211,8 +211,7 @@ C--
 C  Then select final states.
 C--
 C-- 1st Z from 1st X0.
-      IMD1MN = 4
-      IMD1MX = 6
+C
       XZ1 = BRVDK(IMD1MN-1,2) + (BRVDK(IMD1MX,2)-BRVDK(IMD1MN-1,2))*Z(4)
       DO 200 IMD = IMD1MN, IMD1MX
          IF ( XZ1.LT.BRVDK(IMD,2) )              GO TO 210
@@ -234,8 +233,6 @@ C--
       IMD1 = IMD
       WAT  = WAT*(BRVDK(IMD1MX,2)-BRVDK(IMD1MN-1,2))/BRZ1
 C-- 2nd Z from 2nd X0.
-      IMD2MN = 4
-      IMD2MX = 6
       XZ2  = (XZ1-BRVDK(IMD-1,2))/BRZ1
       XZ2 = BRVDK(IMD2MN-1,2) + (BRVDK(IMD2MX,2)-BRVDK(IMD2MN-1,2))*XZ2
       DO 300 IMD = IMD2MN, IMD2MX
