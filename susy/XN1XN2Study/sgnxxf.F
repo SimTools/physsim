@@ -60,7 +60,7 @@ C--
       IF ( NCALL.EQ.0 ) THEN
          NCALL  = 1
          SPIN   = 2
-         FACT   = xGV2PB/(x4PI**3)/SPIN
+         FACT   = xGV2FB/(x4PI**3)/SPIN
          AME    = AMF(1,2,1)
          CALL UVZERO(2*9,EC)
          EC(1,1) = 1
