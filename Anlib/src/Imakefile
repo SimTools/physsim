@@ -3,7 +3,9 @@
  * ## (Description)
  * ##    Imake file for Anlib: C++ analysis library
  * ## (Update Record)
- * ##    99/05/22  K.Fujii   Original version.
+ * ##    99/05/22  K.Fujii     Original version.
+ * ##    01/08/01  K.Ikematsu  Fixed dependency check for
+ * ##                          generating dictionary.
  * ##
  * ## $Id$
  * ############################################################################
@@ -49,7 +51,7 @@ ALLOBJS 	= $(OBJS) $(DICTNAME).$(ObjSuf)
 
 SRCS		= $(subst .$(ObjSuf),.$(SrcSuf),$(ALLOBJS))
 
-HDRS		= $(LIBNAME).h
+HDRS		= $(subst .$(ObjSuf),.h,$(OBJS))
 
 /* Make Targets */
 
