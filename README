@@ -4,11 +4,12 @@
  
 [1] Version Information
 
-   Version: 2001a
+   Version: 2004a
    Release: 1
 
 [2] Version History
 
+    2004/11/23  K.Fujii		2004a-1
     2001/05/25  K.Fujii		2001a-1
     2000/08/29  K.Fujii		2000a-5
     2000/08/24  K.Fujii		2000a-4
@@ -21,9 +22,23 @@
 
 [3] How to Install the Libraries
 
+   Before you install physsim, you have to install
+	lclib
+        jsf
+        Satellites/src/leda/utils
+        Anlib
+   Since we moved some of the Anlib classes to Satellites/src/leda/utils,
+   now we need Satellites to install physsim.
+   You don't have to build all of Satellites, just go to src/leda/utils
+   and "make install" it.
+   We are planning to remove leda/utils from Satellites in the future
+   in order to fix this problem.  Sorry for the inconvenience.
+
    In order to use this package you should first set some
    environmental variables:
 
+        $ export ANLIBROOT=<the directory where Anlib has been installed>
+        $ export SATELLITESROOT=<the directory where Satellites has been installed>
 	$ cd <the directory containing this file>
 	$ export KFLIBROOT=`pwd`
 	$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$KFLIBROOT/lib
