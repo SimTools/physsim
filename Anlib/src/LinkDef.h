@@ -25,6 +25,9 @@
 #pragma link C++ class ANL2DSpline;
 #pragma link C++ class ANLTaggedJet;
 #pragma link C++ class ANLCheatedJetFinder;
+#pragma link C++ class ANLCheatedJadeJetFinder;
+#pragma link C++ class ANLCheatedJadeEJetFinder;
+#pragma link C++ class ANLCheatedDurhamJetFinder;
 #pragma link C++ class ANLGVTXTagger;
 
 #endif
