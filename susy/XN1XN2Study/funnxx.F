@@ -210,7 +210,7 @@ C--
       IDPTCL(3, 6) = 0
 C-- Z from X0.
       XZ = Z(5)
-      DO 200 IMD = 1, 12
+      DO 200 IMD = IMD2MN, IMD2MX
          IF ( XZ.LT.BRVDK(IMD,2) )              GO TO 210
 200   CONTINUE
 C--

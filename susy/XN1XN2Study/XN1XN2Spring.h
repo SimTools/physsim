@@ -63,6 +63,10 @@ typedef struct {
   Float_t  sgmebm;
   Float_t  gamsz2;
   Int_t    isrb;
+  Int_t    imd1lo;      // 1st Z1 decay mode ID.
+  Int_t    imd1hi;      // lst Z1 decay mode ID.
+  Int_t    imd2lo;      // 1st Z2 decay mode ID.
+  Int_t    imd2hi;      // lst Z2 decay mode ID.
 } COMMON_USRPRM;             //  Common /USRPRM/
 
 extern COMMON_USRPRM usrprm_;
@@ -73,6 +77,10 @@ protected:
   Double_t fPolElectron;	// e- polarization
   Double_t fSigmaEbeam;		// beam energy spread
   Int_t    fISRBM;		// Flag for ISR & Beamstrahlung
+  Int_t    fZ1ModesLo;          // 1st Z1 decay mode ID.
+  Int_t    fZ1ModesHi;          // lst Z1 decay mode ID.
+  Int_t    fZ2ModesLo;          // 1st Z2 decay mode ID.
+  Int_t    fZ2ModesHi;          // lst Z2 decay mode ID.
   Double_t fAlphai;		// 1/alpha(m_Z)
   Double_t fAlphas;		// alpha_s(m_Z)
   Double_t fMassW;		// m_W
@@ -104,6 +112,18 @@ public:
   
   void SetISRBM(Int_t isrbm){ fISRBM=isrbm; }
   Int_t GetISRBM(){ return fISRBM;}
+
+  void SetZ1ModesLo(Int_t i){ fZ1ModesLo=i; }
+  Int_t GetZ1ModesLo(){ return fZ1ModesLo;}
+
+  void SetZ1ModesHi(Int_t i){ fZ1ModesHi=i; }
+  Int_t GetZ1ModesHi(){ return fZ1ModesHi;}
+
+  void SetZ2ModesLo(Int_t i){ fZ2ModesLo=i; }
+  Int_t GetZ2ModesLo(){ return fZ2ModesLo;}
+
+  void SetZ2ModesHi(Int_t i){ fZ2ModesHi=i; }
+  Int_t GetZ2ModesHi(){ return fZ2ModesHi;}
    
   void SetAlphai(Double_t alphai){ fAlphai=alphai; }
   Double_t GetAlphai(){ return fAlphai;}
