@@ -241,6 +241,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet){
     if ( spdn->GetID() == 11 || spdn->GetID() == 13 ||  spdn->GetID() == 15 ) {
       if ( (Double_t)ntrkfromchad/ntrkinjet >= kCHadRatioCut ) {
 	if ( thetaspupj < kThetaCut ) return 2;
+	else if ( thetaspdnbarj < kThetaCut ) return -1;
 	else {
 	  if (fDEBUG) cerr << "Th(charm_j) = " << thetaspupj << endl;
 	  return 0;
@@ -258,6 +259,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet){
     } else {
       if ( (Double_t)ntrkfromchad/ntrkinjet > kCHadRatioCut ) {
 	if ( thetaspupbarj < kThetaCut ) return -2;
+	else if ( thetaspdnj < kThetaCut ) return 1;
 	else {
 	  if (fDEBUG) cerr << "Th(charm_j) = " << thetaspupbarj << endl;
 	  return 0;
