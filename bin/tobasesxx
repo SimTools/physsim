@@ -1,0 +1,377 @@
+#!/usr/bin/perl
+#-------------------------------------------------------------------------------
+# ---------
+# tobasesxx
+# ---------
+# (Function)
+#    Convert a generator based on BASESV5.1 to Bases++.
+# (Usage)
+#    Just type
+#    	./tobasesxx XXStudy
+#    then you get "tmp/" that contains converted source files.
+# (Update Record)
+#   00/06/25	K.Fujii		Original version
+#-------------------------------------------------------------------------------
+#--
+#  Open input directory.
+#--
+$indir = $ARGV[0];
+print "Processing $indir \n";
+opendir(INDIR,$indir);
+
+#--
+#  Prepare output directory.
+#--
+$outdir = "tmp";
+umask(0000);
+mkdir($outdir,0755);
+
+#--
+#  Process files.
+#--
+chdir($indir);
+@flist = readdir(INDIR);
+foreach $i (@flist) {
+   if (-f $i) {
+#--
+#  Imakefile
+#--
+      if ($i =~ /Imakefile/) {
+         imakefile($i);
+#--
+#  XXSpring.h
+#--
+      } elsif ($i =~ /.*Spring\.h/) {
+         xxspring_h($i);
+#--
+#  XXSpring.cxx
+#--
+      } elsif ($i =~ /.*Spring\.cxx/) {
+         xxspring_cxx($i);
+#--
+#  funcxx.F
+#--
+      } elsif ($i =~ /fun.*\.F/) {
+         funcxx_f($i);
+#--
+#  sgxxf.F
+#--
+      } elsif ($i =~ /sg.*\.F/) {
+         sgxxf_f($i);
+#--
+#  usrout.F and spinit.F are now obsolete
+#--
+      } elsif ($i =~ /spinit.*\.F/ || $i =~ /usrout.*\.F/) {
+         system "(cd ../$outdir; cvs remove $i)";
+#--
+#  Others don't need modifications.
+#--
+      } else {
+         print "Copying      $i\n";
+	 system "cp -a $i ../$outdir/.";
+      }
+   } elsif (-d $i) {
+#--
+#  prod directory.
+#--
+      if ($i =~ /prod/) {
+         print "Processing $i\n"; 
+         system "cp -ar $i ../$outdir/.";
+#--
+#  bases.C
+#--
+         bases_c();
+#--
+#  sim.C
+#--
+         sim_c();
+#--
+#  CVS and other directories.
+#--
+      } elsif ($i =~ /^\.$/ || $i =~ /^\.\.$/) {
+      } else {
+         print "Copying    $i\n"; 
+         system "cp -ar $i ../$outdir/.";
+      }
+   }
+}
+
+#--
+#  Close directories.
+#--
+closedir(INDIR);
+#--
+#  That's it, folks!
+#--
+exit 0;
+
+#------------------------------------------------------------------------------
+#  Imakefile Processor
+#------------------------------------------------------------------------------
+sub imakefile {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   open(OUTFILE,">../$outdir/$i");
+   while (<INFILE>) {
+      if (!/spinit\.o/ && !/usrout\.o/ && !/makedepend/) {
+         s/ *-lBASESV5\.1 */ /g;
+         s/userin.o *\\/userin.o/;
+         s/SRC /SRCS/;
+         if (/depend::/) {
+         print OUTFILE <<END_MARK
+depend:: \$(SRCS) \$(HDRS) \$(FSRCS)
+	for i in \$(SRCS) \$(FSRCS); do \\
+	rmkdepend -a -- \$(CXXFLAGS) \$(INCPATH) -- \$\$i; done
+END_MARK
+;
+         } else {
+            print OUTFILE $_;
+         }
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
+
+#------------------------------------------------------------------------------
+#  XXSpring.h Processor
+#------------------------------------------------------------------------------
+sub xxspring_h {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   open(OUTFILE,">../$outdir/$i");
+   while (<INFILE>) {
+      if (/#include "TNamed\.h"/) {
+         print OUTFILE "#include \"JSFConfig.h\"\n\n";
+      } elsif (/Double_t Func\(/) {
+         print OUTFILE "  Double_t Func(); // New style not yet\n";
+      }
+      print OUTFILE $_;
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
+
+#------------------------------------------------------------------------------
+#  XXSpring.cxx Processor
+#------------------------------------------------------------------------------
+sub xxspring_cxx {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   open(OUTFILE,">../$outdir/$i");
+   $bsctor  = 0;
+   $userin  = 0;
+   $userout = 0;
+   while (<INFILE>) {
+      if (/extern "C"/) {
+      print OUTFILE <<END_MARK2
+// Variable conversion.
+
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+#define Dhinit(id,xlo,xhi,nx,ylo,yhi,ny,title) H2Init(id,title,nx,xlo,xhi,ny,ylo,yhi)
+
+END_MARK2
+;
+         print OUTFILE $_;
+      } elsif (/extern void usrout/) {
+      } elsif (/extern void exit/) {
+         print OUTFILE $_;
+         print OUTFILE <<END_MARK3
+JSFBases *bso;			// need to map xhfill to h1fill
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\\0';
+	bso->H1Fill(tmp,*x,*w);
+}
+void dhfill_(char *t, double *x, double *y, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\\0';
+	bso->H2Fill(tmp,*x,*y,*w);
+}
+END_MARK3
+;
+      } elsif (/.*Bases::.*Bases\(/) {
+         $bsctor = 1;
+         print OUTFILE $_;
+      } elsif (/Get parameters from jsf\.conf/ && $bsctor == 1) {
+         print OUTFILE "\n  bso = this;\n\n";
+         print OUTFILE $_;
+      } elsif (/fPrintInfo/) {
+      } elsif (/fPrintHist/) {
+         if ($bsctor == 1) {
+	    print OUTFILE "  Userin();";
+	    $bsctor = 0;
+         }
+      } elsif (/ *return *;/) {
+      } elsif (/^Double_t (.*)Bases::Func\(/) {
+         $process = $1;
+         print OUTFILE <<END_MARK4
+Double_t $1Bases::Func()		// new style not yet implemented
+{
+  cerr << ":::::: ERROR "
+       << "  $1Bases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
+}
+
+//_____________________________________________________________________________
+END_MARK4
+;
+         print OUTFILE $_;
+      } elsif (/^void .*Bases::Userin\(/) {
+         $userin = 1;
+         print OUTFILE $_;
+      } elsif (/.*Bases::Userin\(\);/ && $userin == 1) {
+         $userin = 0;
+      } elsif (/Xhinit *\( *[0-9]*[0-9],/) {
+         s/Xhinit *\( *([ 0-9][0-9]),/Xhinit("h$1",/;
+         s/"h ([0-9])"/"h0$1"/;
+         print OUTFILE $_;
+      } elsif (/Dhinit *\( *[0-9]*[0-9],/) {
+         s/Dhinit *\( *([ 0-9][0-9]),/Dhinit("hd$1",/;
+         s/"hd ([0-9])"/"hd0$1"/;
+         print OUTFILE $_;
+      } elsif (/^void .*Bases::Userout\(\)/) {
+         $userout = 1;
+         print OUTFILE $_;
+      } elsif (/usrout_\(\);/ && $userout == 1) {
+         $userout = 0;
+         print OUTFILE <<END_MARK5
+  printf("End of ${process}Bases\\n");
+  printf("ISRBM = %d\\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\\n",fISRBM);
+  printf("       = 1 ; None\\n");
+  printf("       = 2 ; ISR only\\n");
+  printf("       = 3 ; ISR + BM\\n");
+  printf("Ecm                  = %g (GeV)\\n",fRoots);
+  printf("Total Cross section  = %g +- %g (fb)\\n",GetEstimate(),GetError());
+  printf("Number of iterations = %d\\n",GetNoOfIterate());  
+END_MARK5
+;
+      } else {
+         print OUTFILE $_;
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
+
+#------------------------------------------------------------------------------
+#  funcxx.F Processor
+#------------------------------------------------------------------------------
+sub funcxx_f {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   open(OUTFILE,">../$outdir/$i");
+   while (<INFILE>) {
+      if (/ *DATA *NCALL/) {
+         print OUTFILE $_;
+         print OUTFILE "      EXTERNAL   XHFILL, DHFILL\n";
+      } elsif (/CALL *XHFILL/) {
+         s/XHFILL\( *([ 0-9][0-9]),/XHFILL( 'h$1',/;
+         s/'h ([0-9])'/'h0$1'/;
+         print OUTFILE $_;
+      } elsif (/CALL *DHFILL/) {
+         s/DHFILL\( *([ 0-9][0-9]),/DHFILL( 'hd$1',/;
+         s/'hd ([0-9])'/'hd0$1'/;
+         print OUTFILE $_;
+      } else {
+         print OUTFILE $_;
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
+
+#------------------------------------------------------------------------------
+#  sgxxf.F Processor
+#------------------------------------------------------------------------------
+sub sgxxf_f {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   open(OUTFILE,">../$outdir/$i");
+   while (<INFILE>) {
+      if (/xGV2PB/) {
+         s/xGV2PB/xGV2FB/g;
+         print OUTFILE $_;
+      } else {
+         print OUTFILE $_;
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
+
+#------------------------------------------------------------------------------
+#  bases.C Processor
+#------------------------------------------------------------------------------
+sub bases_c {
+   my($i);
+   $i = "bases.C";
+   print "Processing   $i\n"; 
+   open(INFILE,"<prod/$i");
+   open(OUTFILE,">../$outdir/prod/$i");
+   while (<INFILE>) {
+      if (/SetNCALL/ || /SetITMX1/ || /SetITMX2/ ||
+          /fPrintInfo/ || /fPrintHist/) {
+      } elsif (/DoBases\(\)/) {
+         print OUTFILE <<END_MARK6
+//  bases->SetNoOfSample(10000);
+//  bases->SetIteration1( 0.2, 10);
+//  bases->SetIteration2( 0.1, 10);
+  bases->Bases();
+  bases->Bh_plot();
+  bases->Userout();
+END_MARK6
+;
+      } else {
+         print OUTFILE $_;
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
+
+#------------------------------------------------------------------------------
+#  sim.C Processor
+#------------------------------------------------------------------------------
+sub sim_c {
+   my($i);
+   $i = "sim.C";
+   print "Processing   $i\n"; 
+   open(INFILE,"<prod/$i");
+   open(OUTFILE,">../$outdir/prod/$i");
+   while (<INFILE>) {
+      if (/->Bases\(\)/) {
+         s/->Bases\(\)/->GetBases()/;
+         print OUTFILE $_;
+      } else {
+         print OUTFILE $_;
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
