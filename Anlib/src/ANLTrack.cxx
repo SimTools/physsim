@@ -128,14 +128,20 @@ void ANLTrack::SetColorSingletID() {
   // because 4-momentum is decided by charged track if there is.
 
   Int_t ncdctrk = ctp->GetCDCEntries();
+  Int_t nemgen = ctp->GetEMGenEntries();
+
   // If track charge in mixed CAL cluster = 0,
   // Don't use CDCTrack pointer because of subtracted track-information !!
   if ( ncdctrk > 0 && ctp->GetCharge() != 0 ) {
 #ifdef __DEBUG__
     cerr << "# of charged tracks = " << ncdctrk << endl;
 #endif
-    for (Int_t i = 0; i < ncdctrk; i++ ) {
-      ScanThroughDecayChain(kECDC, ctp, i);
+    Double_t egen = 0.;
+    for ( Int_t i = 0; i < ncdctrk; i++ ) {
+      if ( GetEGeneratorParticle(kECDC, ctp, i) > egen ) {
+	ScanThroughDecayChain(kECDC, ctp, i);
+      }
+      egen = GetEGeneratorParticle(kECDC, ctp, i);
     }
 
     TIter nextid(&fMSNPriHad);
@@ -144,22 +150,30 @@ void ANLTrack::SetColorSingletID() {
 #ifdef __DEBUG__
       cerr << "ANLTrack::SetColorSingletID() : id = " << idp->GetNum() << endl;
 #endif
-      // TEMPORARY
       fColorSingletID = idp->GetNum();
     }
-    return; // If ncdctrk > 0 && nemgen > 0 such as electron candidate,
-            // should not scan generator particles in EMC cluster.
-  }
-
-  Int_t nemgen = ctp->GetEMGenEntries();
-  if ( nemgen > 0 ) {
+    // If ncdctrk > 0 && nemgen > 0 such as electron candidate,
+    // should not scan generator particles in EMC cluster.
+  } else if ( nemgen > 0 ) {
 #ifdef __DEBUG__
     cerr << "# of neutral tracks in EMC = " << nemgen << endl;
 #endif
-    for (Int_t i = 0; i < nemgen; i++ ) {
-      ScanThroughDecayChain(kEEMC, ctp, i);
+    Double_t egen = 0.;
+    for ( Int_t i = 0; i < nemgen; i++ ) {
+      if ( GetEGeneratorParticle(kEEMC, ctp, i) > egen ) {
+	ScanThroughDecayChain(kEEMC, ctp, i);
+      }
+      egen = GetEGeneratorParticle(kEEMC, ctp, i);
     }
-    return;
+
+    TIter nextid(&fMSNPriHad);
+    TObjNum *idp;
+    while ((idp = (TObjNum *)nextid())) {
+#ifdef __DEBUG__
+      cerr << "ANLTrack::SetColorSingletID() : id = " << idp->GetNum() << endl;
+#endif
+      fColorSingletID = idp->GetNum();
+    }
   }
 
   fMSNPriHad.SetOwner();  // SetOwner() method only enabled
@@ -231,8 +245,36 @@ ron." << endl;
   */
   ////TObjNum *gpidp = new TObjNum(gpid);
   ////TObjNum *gsnp  = new TObjNum(gsn);
+  cerr << "ANLTrack::ScanThroughDecayChain() : gmsn = " << gmsn << endl;
   TObjNum *gmsnp = new TObjNum(gmsn);
   ////fPIDPriHad.Add(gpidp);  // *gpidp, *gsnp and *gmsnp stays
   ////fSNPriHad.Add(gsnp);    // but (TObjArray *)obj->SetOwner() deletes
   fMSNPriHad.Add(gmsnp);  // its elements.
+}
+
+//_____________________________________________________________________
+Double_t ANLTrack::GetEGeneratorParticle(EFlavourGetterDetectorID id,
+					 JSFLTKCLTrack *ctp, Int_t i) {
+
+  Double_t egen = 0.;
+  Int_t gmsn = 0;
+  if (id == kEEMC) gmsn = ctp->GetEMGenAt(i)->GetSerial();
+  else if (id == kECDC) gmsn = ctp->GetCDCTrackAt(i)->GetGenID();
+  else {
+    cerr << "Unsupported detector type !!" << endl;
+    exit(1);
+  }
+  JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
+  egen = g->GetE();
+
+  /*
+  cerr << "(i, PID, S.N, M.S.N, E) = ("
+       << i << ","
+       << g->GetID() << ","
+       << g->GetSerial() << ","
+       << g->GetMother() << ","
+       << egen << endl;
+  */
+
+  return egen;
 }

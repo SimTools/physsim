@@ -60,7 +60,9 @@ public:
 
 private:
   void      ScanThroughDecayChain(EFlavourGetterDetectorID id,
-				 JSFLTKCLTrack *ctp, Int_t i);
+				  JSFLTKCLTrack *ctp, Int_t i);
+  Double_t  GetEGeneratorParticle(EFlavourGetterDetectorID id,
+                                  JSFLTKCLTrack *ctp, Int_t i);
 
 private:
   const TObject *fTrackPtr;       //  Pointer to JSFLTKCLTrack

@@ -21,7 +21,7 @@
 //*	ANLJadeEJetFinder jclust(ycut);
 //*     jclust.Initialize(tracks); // tracks: TObjArray of LVector derivatives.
 //*     jclust.FindJets();	   // finds jets with ycut = 0.01.
-//*     ycut = 0.015;		   
+//*     ycut = 0.015;
 //*	jclust.SetYcut(ycut);	   // One can make the ycut "bigger"
 //*	jclust.FindJets();	   // and resume with the new ycut.
 //*     ycut = 0.05;
@@ -52,7 +52,15 @@
 //*                             aborts to find ycut making "n" jets.
 //*                             So you have to confirm to be "n" jets in
 //*                             your analysis program.
+//*    2001/10/22  K.Ikematsu   Added virtual NewJet method
+//*                             instead of ANLJet *jet = new ANLJet();
+//*                             and changed fEvis member to protected
+//*                             to overload in ANLCheatedJetFinder class.
+//*    2001/10/22  K.Ikematsu   Changed Merge method to virtual
+//*                             for overloading in ANLTaggedJet class.
+//*    2001/10/24  K.Ikematsu   Added virtual NewJetFinder method.
 //*
+//* $Id$
 //*************************************************************************
 //
 #include "ANLJetFinder.h"
@@ -60,6 +68,9 @@
 //  ------------
 //  ANLJet Class
 //  ------------
+//
+ClassImp(ANLJet)
+
 //*--
 //*  Constructors
 //*--
@@ -75,7 +86,7 @@ ANLJet::ANLJet(const TObjArray &parts) : ANL4DVector(0.), fParts(parts) {
 //*  Destructor
 //*--
 ANLJet::~ANLJet() { fParts.Clear(); }
-	
+
 //*--
 //*  Getters
 //*--
@@ -88,7 +99,7 @@ const ANL4DVector & ANLJet::operator()() const { return *this; }
 //*--
 //*  Setters
 //*--
-void ANLJet::Add(TObject *part)  {
+void ANLJet::Add(TObject *part) {
    fParts.Add(part);
    *this += *(ANL4DVector *)part;
    // ::operator+=(*(ANL4DVector *)this,*(ANL4DVector *)part);
@@ -97,6 +108,9 @@ void ANLJet::Add(TObject *part)  {
 void ANLJet::Merge(TObject *part) { Add(part); }
 
 void ANLJet::Merge(ANLJet *jet) {
+#ifdef __DEBUG__
+  cerr << "ANLJet::Merge() is called ..." << endl;
+#endif
    TIter next(&jet->fParts);
    TObject *obj;
    while ((obj = next())) fParts.Add(obj);
@@ -125,24 +139,24 @@ void ANLJet::DebugPrint(const Char_t *opt) const {
    }
 }
 
-ClassImp(ANLJet)
 
 //_____________________________________________________________________
 //  ------------------
 //  ANLJetFinder Class
 //  ------------------
 //
+ClassImp(ANLJetFinder)
+
 //*--
 //*  Constructors
 //*--
-ANLJetFinder::ANLJetFinder(Double_t y) 
-            : fDone(kFALSE), fEvis(0.), fJets(1), fYcut(y),
-              fYmass(0), fYmassMax(0.) {}
+ANLJetFinder::ANLJetFinder(Double_t y)
+            : fDone(kFALSE), fYcut(y), fJets(1),
+              fYmass(0), fYmassMax(0.), fEvis(0.) {}
 
-ANLJetFinder::ANLJetFinder(const ANLJetFinder &jf) 
-            : fDone(jf.fDone), fEvis(jf.fEvis),
-              fJets(1), fYcut(jf.fYcut),
-              fYmass(0), fYmassMax(jf.fYmassMax) {
+ANLJetFinder::ANLJetFinder(const ANLJetFinder &jf)
+            : fDone(jf.fDone), fYcut(jf.fYcut), fJets(1),
+              fYmass(0), fYmassMax(jf.fYmassMax), fEvis(jf.fEvis) {
    CopyJets(jf.fJets);
 }
 
@@ -162,16 +176,16 @@ void ANLJetFinder::CopyJets(const TObjArray &jets) {
    TIter next(&jets);
    TObject *obj;
    while ((obj = next())) {
-      ANLJet *jet = new ANLJet();
-      jet->Merge((ANLJet *)obj);
-      fJets.Add(jet);
+     ANLJet *jet = NewJet();
+     jet->Merge((ANLJet *)obj);
+     fJets.Add(jet);
    }
 }
 
 void ANLJetFinder::DeleteJets() {
    fJets.Delete();
 }
-	
+
 //*--
 //*  Getters
 //*--
@@ -183,12 +197,12 @@ Bool_t   ANLJetFinder::IsInitialized()  const {
 Double_t ANLJetFinder::GetYcut() const { return fYcut; }
 
 Double_t ANLJetFinder::GetYmax() {
-   if (!fDone) FindJets(); 
+   if (!fDone) FindJets();
    return fYmassMax/(fEvis*fEvis);
 }
 
 Int_t    ANLJetFinder::GetNjets() {
-   if (!fDone) FindJets(); 
+   if (!fDone) FindJets();
    return fJets.GetEntries();
 }
 
@@ -213,7 +227,7 @@ void ANLJetFinder::Initialize(const TObjArray &parts) {
    fEvis = 0.;
    //
    // Store each unlocked object as a single jet.
-   //   
+   //
    TIter next(&parts);
    TObject *obj;
    while ((obj = next())) {
@@ -222,7 +236,7 @@ void ANLJetFinder::Initialize(const TObjArray &parts) {
 	 continue;
       }
       if (((ANL4DVector *)obj)->IsLocked()) continue;
-      ANLJet *jet = new ANLJet();
+      ANLJet *jet = NewJet();
       jet->Merge(obj);		// obj can be a jet, instead of being a track.
       fEvis += jet->E();
       fJets.Add(jet);
@@ -254,7 +268,10 @@ void ANLJetFinder::FindJets() {
    //
    // Initialize pair mass matrix.
    //
-   if (fYmass) delete fYmass; 
+#ifdef __DEBUG__
+   cerr << "ANLJetFinder::FindJets ; Initialized fYmass ..." << endl;
+#endif
+   if (fYmass) delete fYmass;
    fYmass = new TMatrix(np,np);
    TMatrix &ymass = *fYmass;
    Int_t i, j;
@@ -298,6 +315,9 @@ void ANLJetFinder::FindJets() {
       //
       // Update the pair mass array.
       //
+#ifdef __DEBUG__
+      cerr << "ANLJetFinder::FindJets ; Updated fYmass ..." << endl;
+#endif
       for (j = 0; j < np; j++) {
          if (j == im) continue;
          ANLJet *oj = (ANLJet *)fJets.UncheckedAt(j);
@@ -313,7 +333,7 @@ void ANLJetFinder::FindJets() {
 
 void ANLJetFinder::ForceNJets(Int_t njets) {
    if (njets < 1) {
-      cout << "ANLJetFinder::ForceNJets : njets = " << njets 
+      cout << "ANLJetFinder::ForceNJets : njets = " << njets
            << " invalied" << endl;
       return;
    }
@@ -331,8 +351,14 @@ void ANLJetFinder::ForceNJets(Int_t njets) {
    while (kTRUE) {
       ntrial++;
       ycut = (ycutLo + ycutHi)/2;
-      jf   = new ANLJetFinder(*this);
+#ifdef __DEBUG__
+      cerr << "ANLJetFinder::ForceNJets ; NewJetFinder() is called ..." << endl;
+#endif
+      jf   = NewJetFinder(this);
       SetYcut(ycut);
+#ifdef __DEBUG__
+      cerr << "ANLJetFinder::ForceNJets ; FindJets() is called ..." << endl;
+#endif
       FindJets();
       Int_t nj = GetNjets();
       if (ntrial > 100) cerr << "ANLJetFinder::ForceNJets : Making "
@@ -345,56 +371,62 @@ void ANLJetFinder::ForceNJets(Int_t njets) {
          ycutHi = ycut;
          *this  = *jf;
       }
+#ifdef __DEBUG__
+      cerr << "ANLJetFinder::ForceNJets ; deleting jf ..." << endl;
+#endif
       delete jf;
    }
 }
 
-Double_t ANLJetFinder::GetYmass(const ANL4DVector &p1, 
+Double_t ANLJetFinder::GetYmass(const ANL4DVector &p1,
    			        const ANL4DVector &p2) const { return 0; }
 
-ClassImp(ANLJetFinder)
 
 //_____________________________________________________________________
 //  ----------------------
 //  ANLJadeJetFinder Class
 //  ----------------------
 //
+ClassImp(ANLJadeJetFinder)
+
 ANLJadeJetFinder::ANLJadeJetFinder(Double_t y) : ANLJetFinder(y) {}
 
-Double_t ANLJadeJetFinder::GetYmass(const ANL4DVector &p1, 
+Double_t ANLJadeJetFinder::GetYmass(const ANL4DVector &p1,
 				     const ANL4DVector &p2) const {
    return 2 * p1.E() * p2.E() * ( 1 - p1.CosTheta(p2) );
 }
 
-ClassImp(ANLJadeJetFinder)
 
 //_____________________________________________________________________
 //  -----------------------
 //  ANLJadeEJetFinder Class
 //  -----------------------
 //
+ClassImp(ANLJadeEJetFinder)
+
 ANLJadeEJetFinder::ANLJadeEJetFinder(Double_t y) : ANLJetFinder(y) {}
 
-Double_t ANLJadeEJetFinder::GetYmass(const ANL4DVector &p1, 
+Double_t ANLJadeEJetFinder::GetYmass(const ANL4DVector &p1,
 				     const ANL4DVector &p2) const {
    return (p1+p2).GetMass2();
 }
 
-ClassImp(ANLJadeEJetFinder)
 
 //_____________________________________________________________________
 //  ------------------------
 //  ANLDurhamJetFinder Class
 //  ------------------------
 //
+ClassImp(ANLDurhamJetFinder)
 
 ANLDurhamJetFinder::ANLDurhamJetFinder(Double_t y) : ANLJetFinder(y) {}
 
 Double_t ANLDurhamJetFinder::GetYmass(const ANL4DVector &p1,
 				      const ANL4DVector &p2) const {
    Double_t minE = TMath::Min(p1.E(),p2.E());
+#ifdef __DEBUG__
+   cerr << "ANLJetFinder::GetYmass ; Ymass = "
+	<< 2 * minE * minE * ( 1 - p1.CosTheta(p2) ) << endl;
+#endif
    return 2 * minE * minE * ( 1 - p1.CosTheta(p2) );
 }
-
-ClassImp(ANLDurhamJetFinder)
-
