@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+2005/03/02  K.Fujii 	Sample Analysis Module Using Anlib
+-------------------------------------------------------------------------------
+Reaction: 	e+e- -> chi0_2 chi0_2 -> Z Z + missing(2LSPs)
+Generator:	XN2XN2Study
+Usage:		
+
+$ xmkmf -a; make
+$ jsf anl4J.C
+or to avoid a lot of debug messages
+$ jsf anl4J.C 2>/dev/null
+
+You have to prepare MC data(xn2xn2sim.root) in susy/XN2XN2Study/prod directory
+before you do the above.

@@ -7,14 +7,14 @@ int anl4J()
   JSFSteer *jsf  = new JSFSteer();			// Create JSF object
 
   Char_t *outputfile="jsf.root";  // A file to output histograms
-  Char_t *inputfile="../../../../../susy/XCXCStudy/prod/xcxcsim.root"; 
-  // Char_t *inputfile="xcxcsim.root";	// Input simulator file.
+  Char_t *inputfile="../../../../../susy/XN2XN2Study/prod/xn2xn2sim.root"; 
+  // Char_t *inputfile="xn2xn2sim.root";	// Input simulator file.
 
       gSystem->Load("libS4Utils.so");
       gSystem->Load("libAnlib.so");
       gSystem->Load("libJSFAnlib.so");
-      gSystem->Load("../../../../../susy/XCXCStudy/prod/XCXCSpring.so");
-      gSystem->Load("libXCXC4JAnalysis.so");
+      gSystem->Load("../../../../../susy/XN2XN2Study/prod/XN2XN2Spring.so");
+      gSystem->Load("libXN2XN24JAnalysis.so");
 
   file = new TFile(outputfile,"RECREATE");  	// Output file
   fin  = new TFile(inputfile);            	// Input simulator data
@@ -32,7 +32,7 @@ int anl4J()
   simdst->SetFile(file);			// since we analyze SIMDST
   simdst->NoReadWrite();			// instead of QuickSim data.
   
-  XCXC4JAnalysis *myanl = new XCXC4JAnalysis("XCXC4JAnalysis","My Analysis");
+  XN2XN24JAnalysis *myanl = new XN2XN24JAnalysis("XN2XN24JAnalysis","My Analysis");
 
   jsf->Initialize();             		// JSF Module initialization.
 
@@ -49,7 +49,7 @@ int anl4J()
   myanl->SetPlCut(9999.);
   myanl->SetElCut(25.);
   myanl->SetCosjetCut(0.80,0.95);
-  myanl->SetCoswCut(0.90);
+  myanl->SetCoszCut(0.90);
   myanl->SetMinYcut(0.01);
 #if 0
   myanl->SetM2jLoCut(10.);
@@ -66,7 +66,7 @@ int anl4J()
   Int_t nok = 0;
   for (Int_t ev=minevt; ev <= maxevt; ev++) {
      if (!(jsf->GetEvent(ev))) break;		// Read in an event.
-     if (!(jsf->Process(ev))) continue;		// Do SIMDST and XCXC4JAnalysis.
+     if (!(jsf->Process(ev))) continue;		// Do SIMDST and XN2XN24JAnalysis.
      if (!(gROOT->IsBatch())) {
         if (nok++%freq == 0) myanl->DrawHist();	// Draw hists, if interactive.
      }
