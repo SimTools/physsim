@@ -50,6 +50,16 @@ C--
 C  Then calculate Jacobian.
 C--
       WAT  = (THMX-THMN)*( (Q2-AM2)**2 + AMGM2 )/AMGM
+#if 0
+C
+C-- Narrow width approximation.      
+C
+      if ( AM .GE. QMN .AND. AM.LE. QMX ) THEN
+         xPI  = ACOS(-1.D0)
+         Q2   = AM2
+         WAT  = xPI*AMGM
+      ENDIF
+#endif
 C--
 C  That's it.
 C--
