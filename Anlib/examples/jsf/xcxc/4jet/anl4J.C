@@ -6,31 +6,21 @@ int anl4J()
   TFile *fin;
   JSFSteer *jsf;
 
+  jsf  = new JSFSteer();			// Create JSF object
+
   Char_t *outputfile="jsf.root";  // A file to output histograms
   Char_t *inputfile="../../../../../susy/XCXCStudy/prod/xcxcsim.root"; 
   // Char_t *inputfile="xcxcsim.root";	// Input simulator file.
 
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("libS4Utils.sl");
-      gSystem->Load("libAnlib.sl");
-      gSystem->Load("libJSFAnlib.sl");
-      gSystem->Load("../../../../../susy/XCXCStudy/prod/XCXCSpring.sl");
-      gSystem->Load("libXCXC4JAnalysis.sl");
-    }
-    else {
       gSystem->Load("libS4Utils.so");
       gSystem->Load("libAnlib.so");
       gSystem->Load("libJSFAnlib.so");
       gSystem->Load("../../../../../susy/XCXCStudy/prod/XCXCSpring.so");
       gSystem->Load("libXCXC4JAnalysis.so");
-   }
-  }
 
   file = new TFile(outputfile,"RECREATE");  	// Output file
   fin  = new TFile(inputfile);            	// Input simulator data
 
-  jsf  = new JSFSteer();			// Create JSF object
   jsf->SetInput(*fin);
   jsf->SetOutput(*file);
 
