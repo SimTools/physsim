@@ -58,7 +58,8 @@
 SHELL	= /bin/bash
 MFLAGS	=
 CURRDIR	= .
-feq ($(strip $(LCBASEDIR)),)
+
+ifeq ($(strip $(LCBASEDIR)),)
 SUBDIR1	= dgen_lib gen_lib Anlib
 else
 SUBDIR1	= dgen_lib gen_lib
