@@ -22,6 +22,8 @@ HELASV204   = HELASV204
 #ifdef CXXPACKAGE
 # include "conf/makejsf.tmpl"
 
+CXXFLAGS += -D__PYTHIA_VERSION__=5
+
 /* ROOT Related Libraries */
 
 # if defined(MacOSXArchitecture) || defined(DarwinArchitecture)

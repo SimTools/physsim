@@ -19,6 +19,7 @@
 
 /* Package Name */
 
+SOREV		= 2005a
 INSTALLDIR	= ../../lib
 LIBNAME		= JSFAnlib
 SONAME		= lib$(LIBNAME).$(SOEXT).$(SOREV)
@@ -26,7 +27,7 @@ JSFSOLIB	= $(SONAME)
 
 /* Headers */
 
-INCPATH	= -I. -I$(ANLIBROOT)/include -I$(SATELLITESROOT)/include
+INCPATH	= -I. -I$(LEDAROOT)/include
 
 /* Routines to compile */
 
@@ -75,5 +76,5 @@ distclean:: clean
 $(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
 	@echo "Generating dictionary ..."
 	rootcint -f $(DICTNAME).$(SrcSuf) \
- 		-c -I$(JSFROOT)/include -I$(ANLIBROOT)/include \
-		   -I$(SATELLITESROOT)/include $(RCINTDEFINES) $(HDRS) LinkDef.h
+ 		-c -I$(JSFROOT)/include -I$(LEDAROOT)/include \
+		    $(RCINTDEFINES) $(HDRS) LinkDef.h

@@ -17,7 +17,7 @@ XCOMM ##########################################################################
  *
  */
 
-INCPATH	= -I. -I../../src -I$(ANLIBROOT)/include -I$(SATELLITESROOT)/include
+INCPATH	= -I. -I../../src -I$(LEDAROOT)/include
 EXTRACXXOPT = $(INCPATH)
 
 /*
@@ -38,8 +38,8 @@ SRCS		= $(subst .$(ObjSuf),.$(SrcSuf),$(OBJS))
 
 JSFPROGRAM	= $(PACKAGENAME)
 
-ANLLIB		= $(LDDIRFLAG)$(ANLIBROOT)/lib -lAnlib \
-                  $(LDDIRFLAG)$(SATELLITESROOT)/lib -lS4Utils
+ANLLIB		= $(LDDIRFLAG)$(LEDAROOT)/lib -lAnlib \
+                  $(LDDIRFLAG)$(LEDAROOT)/lib -lS4Utils
 LDFLAGS        += $(shell root-config --libs)
 
 /*
