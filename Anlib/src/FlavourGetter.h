@@ -52,14 +52,11 @@ public:
     fMSNPriHad.Delete();
     fPIDOffVT.Delete();
     fSNOffVT.Delete();
-#ifdef __DEBUG__
-    fDEBUG = kFALSE;
-#endif
   }                                                // default constructor
 
   virtual  ~FlavourGetter() {}                     // default destructor
 
-  Int_t     operator()(const ANLJet &jet);
+  virtual  Int_t operator()(const ANLJet &jet);
 
 protected:
   void      SetDataArray(const ANLJet &jet);
@@ -83,13 +80,6 @@ private:
   TObjArray         fPIDOffVT;    //  Array of off-vertex hadron's PID
   TObjArray         fSNOffVT;     //  Array of off-vertex hadron's S.N
 
-#ifdef __DEBUG__
-public:
-  virtual void      SetDebug(Bool_t flag);  // sets debug flag
-protected:
-  Bool_t            fDEBUG;
-#endif
-
   ClassDef(FlavourGetter, 2)      //  FlavourGetter class
 };
 
@@ -103,9 +93,6 @@ public:
   TTL4JFlavourGetter(JSFSpring &sp) {
     JSFSpringBuf  *spptn   = (JSFSpringBuf *)sp.EventBuf();
     fSpgen = spptn->GetPartons();
-#ifdef __DEBUG__
-    fDEBUG = kFALSE;
-#endif
   }                                                // default constructor
 
   Int_t    operator()(const ANLJet &jet);
