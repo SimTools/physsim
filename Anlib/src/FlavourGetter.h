@@ -23,10 +23,12 @@
 //*    2001/07/26  K.Ikematsu   Added TTL4JFlavourGetter class
 //*    2001/07/31  K.Ikematsu   Supported to search generator particles
 //*                             contributing to the EM cluster (gamma)
+//*    2001/08/02  K.Ikematsu   Added fPIDOffVT and fSNOffVT members
 //*
 //* $Id$
 //*************************************************************************
 //
+#include <stdlib.h>
 #include "JSFSteer.h"
 #include "JSFModule.h"
 #include "JSFSIMDST.h"
@@ -34,6 +36,7 @@
 #include "JSFCDCTrack.h"
 #include "JSFSpring.h"
 #include "Anlib.h"
+typedef enum EFlavourGetterDetectorID {kECDC,kEEMC};
 //_____________________________________________________________________
 //  -------------------
 //  FlavourGetter Class
@@ -45,12 +48,11 @@ public:
     JSFSIMDST     *sds = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
     JSFSIMDSTBuf  *evt = (JSFSIMDSTBuf*)sds->EventBuf();
     fGen   = evt->GetGeneratorParticles();
-    fPIDGen.Delete();
-    fSNGen.Delete();
-    fMSNGen.Delete();
+    fPIDPriHad.Delete();
+    fSNPriHad.Delete();
+    fMSNPriHad.Delete();
     fPIDOffVT.Delete();
     fSNOffVT.Delete();
-    fMSNOffVT.Delete();
 #ifdef __DEBUG__
     fDEBUG = kFALSE;
 #endif
@@ -61,26 +63,27 @@ public:
   Int_t     operator()(const ANLJet &jet);
 
 protected:
-  void      SetData(const ANLJet &jet);
+  void      SetDataArray(const ANLJet &jet);
   TObjArray &GetPrimaryHadronPID();
   TObjArray &GetPrimaryHadronSN();
   TObjArray &GetPartonID();
+  TObjArray &GetOffVertexHadronPID();
+  TObjArray &GetOffVertexHadronSN();
   void      DebugPrint(const Char_t *opt="Brief") const;
 
 private:
   void      SearchPrimaryHadron(const ANLTrack &t);
-  void      SearchOffVertexHadron(const ANLTrack &t);
-
+  void      ScanThroughDecayChain(EFlavourGetterDetectorID id,
+				  JSFLTKCLTrack *ctp, Int_t i);
 private:
   TClonesArray     *fGen;         //! Pointer to GeneratorParticles Array
-  TObjArray         fPIDGen;      //  Array of primary hadron's PID
-  TObjArray         fSNGen;       //  Array of primary hadron's S.N
-  TObjArray         fMSNGen;      //  Array of primary hadron's Mother S.N
+  TObjArray         fPIDPriHad;   //  Array of primary hadron's PID
+  TObjArray         fSNPriHad;    //  Array of primary hadron's S.N
+  TObjArray         fMSNPriHad;   //  Array of primary hadron's Mother S.N
                                   //  (corresponding to PartonID)
   TObjArray         fPIDOffVT;    //  Array of off-vertex hadron's PID
   TObjArray         fSNOffVT;     //  Array of off-vertex hadron's S.N
-  TObjArray         fMSNOffVT;    //  Array of off-vertex hadron's Mother S.N
-                                  //  (corresponding to PartonID)
+
 #ifdef __DEBUG__
 public:
   virtual void      SetDebug(Bool_t flag);  // sets debug flag
