@@ -13,7 +13,7 @@ XCOMM #
 XCOMM # Define the name of the library.
 XCOMM #
 INSTALLDIR = ../../lib
-LIBNAME   = GENLIBHG
+LIBNAME   = DGENLIBHG
 XCOMM #
 XCOMM # Routines to compile.
 XCOMM #
