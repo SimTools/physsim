@@ -245,7 +245,7 @@ void WWZBases::Userin()
 
       Xhinit( 1, -1.0, 1.0, 50,"cos(theta_Z) ");
       Xhinit( 2,  0.0,360., 50,"phi_Z        ");
-      Xhinit( 3,  0.0, 1.0, 50,"m(W-W+)/roots");
+      Xhinit( 3,  0.4, 0.8, 50,"m(W-W+)/roots");
       Xhinit( 4, -1.0, 1.0, 50,"cos(theta_W-)");
       Xhinit( 5,  0.0,360., 50,"phi_W-       ");
       Xhinit( 7,  1.0,  5.,  4,"helicity combination  ");

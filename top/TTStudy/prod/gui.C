@@ -29,8 +29,7 @@
   if( gClient == 0 ) {
     gui=0;
     BatchRun();
-  }
-  else  gui=new JSFGUIFrame(gClient->GetRoot(), 400, 220);
+  } else gui=new JSFGUIFrame(gClient->GetRoot(), 400, 220);
 
 //********************************************
 //*  Start execution

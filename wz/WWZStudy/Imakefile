@@ -8,6 +8,10 @@ XCOMM ##    95/03/13  K.Fujii 	Original version for HELAS V204.
 XCOMM ##    95/06/07  K.Fujii 	Use 95a.
 XCOMM ##    97/08/30  K.Fujii 	Use 97a.
 XCOMM ##    99/05/20  K.Fujii 	Modified for JSF.
+XCOMM ##    00/04/20  K.Fujii 	HIGGSONLY flag prepared:
+XCOMM ##				make EXTRADEFINES=-DHIGGSONLY
+XCOMM ##			produces an executable that generates
+XCOMM ##				e+e- --> ZH followed by H -> WW(*)
 XCOMM ###########################################################################
 
 /*
