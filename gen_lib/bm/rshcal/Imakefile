@@ -1,0 +1,69 @@
+XCOMM ##############################################################################
+XCOMM ## (Description)
+XCOMM ##    Make file for plotting shat.
+XCOMM ##	clean    : to clean the directory.
+XCOMM ##	cleanall : to remove everything reproducible.
+XCOMM ## (Update Record) 
+XCOMM ##    94/11/25  K.Fujii 	Original.
+XCOMM ##
+XCOMM ##
+XCOMM ##############################################################################
+
+#include "config/kflib.tmpl"
+
+/*
+ * Define the name of the executable. 
+ */
+ 
+PROGRAM1      = mkblkd
+PROGRAM2      = rshcal
+
+/*
+ * Directory to store executables.
+ */
+ 
+GODIR	      = prod
+
+/*
+ * Routines to complie.
+ */
+ 
+OBJS	      = mkblkd.o \
+		rshcal.o
+
+/*
+ * Specify compiler and linker.
+ */
+
+LD	      = $(F77)
+
+/*
+ * Build and Compile the source codes.
+ */
+
+/*
+ * Make options.
+ */
+ 
+all::		$(PROGRAM1) $(PROGRAM2)
+
+
+$(PROGRAM1):    $(OBJS) 
+		@echo "Linking $(PROGRAM1) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM1).exe
+		@echo "done"
+
+$(PROGRAM2):     $(OBJS)
+		@echo "Linking $(PROGRAM2) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM2).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM2).exe
+		@echo "done"
+
+clean::		
+		@rm -f $(OBJS) core
+
+distclean:: clean	
+		@rm -f $(OBJS) Makefile Makefile.bak
+		@(cd $(GODIR); rm -f *.exe core)
+
