@@ -182,8 +182,6 @@ NNZBases::NNZBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("NNZBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("NNZBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("NNZBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

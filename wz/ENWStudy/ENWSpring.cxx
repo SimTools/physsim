@@ -178,8 +178,6 @@ ENWBases::ENWBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("ENWBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("ENWBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("ENWBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

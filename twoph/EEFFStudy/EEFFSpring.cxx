@@ -185,8 +185,6 @@ EEFFBases::EEFFBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("EEFFBases.EfCut","0."),"%lg",&fEfCut);
   sscanf(gJSF->Env()->GetValue("EEFFBases.CosfCut","0.8"),"%lg",&fCosfCut);
   sscanf(gJSF->Env()->GetValue("EEFFBases.MassffMin","5."),"%lg",&fMassffMin);
-
-  Userin();
 }
 
 

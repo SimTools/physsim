@@ -180,8 +180,6 @@ WWBases::WWBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("WWBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("WWBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("WWBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

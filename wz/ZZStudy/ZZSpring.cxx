@@ -181,8 +181,6 @@ ZZBases::ZZBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("ZZBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("ZZBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("ZZBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

@@ -180,8 +180,6 @@ NNWWBases::NNWWBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("NNWWBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("NNWWBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("NNWWBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

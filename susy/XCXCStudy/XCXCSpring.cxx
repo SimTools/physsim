@@ -183,8 +183,6 @@ XCXCBases::XCXCBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("XCXCBases.tanb","+2."),"%lg",&ftanb);
   sscanf(gJSF->Env()->GetValue("XCXCBases.mA","-9999."),"%lg",&fmA);
   sscanf(gJSF->Env()->GetValue("XCXCBases.WidthChic1","-1."),"%lg",&fWidthChic1);
-
-  Userin();
 }
 
 

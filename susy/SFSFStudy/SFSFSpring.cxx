@@ -179,8 +179,6 @@ SFSFBases::SFSFBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("SFSFBases.IDoTau","0"),"%d",&fIDoTau);
   sscanf(gJSF->Env()->GetValue("SFSFBases.HelTauMinus","0."),"%lg",&fHelTauMinus);
   sscanf(gJSF->Env()->GetValue("SFSFBases.HelTauPlus","0."),"%lg",&fHelTauPlus);
-
-  Userin();
 }
 
 

@@ -180,8 +180,6 @@ EEWWBases::EEWWBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("EEWWBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("EEWWBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("EEWWBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

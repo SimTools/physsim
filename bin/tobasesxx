@@ -184,6 +184,7 @@ sub xxspring_cxx {
 #define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
 #define Dhinit(id,xlo,xhi,nx,ylo,yhi,ny,title) H2Init(id,title,nx,xlo,xhi,ny,ylo,yhi)
 
+JSFBases *bso;			// need to map xhfill to h1fill
 END_MARK2
 ;
          print OUTFILE $_;
@@ -191,7 +192,6 @@ END_MARK2
       } elsif (/extern void exit/) {
          print OUTFILE $_;
          print OUTFILE <<END_MARK3
-JSFBases *bso;			// need to map xhfill to h1fill
 void xhfill_(char *t, double *x, double *w, int len)
 {
 	char tmp[1024];

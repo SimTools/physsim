@@ -1,4 +1,10 @@
 -------------------------------------------------------------------------------
+2000/07/13	K.Fujii		Physsim-2000a-3
+-------------------------------------------------------------------------------
+1) Userin() call removed from ctor of XXBases. Because of this, 
+   the physsim package now requires jsf-1-15 or later.
+
+-------------------------------------------------------------------------------
 2000/06/26	K.Fujii		Physsim-2000a-2
 -------------------------------------------------------------------------------
 
@@ -24,10 +30,9 @@ higgs/ZHStudy   OK
 twoph/EEFFStudy OK
 top/EETTStudy OK
    /NNTTStudy OK
-   /TTHStudy  OK (but hd**'s are empty after sim.C, though they are nonempty
-                  ater sim.C??? Very strange.)
+   /TTHStudy  OK
    /TTStudy   OK
-   /TTZStudy  OK (same as TTHStudy.)
+   /TTZStudy  OK
 wz/EEWWStudy  OK
   /EEZStudy   OK
   /ENWStudy   OK (itmx1/2=5/5 gives nan at the final iteration??? OK for 8/5)
@@ -35,5 +40,6 @@ wz/EEWWStudy  OK
   /NNZStudy   OK
   /WWStudy    OK
   /WWZStudy   OK (mh >> Ecm to avoid bad convergency)
-  /ZZStudy    OK (ampzz.f had to be renamed to ampzz.F)
+  /ZZStudy    OK (ampzz.f had to be renamed to ampzz.F. decay mode hist. for
+  		  spring is half-empty, though corresponding BS's is OK.)
 

@@ -194,8 +194,6 @@ TTHBases::TTHBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("TTHBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("TTHBases.MassHiggs","120."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("TTHBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

@@ -183,8 +183,6 @@ EETTBases::EETTBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("EETTBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("EETTBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("EETTBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

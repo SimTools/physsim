@@ -183,8 +183,6 @@ NNTTBases::NNTTBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("NNTTBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("NNTTBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("NNTTBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 

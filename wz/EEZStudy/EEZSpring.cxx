@@ -181,8 +181,6 @@ EEZBases::EEZBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("EEZBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("EEZBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("EEZBases.MassTop","170."),"%lg",&fMassTop);  
-
-  Userin();
 }
 
 
