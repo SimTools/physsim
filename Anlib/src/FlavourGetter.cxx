@@ -17,6 +17,8 @@
 //*    2001/07/20  K.Ikemtasu   Added GetPrimaryHadronSN method
 //*    2001/07/20  K.Ikemtasu   Added GetPartonID method
 //*    2001/07/26  K.Ikematsu   Added TTL4JFlavourGetter class
+//*    2001/07/31  K.Ikematsu   Supported to search generator particles
+//*                             contributing to the EM cluster (gamma)
 //*
 //* $Id$
 //*************************************************************************
@@ -33,6 +35,23 @@ ClassImp(FlavourGetter)
 //*--
 //*  Setters
 //*--
+void FlavourGetter::SetData(const ANLJet &jet) {
+
+  fPIDGen.Clear();
+  fSNGen.Clear();
+  fMSNGen.Clear();
+
+  TIter next(&jet.GetParticlesInJet());
+  ANLTrack *tp;
+  while ((tp = (ANLTrack *)next())) {
+    SearchPrimaryHadron(*tp);
+  }
+
+  fPIDGen.SetOwner();  // SetOwner() method only enabled
+  fSNGen.SetOwner();   // after adding contents
+  fMSNGen.SetOwner();
+}
+
 void FlavourGetter::SetDebug(Bool_t flag) {
   if ( flag != fDEBUG ) {
     fDEBUG = flag;
@@ -43,21 +62,26 @@ void FlavourGetter::SetDebug(Bool_t flag) {
 //*--
 //*  Getters
 //*--
-Int_t FlavourGetter::operator()(const ANLJet &jet){
+Int_t FlavourGetter::operator()(const ANLJet &jet) {
 
-  static const Double_t kBHadRatioCut   = 0.3;
-  static const Double_t kCHadRatioCut   = 0.2;
+  static const Double_t kBHadRatioCut   = 0.25;
+  static const Double_t kCHadRatioCut   = 0.15;
   static const Double_t kPriHadRatioCut = 0.9;
 
   Int_t ntrkinjet = 0;
   Int_t ntrkfrombhad = 0;
   Int_t ntrkfromchad = 0;
 
-  TIter next(&jet.GetParticlesInJet());
-  ANLTrack *tp;
-  while ((tp = (ANLTrack *)next())) {
-    Int_t hadpid = TMath::Abs(GetPrimaryHadronPID(*tp));
-    if ( hadpid != 0 ) ntrkinjet++;
+  SetData(jet);
+
+  TIter nexthadpid(&fPIDGen);
+  TObjNum *pidp;
+  while ((pidp = (TObjNum *)nexthadpid())) {
+    // fPIDGen : Not Yet contained primary hadron's PIDs contributing to
+    //           the HDC cluster from neutral combined tracks.
+    Int_t hadpid = TMath::Abs(pidp->GetNum());
+    if (fDEBUG) cerr << "FlavourGetter::operator() : PID = " << hadpid << endl;
+    ntrkinjet++;
 
     Int_t flavour = 0;
     if ( hadpid/1000 > 0 && hadpid/10000 == 0 ) { // Meson-Baryon branch
@@ -86,49 +110,108 @@ Int_t FlavourGetter::operator()(const ANLJet &jet){
 }
 
 //_____________________________________________________________________
-Int_t FlavourGetter::GetPrimaryHadronPID(const ANLTrack &t){
-  SearchPrimaryHadron(t);
-  return fGpid;
-}
+TObjArray & FlavourGetter::GetPrimaryHadronPID() { return fPIDGen; }
 
-Int_t FlavourGetter::GetPrimaryHadronSN(const ANLTrack &t){
-  SearchPrimaryHadron(t);
-  return fGsn;
-}
+TObjArray & FlavourGetter::GetPrimaryHadronSN() { return fSNGen; }
 
-Int_t FlavourGetter::GetPartonID(const ANLTrack &t){
-  SearchPrimaryHadron(t);
-  return fGmsn;
-}
+TObjArray & FlavourGetter::GetPartonID() { return fMSNGen; }
 
 //_____________________________________________________________________
-void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t){
+void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
 
-  JSFCDCTrack *cdctp = t.GetLTKCLTrack()->GetCDC();
-  if (!cdctp) {
-    //cerr << "No pointer to JSFCDCTrack !" << endl;
-    fGsn  = 0;
-    fGpid = 0;
-    fGmsn = 0;
-    return;
+  JSFLTKCLTrack *ctp = t.GetLTKCLTrack();
+
+  if (fDEBUG) {
+    if ( ctp->GetType() == 1 ) {
+      cerr << "Combined track type : pure gamma" << endl;
+    } else if ( ctp->GetType() == 2 ) {
+      cerr << "Combined track type : gamma in mixed EMC cluster" << endl;
+    } else if ( ctp->GetType() == 3 ) {
+      cerr << "Combined track type : pure nutral hadron" << endl;
+    } else if ( ctp->GetType() == 4 ) {
+      cerr << "Combined track type : hadron in mixed HDC cluster" << endl;
+    } else if ( ctp->GetType() == 5 ) {
+      cerr << "Combined track type : pure charged hadron" << endl;
+    } else if ( ctp->GetType() == 11 ) {
+      cerr << "Combined track type : electron candidate" << endl;
+    } else if ( ctp->GetType() == 13 ) {
+      cerr << "Combined track type : muon candidate" << endl;
+    } else if ( ctp->GetType() == 6 ) {
+      cerr << "Combined track type : unmatched track" << endl;
+    } else {
+      cerr << "illegal track type !!!" << endl;
+    }
+    cerr << "  CDCEntries   = " << ctp->GetCDCEntries() << endl;
+    cerr << "  EMGenEntries = " << ctp->GetEMGenEntries() << endl;
   }
 
-  fGsn = 0;
-  fGsn = t.GetLTKCLTrack()->GetCDC()->GetGenID();
-  fGpid = 0;
-  while ( fGsn > 0 ) {
-    JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(fGsn-1);
-    fGpid = g->GetID();
-    fGmsn = g->GetMother();
+  Int_t nemgen = ctp->GetEMGenEntries();
+  if ( nemgen > 0 ) {
+    if (fDEBUG) cerr << "# of neutral tracks in EMC = " << nemgen << endl;
+    for (Int_t i = 0; i < nemgen; i++ ) {
+      if (fDEBUG) cerr << "i = " << i << endl;
+      Int_t gpid = 0;
+      Int_t gsn  = 0;
+      Int_t gmsn = ctp->GetEMGenAt(i)->GetSerial();
+      while ( gmsn >= 0 ) {
+	JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
+	gpid = g->GetID();
+	gsn  = g->GetSerial();
+	gmsn = g->GetMother();
 
-    if (fDEBUG) cerr << "(PID, S.N, M.S.N) = ("
-		     << fGpid << ","
-		     << fGsn  << ","
-		     << fGmsn << ")" << endl;
-
-    fGsn = fGmsn;
+	if (fDEBUG) cerr << "(PID, S.N, M.S.N) = ("
+			 << gpid << ","
+			 << gsn  << ","
+			 << gmsn << ")" << endl;
+      }
+      if (fDEBUG) cerr << "-- Search ended --" << endl;
+      TObjNum *gpidp = new TObjNum(gpid);
+      TObjNum *gsnp  = new TObjNum(gsn);
+      TObjNum *gmsnp = new TObjNum(gmsn);
+      fPIDGen.Add(gpidp);  // *gpidp, *gsnp and *gmsnp stays
+      fSNGen.Add(gsnp);    // but (TObjArray *)obj->SetOwner() deletes
+      fMSNGen.Add(gmsnp);  // its elements.
+    }
   }
-  //cerr << "-- Search ended --" << endl;
+
+  Int_t ncdctrk = ctp->GetCDCEntries();
+  if ( ncdctrk > 0 ) {
+    if (fDEBUG) cerr << "# of charged tracks = " << ncdctrk << endl;
+    if ( (ctp->GetType()==2||ctp->GetType()==4) && ctp->GetCharge() == 0 ) {
+      if (fDEBUG) cerr << "Charge of this track in mixed CAL cluster = "
+		       << ctp->GetCharge() << endl
+		       << "Don't use these CDCTrack pointer !" << endl;
+      return;
+    }
+#if 0
+    for (Int_t i = 0; i < ncdctrk; i++ ) {
+#else // temporary treatment
+    for (Int_t i = 0; i < 1; i++ ) {
+#endif
+      if (fDEBUG) cerr << "i = " << i << endl;
+      Int_t gpid = 0;
+      Int_t gsn  = 0;
+      Int_t gmsn = ctp->GetCDCTrackAt(i)->GetGenID();
+      while ( gmsn >= 0 ) {
+        JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
+        gpid = g->GetID();
+        gsn  = g->GetSerial();
+        gmsn = g->GetMother();
+
+        if (fDEBUG) cerr << "(PID, S.N, M.S.N) = ("
+                         << gpid << ","
+                         << gsn  << ","
+                         << gmsn << ")" << endl;
+      }
+      if (fDEBUG) cerr << "-- Search ended --" << endl;
+      TObjNum *gpidp = new TObjNum(gpid);
+      TObjNum *gsnp  = new TObjNum(gsn);
+      TObjNum *gmsnp = new TObjNum(gmsn);
+      fPIDGen.Add(gpidp);  // *gpidp, *gsnp and *gmsnp stays
+      fSNGen.Add(gsnp);    // but (TObjArray *)obj->SetOwner() deletes
+      fMSNGen.Add(gmsnp);  // its elements.
+    }
+  }
 }
 
 //_____________________________________________________________________
@@ -140,36 +223,40 @@ ClassImp(TTL4JFlavourGetter)
 
 //_____________________________________________________________________
 //*--
-//*  Setters
-//*--
-void TTL4JFlavourGetter::SetDebug(Bool_t flag) {
-  if ( flag != fDEBUG ) {
-    fDEBUG = flag;
-  }
-}
-
-//_____________________________________________________________________
-//*--
 //*  Getters
 //*--
-Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet){
+Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 
   static const Double_t kThetaCut = 10.0;
-  //static const Double_t kCHadRatioCut = 0.25;
-  //temporary treatment
-  static const Double_t kCHadRatioCut = 0.1;
+  static const Double_t kCHadRatioCut = 0.15;
 
   Int_t ntrkinjet = 0;
   Int_t ntrkfromb = 0;
   Int_t ntrkfromw = 0;
   Int_t ntrkfromchad = 0;
 
-  TIter next(&jet.GetParticlesInJet());
-  ANLTrack *tp;
-  while ((tp = (ANLTrack *)next())) {
-    Int_t hadpid   = TMath::Abs(GetPrimaryHadronPID(*tp));
-    Int_t partonid = TMath::Abs(GetPartonID(*tp));
-    if ( hadpid != 0 ) ntrkinjet++;
+  SetData(jet);
+
+  TIter nextptnid(&GetPartonID());
+  TObjNum *ptnidp;
+  while ((ptnidp = (TObjNum *)nextptnid())) {
+    // fMSNGen : Not Yet contained primary hadron's Mother S.N contributing to
+    //           the HDC cluster from neutral combined tracks.
+    Int_t partonid = TMath::Abs(ptnidp->GetNum());
+    if (fDEBUG) cerr << "TTL4JFlavourGetter::operator() : MSN = " << partonid << endl;
+
+    if ( partonid == 3 ) ntrkfromb++;
+    else if ( partonid == 7 || partonid == 9 ) ntrkfromw++;
+  }
+
+  TIter nexthadpid(&GetPrimaryHadronPID());
+  TObjNum *pidp;
+  while ((pidp = (TObjNum *)nexthadpid())) {
+    // fPIDGen : Not Yet contained primary hadron's PIDs contributing to
+    //           the HDC cluster from neutral combined tracks.
+    Int_t hadpid = TMath::Abs(pidp->GetNum());
+    if (fDEBUG) cerr << "TTL4JFlavourGetter::operator() : PID = " << hadpid << endl;
+    ntrkinjet++;
 
     Int_t flavour = 0;
     if ( hadpid/1000 > 0 && hadpid/10000 == 0 ) { // Meson-Baryon branch
@@ -178,8 +265,6 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet){
       flavour = (hadpid/100)%10;
     }
 
-    if ( partonid == 3 ) ntrkfromb++;
-    else if ( partonid == 7 || partonid == 9 ) ntrkfromw++;
     if ( flavour == 4 ) ntrkfromchad++;
   }
 

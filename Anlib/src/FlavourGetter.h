@@ -19,6 +19,8 @@
 //*    2001/07/20  K.Ikemtasu   Added GetPrimaryHadronSN method
 //*    2001/07/20  K.Ikemtasu   Added GetPartonID method
 //*    2001/07/26  K.Ikematsu   Added TTL4JFlavourGetter class
+//*    2001/07/31  K.Ikematsu   Supported to search generator particles
+//*                             contributing to the EM cluster (gamma)
 //*
 //* $Id$
 //*************************************************************************
@@ -38,33 +40,41 @@
 class FlavourGetter {
 public:
   FlavourGetter() {
-    JSFSIMDST     *sds     = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
-    JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
+    JSFSIMDST     *sds = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
+    JSFSIMDSTBuf  *evt = (JSFSIMDSTBuf*)sds->EventBuf();
     fGen   = evt->GetGeneratorParticles();
-    fGpid  = 0; fGsn = 0; fGmsn = 0;
+    fPIDGen.Delete();
+    fSNGen.Delete();
+    fMSNGen.Delete();
     fDEBUG = kFALSE;
   }                                                // default constructor
 
-  virtual ~FlavourGetter() {}                      // default destructor
-  Int_t    operator()(const ANLJet &jet);
-  virtual void SetDebug(Bool_t flag);              // sets debug flag
+  virtual  ~FlavourGetter() {}                     // default destructor
 
-  //private:
-  Int_t GetPrimaryHadronPID(const ANLTrack &t);
-  Int_t GetPrimaryHadronSN(const ANLTrack &t);
-  Int_t GetPartonID(const ANLTrack &t);
+  Int_t     operator()(const ANLJet &jet);
+
+protected:
+  void      SetData(const ANLJet &jet);
+  TObjArray &GetPrimaryHadronPID();
+  TObjArray &GetPrimaryHadronSN();
+  TObjArray &GetPartonID();
+  void      DebugPrint(const Char_t *opt="Brief") const;
 
 private:
-  void SearchPrimaryHadron(const ANLTrack &t);
+  void      SearchPrimaryHadron(const ANLTrack &t);
 
 private:
   TClonesArray     *fGen;         //! Pointer to GeneratorParticles Array
-  Int_t             fGpid;        //  PID of GeneratorParticle
-  Int_t             fGsn;         //  S.N of GeneratorParticle
-  Int_t             fGmsn;        //  Mother S.N of GeneratorParticle
-  Bool_t            fDEBUG;       //  Debug flag
+  TObjArray         fPIDGen;      //  Array of primary hadron's PID
+  TObjArray         fSNGen;       //  Array of primary hadron's S.N
+  TObjArray         fMSNGen;      //  Array of primary hadron's Mother S.N
+                                  //  (corresponding to PartonID)
+public:
+  virtual void      SetDebug(Bool_t flag);  // sets debug flag
+protected:
+  Bool_t            fDEBUG;
 
-  ClassDef(FlavourGetter, 1)      //  FlavourGetter class
+  ClassDef(FlavourGetter, 2)      //  FlavourGetter class
 };
 
 //_____________________________________________________________________
@@ -81,13 +91,41 @@ public:
   }                                                // default constructor
 
   Int_t    operator()(const ANLJet &jet);
-  void     SetDebug(Bool_t flag);                  // sets debug flag
 
 private:
   TClonesArray     *fSpgen;       //! Pointer to SpringParton
-  Bool_t            fDEBUG;       //  Debug flag
 
-  ClassDef(TTL4JFlavourGetter, 1)    //  TTFlavourGetter class
+  ClassDef(TTL4JFlavourGetter, 2) //  TTL4JFlavourGetter class
+};
+
+//_____________________________________________________________________
+//  -------------
+//  TObjNum Class
+//  -------------
+//
+// TObjNum is a simple container for an integer.
+class TObjNum : public TObject {
+private:
+  int  num;
+
+public:
+  TObjNum(int i = 0) : num(i) { }
+  ~TObjNum() {
+    //Printf("~TObjNum = %d", num);
+    cerr << "~TObjNum = " << num << endl;
+  }
+  void    SetNum(int i) { num = i; }
+  int     GetNum() { return num; }
+  void    Print(Option_t *) const { Printf("TObjNum = %d", num); }
+  ULong_t Hash() const { return num; }
+  Bool_t  IsEqual(const TObject *obj) const { return num == ((TObjNum*)obj)->num; }
+  Bool_t  IsSortable() const { return kTRUE; }
+  Int_t   Compare(const TObject *obj) const { if (num > ((TObjNum*)obj)->num)
+    return 1;
+  else if (num < ((TObjNum*)obj)->num)
+    return -1;
+  else
+    return 0; }
 };
 
 #endif
