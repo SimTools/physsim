@@ -15,7 +15,7 @@ dir=..
 todir=.
 program=fullgen
 outfile=$filen
-if [ `uname -s | grep -c Linux` != 0 ]; then
+if [ `uname -s | grep -c hpux` = 0 ]; then
    ftn30=fort.30
 else
    ftn30=ftn30

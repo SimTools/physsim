@@ -12,6 +12,22 @@ echo "(-----------------------------------------------------------" >> integ.dat
 #--
 #  Start bases.
 #--
+echo "set order x y dy dummy dummy" >> integ.dat
+./go_command 170.   120.  300.  $isrb mh120s0300
+./go_command 170.   120.  400.  $isrb mh120s0400
+./go_command 170.   120.  500.  $isrb mh120s0500
+./go_command 170.   120.  600.  $isrb mh120s0600
+./go_command 170.   120.  700.  $isrb mh120s0700
+./go_command 170.   120.  800.  $isrb mh120s0800
+./go_command 170.   120.  900.  $isrb mh120s0900
+./go_command 170.   120. 1000.  $isrb mh120s1000
+./go_command 170.   120. 2000.  $isrb mh120s2000
+./go_command 170.   120. 5000.  $isrb mh120s5000
+./go_command 170.   120. 10000.  $isrb mh120s10000
+echo "plot" >> integ.dat
+echo "join" >> integ.dat
+exit 0
+echo "set order dummy x y dy dummy x" >> integ.dat
 ./go_command 170. 12000. 1500.  $isrb nohs10
 ./go_command 170.   800. 1500.  $isrb mh800s10
 ./go_command 170.   700. 1500.  $isrb mh700s10
@@ -19,4 +35,13 @@ echo "(-----------------------------------------------------------" >> integ.dat
 ./go_command 170.   500. 1500.  $isrb mh500s10
 ./go_command 170.   400. 1500.  $isrb mh400s10
 ./go_command 170.   300. 1500.  $isrb mh300s10
+./go_command 170.   200. 1500.  $isrb mh200s10
+./go_command 170.   180. 1500.  $isrb mh180s10
+./go_command 170.   170. 1500.  $isrb mh170s10
+./go_command 170.   160. 1500.  $isrb mh160s10
+./go_command 170.   150. 1500.  $isrb mh150s10
+./go_command 170.   100. 1500.  $isrb mh100s10
+./go_command 170.    50. 1500.  $isrb mh050s10
+echo "plot" >> integ.dat
+echo "join" >> integ.dat
 exit 0
