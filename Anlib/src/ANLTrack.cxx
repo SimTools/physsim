@@ -245,7 +245,9 @@ ron." << endl;
   */
   ////TObjNum *gpidp = new TObjNum(gpid);
   ////TObjNum *gsnp  = new TObjNum(gsn);
+#ifdef __DEBUG__
   cerr << "ANLTrack::ScanThroughDecayChain() : gmsn = " << gmsn << endl;
+#endif
   TObjNum *gmsnp = new TObjNum(gmsn);
   ////fPIDPriHad.Add(gpidp);  // *gpidp, *gsnp and *gmsnp stays
   ////fSNPriHad.Add(gsnp);    // but (TObjArray *)obj->SetOwner() deletes

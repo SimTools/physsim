@@ -290,7 +290,7 @@ ClassImp(TTL4JFlavourGetter)
 //*--
 Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 
-  static const Double_t kThetaCut = 10.0;
+  static const Double_t kThetaCut = 12.0;
   static const Double_t kCHadRatioCut = 0.8;
 
   Int_t ntrkinjet = 0;
