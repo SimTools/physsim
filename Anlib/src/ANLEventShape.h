@@ -26,13 +26,16 @@
 //*
 //*************************************************************************
 //
-#include <iostream.h>
+#include <iostream>
 #include "TClass.h"
 #include "TMath.h"
 #include "TMatrix.h"
 #include "TRandom.h"
 #include "TObjArray.h"
 #include "ANL4DVector.h"
+
+using namespace std;
+
 //_____________________________________________________________________
 //  -------------------
 //  ANLEventShape Class

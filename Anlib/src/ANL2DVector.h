@@ -19,10 +19,13 @@
 //* $Id$
 //*************************************************************************
 //
-#include <iostream.h>
+#include <iostream>
 #include "TVector.h"
 #include "TVector2.h"
 #include "Lockable.h"
+
+using namespace std;
+
 //_____________________________________________________________________
 //  -----------------
 //  Lockable TVector2

@@ -21,10 +21,13 @@
 //*
 //*************************************************************************
 //
-#include <iostream.h>
+#include <iostream>
 #include "TLorentzVector.h"
 #include "Lockable.h"
 #include "ANL3DVector.h"
+
+using namespace std;
+
 //_____________________________________________________________________
 //  -----------------------
 //  Lockable TLorentzVector

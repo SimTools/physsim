@@ -30,7 +30,7 @@
 //* $Id$
 //*************************************************************************
 //
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include "JSFLTKCLTrack.h"
 #include "JSFSteer.h"
@@ -39,6 +39,8 @@
 #include "JSFGeneratorParticle.h"
 #include "ANL4DVector.h"
 typedef enum EFlavourGetterDetectorID {kECDC,kEEMC};
+
+using namespace std;
 //_____________________________________________________________________
 //  --------------
 //  ANLTrack Class

@@ -23,8 +23,11 @@
 //
 #include "TClass.h"
 #include "TObjArray.h"
-#include <iostream.h>
+#include <iostream>
 #include "ANL4DVector.h"
+
+using namespace std;
+
 //_____________________________________________________________________
 //  -------------
 //  ANLPair Class

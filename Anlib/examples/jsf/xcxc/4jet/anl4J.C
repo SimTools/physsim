@@ -1,4 +1,3 @@
-Int_t maxevt = 5000;
 Int_t freq   = 10;
 
 int anl4J()
@@ -31,6 +30,10 @@ int anl4J()
   jsf->SetInput(*fin);
   jsf->SetOutput(*file);
 
+  Int_t nevent=jsf->Env()->GetValue("JSFSteer.Nevent",1000000);  
+  Int_t minevt=1;
+  Int_t maxevt=minevt+nevent;
+
   // Define modules to use. //
 
   JSFSIMDST    *simdst = new JSFSIMDST();	// Necessary to create SIMDST 
@@ -48,18 +51,23 @@ int anl4J()
 
   // Adjust Cut //
 
-  myanl->SetEvisCut(80.);
-  myanl->SetPtCut(10.);
-  myanl->SetPlCut(999.);
-  myanl->SetCosjetCut(0.98);
-  myanl->SetCoswCut(0.95);
-  myanl->SetMinYcut(0.004);
-  myanl->SetM2jCut(12.);
+  myanl->SetEvisLoCut(20.);
+  myanl->SetEvisHiCut(400.);
+  myanl->SetPtCut(0.);
+  myanl->SetPlCut(9999.);
+  myanl->SetElCut(25.);
+  myanl->SetCosjetCut(0.80,0.95);
+  myanl->SetCoswCut(0.90);
+  myanl->SetMinYcut(0.01);
+  myanl->SetM2jLoCut(10.);
+  myanl->SetM2jHiCut(10.);
+  myanl->SetMM1Cut(70.);
+  myanl->SetMM2Cut(120.);
   myanl->SetAcopCut(30.);
 
   jsf->BeginRun(1);      			// Set run number to 1.  
   Int_t nok = 0;
-  for (Int_t ev=1; ev <= maxevt; ev++) {
+  for (Int_t ev=minevt; ev <= maxevt; ev++) {
      if (!(jsf->GetEvent(ev))) break;		// Read in an event.
      if (!(jsf->Process(ev))) continue;		// Do SIMDST and XCXC4JAnalysis.
      if (!(gROOT->IsBatch())) {

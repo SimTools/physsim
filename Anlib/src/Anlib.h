@@ -45,7 +45,7 @@
 //* $Id$
 //*************************************************************************
 //
-#include <iostream.h>
+#include <iostream>
 #include "ANL2DVector.h"
 #include "ANL3DVector.h"
 #include "ANL4DVector.h"

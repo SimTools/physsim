@@ -65,11 +65,14 @@
 //* $Id$
 //*************************************************************************
 //
-#include <iostream.h>
+#include <iostream>
 #include "TClass.h"
 #include "TMatrix.h"
 #include "TObjArray.h"
 #include "ANL4DVector.h"
+
+using namespace std;
+
 //_____________________________________________________________________
 //  ------------
 //  ANLJet Class

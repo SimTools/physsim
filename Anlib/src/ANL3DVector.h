@@ -88,6 +88,14 @@ public:
 				     const ANL3DVector &q2) {
      return ( q1(1)*q2(1) + q1(2)*q2(2) + q1(3)*q2(3) );
    }
+   inline friend ANL3DVector operator* (Double_t a,
+				     const ANL3DVector &q) {
+     ANL3DVector ans(a*q(1),a*q(2),a*q(3)); return ans;
+   }
+   inline friend ANL3DVector operator* (const ANL3DVector &q,
+                                         Double_t a) {
+     ANL3DVector ans(a*q(1),a*q(2),a*q(3)); return ans;
+   }
 
    inline friend ANL3DVector operator^ (const ANL3DVector &q1,
 				        const ANL3DVector &q2) {

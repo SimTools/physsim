@@ -78,15 +78,21 @@ class XCXC4JAnalysis : public JSFModule {
 private:
   Int_t    xNtracks;    // No. of tracks
   Double_t xEtrack;     // track energy
-  Double_t xEvis;       // Minimum visible energy
+  Double_t xEvisLo;     // Minimum visible energy
+  Double_t xEvisHi;     // Maximum visible energy
   Double_t xPt;         // Pt minimum
   Double_t xPl;         // Pl maximum
+  Double_t xEl;         // Elepton maximum
   Double_t xYcut;       // y_cut to force the event to 4 jets
   Int_t    xNjets;      // No. of jets
   Double_t xEjet;	// E_jet minimum
-  Double_t xCosjet;	// |cos(theta_j)| maximum
+  Double_t xCosjet1;	// |cos(theta_j)| maximum
+  Double_t xCosjet2;	// |cos(theta_j)| maximum
   Double_t xCosw;	// |cos(theta_w)| maximum
-  Double_t xM2j;	// |m_jj-m_W| maximum
+  Double_t xM2jLo;	// m_W - xM2jLo < m_jj
+  Double_t xM2jHi;	// m_jj < m_W + xM2jHi
+  Double_t xMM1;        // mm_WW < xMM1 or
+  Double_t xMM2;        // mm_WW > xMM2
   Double_t xAcop;	// Acoplanarity minimum
 
   static Int_t Ngoods;	// Number of good events
@@ -99,6 +105,7 @@ public:
   TH1F *hPt;
   TH1F *hNjets;
   TH1F *hEjet;
+  TH1F *hElep;
   TH1F *hCosjet;
   TH1F *hNsols;
   TH1F *hChi2;
@@ -106,6 +113,8 @@ public:
   TH2F *hCosw1Cosw2;
   TH2F *hMw1Mw2;
   TH2F *hEvisPl;
+  TH1F *hMM;
+  TH1F *hEw;
   TH1F *hAcop;
 public:
   XCXC4JAnalysis() : JSFModule("XCXC4JAnalysis", "XCXC4JAnalysis Example") {}
@@ -114,15 +123,24 @@ public:
 
   inline void SetNtrackCut(Int_t    x) { xNtracks = x; }
   inline void SetEtrackCut(Double_t x) { xEtrack = x; }
-  inline void SetEvisCut  (Double_t x) { xEvis = x; }
+  inline void SetEvisCut  (Double_t x) { xEvisLo = x; }
+  inline void SetEvisLoCut(Double_t x) { xEvisLo = x; }
+  inline void SetEvisHiCut(Double_t x) { xEvisHi = x; }
   inline void SetPtCut    (Double_t x) { xPt = x; }
   inline void SetPlCut    (Double_t x) { xPl = x; }
+  inline void SetElCut    (Double_t x) { xEl = x; }
   inline void SetMinYcut  (Double_t x) { xYcut  = x; }
   inline void SetNjetCut  (Int_t    x) { xNjets = x; }
   inline void SetEjetCut  (Double_t x) { xEjet = x; }
-  inline void SetCosjetCut(Double_t x) { xCosjet = x; }
+  inline void SetCosjetCut(Double_t x) { xCosjet2 = x; }
+  inline void SetCosjetCut(Double_t x1, Double_t x2) 
+                                       { xCosjet1 = x1; xCosjet2 = x2; }
   inline void SetCoswCut  (Double_t x) { xCosw = x; }
-  inline void SetM2jCut   (Double_t x) { xM2j = x; }
+  inline void SetM2jCut   (Double_t x) { xM2jLo = x; }
+  inline void SetM2jLoCut (Double_t x) { xM2jLo = x; }
+  inline void SetM2jHiCut (Double_t x) { xM2jHi = x; }
+  inline void SetMM1Cut   (Double_t x) { xMM1 = x; }
+  inline void SetMM2Cut   (Double_t x) { xMM2 = x; }
   inline void SetAcopCut  (Double_t x) { xAcop = x; }
 
   void CleanUp(TObjArray *objs);
