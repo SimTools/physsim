@@ -1,0 +1,59 @@
+XCOMM ###########################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for Fujii's SS library.
+XCOMM ## (Update Record) 
+XCOMM ##    97/07/26  K.Fujii 	Original version.
+XCOMM ##    99/05/16  K.Fujii 	Reorganized directory structure.
+XCOMM ###########################################################################
+
+/* #define ENABLESHARED */
+#include "config/kflib.tmpl"
+/* REQUIREDLIBS = $(LCLIBS) $(CERNLIBS) -lg2c -lm -lc */
+
+XCOMM #
+XCOMM # Define the name of the library.
+XCOMM #
+INSTALLDIR = ../../lib
+LIBNAME   = DGENLIBSS
+XCOMM #
+XCOMM # Routines to compile.
+XCOMM #
+OBJS = couplsub.o \
+                couplsub2.o \
+                dcy2body.o \
+                gmxfsf.o \
+                gtsfms.o \
+                gtsfms3.o \
+                helasc.o \
+                hgsmix.o \
+                hoqrvd.o \
+                inodcy.o \
+                inomix.o \
+                inomix3.o \
+                inmass.o \
+                insscn.o \
+                insusy.o \
+                insuze.o \
+                modgam.o \
+                sf2br.o \
+                sfmass.o \
+                sfmmas.o \
+                sfmmix.o \
+                swpelm.o \
+                xcmass.o \
+                xnmass.o
+
+XCOMM #--
+XCOMM #  Library
+XCOMM #--
+ALLOBJ = $(OBJS)
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(ALLOBJ),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(ALLOBJ) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))
+
+distclean:: clean
+	rm -f Makefile
+
