@@ -63,8 +63,8 @@ C GUT RELATION TO GAUGINO MASS
       FM(2) = 0
       FM(3) = 0
 cccccccccc test at 11/16/98 cccccccccc
-ccc      M1=87.83
-ccc      M1 = 87.83585
+ccc      M1=87.83D0
+ccc      M1 = 87.83585D0
       write(6,*) '========== INMASS =========='
       write(6,*) 'IS=',IS
       write(6,*) 'M0=',AM0

@@ -25,7 +25,7 @@ C--
       TN2W = SN2W/CS2W
       SNW  = SQRT(SN2W)
       CSW  = SQRT(CS2W)
-      AM1  = (5./3)*AM2*TN2W
+      AM1  = (5.D0/3)*AM2*TN2W
       CSB  = COS(BT)
       SNB  = SIN(BT)
 C--

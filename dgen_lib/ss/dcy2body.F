@@ -28,33 +28,71 @@ C                           f_1 - f_2 - V
 C Output
 C     DCYWDT : decay width (GeV)
 C----------------------------------------------------------------------C
-      IMPLICIT REAL*8 (A-H, O-Z)
+      IMPLICIT REAL*8 ( A-H, O-Z )
       COMPLEX*16 GL, GR
 C----------------------------------------------------------------------C
       IF( F1MAS .LE. F2MAS+VMAS ) THEN
-        DCYWDT = 0.
+        DCYWDT = 0.D0
         RETURN
       ENDIF
  
-      PI = ACOS(0.)*2.
+      PI = ACOS(0.D0)*2.D0
       F1MAS2 = F1MAS**2
       F2MAS2 = F2MAS**2
       VMAS2 = VMAS**2
  
       PMOM2 = (F1MAS2-(F2MAS+VMAS)**2)*(F1MAS2-(F2MAS-VMAS)**2)
-     &         /4./F1MAS2
+     &         /4.D0/F1MAS2
       PMOM = SQRT(PMOM2)
  
-      TMAT2 = 0.5* ( ABS(GL)**2 + ABS(GR)**2 )
+      TMAT2 = 0.5D0* ( ABS(GL)**2 + ABS(GR)**2 )
      &        * ( F1MAS2+F2MAS2-VMAS2
      &             + ((F1MAS2-F2MAS2)**2-VMAS2**2)/VMAS2      )
-     &       - 6.*F1MAS*F2MAS*REAL( GL*CONJG(GR) )
+     &       - 6.D0*F1MAS*F2MAS*REAL( GL*CONJG(GR) )
  
-      DCYWDT = PMOM*TMAT2/8./PI/F1MAS2
+      DCYWDT = PMOM*TMAT2/8.D0/PI/F1MAS2
  
  
       RETURN
       END
+C--------------
+      SUBROUTINE SC1SC2V(SCMAS1,SCMAS2,VMAS, GV, DCYWDT )
+C Purpose
+C     calculate the decay widthes of
+C       Scaler_1 ---> Scaler_2 + V
+C Inputs ( note that GL,GR are complex*8 )
+C     SCMAS1  (Real*4) :    mass of scaler1 (GeV)
+C     SCMAS2  (Real*4) :    mass of scaler_2  (GeV)
+C     VMAS  (Real*4) :    mass of vector  (GeV)
+C     GV (complex*8) :   coupling of  scaler1 - scaler2 - V
+C                       
+C Output
+C     DCYWDT : decay width (GeV)
+C         
+C----------------------------------------------------------------------C
+      IMPLICIT REAL*8 ( A-H, O-Z )
+      COMPLEX*16 GV
+C----------------------------------------------------------------------C
+      IF( SCMAS1 .LE. SCMAS2+VMAs) THEN
+        DCYWDT = 0.D0
+        RETURN
+      ENDIF
+ 
+      PI = ACOS(0.D0)*2.D0
+      SCMS12 = SCMAS1**2
+      SCMS22 = SCMAS2**2
+      VMAS2 = VMAS**2
+      BETA2 = ( 1.D0 - (SCMAS2 + VMAS)**2/SCMS12)*
+     &         ( 1.D0 - (SCMAS2 - VMAS)**2/SCMS12)
+      BETA =SQRT(BETA2)
+      TMAT2= (SCMS12 - SCMS22)**2/VMAS2 -1.5D0*(SCMS12+SCMS22) 
+     & + 0.5D0*VMAS2
+      DCYWDT = BETA * TMAT2 * ABS(GV)**2/16.D0/PI/SCMAS1
+ 
+ 
+      RETURN
+      END
+
 C----------------------------------------------------------------------C
       SUBROUTINE SCF1F2( SCMAS, F1MAS, F2MAS, GL, GR, DCYWDT )
 C----------------------------------------------------------------------C
@@ -70,27 +108,27 @@ C                           scaler - f_1 - f_2
 C Output
 C     DCYWDT : decay width (GeV)
 C----------------------------------------------------------------------C
-      IMPLICIT REAL*8 (A-H, O-Z)
+      IMPLICIT REAL*8 ( A-H, O-Z )
       COMPLEX*16 GL, GR
 C----------------------------------------------------------------------C
       IF( SCMAS .LE. F1MAS+F2MAS ) THEN
-        DCYWDT = 0.
+        DCYWDT = 0.D0
         RETURN
       ENDIF
  
-      PI = ACOS(0.)*2.
+      PI = ACOS(0.D0)*2.D0
       SCMAS2 = SCMAS**2
       F1MAS2 = F1MAS**2
       F2MAS2 = F2MAS**2
  
       PMOM2 = (SCMAS2-(F1MAS+F2MAS)**2)*(SCMAS2-(F1MAS-F2MAS)**2)
-     &         /4./SCMAS2
+     &         /4.D0/SCMAS2
       PMOM = SQRT(PMOM2)
  
       TMAT2 = ( ABS(GL)**2 + ABS(GR)**2 ) * ( SCMAS2-F1MAS2-F2MAS2 )
-     &       - 4.*F2MAS*F1MAS*REAL( GL*CONJG(GR) )
+     &       - 4.D0*F2MAS*F1MAS*REAL( GL*CONJG(GR) )
  
-      DCYWDT = PMOM*TMAT2/8./PI/SCMAS2
+      DCYWDT = PMOM*TMAT2/8.D0/PI/SCMAS2
  
  
       RETURN
@@ -110,29 +148,29 @@ C                           f_1 - f_2 - scaler
 C Output
 C     DCYWDT : decay width (GeV)
 C----------------------------------------------------------------------C
-      IMPLICIT REAL*8 (A-H, O-Z)
+      IMPLICIT REAL*8 ( A-H, O-Z )
       COMPLEX*16 GL, GR
 C----------------------------------------------------------------------C
       IF( F1MAS .LE. F2MAS+SCMAS ) THEN
-        DCYWDT = 0.
+        DCYWDT = 0.D0
         RETURN
       ENDIF
  
-      PI = ACOS(0.)*2.
+      PI = ACOS(0.D0)*2.D0
       F1MAS2 = F1MAS**2
       F2MAS2 = F2MAS**2
       SCMAS2 = SCMAS**2
  
       PMOM2 = (F1MAS2-(F2MAS+SCMAS)**2)*(F1MAS2-(F2MAS-SCMAS)**2)
-     &         /4./F1MAS2
+     &         /4.D0/F1MAS2
       PMOM = SQRT(PMOM2)
  
       TMAT2 = ( ABS(GL)**2 + ABS(GR)**2 ) * ( F1MAS2+F2MAS2-SCMAS2 )
-     &       + 4.*F1MAS*F2MAS*REAL( GL*CONJG(GR) )
+     &       + 4.D0*F1MAS*F2MAS*REAL( GL*CONJG(GR) )
 C      spin average for initial fermion f1
-      TMAT2 = TMAT2/2.
+      TMAT2 = TMAT2/2.D0
  
-      DCYWDT = PMOM*TMAT2/8./PI/F1MAS2
+      DCYWDT = PMOM*TMAT2/8.D0/PI/F1MAS2
  
  
       RETURN

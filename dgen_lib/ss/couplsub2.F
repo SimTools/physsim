@@ -39,14 +39,15 @@ C  BASIC RELATION
 C  G1 =  GL COS(THETA) + GR SIN(THETA)
 C  G2 = -GL SIN(THETA) + GR COS(THETA)
 C----------------------------------------------------------------------C
+      IMPLICIT REAL*8 ( A-H, O-Z )
       COMPLEX*16 GCNSEL(2,2), GCNSER(2,2),
-     &           GCUSDL(2,2), GCUSDR(2,2), GCDSUL(2,2), GCDSUR(2,2)
+     &          GCUSDL(2,2), GCUSDR(2,2), GCDSUL(2,2), GCDSUR(2,2)
       COMPLEX*16 GNESEL(2,4), GNESER(2,4),
-     &           GNUSUL(2,4), GNUSUR(2,4), GNDSDL(2,4), GNDSDR(2,4)
+     &          GNUSUL(2,4), GNUSUR(2,4), GNDSDL(2,4), GNDSDR(2,4)
       COMPLEX*16 GCNSE1(2,2), GCNSE2(2,2),
-     &           GCUSD1(2,2), GCUSD2(2,2), GCDSU1(2,2), GCDSU2(2,2)
+     &          GCUSD1(2,2), GCUSD2(2,2), GCDSU1(2,2), GCDSU2(2,2)
       COMPLEX*16 GNESE1(2,4), GNESE2(2,4),
-     &           GNUSU1(2,4), GNUSU2(2,4), GNDSD1(2,4), GNDSD2(2,4)
+     &          GNUSU1(2,4), GNUSU2(2,4), GNDSD1(2,4), GNDSD2(2,4)
       REAL*8 SPHI(3)
 C--
 C     INITIALIZE COS OR SIN (THETA_SF)

@@ -20,7 +20,7 @@ C Output: SWM, SZM                 / chargino,neutralino masses
 C         DCCINO, DCNINO
 C         BRCINO, BRNINO
 C----------------------------------------------------------------------C
-      IMPLICIT REAL*8 (A-H, O-Z)
+      IMPLICIT REAL*8 ( A-H, O-Z )
       REAL*8  OL(2,2), OR(2,2), ER
       REAL*8  ON(4,4)
       COMPLEX*16 ETA(4), UN(4,4), GL, GR
@@ -30,9 +30,9 @@ C----------------------------------------------------------------------C
       REAL*8  BRCINO(40,4), BRNINO(40,2)
  
       COMPLEX*16 GCESNL(2,4), GCNSEL(2,4), GCNSER(2,4),
-     &           GCUSDL(2,4), GCUSDR(2,4), GCDSUL(2,4), GCDSUR(2,4)
+     &          GCUSDL(2,4), GCUSDR(2,4), GCDSUL(2,4), GCDSUR(2,4)
       COMPLEX*16 GNNSNL(2,4), GNESEL(2,4), GNESER(2,4),
-     &           GNUSUL(2,4), GNUSUR(2,4), GNDSDL(2,4), GNDSDR(2,4)
+     &          GNUSUL(2,4), GNUSUR(2,4), GNDSDL(2,4), GNDSDR(2,4)
  
       COMPLEX*16 GNCW(2,4,2)
       COMPLEX*16 GCCZ(2,2,2)
@@ -56,12 +56,12 @@ C     require that chargino(1) is heavier than neutralino(1)
  
       DO 1 I=1,40
        DO 2 J=1,4
-        DCNINO(I,J)=0.
-        BRNINO(I,J)=0.
+        DCNINO(I,J)=0.D0
+        BRNINO(I,J)=0.D0
 2      CONTINUE
        DO 3 J=1,2
-        DCCINO(I,J)=0.
-        BRCINO(I,J)=0.
+        DCCINO(I,J)=0.D0
+        BRCINO(I,J)=0.D0
 3      CONTINUE
 1     CONTINUE
  
@@ -88,25 +88,25 @@ C       determine ino-ino-Higgs couplings
      &                    GCCH, GCNH, GNNH )
  
 C       set SM couplings etc.
-      GAMW = 2.25
-      GAMZ = 2.53
-      PI  = ACOS(0.)*2.
-      EC2 = 4.*PI*ALPHE
+      GAMW = 2.25D0
+      GAMZ = 2.53D0
+      PI  = ACOS(0.D0)*2.D0
+      EC2 = 4.D0*PI*ALPHE
       GWEAK = SQRT(EC2/SIN2W)
-      COS2W = 1.-SIN2W
+      COS2W = 1.D0-SIN2W
       GZ    = SQRT(EC2/COS2W/SIN2W)
 C   f-f_bar-Z
-      GZNL = -GZ*( 0.5 )
-      GZNR = 0.
-      GZEL = -GZ*(-0.5+SIN2W)
+      GZNL = -GZ*( 0.5D0 )
+      GZNR = 0.D0
+      GZEL = -GZ*(-0.5D0+SIN2W)
       GZER = -GZ*(     SIN2W)
-      GZUL = -GZ*( 0.5-2./3.*SIN2W)
-      GZUR = -GZ*(    -2./3.*SIN2W)
-      GZDL = -GZ*(-0.5+1./3.*SIN2W)
-      GZDR = -GZ*(     1./3.*SIN2W)
+      GZUL = -GZ*( 0.5D0-2.D0/3.D0*SIN2W)
+      GZUR = -GZ*(    -2.D0/3.D0*SIN2W)
+      GZDL = -GZ*(-0.5D0+1.D0/3.D0*SIN2W)
+      GZDR = -GZ*(     1.D0/3.D0*SIN2W)
 C   f1-f2_bar-W
-      GWFL = -GWEAK/SQRT(2.)
-      GWFR = 0.
+      GWFL = -GWEAK/SQRT(2.D0)
+      GWFR = 0.D0
  
 C=============================
 C neutralino decay
@@ -128,7 +128,7 @@ C  neutralino_J --> chargino_i(-) + W(+)  + h.c.
       GR = GNCW(2,J,I)
       CALL F1F2VD( F1MAS, F2MAS, VMAS, GL, GR, DCYWDT )
       N = N+1
-      DCNINO(N,J) = DCYWDT *2.
+      DCNINO(N,J) = DCYWDT *2.D0
 10    CONTINUE
 C N is 2
  
@@ -141,7 +141,7 @@ C  neutralino_J --> chargino_i(-) + Higgs(+)  + h.c.
       GR = GCNH(2,I,J)
       CALL F1F2SC( F1MAS, F2MAS, SCMAS, GL, GR, DCYWDT )
       N = N+1
-      DCNINO(N,J) = DCYWDT *2.
+      DCNINO(N,J) = DCYWDT *2.D0
 11    CONTINUE
 C N is 4
  

@@ -11,11 +11,11 @@ C  outputs : HG0MAS(i) i=1..2 / neutral Higgs mass (i=1:lighter )
 C            HGCMAS           / charged Higgs mass( physical )
 C            TANA   / tan of Higgs boson mixing angle
 C----------------------------------------------------------------------C
-      IMPLICIT REAL*8 (A-H, O-Z)
+      IMPLICIT REAL*8 ( A-H, O-Z )
       REAL*8 HG0MAS(2), HG0MS2(2)
 C     DATA IIII/0/
 C----------------------------------------------------------------------C
-      COS2W = 1.-SIN2W
+      COS2W = 1.D0-SIN2W
       COSW  = SQRT(COS2W)
       ZM    = WM/COSW
       ZM2   = ZM**2
@@ -29,20 +29,20 @@ C     SINDB = 2.*SINB*COSB
 C     SIN2B = SINB**2
 C     COS2B = COSB**2
       TAN2B = TANB**2
-      COS2B = 1./(1.+TAN2B)
+      COS2B = 1.D0/(1.D0+TAN2B)
       COSB  = SIGN( SQRT(COS2B), TANB )
-      SIN2B = 1.-COS2B
+      SIN2B = 1.D0-COS2B
       SINB  = SQRT(SIN2B)
       COSDB = (COSB-SINB)*(COSB+SINB)
-      SINDB = 2.*SINB*COSB
+      SINDB = 2.D0*SINB*COSB
  
       HGCMAS = SQRT( PSMAS2 + WM**2 )
       AMS    = PSMAS2 + ZM2
       DELTM  = SQRT( ((PSMAS+ZM)*(PSMAS-ZM))**2
-     &                + 4.*PSMAS2 * ZM2 *SINDB**2 )
+     &                + 4.D0*PSMAS2 * ZM2 *SINDB**2 )
  
-      HG0MS2(1) =  0.5*( AMS - DELTM )
-      HG0MS2(2) =  0.5*( AMS + DELTM )
+      HG0MS2(1) =  0.5D0*( AMS - DELTM )
+      HG0MS2(2) =  0.5D0*( AMS + DELTM )
       DO 10 I=1,2
 10    HG0MAS(I) = SQRT( HG0MS2(I) )
  

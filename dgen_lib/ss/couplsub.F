@@ -13,7 +13,6 @@ C----------------------------------------------------------------------C
       SUBROUTINE  INOGBS( ALPHE, SIN2W,
      &                    PHIL, PHIR, ER, ON, ETA,
      &                    GNCW, GCCZ, GNNZ )
-      IMPLICIT REAL*8 (A-H, O-Z)
 C----------------------------------------------------------------------C
 C Purpose: give couplings of Ino -Gauge_boson
 C Input  : ALPHE  e**2/4/pi         !
@@ -28,32 +27,33 @@ C          GNNZ(i,j,k) (i=1..2, j=1..4, k=1..4 )  ( j =/< k )
 C              i=1/left-handed,  i=2/right-handed
 C
 C----------------------------------------------------------------------C
-      REAL*8     ON(4,4)
+      IMPLICIT REAL*8 ( A-H, O-Z )
+      REAL*8    ON(4,4)
       COMPLEX*16 ETA(4)
  
       COMPLEX*16 GNCW(2,4,2)
       COMPLEX*16 GCCZ(2,2,2), GV(2,2), GA(2,2)
       COMPLEX*16 GNNZ(2,4,4), CA(4,4), CV(4,4)
       COMPLEX*16 IMGI, CMPLX
-      DATA IMGI  /(0.D0,1.D0)/
+      DATA IMGI /(0.D0,1.D0)/
 C----------------------------------------------------------------------C
       DO 1 I=1,4
-        IF( ETA(I).NE.1. .AND. ETA(I).NE.IMGI ) THEN
+        IF( ETA(I).NE.1.D0 .AND. ETA(I).NE.IMGI ) THEN
           WRITE(6,*) ' ETA is wrong, ETA=',ETA
           STOP
         ENDIF
 1     CONTINUE
+C      write(*,*) alphe, 'alphe in couplsub'
+      PI = ACOS(0.D0)*2.D0
+      SQRT2 = SQRT(2.D0)
  
-      PI = ACOS(0.)*2.
-      SQRT2 = SQRT(2.)
- 
-      COS2W = 1.-SIN2W
+      COS2W = 1.D0-SIN2W
       COSW  = SQRT(COS2W)
       SINW  = SQRT(SIN2W)
       TANW  = SINW/COSW
       TAN2W = TANW**2
  
-      GWEAK = SQRT(ALPHE*4.*PI/SIN2W)
+      GWEAK = SQRT(ALPHE*4.D0*PI/SIN2W)
       GZ    = GWEAK/COSW
  
       SINPL = SIN(PHIL)
@@ -82,14 +82,14 @@ C---
 C---
 C Chargino-Chargino-Z_boson
 C---
-      GV(1,1) = 0.25*( SIN2PL+ SIN2PR ) - COS2W
-      GA(1,1) = 0.25*( SIN2PL- SIN2PR )
+      GV(1,1) = 0.25D0*( SIN2PL+ SIN2PR ) - COS2W
+      GA(1,1) = 0.25D0*( SIN2PL- SIN2PR )
  
-      GV(2,2) = 0.25*( COS2PL+ COS2PR ) - COS2W
-      GA(2,2) = 0.25*( COS2PL- COS2PR )
+      GV(2,2) = 0.25D0*( COS2PL+ COS2PR ) - COS2W
+      GA(2,2) = 0.25D0*( COS2PL- COS2PR )
  
-      GV(1,2) = 0.25*( COSPL*SINPL + ER*COSPR*SINPR )
-      GA(1,2) = 0.25*( COSPL*SINPL - ER*COSPR*SINPR )
+      GV(1,2) = 0.25D0*( COSPL*SINPL + ER*COSPR*SINPR )
+      GA(1,2) = 0.25D0*( COSPL*SINPL - ER*COSPR*SINPR )
       GV(2,1) = GV(1,2)
       GA(2,1) = GA(1,2)
  
@@ -111,11 +111,11 @@ C---
        COM = ON(I,3)*ON(J,3) - ON(I,4)*ON(J,4)
        CMPLX = ETA(I)*CONJG(ETA(J))
        IF( REAL(CMPLX) .EQ. 0 ) THEN
-         CV(I,J) = 0.5*IMGI *IMAG(CMPLX) * COM
-         CA(I,J) = 0.
+         CV(I,J) = 0.5D0*IMGI *IMAG(CMPLX) * COM
+         CA(I,J) = 0.D0
        ELSE
-         CV(I,J) = 0.
-         CA(I,J) = 0.5 *REAL(CMPLX) * COM
+         CV(I,J) = 0.D0
+         CA(I,J) = 0.5D0 *REAL(CMPLX) * COM
        ENDIF
 30    CONTINUE
       DO 31 I=1,4
@@ -129,7 +129,7 @@ C---
       IF(J.NE.K ) THEN
       GNNZ(I,J,K) = -GNNZ(I,J,K)*GZ
       ELSE
-      GNNZ(I,J,K) = -GNNZ(I,J,K)*GZ/2.
+      GNNZ(I,J,K) = -GNNZ(I,J,K)*GZ/2.D0
       ENDIF
 32    CONTINUE
  
@@ -145,6 +145,9 @@ C----------------------------------------------------------------------C
      &                    GNNSNL, GNESEL, GNESER,
      &                    GNUSUL, GNUSUR, GNDSDL, GNDSDR )
 C----------------------------------------------------------------------C
+C modified by M. M. Nojiri Aug.1 1996
+C  neutralino-uquark suquark is corrected
+C  some typo in comment like are corrected 
 C purpose : give couplings for Ino -fermion -Sfermion
 C Input  : ALPHE  e**2/4/pi
 C          SIN2W (real*4)  weak mixing angle
@@ -154,7 +157,7 @@ C               ( charged-lepton, up-type, down-type )
 C          TANB  (real*4)  SUSY parameter tan(beta)=v2/v1
 C          PHIL, PHIR      chargino mix. angle
 C          ER              chargino mix. phase
-C          ON(i,j) (real*4)(i,j=1..4)diagonalizing matrix for chargino
+C          ON(i,j) (real*4)(i,j=1..4)diagonalizing matrix for neutralino
 C          ETA(i)  (complex*8) (i=1..4)    phase factor
 C Output :
 C    GCESNL(i,j) (i=1..2, j=1..2 ) / chargino(j)-electron-Sneutrino_L
@@ -167,24 +170,24 @@ C    GCUSDR(i,j) (i=1..2, j=1..2 ) / chargino(j)-u_quark-Sd_quark_R
 C    GNNSNL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-neutrino-Sneutrino_L
 C    GNESEL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-electron-Selectron_L
 C    GNESER(i,j) (i=1..2, j=1..4 ) / neutralino(j)-electron-Selectron_R
-C    GNUSEL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_L
-C    GNUSER(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_R
-C    GNDSEL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_L
-C    GNDSER(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_R
+C    GNUSUL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_L
+C    GNUSUR(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_R
+C    GNDSDL(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_L
+C    GNDSDR(i,j) (i=1..2, j=1..4 ) / neutralino(j)-u_quark-Su_quark_R
 C              i=1/left-handed-coupling,  i=2/right-handed
 C----------------------------------------------------------------------C
-      IMPLICIT REAL*8 (A-H, O-Z)
+      IMPLICIT REAL*8 ( A-H, O-Z )
       REAL*8 ON(4,4)
       COMPLEX*16 ETA(4)
       COMPLEX*16 GCESNL(2,2), GCNSEL(2,2), GCNSER(2,2),
-     &           GCUSDL(2,2), GCUSDR(2,2), GCDSUL(2,2), GCDSUR(2,2)
+     &          GCUSDL(2,2), GCUSDR(2,2), GCDSUL(2,2), GCDSUR(2,2)
       COMPLEX*16 GNNSNL(2,4), GNESEL(2,4), GNESER(2,4),
-     &           GNUSUL(2,4), GNUSUR(2,4), GNDSDL(2,4), GNDSDR(2,4)
+     &          GNUSUL(2,4), GNUSUR(2,4), GNDSDL(2,4), GNDSDR(2,4)
 C----------------------------------------------------------------------C
-      PI = ACOS(0.)*2.
-      SQRT2 = SQRT(2.)
-      GWEAK = SQRT(ALPHE*4.*PI/SIN2W)
-      COS2W = 1.-SIN2W
+      PI = ACOS(0.D0)*2.D0
+      SQRT2 = SQRT(2.D0)
+      GWEAK = SQRT(ALPHE*4.D0*PI/SIN2W)
+      COS2W = 1.D0-SIN2W
       TANW  = SQRT(SIN2W/COS2W)
 C  0 < beta < pi
 C     BETA  = ATAN2( ABS(TANB), SIGN(1.,TANB) )
@@ -192,9 +195,9 @@ C     BETA  = DATAN2( DABS(DBLE(TANB)), DSIGN(1.D0,DBLE(TANB)) )
 C     COSB  = COS(BETA)
 C     SINB  = SIN(BETA)
       TAN2B = TANB**2
-      COS2B = 1./(1.+TAN2B)
+      COS2B = 1.D0/(1.D0+TAN2B)
       COSB  = SIGN( SQRT(COS2B), TANB )
-      SIN2B = 1.-COS2B
+      SIN2B = 1.D0-COS2B
       SINB  = SQRT(SIN2B)
       COSPL = COS(PHIL)
       SINPL = SIN(PHIL)
@@ -203,7 +206,7 @@ C     SINB  = SIN(BETA)
  
       WMCOSB = WM*COSB
       WMSINB = WM*SINB
-      WMSQR2 = WM*SQRT(2.)
+      WMSQR2 = WM*SQRT(2.D0)
       WSQ2CB = WMSQR2*COSB
       WSQ2SB = WMSQR2*SINB
  
@@ -211,20 +214,23 @@ C---
 C Chargino-fermion-Sfermion
 C---
 C chargino-electron-Sneutrino
+      write(*,*) 'chargino-electron-sneutrino coupling'
+      write(*,*) phil,phir
+      write(*,*) gweak, cospr, cospl
       GCESNL(1,1) = -GWEAK*COSPR
       GCESNL(2,1) =  GWEAK*EMAS*SINPL/WSQ2CB
       GCESNL(1,2) =  GWEAK*ER*SINPR
       GCESNL(2,2) =  GWEAK*EMAS*COSPL/WSQ2CB
 C chargino-neutrino-Selectron_L
       GCNSEL(1,1) = -GWEAK*COSPL
-      GCNSEL(2,1) =  0.
+      GCNSEL(2,1) =  0.D0
       GCNSEL(1,2) =  GWEAK*SINPL
-      GCNSEL(2,2) =  0.
+      GCNSEL(2,2) =  0.D0
 C chargino-neutrino-Selectron_R
       GCNSER(1,1) =  GWEAK*EMAS*SINPL/WSQ2CB
-      GCNSER(2,1) =  0.
+      GCNSER(2,1) =  0.D0
       GCNSER(1,2) =  GWEAK*EMAS*COSPL/WSQ2CB
-      GCNSER(2,2) =  0.
+      GCNSER(2,2) =  0.D0
 C chargino-d_quark-Su_quark_L
       GCDSUL(1,1) = -GWEAK*COSPR
       GCDSUL(2,1) =  GWEAK*DMAS*SINPL/WSQ2CB
@@ -232,9 +238,9 @@ C chargino-d_quark-Su_quark_L
       GCDSUL(2,2) =  GWEAK*DMAS*COSPL/WSQ2CB
 C chargino-d_quark-Su_quark_R
       GCDSUR(1,1) =  GWEAK*UMAS*SINPR/WSQ2SB
-      GCDSUR(2,1) =  0.
+      GCDSUR(2,1) =  0.D0
       GCDSUR(1,2) =  GWEAK*UMAS*ER*COSPR/WSQ2SB
-      GCDSUR(2,2) =  0.
+      GCDSUR(2,2) =  0.D0
 C chargino-u_quark-Sd_quark_L
       GCUSDL(1,1) = -GWEAK*COSPL
       GCUSDL(2,1) =  GWEAK*UMAS*SINPR/WSQ2SB
@@ -242,40 +248,33 @@ C chargino-u_quark-Sd_quark_L
       GCUSDL(2,2) =  GWEAK*UMAS*ER*COSPR/WSQ2SB
 C chargino-u_quark-Sd_quark_R
       GCUSDR(1,1) =  GWEAK*DMAS*SINPL/WSQ2CB
-      GCUSDR(2,1) =  0.
+      GCUSDR(2,1) =  0.D0
       GCUSDR(1,2) =  GWEAK*DMAS*COSPL/WSQ2CB
-      GCUSDR(2,2) =  0.
+      GCUSDR(2,2) =  0.D0
  
 C---
 C Neutralino-fermion-Sfermion
 C---
-      UCHRG= 2./3.
-      DCHRG=-1./3.
+      UCHRG= 2.D0/3.D0
+      DCHRG=-1.D0/3.D0
       DO 10 I=1,4
         GNNSNL(1,I) = CONJG(ETA(I))*(ON(I,2)-ON(I,1)*TANW)
 C       GNNSNL(1,I) = CONJG(ETA(I))*(ON(I,2))
-        GNNSNL(2,I) = 0.
+        GNNSNL(2,I) = 0.D0
         GNESEL(1,I) =-CONJG(ETA(I))*(ON(I,2)+ON(I,1)*TANW)
         GNESEL(2,I) = ETA(I)*EMAS*ON(I,3)/WMCOSB
         GNESER(1,I) = CONJG(ETA(I))*EMAS*ON(I,3)/WMCOSB
-        GNESER(2,I) = 2.*ETA(I)*ON(I,1)*TANW
-C>>> 96/08/01  Bug fixup due to nojirim
-C        GNUSUL(1,I) = CONJG(ETA(I))
-C     &               *( ON(I,2)+(2.*UCHRG-1.)*ON(I,1)*TANW )
-C        GNUSUL(2,I) = ETA(I)*UMAS*ON(I,3)/WMSINB
-C        GNUSUR(1,I) = CONJG(ETA(I))*UMAS*ON(I,3)/WMSINB
-C        GNUSUR(2,I) =-2.*ETA(I)*UCHRG*TANW*ON(I,1)
+        GNESER(2,I) = 2.D0*ETA(I)*ON(I,1)*TANW
         GNUSUL(1,I) = CONJG(ETA(I))
-     &               *( ON(I,2)+(2.*UCHRG-1.)*ON(I,1)*TANW )
+     &               *( ON(I,2)+(2.D0*UCHRG-1.D0)*ON(I,1)*TANW )
         GNUSUL(2,I) = ETA(I)*UMAS*ON(I,4)/WMSINB
         GNUSUR(1,I) = CONJG(ETA(I))*UMAS*ON(I,4)/WMSINB
-        GNUSUR(2,I) =-2.*ETA(I)*UCHRG*TANW*ON(I,1)
-C>>>
+        GNUSUR(2,I) =-2.D0*ETA(I)*UCHRG*TANW*ON(I,1)
         GNDSDL(1,I) = CONJG(ETA(I))
-     &               *(-ON(I,2)+(2.*DCHRG+1.)*ON(I,1)*TANW )
+     &               *(-ON(I,2)+(2.D0*DCHRG+1.D0)*ON(I,1)*TANW )
         GNDSDL(2,I) = ETA(I)*DMAS*ON(I,3)/WMCOSB
         GNDSDR(1,I) = CONJG(ETA(I))*DMAS*ON(I,3)/WMCOSB
-        GNDSDR(2,I) =-2.*ETA(I)*DCHRG*TANW*ON(I,1)
+        GNDSDR(2,I) =-2.D0*ETA(I)*DCHRG*TANW*ON(I,1)
 10    CONTINUE
  
       GWSQR2 = GWEAK/SQRT2
@@ -300,6 +299,8 @@ C----------------------------------------------------------------------C
      &                    GHHWW, GH02W2, GH0HWZ, GH0HWA,
      &                    GHHZZ, GH02Z2, GHHZA, GHHAA )
 C----------------------------------------------------------------------C
+C corrected by M. M. Nojiri Aug. 1st 1996
+C definition of signd was wrong. 
 C purpose : give  Higss- Gauge_boson couplings
 C inputs  : ALPHE, SIN2W, WM / S.M. parameters
 C           TANB / ratio of vev. ( v2/v1 )
@@ -322,17 +323,17 @@ C                                ( same for all H_0(i) )
 C           GHHZA              / Higgs_(+) -Higgs_(-) -Z-A
 C           GHHAA              / Higgs_(+) -Higgs_(-) -A-A
 C----------------------------------------------------------------------C
-      IMPLICIT REAL*8 (A-H, O-Z)
+      IMPLICIT REAL*8 ( A-H, O-Z )
       COMPLEX*16 GH0WW(2), GH0ZZ(2), GH0HCW(3), GH0PHZ(2),
-     &           GH0HWZ(3), GH0HWA(3)
+     &          GH0HWZ(3), GH0HWA(3)
       COMPLEX*16 IMGI
-      DATA IMGI  /(0.D0,1.D0)/
+      DATA IMGI/(0.D0,1.D0)/
 C----------------------------------------------------------------------C
-      PI = ACOS(0.)*2.
-      GWEAK = SQRT(ALPHE*4.*PI/SIN2W)
-      EC    = SQRT(ALPHE*4.*PI)
+      PI = ACOS(0.D0)*2.D0
+      GWEAK = SQRT(ALPHE*4.D0*PI/SIN2W)
+      EC    = SQRT(ALPHE*4.D0*PI)
  
-      COS2W = 1.-SIN2W
+      COS2W = 1.D0-SIN2W
       COSW  = SQRT(COS2W)
       ZM    = WM/COSW
       GZ    = GWEAK/COSW
@@ -340,54 +341,51 @@ C----------------------------------------------------------------------C
 C     ALPHA = ATAN2( ABS(TANA), SIGN(1.,TANA) )
 C     ALPHA = DATAN2( DABS(DBLE(TANA)), DSIGN(1.D0,DBLE(TANA)) )
       TAN2A = TANA**2
-      COS2A = 1./(1.+TAN2A)
+      COS2A = 1.D0/(1.D0+TAN2A)
       COSA  = SIGN( SQRT(COS2A), TANA )
-      SIN2A = 1.-COS2A
+      SIN2A = 1.D0-COS2A
       SINA  = SQRT(SIN2A)
 C     BETA  = ATAN2( ABS(TANB), SIGN(1.,TANB) )
 C     BETA  = DATAN2( DABS(DBLE(TANB)), DSIGN(1.D0,DBLE(TANB)) )
       TAN2B = TANB**2
-      COS2B = 1./(1.+TAN2B)
+      COS2B = 1.D0/(1.D0+TAN2B)
       COSB  = SIGN( SQRT(COS2B), TANB )
-      SIN2B = 1.-COS2B
+      SIN2B = 1.D0-COS2B
       SINB  = SQRT(SIN2B)
  
 C     DELT = ALPHA-BETA
 C     COSD = COS(DELT)
 C     SIND = SIN(DELT)
       COSD = COSA*COSB + SINA*SINB
-C>>> 96/08/01  Bug fixup due to nojirim
-C      SIND = SINA*COSB + COSA*SINB
       SIND = SINA*COSB - COSA*SINB
-C>>>
  
       GH0WW(1) = -GWEAK*SIND *WM
       GH0WW(2) =  GWEAK*COSD *WM
  
-      GH0ZZ(1) = -0.5*GZ*SIND *ZM
-      GH0ZZ(2) =  0.5*GZ*COSD *ZM
+      GH0ZZ(1) = -0.5D0*GZ*SIND *ZM
+      GH0ZZ(2) =  0.5D0*GZ*COSD *ZM
  
-      GH0HCW(1) = 0.5*GWEAK*COSD *IMGI
-      GH0HCW(2) = 0.5*GWEAK*SIND *IMGI
-      GH0HCW(3) =-0.5*GWEAK
+      GH0HCW(1) = 0.5D0*GWEAK*COSD *IMGI
+      GH0HCW(2) = 0.5D0*GWEAK*SIND *IMGI
+      GH0HCW(3) =-0.5D0*GWEAK
  
-      GH0PHZ(1) =-0.5*GZ*COSD
-      GH0PHZ(2) =-0.5*GZ*SIND
+      GH0PHZ(1) =-0.5D0*GZ*COSD
+      GH0PHZ(2) =-0.5D0*GZ*SIND
  
-      GHHZ      = -(-0.5+SIN2W)*GZ *IMGI
+      GHHZ      = -(-0.5D0+SIN2W)*GZ *IMGI
       GHHA      = EC *IMGI
  
-      GHHWW     = 0.5*GWEAK**2
-      GH02W2    = 0.25*GWEAK**2
-      GH0HWZ(1) =-0.5*GWEAK*GZ*SIN2W*COSD
-      GH0HWZ(2) =-0.5*GWEAK*GZ*SIN2W*SIND
-      GH0HWZ(3) =-0.5*GWEAK*GZ*SIN2W *IMGI
-      GH0HWA(1) = 0.5*GWEAK*EC*COSD
-      GH0HWA(2) = 0.5*GWEAK*EC*SIND
-      GH0HWA(3) = 0.5*GWEAK*EC *IMGI
-      GHHZZ     = GZ**2*(-0.5+SIN2W)**2
-      GH02Z2    = GZ**2/8.
-      GHHZA     =-2.*GZ*EC*(-0.5+SIN2W)
+      GHHWW     = 0.5D0*GWEAK**2
+      GH02W2    = 0.25D0*GWEAK**2
+      GH0HWZ(1) =-0.5D0*GWEAK*GZ*SIN2W*COSD
+      GH0HWZ(2) =-0.5D0*GWEAK*GZ*SIN2W*SIND
+      GH0HWZ(3) =-0.5D0*GWEAK*GZ*SIN2W *IMGI
+      GH0HWA(1) = 0.5D0*GWEAK*EC*COSD
+      GH0HWA(2) = 0.5D0*GWEAK*EC*SIND
+      GH0HWA(3) = 0.5D0*GWEAK*EC *IMGI
+      GHHZZ     = GZ**2*(-0.5D0+SIN2W)**2
+      GH02Z2    = GZ**2/8.D0
+      GHHZA     =-2.D0*GZ*EC*(-0.5D0+SIN2W)
       GHHAA     = EC**2
  
  
@@ -411,18 +409,19 @@ C           GNNH(i,j,k,l)(i=1..2, j,k=1..4 ) N.ino(j)-N.ino(k)-H_0(l)
 C                         (   l=1..3  )
 C              i=1/left-handed,  i=2/right-handed
 C----------------------------------------------------------------------C
-      IMPLICIT REAL*8 (A-H, O-Z)
-      REAL*8     ON(4,4)
+      IMPLICIT REAL*8 ( A-H, O-Z )
+      REAL*8    ON(4,4)
       COMPLEX*16 ETA(4)
       COMPLEX*16 GSCCH(2,2), GCCH(2,2,2,3), GPCCP(2)
       COMPLEX*16 GCNH(2,2,4), GNNH(2,4,4,3), SS(3),PP(3), SS0, PP0
       COMPLEX*16 IMGI, CMPLX
-      DATA IMGI  /(0.D0,1.D0)/
+      DATA IMGI /(0.D0,1.D0)/
 C----------------------------------------------------------------------C
-      PI = ACOS(0.)*2.
-      SQRT2 = SQRT(2.)
-      GWEAK = SQRT(ALPHE*4.*PI/SIN2W)
-      COS2W = 1.-SIN2W
+      PI = ACOS(0.D0)*2.D0
+      SQRT2 = SQRT(2.D0)
+      GWEAK = SQRT(ALPHE*4.D0*PI/SIN2W)
+C      write(*,*) 'gweak from ino-higgs routine' , gweak
+      COS2W = 1.D0-SIN2W
       SINW  = SQRT(SIN2W)
       COSW  = SQRT(COS2W)
       TANW  = SINW/COSW
@@ -434,18 +433,18 @@ C     BETA  = DATAN2( DABS(DBLE(TANB)), DSIGN(1.D0,DBLE(TANB)) )
 C     COSB  = COS(BETA)
 C     SINB  = SIN(BETA)
       TAN2B = TANB**2
-      COS2B = 1./(1.+TAN2B)
+      COS2B = 1.D0/(1.D0+TAN2B)
       COSB  = SIGN( SQRT(COS2B), TANB )
-      SIN2B = 1.-COS2B
+      SIN2B = 1.D0-COS2B
       SINB  = SQRT(SIN2B)
 C     ALPHA = ATAN2( ABS(TANA), SIGN(1.,TANA) )
 C     ALPHA = DATAN2( DABS(DBLE(TANA)), DSIGN(1.D0,DBLE(TANA)) )
 C     SINA  = SIN(ALPHA)
 C     COSA  = COS(ALPHA)
       TAN2A = TANA**2
-      COS2A = 1./(1.+TAN2A)
+      COS2A = 1.D0/(1.D0+TAN2A)
       COSA  = SIGN( SQRT(COS2A), TANA )
-      SIN2A = 1.-COS2A
+      SIN2A = 1.D0-COS2A
       SINA  = SQRT(SIN2A)
  
       COSPL = COS(PHIL)
@@ -513,12 +512,13 @@ C---
      &               +COSPR*ONI21T )*CONJG(ETA(I))
        GCNH(2,2,I) = SINB*(-SINPL*ON(I,3) -COSPL*ONI21T )*ETA(I)
 10    CONTINUE
- 
+C      write(*,*) 'i,j,k, gcnh'
       DO 15 I=1,2
       DO 15 J=1,2
       DO 15 K=1,4
-15    GCNH(I,J,K) = GCNH(I,J,K) * (-GWEAK)
- 
+      GCNH(I,J,K) = GCNH(I,J,K) * (-GWEAK)
+      write(*,*) i,j,k, gcnh(i,j,k)
+ 15   CONTINUE
 C---
 C Neutralino-Neutralino-Higgs
 C---
@@ -549,18 +549,18 @@ C---
      &       +ONJ21T*(-SINB*ON(I,3)+COSB*ON(I,4))
        IF( REAL(CMPLX) .NE.0 ) THEN
         SS(1) = REAL(CMPLX)*FF1
-        PP(1) = 0.
+        PP(1) = 0.D0
         SS(2) = REAL(CMPLX)*FF2
-        PP(2) = 0.
-        SS(3) = 0.
+        PP(2) = 0.D0
+        SS(3) = 0.D0
         PP(3) =-REAL(CMPLX)*FF3
        ELSE
-        SS(1) = 0.
+        SS(1) = 0.D0
         PP(1) = IMAG(CMPLX)*FF1
-        SS(2) = 0.
+        SS(2) = 0.D0
         PP(2) = IMAG(CMPLX)*FF2
         SS(3) = IMAG(CMPLX)*FF3
-        PP(3) = 0.
+        PP(3) = 0.D0
        ENDIF
        GNNH(1,I,J,1) = SS(1) -IMGI*PP(1)
        GNNH(2,I,J,1) = SS(1) +IMGI*PP(1)
@@ -574,8 +574,12 @@ C---
       DO 50 J=1,4
       DO 50 K=1,4
       DO 50 L=1,3
-50    GNNH(I,J,K,L) = GNNH(I,J,K,L)*(-GWEAK)/2.
+50    GNNH(I,J,K,L) = GNNH(I,J,K,L)*(-GWEAK)/2.D0
  
  
       RETURN
       END
+
+
+
+

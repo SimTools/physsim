@@ -5,7 +5,7 @@ C*  Swap ARRAY1(*) in decreasing order.
 C*  Input  ARRAY1(*), IDIM
 C*  Output IORDER(*), ARRAY2(*)
 C----------------------------------------------------------------------C
-      IMPLICIT  REAL*8 (A-H, O-Z)
+      IMPLICIT REAL*8 ( A-H, O-Z )
       REAL*8    ARRAY1(IDIM), ARRAY2(IDIM)
       INTEGER*4 IORDER(IDIM)
 C--------------------------------------

@@ -38,12 +38,13 @@ C REAL*8  ZM                  Z boson mass
 C REAL*8  SWM(2), SZM(4)      masses of charginos & neutralinos ( > 0 )
 C REAL*8  OL(2,2), OR(2,2), ER      matrices etc. for diagonalization
 C REAL*8  PHIL, PHIR                mixing angles
-C REL*8   ON(4,4)                   matrices etc. for diagonalization
-C COMPLEX*16  UN(4,4), ETA(4)
+C REL*4   ON(4,4)                   matrices etc. for diagonalization
+C COMPLEX*16 UN(4,4), ETA(4)
 C=============
 C REAL*8  MIXCHG(2,2), MIXNEU(4,4)  mixing matrices
 C=======================================================================
 
+      IMPLICIT REAL*8 ( A-H, O-Z )
       PARAMETER ( PI = 3.1415927D0 )
 
       REAL*8  MIXCHG(2,2), MIXNEU(4,4)
@@ -68,7 +69,7 @@ C check
 
       SQRT2 = SQRT(2.D0)
 
-      COS2W = 1-SIN2W
+      COS2W = 1.D0-SIN2W
       TAN2W = SIN2W/COS2W
       SINW  = SQRT(SIN2W)
       COSW  = SQRT(COS2W)
@@ -82,16 +83,16 @@ C     BETA  = ATAN2( ABS(TANB), SIGN(1.,TANB) )
 C     COSB  = COS(BETA)
 C     SINB  = SIN(BETA)
 C     COSDB = (COSB-SINB)*(COSB+SINB)
-C     SINDB = 2*SINB*COSB
+C     SINDB = 2.*SINB*COSB
 C     SIN2B = SINB**2
 C     COS2B = COSB**2
       TAN2B = TANB**2
-      COS2B = 1/(1+TAN2B)
+      COS2B = 1.D0/(1.D0+TAN2B)
       COSB  = SIGN( SQRT(COS2B), TANB )
-      SIN2B = 1-COS2B
+      SIN2B = 1.D0-COS2B
       SINB  = SQRT(SIN2B)
       COSDB = (COSB-SINB)*(COSB+SINB)
-      SINDB = 2*SINB*COSB
+      SINDB = 2.D0*SINB*COSB
 
 C  constants calculated by using of the given values
 C    gaugino masses
@@ -109,15 +110,15 @@ C  chargino mass matrix ( 2*2 )
 
 C  neutralino mass matrix ( 4*4 )
       MIXNEU(1,1) = G1MAS
-      MIXNEU(2,1) = 0
+      MIXNEU(2,1) = 0.D0
       MIXNEU(2,2) = G2MAS
       MIXNEU(3,1) = -ZM* SINW*COSB
       MIXNEU(3,2) =  ZM* COSW*COSB
-      MIXNEU(3,3) = 0
+      MIXNEU(3,3) = 0.D0
       MIXNEU(4,1) =  ZM* SINW*SINB
       MIXNEU(4,2) = -ZM* COSW*SINB
       MIXNEU(4,3) = -HM1
-      MIXNEU(4,4) = 0
+      MIXNEU(4,4) = 0.D0
 
       MIXNEU(1,2) = MIXNEU(2,1)
       MIXNEU(1,3) = MIXNEU(3,1)
@@ -129,7 +130,7 @@ C  neutralino mass matrix ( 4*4 )
 C  calculation for chargino
 C   mass eigenvalues
       DELTC2 = (G2MAS2+HM12 +2*WM2 )**2
-     &        -4*( G2MAS*HM1 -WM2*SINDB)**2
+     &        -4.D0*( G2MAS*HM1 -WM2*SINDB)**2
 CCCC
       IF( DELTC2 .LT.0 ) THEN
         WRITE(6,*) 'G3MAS=',G3MAS,' HM1=',HM1, ' TANB=',TANB
@@ -138,21 +139,21 @@ CCCC
         RETURN
       ENDIF
       DELTC  = SQRT(DELTC2)
-      SWM2(1) = 0.5D0 *(G2MAS2 +HM12 + 2*WM2-DELTC)
-C     SWM2(2) = 0.5D0 *(G2MAS2 +HM12 + 2*WM2+DELTC)
+      SWM2(1) = 0.5D0 *(G2MAS2 +HM12 + 2.D0*WM2-DELTC)
+C     SWM2(2) = 0.5 *(G2MAS2 +HM12 + 2.*WM2+DELTC)
       SWM2(2) = SWM2(1) + DELTC
       SWM(1) = SQRT(SWM2(1))
       SWM(2) = SQRT(SWM2(2))
-      TANDPL = 2*SQRT2*WM*(G2MAS*COSB+HM1*SINB)
-     &         /(G2MAS2-HM12-2*WM2*COSDB)
-      TANDPR = 2*SQRT2*WM*(G2MAS*SINB+HM1*COSB)
-     &         /(G2MAS2-HM12+2*WM2*COSDB)
-      TANPL = ( SWM2(1) -G2MAS2 -2*WM2*SIN2B)
+      TANDPL = 2.D0*SQRT2*WM*(G2MAS*COSB+HM1*SINB)
+     &         /(G2MAS2-HM12-2.D0*WM2*COSDB)
+      TANDPR = 2.D0*SQRT2*WM*(G2MAS*SINB+HM1*COSB)
+     &         /(G2MAS2-HM12+2.D0*WM2*COSDB)
+      TANPL = ( SWM2(1) -G2MAS2 -2.D0*WM2*SIN2B)
      &         /SQRT2/WM/(G2MAS*COSB+HM1*SINB)
-      TANPR = ( SWM2(1) -G2MAS2 -2*WM2*COS2B)
+      TANPR = ( SWM2(1) -G2MAS2 -2.D0*WM2*COS2B)
      &         /SQRT2/WM/(G2MAS*SINB+HM1*COSB)
 C  0 < phi_L < pi
-      PHIL  = ATAN2( ABS(TANPL), SIGN(1.,TANPL) )
+      PHIL  = ATAN2( ABS(TANPL), SIGN(1.D0,TANPL) )
       COSPL = COS(PHIL)
       SINPL = SIN(PHIL)
       OL(1,1) =  COSPL
@@ -161,7 +162,7 @@ C  0 < phi_L < pi
       OL(2,2) =  COSPL
 
 C  take 0 < phi_R < pi and check the lighter mass eigen value
-      PHIR  = ATAN2( ABS(TANPR), SIGN(1.,TANPR) )
+      PHIR  = ATAN2( ABS(TANPR), SIGN(1.D0,TANPR) )
       COSPR = COS(PHIR)
       SINPR = SIN(PHIR)
       OR(1,1) =  COSPR
@@ -171,7 +172,7 @@ C  take 0 < phi_R < pi and check the lighter mass eigen value
 C diagonalize mass matrix with OL & OR and check the 1st eigen value
 C and then re-define phi_R if the 1st eigen value is less than 0.
 C ( the 1st eigen value corresponds to the lighter chargino )
-      AM1=0.
+      AM1=0.D0
       DO 5  I=1,2
       DO 5  J=1,2
 5     AM1 = AM1 + OR(1,I)*MIXCHG(I,J)*OL(1,J)
@@ -181,7 +182,7 @@ C ( the 1st eigen value corresponds to the lighter chargino )
         COSPR = -COSPR
       ENDIF
       PHIR  = ATAN2( SINPR, COSPR )
-      ER = SIGN(1., G2MAS*HM1-WM2*SINDB)
+      ER = SIGN(1.D0, G2MAS*HM1-WM2*SINDB)
       OR(1,1) =  COSPR
       OR(2,1) = -SINPR*ER
       OR(1,2) =  SINPR
@@ -195,8 +196,8 @@ C ( the 1st eigen value corresponds to the lighter chargino )
         WRITE(6,101) ' SWM=',SWM
         WRITE(6,103) ' TANPL=',TANPL, ' TANPR=',TANPR,'  ER=',ER
         WRITE(6,103) ' TANDPL=',TANDPL, ' TANDPR=',TANDPR
-        WRITE(6,103) ' PHIL =',PHIL/PI*180.,
-     &               ' PHIR =',PHIR/PI*180.
+        WRITE(6,103) ' PHIL =',PHIL/PI*180.D0,
+     &               ' PHIR =',PHIR/PI*180.D0
         WRITE(6,102) '  OL=', ( OL(1,I),I=1,2)
      &              ,'  OR=', ( OR(1,I),I=1,2)
         WRITE(6,102) '     ', ( OL(2,I),I=1,2)
@@ -289,10 +290,10 @@ C        J : order index in increasing (abs.value) order.
         J = 5-IORDER(I)
         EI(J) = EI1(I)
         SZM(J)= EI1(I)
-        IF( SZM(J).GT.0. ) THEN
-          ETA(J) = (1., 0.)
+        IF( SZM(J).GT.0.D0 ) THEN
+          ETA(J) = (1.D0, 0.D0)
         ELSE
-          ETA(J) = (0., 1.)
+          ETA(J) = (0.D0, 1.D0)
         ENDIF
         DO 16 K=1,4
           EV(K,J) = EV1(K,I)

@@ -3,7 +3,7 @@
       IMPLICIT REAL*8 ( A-H, O-Z )
 #include "../sm/include/SMCONS.inc"
       COMPLEX*16 GCFSF(2)
-      REAL* 8    AMX, AMF, AMSF, GM
+      REAL*8    AMX, AMF, AMSF, GM
 C--
 C  Statement function.
 C--

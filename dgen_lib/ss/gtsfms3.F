@@ -20,12 +20,12 @@ C     calculate SFM3(7) from SFM(7) (extract D term contribution
 C     out) 
 C     IF IS.NEQ.0 IT USE THE VALUE AS IT IS INPUTTED.
       C(1) = -0.5D0
-      C(2) =  0.5D0 -    S2W
+      C(2) =  0.5D0 -      S2W
       C(3) =             S2W      
       C(4) = -0.5D0 + 2/3.D0*S2W
-      C(5) =        - 2/3.D0*S2W
+      C(5) =      - 2/3.D0*S2W
       C(6) =  0.5D0 - 1/3.D0*S2W
-      C(7) =          1/3.D0*S2W
+      C(7) =        1/3.D0*S2W
       AMZCS = AZM*AZM*(TANB-1)*(TANB+1)/(TANB*TANB+1)
       DO 20 I = 1, 7
          SFM3(I) = SQRT(SFM(I)**2 - C(I)*AMZCS)
