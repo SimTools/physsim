@@ -1,0 +1,660 @@
+C   WM CALCULATED FROM ZM AND GF, BY Z.HIOKI    30TH NOV. 1988
+C   NEWEST VERSION
+C-----------------------------------------------------------------------
+C           MW5.FORT77
+C
+C  1-L00P CORRECTION  ( W-BOSON MASS SHIFT )
+C
+C ** CALCULATION OF DELTA-R **
+C  MAIN PROGRAM
+CRUN       IMPLICIT REAL*8(A-H,O-Z)
+CRUN       COMMON /ZHMASS/ ZM, SQZM, WM, SQWM, EM, XM, TAM,
+CRUN      *     UM, DM, CM, SM, TM, BM, PM, DELWM,
+CRUN      #     DELZM, ZL, ZLM, Y, CS, SN, ALP, PAI, VC2, VC3, FLM, FUM,
+CRUN       COMMON/ZHCMWN/F1,F2,F3,F4
+CRUN       DIMENSION J(2),WMASS(5)
+CRUN C  HIGGS MASS
+CRUN       DATA PM0/ 100./
+CRUN C----
+CRUN C     DO 1000 KKK=1,1,1
+CRUN C     DO 2000 LLL=1,1,1
+CRUN C     SSQZM=90D0+DFLOAT(KKK-1)
+CRUN C     TM0=30D0+30D0*DFLOAT(LLL-1)
+CRUN       SSQZM = 92.
+CRUN       TM0   = 180.
+CRUN       PM0   = 1000.
+CRUN       CALL ZHWMAS( DR, WMASS, SSQZM, TM0, PM0)
+CRUN       CALL DATE(J)
+CRUN       FLM0 = SQRT( FLM )
+CRUN       FUM0 = SQRT( FUM )
+CRUN       FDM0 = SQRT( FDM )
+CRUN       WRITE(6,1) J, F1, F2, F3, F4, TM0, PM0
+CRUN      *,         FLM0, FUM0, FDM0, SSQZM,  SQWM, WMASS, DR
+CRUN 1     FORMAT(1H //10X,2A4//2X,7HFERMI1=F3.0,2X,7HFERMI2=F3.0,2X,7HF
+CRUN      #=F3.0,2X,7HFERMI4=F3.0
+CRUN      #//2X,3HMT=F7.2,2X,7HMHIGGS=F7.2,2X,4HFLM=F7.2,2X,4HFUM=F7.2,2
+CRUN      #DM=F7.2//3X,3HMZ=F8.4,3X,4HMW0=F8.4///2X,3HMW=F9.4,3X,4HMW2=F
+CRUN      #X,4HMW3=F9.4,3X,4HMW4=F9.4,3X,'MW5=',F9.4,//5X,3HDR=,D15.7/)
+CRUN 2000  CONTINUE
+CRUN 1000  CONTINUE
+CRUN       STOP
+CRUN       END
+CRUN
+CRUN       IMPLICIT REAL*8(A-H,O-Z)
+CRUN       DIMENSION WMASS(5)
+CRUN 1     CONTINUE
+CRUN       PRINT *,'Enter Z,Top,Higgs masses'
+CRUN       READ(5,*) SSQZM,TM0,PM0
+CRUN       IF(SSQZM.LE.0.) GO TO 9
+CRUN       CALL ZHWMAS( DR, WMASS, SSQZM,  TM0,  PM0)
+CRUN       PRINT *,' DR =',DR,' for Mw,Mz,Mt,Mh=',WMASS(4),SSQZM,TM0,PM0
+CRUN       PRINT *,' SIN2W=',1.-( WMASS(4)/SSQZM )**2
+CRUN       GO TO 1
+CRUN 9     CONTINUE
+CRUN       STOP
+CRUN       END
+CRUN
+      SUBROUTINE ZHWMAS( DR, WMASS, SSQZM, TM0, PM0)
+C**********************************************************************
+C*  INPUT:
+C*        SSQZM  : Z MASS
+C*        TM0    : TOP QUARK MASS
+C*        PM0    : HIGGS MASS
+C*  OUTPUT:
+C*        DR     : RADIATIVE CORECTION TO W MASS
+C*        WMASS(1):
+C*        WMASS(2):
+C*        WMASS(3):
+C*        WMASS(4): Like as Sirlin.
+C*        WMASS(5): No corection
+C*  NOTE:
+C*        THIS SUBROUTINE REQUIRES BLOCK DATA ZHPRM.
+C*            WRITTEN  BY Z. HIOKI,  ( MODIFIED BY T.TAUCHI )
+C**********************************************************************
+      IMPLICIT REAL*8(A-H,O-Z)
+      COMMON /ZHMASS/ ZM, SQZM, WM, SQWM, EM, XM, TAM,
+     *     UM, DM, CM, SM, TM, BM, PM, DELWM,
+     #     DELZM, ZL, ZLM, Y, CS, SN, ALP, PAI, VC2, VC3, FLM, FUM, FDM
+      COMMON/ZHCMWN/F1,F2,F3,F4
+      DIMENSION WMASS(5)
+      EXTERNAL ACC
+C-- CONSTANTS
+      DATA GF/ 1.16632D-5/, WWW/ 37.281311D0/
+C
+      SQZM= SSQZM
+      ZM  = SQZM**2
+      WM  = SQZM*(  SQZM + DSQRT( SQZM**2 - 4D0*WWW**2 )  ) / 2D0
+      SQWM= DSQRT( WM )
+      TM  = TM0**2
+      PM  = PM0**2
+      SN  = 5.62D-2*F1*F2
+      CS  = 1D0-SN
+      WMASS(5) = SQWM
+C  DEF OF ZN
+      ZN=ZM/64D0/WM/(ZM-WM)*((ZM+2D0*WM)/2D0+ZM*DLOG(ZM)+2D0*WM*DLOG(WM)
+     #)
+C  DEF OF ZL
+      ZL=ZM*(5D-1+DLOG(WM))/32D0
+     #/(ZM-WM)+(ZM-2D0*WM)**2*(5D-1+DLOG(ZM))/64D0/WM/(ZM-WM)
+C  DEF OF ZLM ( ZL OF MUON )
+      ZLM=ZM*(5D-1+DLOG(WM))/32D0
+     #/(ZM-WM)+(ZM-2D0*WM)**2*(5D-1+DLOG(ZM))/64D0/WM/(ZM-WM)
+C  DEF OF DELZMF
+      DELZMF=ZM*ZM*(ZM*(2D0*(F1+F2+F3+F4)*E(0D0,0D0,ZM)
+     #+(1D0+(4D0*WM-3D0*ZM
+     #)**2/ZM/ZM)*(E(EM,EM,ZM)*F1+E(XM,XM,ZM)*F2+E(TAM,TAM,ZM)*F3
+     #+E(FLM,FLM,ZM)*F4)+3D0*(
+     #1D0+(8D0*WM-5D0*ZM)**2/9D0/ZM/ZM)*(E(UM,UM,ZM)*F1+E(CM,CM,ZM)*F2+
+     #E(TM,TM,ZM)*F3+E(FUM,FUM,ZM)*F4)
+     #+3D0*(1D0+(4D0*WM-ZM)**2/9D0/ZM/ZM)*(E(DM,DM,ZM)*F1
+     #+E(SM,SM,ZM)*F2+E(BM,BM,ZM)*F3+E(FDM,FDM,ZM)*F4))
+     #-EM*E0(EM,EM,ZM)*F1-XM*E0(XM,XM,ZM)*F2-
+     #TAM*E0(TAM,TAM,ZM)*F3-
+     #FLM*E0(FLM,FLM,ZM)*F4-3D0*(UM*E0(UM,UM,ZM)*F1+DM*E0(DM,DM,ZM)*F1+
+     #CM*E0(CM,CM,ZM)*F2+SM*E0(SM,SM,ZM)*F2+TM*E0(TM,TM,ZM)*F3+BM*E0(BM,
+     #BM,ZM)*F3+FUM*E0(FUM,FUM,ZM)*F4+FDM*E0(FDM,FDM,ZM)*F4))
+C  DEF OF DELZM
+      DELZM=-1D0/32D0/WM/(ZM-WM)*(-ZM*(ZM*ZM-2D0*ZM*WM+4D0*WM*WM)/3D0+
+     #ZM*ZM*ZM*DLOG(ZM)/2D0+WM*(ZM*ZM-4D0*ZM*WM+16D0*WM*WM)*DLOG(WM)+
+     #DELZMF+ZM*(ZM*ZM-4D0*ZM*WM+24D0*WM*WM)*E(WM,WM,ZM)+
+     #WM*(3D0*ZM*ZM-14D0*ZM*WM-16D0*WM*WM)*E0(WM,WM,ZM)+ZM*ZM*ZM*(2D0*E0
+     #(PM,ZM,ZM)-E2(PM,ZM,ZM))-PM*ZM*ZM*(E1(ZM,PM,ZM)-DLOG(PM)/2D0))
+C  DEF OF DELWMF
+      DELWMF=2D0*WM*(E(0D0,EM,WM)*F1+E(0D0,XM,WM)*F2+E(0D0,TAM,WM)*F3
+     #+E(0D0,FLM,WM)*F4)-
+     #EM*E1(0D0,EM,WM)*F1-XM*E1(0D0,XM,WM)*F2-TAM*E1(0D0,TAM,WM)*F3
+     #-FLM*E1(0D0,FLM,WM)*F4+3
+     #D0*CS*(2D0*WM*E(UM,DM,WM)*F1-DM*E1(UM,DM,WM)*F1-UM*E1(DM,UM,WM)*F1
+     #)+3D0*SN*(2D0*
+     #WM*E(UM,SM,WM)-SM*E1(UM,SM,WM)-UM*E1(SM,UM,WM))+3D0*CS*(2D0*WM*
+     #E(CM,SM,WM)*F2-SM*E1(CM,SM,WM)*F2-CM*E1(SM,CM,WM)*F2)+
+     #3D0*SN*(2D0*WM*E(CM,DM,WM)-DM*E1(CM,DM,WM)-CM*E1(DM,CM,WM))+3D0*(2
+     #D0*WM*E(TM,BM,WM)*F3-BM*E1(TM,BM,WM)*F3-TM*E1(BM,TM,WM)*F3)
+     #+3D0*(2D0*WM*E(FUM,FDM,WM)*F4-FDM*E1(FUM,FDM,WM)*F4
+     #-FUM*E1(FDM,FUM,WM)*F4)
+C  DEF OF DELWM
+      DELWM=-1D0/32D0/(ZM-WM)*(-WM*ZM+7D0*WM*ZM*DLOG(WM)+ZM*(6D0*WM+ZM/2
+     #D0)*DLOG(ZM)+2D0*ZM*DELWMF+(ZM*ZM-20D0*ZM*WM-8D0*WM*WM)*E0(ZM,WM,W
+     #M)+(ZM*ZM+16D0*ZM*WM+4D0*WM*WM)*E1(ZM,WM,WM)-WM*(ZM+20D0*WM)*E2(ZM
+     #,WM,WM)+4D0*WM*(ZM-WM)*(-2D0*E0(0D0,WM,WM)+E1(0D0,WM,WM)-5D0*E2(0D
+     #0,WM,WM))+PM*ZM*(DLOG(PM)/2D0-E1(WM,PM,WM))+ZM*WM*(2D0*E0(PM,WM,WM
+     #)-E2(PM,WM,WM)))
+C  DEF OF Y
+      Y=-1D0/48D0+7D0*DLOG(WM)/32D0
+     #-F1*(DLOG(WM)+DLOG(WM)/3D0+4D0*DLOG(WM)/3D0)/24D0
+     #-F2*(DLOG(WM)+DLOG(WM)/3D0+4D0*DLOG(WM)/3D0)/24D0
+     #-F3*(DLOG(WM)+DLOG(WM)/3D0+4D0*DLOG(WM)/3D0)/24D0
+     #-F4*(DLOG(FLM)+DLOG(FDM)/3D0+4D0*DLOG(FUM)/3D0)/24D0
+C  RUNNING COUPLING-CONSTANT
+      SUM=F1*(DLOG(EM/WM)+DLOG(DM/WM)/3D0+4D0*DLOG(UM/WM)/3D0)
+     #+F2*(DLOG(XM/WM)+DLOG(SM/WM)/3D0+4D0*DLOG(CM/WM)/3D0)
+     #+F3*(DLOG(TAM/WM)+DLOG(BM/WM)/3D0)
+      IF(TM.GT.WM) GO TO 10
+      SUM=SUM+4D0/3D0*DLOG(TM/WM)*F3
+10    ALPW=ALP/(1D0+ALP*(SUM+SUM)/6D0/PAI)
+C
+C  DEF OF VF0
+      VF0=(ZM*DLOG(ZM)-WM*DLOG(WM))/(ZM-WM)-1D0
+C  DEF OF VC2
+      VC2=5D0-6D0*DLOG(WM)-2D0*WM/(ZM-WM)*(5D-1+3D0*VF0)
+     #-ZM*(ZM-2D0*WM)/2D0/WM/(ZM-WM)*(5D-1+DLOG(ZM))
+     #+16D0*(DELZM/ZM-(DELZM-DELWM)/(ZM-WM)+2D0*Y+ZL+ZN)
+C  DEF OF VC3
+      VC3=VC2-16D0*(ZL-ZLM)
+C
+C  ---------  START OF CALCULATION  ----------
+C
+      AT=-ALP*PAI*ZM/2D0/WM/(ZM-WM)
+      DR=ACC(0D0)/AT
+      AAA=DSQRT(PAI*ALPW/DSQRT(2D0)/GF/(1D0-DR))
+      WMASS(1)=SQZM*DSQRT((1D0+DSQRT(1D0-4D0*AAA**2/ZM))/2D0)
+C
+      AAA=DSQRT(PAI*(ALPW+ALP*DR)/DSQRT(2D0)/GF)
+      WMASS(2)=SQZM*DSQRT((1D0+DSQRT(1D0-4D0*AAA**2/ZM))/2D0)
+C
+      AAA=DSQRT(PAI*ALPW/DSQRT(2D0)/GF)
+      SQWMLL=SQZM*DSQRT((1D0+DSQRT(1D0-4D0*AAA**2/ZM))/2D0)
+      WMASS(3)=
+     * SQWMLL+SQWM**3*(ZM-WM)**2*ACC(0D0)/ALP/PAI/ZM/(2D0*WM-ZM)
+C  ---------------------------------------------------------------------
+C  DEF OF Y
+      Y=-1D0/48D0+7D0*DLOG(WM)/32D0
+     #-F1*(DLOG(EM)+DLOG(DM)/3D0+4D0*DLOG(UM)/3D0)/24D0
+     #-F2*(DLOG(XM)+DLOG(SM)/3D0+4D0*DLOG(CM)/3D0)/24D0
+     #-F3*(DLOG(TAM)+DLOG(BM)/3D0+4D0*DLOG(TM)/3D0)/24D0
+     #-F4*(DLOG(FLM)+DLOG(FDM)/3D0+4D0*DLOG(FUM)/3D0)/24D0
+C  DEF OF VF0
+      VF0=(ZM*DLOG(ZM)-WM*DLOG(WM))/(ZM-WM)-1D0
+C  DEF OF VC2
+      VC2=5D0-6D0*DLOG(WM)-2D0*WM/(ZM-WM)*(5D-1+3D0*VF0)
+     #-ZM*(ZM-2D0*WM)/2D0/WM/(ZM-WM)*(5D-1+DLOG(ZM))
+     #+16D0*(DELZM/ZM-(DELZM-DELWM)/(ZM-WM)+2D0*Y+ZL+ZN)
+C  DEF OF VC3
+      VC3=VC2-16D0*(ZL-ZLM)
+C
+      DR=ACC(0D0)/AT
+      AAA=DSQRT(PAI*ALP/DSQRT(2D0)/GF/(1D0-DR))
+      WMASS(4) = SQZM*DSQRT((1D0+DSQRT(1D0-4D0*AAA**2/ZM))/2D0)
+C  ---------------------------------------------------------------------
+C
+      RETURN
+      END
+C
+C
+C ** ACC **
+C
+      DOUBLE PRECISION FUNCTION ACC(X)
+      IMPLICIT REAL*8(A-H,O-Z)
+      COMMON /ZHMASS/ ZM, SQZM, WM, SQWM, EM, XM, TAM,
+     *     UM, DM, CM, SM, TM, BM, PM, DELWM,
+     #     DELZM, ZL, ZLM, Y, CS, SN, ALP, PAI, VC2, VC3, FLM, FUM, FDM
+      ACC=ALP*ALP*ZM/16D0/WM/(ZM-WM)
+     #*(-VC2-VC3+2D0*ZM/WM/(ZM-WM)*AW(X)-1D0-2D0*DLOG(WM)
+     #+(3D0*ZM*ZM-6D0*ZM*WM-2D0*WM*WM)/(ZM-WM)**2*DLOG(ZM/WM))
+      RETURN
+      END
+C
+C
+C ** AW **
+C
+      DOUBLE PRECISION FUNCTION AW(X)
+      IMPLICIT REAL*8(A-H,O-Z)
+      COMMON /ZHMASS/ ZM, SQZM, WM, SQWM, EM, XM, TAM,
+     *     UM, DM, CM, SM, TM, BM, PM, DELWM,
+     #     DELZM, ZL, ZLM, Y, CS, SN, ALP, PAI, VC2, VC3, FLM, FUM, FDM
+      AW=-(X-WM)/2D0+(-(PM-2D0*WM)*(E0(PM,WM,X)-E0(PM,WM,WM))
+     #+(AWFL(X)+AWFQ(X))*2D0
+     #+(PM-WM)*(E1(PM,WM,X)-E1(PM,WM,WM))+X*E(PM,WM,X)-WM*E(PM,WM,WM))
+     #/2D0+(ZM-WM)/ZM*(-7D0*WM*((DLOG(WM)-1D0)-E0(0D0,WM,WM))
+     #-5D0*(X*(DLOG(WM)-1D0)-WM*E0(0D0,WM,WM))
+     #+8D0*WM*((DLOG(WM)-1.5D0)/2D0-E0(0D0,WM,WM)+E1(0D0,WM,WM))
+     #+10D0*(X*(DLOG(WM)/6D0-5D0/36D0)-WM*E(0D0,WM,WM)))
+     #+((4D0*ZM*ZM-10D0*ZM*WM-28D0*WM*WM)
+     #*(E0(WM,ZM,X)-E0(WM,ZM,WM))
+     #-20D0*WM*(X*E0(WM,ZM,X)-WM*E0(WM,ZM,WM))
+     #+(-2D0*ZM*ZM-30D0*ZM*WM+32D0*WM*WM)*(E1(WM,ZM,X)-E1(WM,ZM,WM))
+     #+(2D0*ZM+4D1*WM)*(X*E(WM,ZM,X)-WM*E(WM,ZM,WM)))/4D0/ZM
+      RETURN
+      END
+C
+C
+C ** AWFL **
+C
+      DOUBLE PRECISION FUNCTION AWFL(X)
+      IMPLICIT REAL*8(A-H,O-Z)
+      COMMON /ZHMASS/ ZM, SQZM, WM, SQWM, EM, XM, TAM,
+     *     UM, DM, CM, SM, TM, BM, PM, DELWM,
+     #     DELZM, ZL, ZLM, Y, CS, SN, ALP, PAI, VC2, VC3, FLM, FUM, FDM
+      COMMON/ZHCMWN/F1,F2,F3,F4
+      AWFL=-EM*(E0(0D0,EM,X)-E0(0D0,EM,WM))*F1
+     #+EM*(E0(0D0,EM,X)-E1(0D0,EM,X)-E0(0D0,EM,WM)+E1(0D0,EM,WM))*F1
+     #+2D0*(X*E(0D0,EM,X)-WM*E(0D0,EM,WM))*F1
+     #-XM*(E0(0D0,XM,X)-E0(0D0,XM,WM))*F2
+     #+XM*(E0(0D0,XM,X)-E0(0D0,XM,WM)-E1(0D0,XM,X)+E1(0D0,XM,WM))*F2
+     #+2D0*(X*E(0D0,XM,X)-WM*E(0D0,XM,WM))*F2
+     #-TAM*(E0(0D0,TAM,X)-E0(0D0,TAM,WM))*F3
+     #+TAM*(E0(0D0,TAM,X)-E0(0D0,TAM,WM)-E1(0D0,TAM,X)+E1(0D0,TAM,WM))*F
+     #3
+     #+2D0*(X*E(0D0,TAM,X)-WM*E(0D0,TAM,WM))*F3
+     #-FLM*(E0(0D0,FLM,X)-E0(0D0,FLM,WM))*F4
+     #+FLM*(E0(0D0,FLM,X)-E0(0D0,FLM,WM)-E1(0D0,FLM,X)+E1(0D0,FLM,WM))
+     #*F4
+     #+2D0*(X*E(0D0,FLM,X)-WM*E(0D0,FLM,WM))*F4
+      RETURN
+      END
+C
+C
+C ** AWFQ **
+C
+      DOUBLE PRECISION FUNCTION AWFQ(X)
+      IMPLICIT REAL*8(A-H,O-Z)
+      COMMON /ZHMASS/ ZM, SQZM, WM, SQWM, EM, XM, TAM,
+     *     UM, DM, CM, SM, TM, BM, PM, DELWM,
+     #     DELZM, ZL, ZLM, Y, CS, SN, ALP, PAI, VC2, VC3, FLM, FUM, FDM
+      COMMON/ZHCMWN/F1,F2,F3,F4
+      AWFQ=3D0*(
+     #CS*(-DM*(E0(DM,UM,X)-E0(DM,UM,WM))
+     #+(DM-UM)*(E1(DM,UM,X)-E1(DM,UM,WM))
+     #+2D0*(X*E(DM,UM,X)-WM*E(DM,UM,WM)))*F1
+     #+SN*(-SM*(E0(SM,UM,X)-E0(SM,UM,WM))
+     #+(SM-UM)*(E1(SM,UM,X)-E1(SM,UM,WM))
+     #+2D0*(X*E(SM,UM,X)-WM*E(SM,UM,WM)))
+     #+CS*(-SM*(E0(SM,CM,X)-E0(SM,CM,WM))
+     #+(SM-CM)*(E1(SM,CM,X)-E1(SM,CM,WM))
+     #+2D0*(X*E(SM,CM,X)-WM*E(SM,CM,WM)))*F2
+     #+SN*(-DM*(E0(DM,CM,X)-E0(DM,CM,WM))
+     #+(DM-CM)*(E1(DM,CM,X)-E1(DM,CM,WM))
+     #+2D0*(X*E(DM,CM,X)-WM*E(DM,CM,WM)))
+     #-BM*(E0(BM,TM,X)-E0(BM,TM,WM))*F3
+     #+(BM-TM)*(E1(BM,TM,X)-E1(BM,TM,WM))*F3
+     #+2D0*(X*E(BM,TM,X)-WM*E(BM,TM,WM))*F3
+     #-FDM*(E0(FDM,FUM,X)-E0(FDM,FUM,WM))*F4
+     #+(FDM-FUM)*(E1(FDM,FUM,X)-E1(FDM,FUM,WM))*F4
+     #+2D0*(X*E(FDM,FUM,X)-WM*E(FDM,FUM,WM))*F4)
+      RETURN
+      END
+C
+C
+C ** E0 **
+C
+      DOUBLE PRECISION FUNCTION E0(X,Y,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+      WD=X-Y
+      IF(WD.NE.0D0) GO TO 1
+      WS=X+Y
+      IF(WS.NE.0D0) GO TO 2
+      IF(Z.NE.0D0) GO TO 3
+      E0=0D0
+      RETURN
+3     E0=DLOG(DABS(Z))-2D0
+      RETURN
+2     IF(Z) 10,20,30
+10    WX=Z**2/(X**2*(DABS(DLOG(X))))-10D-4
+      IF(WX.GE.0D0) GO TO 200
+      E0=DLOG(X)-Z/(6D0*X)
+      RETURN
+200   E0=DLOG(X)-2D0+DSQRT(1D0-4D0*X/Z)*
+     #DLOG((2D0*X-Z+DSQRT((-Z)*(4D0*X-Z)))/(2D0*X))
+      RETURN
+20    E0=DLOG(X)
+      RETURN
+30    WZ=Z-4D0*X
+      IF(WZ.GE.0D0) GO TO 1000
+      E0=DLOG(X)-2D0+2D0*DSQRT((4D0*X-Z)/Z)*
+     #DATAN(DSQRT(Z/(4D0*X-Z)))
+      RETURN
+1000  E0=DLOG(X)-2D0+DSQRT((Z-4D0*X)/Z)*
+     #DLOG((Z-2D0*X+DSQRT(Z*(Z-4D0*X)))/(2D0*X))
+      RETURN
+1     IF(X.NE.0D0) GO TO 6
+      IF(Y.NE.Z) GO TO 35
+      E0=DLOG(Z)-2D0
+      RETURN
+35    RYZ=DABS(Z/Y)-1D-5
+      IF(RYZ.GE.0D0) GO TO 36
+      E0=-1D0+DLOG(Y)-Z/2D0/Y
+      RETURN
+36    E0=(1D0-Y/Z)*DLOG(DABS(Z-Y))+Y*DLOG(Y)/Z-2D0
+      RETURN
+6     WY=Y-Z
+      IF(WY.NE.0D0) GO TO 40
+      WB=4D0*Z-X
+      IF(WB.GT.0D0) GO TO 300
+      IF(Z/X.GT.3D-5)GO TO 303
+      E0=DLOG(X)
+      RETURN
+303   E0=X*DLOG(X)/(2D0*Z)-(X-2D0*Z)*DLOG(Z)/(2D0*Z)-2D0
+     #-DSQRT(X*(X-4D0*Z))*DLOG((X+DSQRT(X*(X-4D0*Z)))**2
+     #/(4D0*X*Z))/2D0/Z
+      RETURN
+300   E0=X*DLOG(X)/(2D0*Z)-(X-2D0*Z)*DLOG(Z)/(2D0*Z)-2D0
+     #+DSQRT(X*(4D0*Z-X))*(DATAN((2D0*Z-X)/(DSQRT(X*(4D0*Z-X))))
+     #+DATAN(X/(DSQRT(X*(4D0*Z-X)))))/Z
+      RETURN
+40    WA=X-Z
+      IF(WA.NE.0D0) GO TO 50
+      WB=4D0*Z-Y
+      IF(WB.GT.0D0) GO TO 400
+      IF(Z/Y.GT.3D-5)GO TO 404
+      E0=DLOG(Y)
+      RETURN
+404   E0=Y*DLOG(Y)/(2D0*Z)-(Y-2D0*Z)*DLOG(Z)/(2D0*Z)-2D0
+     #-DSQRT(Y*(Y-4D0*Z))*DLOG((Y+DSQRT(Y*(Y-4D0*Z)))**2
+     #/(4D0*Y*Z))/2D0/Z
+      RETURN
+400   E0=Y*DLOG(Y)/(2D0*Z)-(Y-2D0*Z)*DLOG(Z)/(2D0*Z)-2D0
+     #+DSQRT(Y*(4D0*Z-Y))*(DATAN((2D0*Z-Y)/(DSQRT(Y*(4D0*Z-Y))))
+     #+DATAN(Y/(DSQRT(Y*(4D0*Z-Y)))))/Z
+      RETURN
+50    WW=(Z/(X-Y))**2-1D-6
+      IF(WW.GE.0D0) GO TO 4000
+      IF(X/Y.GT.1D-5)GO TO 123
+      E0=DLOG(Y)
+      RETURN
+123   IF(Y/X.GT.1D-5)GO TO 234
+      E0=DLOG(X)
+      RETURN
+234   E0=(X*DLOG(X)-Y*DLOG(Y))/(X-Y)-1D0
+      RETURN
+4000  QM1=Z-(DSQRT(X)-DSQRT(Y))**2
+      QM2=Z-(DSQRT(X)+DSQRT(Y))**2
+      IF(QM1) 5000,5000,7
+7     IF(QM2) 70,5000,5000
+70    E0=-2D0+DLOG(X*Y)/2D0+(Y-X)*DLOG(Y/X)/2D0/Z
+     #+2D0*DSQRT((2D0*(X+Y)*Z-(X-Y)**2-Z*Z)/4D0/Z/Z)
+     #*DATAN(DSQRT(2D0*(X+Y)*Z-(X-Y)**2-Z*Z)/(X+Y-Z))
+      RETURN
+5000  IF(Z-X-Y) 7000,6000,6000
+6000  E0=((Z-X+Y)*DLOG(Y)+(Z+X-Y)*DLOG(X)-4D0*Z+DSQRT((Z+X-Y)**2
+     #-4D0*X*Z)*DLOG((Z-X-Y+DSQRT((Z+X-Y)**2-4D0*X*Z))**2/
+     #(4D0*X*Y)))/(2D0*Z)
+      RETURN
+7000  E0=((Z-X+Y)*DLOG(Y)+(Z+X-Y)*DLOG(X)-4D0*Z-DSQRT((Z+X-Y)**2
+     #-4D0*X*Z)*DLOG((Z-X-Y-DSQRT((Z+X-Y)**2-4D0*X*Z))**2/
+     #(4D0*X*Y)))/(2D0*Z)
+      RETURN
+      END
+C
+C
+C ** E1 **
+C
+      DOUBLE PRECISION FUNCTION E1(X,Y,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+      WD=X-Y
+      IF(WD.NE.0D0) GO TO 1
+      WS=X+Y
+      IF(WS.NE.0D0) GO TO 2
+      IF(Z.NE.0D0) GO TO 3
+      E1=0D0
+      RETURN
+3     E1=(DLOG(DABS(Z))-2D0)/2D0
+      RETURN
+2     IF(Z) 10,20,30
+10    WX=Z**2/(X**2*(DABS(DLOG(X))))-10D-4
+      IF(WX.GE.0D0) GO TO 200
+      E1=(DLOG(X)-Z/(6D0*X))/2D0
+      RETURN
+200   E1=(DLOG(X)-2D0+DSQRT(1D0-4D0*X/Z)*
+     #DLOG((2D0*X-Z+DSQRT((-Z)*(4D0*X-Z)))/(2D0*X)))/2D0
+      RETURN
+20    E1=(DLOG(X))/2D0
+      RETURN
+30    WZ=Z-4D0*X
+      IF(WZ.GE.0D0) GO TO 1000
+      E1=(DLOG(X)-2D0+2D0*DSQRT((4D0*X-Z)/Z)*
+     #DATAN(DSQRT(Z/(4D0*X-Z))))/2D0
+      RETURN
+1000  E1=(DLOG(X)-2D0+DSQRT((Z-4D0*X)/Z)*
+     #DLOG((Z-2D0*X+DSQRT(Z*(Z-4D0*X)))/(2D0*X)))/2D0
+      RETURN
+1     IF(X.NE.0D0) GO TO 6
+      IF(Y.NE.Z) GO TO 35
+      E1=(DLOG(Z)-1D0)*5D-1
+      RETURN
+35    RYZ=DABS(Z/Y)-1D-5
+      IF(RYZ.GE.0D0) GO TO 36
+      E1=-1D0/4D0+DLOG(Y)/2D0-Z/6D0/Y
+      RETURN
+36    E1=(1D0-Y/Z)**2/2D0*DLOG(DABS(Z-Y))+Y*(2D0*Z-Y)/2D0/Z/Z*DLOG(Y)-1D
+     #0+Y/(2D0*Z)
+      RETURN
+6     WY=Y-Z
+      IF(WY.NE.0D0) GO TO 40
+      WB=4D0*Z-X
+      IF(WB.GT.0D0) GO TO 300
+      IF(Z/X.GT.3D-5)GO TO 303
+      E1=DLOG(X)/2D0
+      RETURN
+303   E1=(X*X-2D0*X*Z)*DLOG(X)/(4D0*Z*Z)+(2D0*Z*X-X*X+2D0*Z*Z)*DLOG(Z)/(
+     #4D0*Z*Z)-1D0/2D0
+     #-DSQRT(X*(X-4D0*Z))*DLOG((X+DSQRT(X*(X-4D0*Z)))**2
+     #/(4D0*X*Z))/4D0/Z/Z*X-X/(2D0*Z)
+      RETURN
+300   E1=(-2D0*X*Z+X*X)*DLOG(X)/(4D0*Z*Z)+(2D0*Z*X-X*X+2D0*Z*Z)*DLOG(Z)/
+     #(4D0*Z*Z)-1D0/2D0
+     #+DSQRT(X*(4D0*Z-X))*(DATAN((2D0*Z-X)/(DSQRT(X*(4D0*Z-X))))
+     #+DATAN(X/(DSQRT(X*(4D0*Z-X)))))/2D0/Z/Z*X-X/2D0/Z
+      RETURN
+40    WA=X-Z
+      IF(WA.NE.0D0) GO TO 50
+      WB=4D0*Z-Y
+      IF(WB.GT.0D0) GO TO 400
+      IF(Z/Y.GT.3D-5)GO TO 404
+      E1=DLOG(Y)/2D0
+      RETURN
+404   E1=Y*DLOG(Y)/(2D0*Z)-(Y-2D0*Z)*DLOG(Z)/(2D0*Z)-2D0
+     #-DSQRT(Y*(Y-4D0*Z))*DLOG((Y+DSQRT(Y*(Y-4D0*Z)))**2
+     #/(4D0*Y*Z))/2D0/Z
+     #-(Y*Y-2D0*Y*Z)*DLOG(Y)/(4D0*Z*Z)-(2D0*Z*Y-Y*Y+2D0*Z*Z)*DLOG(Z)/(4D
+     #0*Z*Z)+1D0/2D0
+     #+DSQRT(Y*(Y-4D0*Z))*DLOG((Y+DSQRT(Y*(Y-4D0*Z)))**2
+     #/(4D0*Y*Z))/4D0/Z/Z*Y+Y/(2D0*Z)
+      RETURN
+400   E1=Y*DLOG(Y)/(2D0*Z)-(Y-2D0*Z)*DLOG(Z)/(2D0*Z)-2D0
+     #+DSQRT(Y*(4D0*Z-Y))*(DATAN((2D0*Z-Y)/(DSQRT(Y*(4D0*Z-Y))))
+     #+DATAN(Y/(DSQRT(Y*(4D0*Z-Y)))))/Z
+     #-((-2D0*Y*Z+Y*Y)*DLOG(Y)/(4D0*Z*Z)+(2D0*Z*Y-Y*Y+2D0*Z*Z)*DLOG(Z)/
+     #(4D0*Z*Z)-1D0/2D0
+     #+DSQRT(Y*(4D0*Z-Y))*(DATAN((2D0*Z-Y)/(DSQRT(Y*(4D0*Z-Y))))
+     #+DATAN(Y/(DSQRT(Y*(4D0*Z-Y)))))/2D0/Z/Z*Y-Y/2D0/Z)
+      RETURN
+50    WW=(Z/(X-Y))**2-1D-6
+      IF(WW.GE.0D0) GO TO 4000
+      IF(X/Y.GT.1D-5)GO TO 123
+      E1=DLOG(Y)/2D0
+      RETURN
+123   IF(Y/X.GT.1D-5)GO TO 234
+      E1=DLOG(X)/2D0
+      RETURN
+234   E1=(DLOG(Y)-X*X/(Y-X)**2*DLOG(Y/X)-5D-1+X/(Y-X))/2D0
+      RETURN
+4000  QM1=Z-(DSQRT(X)-DSQRT(Y))**2
+      QM2=Z-(DSQRT(X)+DSQRT(Y))**2
+      IF(QM1) 5000,5000,7
+7     IF(QM2) 70,5000,5000
+70    E1=-X*DLOG(X)/2D0/Z+Y*DLOG(Y)/2D0/Z+(Y-X-2D0*Z)
+     #/2D0/Z-(Y-X-Z)/2D0/Z*(DLOG(X*Y)/2D0+(Y-X)*DLOG(Y/X)/2D0/Z)
+     #-(Y-X-Z)/Z*DSQRT((2D0*(X+Y)*Z-(X-Y)**2-Z*Z)/4D0/Z/Z)
+     #*DATAN(DSQRT(2D0*(X+Y)*Z-(X-Y)**2-Z*Z)/(X+Y-Z))
+      RETURN
+5000  IF(Z-X-Y) 7000,6000,6000
+6000  E1=(2D0*Z**2*DLOG(Y)-((Z+X-Y)**2-2D0*X*Z)*
+     #DLOG(Y/X)-4D0*Z**2-2D0*Z*(X-Y)+(Z+X-Y)*DSQRT((Z+X-Y)**2
+     #-4D0*X*Z)*DLOG((Z-X-Y
+     #+DSQRT((Z+X-Y)**2-4D0*X*Z))**2/(4D0*X*Y)))/(4D0*Z**2)
+      RETURN
+7000  E1=(2D0*Z**2*DLOG(Y)-((Z+X-Y)**2-2D0*X*Z)*
+     #DLOG(Y/X)-4D0*Z**2-2D0*Z*(X-Y)-(Z+X-Y)*DSQRT((Z+X-Y)**2
+     #-4D0*X*Z)*DLOG((Z-X-Y
+     #-DSQRT((Z+X-Y)**2-4D0*X*Z))**2/(4D0*X*Y)))/(4D0*Z**2)
+      RETURN
+      END
+C
+C
+C ** E2 **
+C
+      DOUBLE PRECISION FUNCTION E2(X,Y,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+      WD=X-Y
+      IF(WD.NE.0D0) GO TO 1
+      WS=X+Y
+      IF(WS.NE.0D0) GO TO 2
+      IF(Z.NE.0D0) GO TO 3
+      E2=0D0
+      RETURN
+3     E2=DLOG(DABS(Z))/3D0-13D0/18D0
+      RETURN
+2     IF(Z) 10,20,30
+10    WX=Z**2/(X**2*(DABS(DLOG(X))))-10D-4
+      IF(WX.GE.0D0) GO TO 200
+      E2=DLOG(X)/3D0-Z/(20D0*X)
+      RETURN
+200   E2=DLOG(X)/3D0-13D0/18D0+DSQRT(1D0-4D0*X/Z)*
+     #DLOG((2D0*X-Z+DSQRT((-Z)*(4D0*X-Z)))/(2D0*X))
+     #*(1D0-X/Z)/3D0+2D0*X/(3D0*Z)
+      RETURN
+20    E2=DLOG(X)/3D0
+      RETURN
+30    WZ=Z-4D0*X
+      IF(WZ.GE.0D0) GO TO 1000
+      E2=DLOG(X)/3D0-13D0/18D0+2D0*(Z-X)/3D0*DSQRT((4D0*X-Z)/Z)*
+     #DATAN(DSQRT(Z/(4D0*X-Z)))/Z+2D0*X/(3D0*Z)
+      RETURN
+1000  E2=DLOG(X)/3D0-13D0/18D0+(Z-X)/3D0*DSQRT((Z-4D0*X)/Z)*
+     #DLOG((Z-2D0*X+DSQRT(Z*(Z-4D0*X)))/(2D0*X))/Z+2D0*X/(3D0*Z)
+      RETURN
+1     IF(X.NE.0D0) GO TO 6
+      IF(Y.NE.Z) GO TO 35
+      E2=(3D0*DLOG(Z)-2D0)/9D0
+      RETURN
+35    RYZ=DABS(Z/Y)-1D-5
+      IF(RYZ.GE.0D0) GO TO 36
+      E2=-1D0/9D0+DLOG(Y)/3D0-Z/12D0/Y
+      RETURN
+36    E2=(1D0-Y/Z)**3*DLOG(DABS(Z-Y))/3D0+Y*(3D0*Z*Z-3D0*Y*Z+Y**2)*DLOG
+     #(Y)/Z**3/3D0-13D0/18D0+5D0*Y/(6D0*Z)-Y*Y/(3D0*Z*Z)
+      RETURN
+6     WY=Y-Z
+      IF(WY.NE.0D0) GO TO 40
+      WB=4D0*Z-X
+      IF(WB.GT.0D0) GO TO 300
+      IF(Z/X.GT.3D-5)GO TO 303
+      E2=DLOG(X)/3D0
+      RETURN
+303   E2=DLOG(Z)/3D0+X**2*(X-3D0*Z)*DLOG(X/Z)/(6D0*Z**3)
+     #-2D0/9D0
+     #-DSQRT(X*(X-4D0*Z))*DLOG((X+DSQRT(X*(X-4D0*Z)))**2
+     #/(4D0*X*Z))/(6D0*Z**3)*X*(X-Z)+X*(3D0*Z-2D0*X)/(6D0*Z*Z)
+      RETURN
+300   E2=DLOG(Z)/3D0+X**2*(X-3D0*Z)*DLOG(X/Z)/(6D0*Z**3)
+     #-2D0/9D0
+     #+DSQRT(X*(4D0*Z-X))*(DATAN((2D0*Z-X)/(DSQRT(X*(4D0*Z-X))))
+     #+DATAN(X/(DSQRT(X*(4D0*Z-X)))))/(Z**3*3D0)*X*(X-Z)
+     #+X*(3D0*Z-2D0*X)/(6D0*Z*Z)
+      RETURN
+40    WA=X-Z
+      IF(WA.NE.0D0) GO TO 50
+      WB=4D0*Z-Y
+      IF(WB.GT.0D0) GO TO 400
+      IF(Z/Y.GT.3D-5)GO TO 404
+      E2=DLOG(Y)/3D0
+      RETURN
+404   E2=((9D0*Z*Z-6D0*Y*Z+Y*Y)*Y*DLOG(Y)+(2D0*Z**3-9D0*Y*Z*Z+6D0*Y*
+     #Y*Z-Y**3)*DLOG(Z)-Z*(22D0*Z*Z-27D0*Y*Z+6D0*Y*Y)/3D0
+     #-(3D0*Z-Y)*(Z-Y)*DSQRT(Y*(Y-4D0*Z))*
+     #DLOG((Y+DSQRT(Y*(Y-4D0*Z)))**2/(4D0*Y*Z)))/(6D0*Z**3)
+      RETURN
+400   E2=((9D0*Z*Z-6D0*Y*Z+Y*Y)*Y*DLOG(Y)+(2D0*Z**3-9D0*Y*Z*Z+6D0*Y*
+     #Y*Z-Y**3)*DLOG(Z)-Z*(22D0*Z*Z-27D0*Y*Z+6D0*Y*Y)/3D0
+     #+(3D0*Z-Y)*(Z-Y)*DSQRT(Y*(4D0*Z-Y))*
+     #(DATAN((2D0*Z-Y)/DSQRT(Y*(4D0*Z-Y)))
+     #+DATAN(DSQRT(Y/(4D0*Z-Y))))*2D0)/(6D0*Z**3)
+      RETURN
+50    WW=(Z/(X-Y))**2-1D-6
+      IF(WW.GE.0D0) GO TO 4000
+      IF(X/Y.GT.1D-5)GO TO 123
+      E2=DLOG(Y)/3D0
+      RETURN
+123   IF(Y/X.GT.1D-5)GO TO 234
+      E2=DLOG(X)/3D0
+      RETURN
+234   E2=(DLOG(Y)+(X/(Y-X))**3*DLOG(Y/X)-1D0/3D0+X/(Y-X)/2D0
+     #-(X/(Y-X))**2)/3D0
+      RETURN
+4000  QM1=Z-(DSQRT(X)-DSQRT(Y))**2
+      QM2=Z-(DSQRT(X)+DSQRT(Y))**2
+      IF(QM1) 5000,5000,7
+7     IF(QM2) 70,5000,5000
+70    E2=-13D0/18D0+(5D0*Y-X)/6D0/Z-(X-Y)**2/3D0/Z/Z
+     #+((Y-X+Z)**3/24D0/Z**3-Y*(Y-X-Z)/2D0/Z**2)*DLOG(Y)
+     #-((Y-X-Z)**3/24D0/Z**3-X*(Y-X-Z)/2D0/Z**2)*DLOG(X)
+     #+(Y-X-Z)**2/8D0/Z**2*(DLOG(X*Y)+(Y-X)/Z*DLOG(Y/X))
+     #+2D0/3D0/Z**2*(Z*Z+(X-2D0*Y)*Z+(X-Y)**2)
+     #*DSQRT((2D0*(X+Y)*Z-(X-Y)**2-Z*Z)/4D0/Z**2)
+     #*DATAN(DSQRT(2D0*(X+Y)*Z-(X-Y)**2-Z*Z)/(X+Y-Z))
+      RETURN
+5000  IF(Z-X-Y) 7000,6000,6000
+6000  E2=(6D0*Z**3*DLOG(Y)-3D0*(Z+X-Y)*((Z+X-Y)**2
+     #-3D0*X*Z)*DLOG(Y/X)-4D0*Z**3+12D0*X*Z**2-3D0*
+     #Z*(Z+X-Y)*(3D0*Z+2D0*(X-Y))+3D0*((Z+X-Y)**2-X*Z)
+     #*DSQRT((Z+X-Y)**2-4D0*X*Z)*DLOG((Z-X-Y+DSQRT
+     #((Z+X-Y)**2-4D0*X*Z))**2/(4D0*X*Y)))/(18D0*Z**3)
+      RETURN
+7000  E2=(6D0*Z**3*DLOG(Y)-3D0*(Z+X-Y)*((Z+X-Y)**2
+     #-3D0*X*Z)*DLOG(Y/X)-4D0*Z**3+12D0*X*Z**2-3D0*
+     #Z*(Z+X-Y)*(3D0*Z+2D0*(X-Y))-3D0*((Z+X-Y)**2-X*Z)
+     #*DSQRT((Z+X-Y)**2-4D0*X*Z)*DLOG((Z-X-Y-DSQRT
+     #((Z+X-Y)**2-4D0*X*Z))**2/(4D0*X*Y)))/(18D0*Z**3)
+      RETURN
+      END
+C
+C
+C ** E **
+C
+      DOUBLE PRECISION FUNCTION E(X,Y,Z)
+      IMPLICIT REAL*8(A-H,O-Z)
+      E=E1(X,Y,Z)-E2(X,Y,Z)
+      RETURN
+      END
+ 
+      BLOCK DATA  ZHPRM
+      IMPLICIT REAL*8(A-H,O-Z)
+C FERMION MASSES-SQURE
+C---
+C    Remove option BREMS5 for adjust light quark masses to get good
+C    agreement with BREMMUS5.
+C---
+      COMMON /ZHMASS/ ZM, SQZM, WM, SQWM, EM, XM, TAM,
+     *     UM, DM, CM, SM, TM, BM, PM, DELWM,
+     #     DELZM, ZL, ZLM, Y, CS, SN, ALP, PAI, VC2, VC3, FLM, FUM, FDM
+      DATA  EM/ 2.611D-7/, XM/ 0.01117D0/, TAM/3.17552D0/
+     *,     UM/ 0.00160D0 /, DM/ 0.004225D0/, CM/ 2.25D0/, SM/ 0.01D0/
+     *,     BM/ 22.09D0   /, FLM/ 2500.D0/, FUM/ 2500.D0/, FDM/ 2500.D0/
+CBREMS5       DATA  EM/ 2.611D-7/, XM/ 0.01117/, TAM/3.17552/
+CBREMS5      *,     UM/ 0.00305 /, DM/ 0.00305 /, CM/ 2.25/, SM/ 0.49  /
+CBREMS5      *,     BM/ 20.25   /, FLM/ 2500./, FUM/ 2500./, FDM/ 2500./
+      DATA ALP/0.007297350D0/, PAI/ 3.14159D0/
+      COMMON/ZHCMWN/F1,F2,F3,F4
+C  F1,F2,F3,F4 : FERMION GENERATION
+      DATA F1,F2,F3,F4/ 1., 1., 1., 0./
+      END

@@ -1,0 +1,93 @@
+#!/bin/sh
+set -v
+#--
+#  Specify the executalbe.
+#--
+dir=../
+program=fullgen
+# outfile=70_131_10_p1
+# outfile=20_400_250_p2
+#outfile=1000_190_65_m15
+outfile=200_263_84_m2
+#--
+#  Go.
+#--
+time $dir/$program.exe << eof > $outfile.out
+@!                                                                      
+@!*************************************************                     
+@! Input section for Steering part.                                     
+@!*************************************************                     
+@!                                                                      
+STEERING
+   EVENT GEN(20)             ! Number of event is just a dummy
+*  STEERING DEBUG(37)        ! Standard debug level
+   ANAL  SEQ(BASES)          ! Select only BASES module
+*  ANAL  SEQ(SPRING LUND_Frag GENE_LIST SWIMMER SMEARING)
+*  OUTFILE FILE($outfile.tbs)   ! Output file for BASES data
+*  OUTFILE FILE(/scratch/fujiik/$outfile.tbs)
+EXIT
+@!                                                                      
+@!*************************************************                     
+@! Input section for Spring part.                                       
+@!*************************************************                     
+@!                                                                      
+BASES
+  HELP    !  for PRINT command help
+  GETB 0  !  (0,1,2)=(Do BS,Read from TBS,Read from FT23)
+  PUTB 1  !  (0,1,2)=(No BS,BS to TBS,BS to FT23)
+  DOSP 0  !  (0,1)=(No SP,SP)
+  PHST 1  !  (0,1)=(No Hist,Hist)
+  PINF 1  !  (0,1)=(No Print,Print)
+  PLOG 1  !  (0,1)=(Np Print,Print) BS info
+  HSTF $outfile.tdr ! histogram file
+@!  INF  ft23.bs ! input file  for GETB=2
+@!  OUTF ft23.bs ! output file for PUTB=2
+@!
+@! Bases Integration Parameters
+@!
+  NCAL 10000  !  NCALL
+  ITM1 5      !  ITMAX1
+  ITM2 5      !  ITMAX2
+@!
+@! Standard Model Parameters
+@!
+  ALFI 128.   ! 1/alpha(m_Z)
+  ALFS 0.12   ! alpha_s(m_Z)
+  AMSW 80.2   ! m_W
+  AMSZ 91.188 ! m_Z
+  AMSH 1000.  ! m_H
+  AMST 175.   ! m_t
+@!
+@!  ALFI 128.   ! 1/alpha(m_Z)
+@!  ALFS 0.12   ! alpha_s(m_Z)
+@!  AMSW 80.    ! m_W
+@!  AMSZ 91.17  ! m_Z
+@!  AMSH  300.  ! m_H
+@!  AMST 170.   ! m_t
+@!
+@! SUSY Parameters
+@!
+@!  AM0   70.   ! m_0
+@!  AMU  131.   ! mu
+@!  AM2   10.   ! M_2
+@!  TNB    1.   ! tan(beta)
+@!
+@!  AM0 1000.   ! m_0
+@!  AMU  190.   ! mu
+@!  AM2   65.   ! M_2
+@!  TNB -1.5.   ! tan(beta)
+@!
+  AM0  200.   ! m_0
+  AMU  263.   ! mu
+  AM2   83.7  ! M_2
+  TNB   -2.   ! tan(beta)
+@!  AMA  407.   ! m_A set to sqrt(AM0**2+AMU**2) if unspecified
+EXIT                                        
+@!                                                                      
+@!*************************************************                     
+@! Start execution.                                                     
+@!*************************************************                     
+@!                                                                      
+GO
+eof
+exit 0

@@ -1,0 +1,119 @@
+XCOMM ############################################################################
+XCOMM ##(Description)
+XCOMM ##   Imake file for NNWW generator.
+XCOMM ##	clean    : to clean the directory.
+XCOMM ##	cleanall : to remove everything reproducible.
+XCOMM ##(Update Record) 
+XCOMM ##   99/05/21  K.Fujii	Original version for JSF.
+XCOMM ############################################################################
+
+/*
+ * Template Files
+ *
+ */
+
+#define CXXPACKAGE
+#include "../../config/lclib.tmpl"
+
+INCPATH	= -I. -I$(KFLIBROOT)/dgen_lib/sm/include \
+	-I$(KFLIBROOT)/dgen_lib/bm/include \
+	-I$(KFLIBROOT)/gen_lib/bs/include \
+	-I$(LCDIR)/simjlc/src -I$(LCDIR)/util/fortlib/src 
+
+#if defined(hitachiArchitecture)
+ANALLIB   = $(LDDIRFLAG)$(JSFROOT)/lib -lJSF -lJSFLCFULL -lJSFQuickSim \
+	    $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
+	    -lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	    -lDHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
+#else
+ANALLIB   = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
+	    -lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	    -lDHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
+#endif
+
+KFLIB	= $(LDDIRFLAG)$(KFLIBDIR) -lDGENLIBSM \
+	-lDGENLIBKN -lDGENLIBBM -lDFORTLIB -lANLLIB
+
+/*
+ * Fortran Objects
+ *
+ */
+
+FOBJS = ampnnww.o \
+		fulnnww.o \
+		funnnww.o \
+		sgnnwwf.o \
+		spevnt.o \
+		spinit.o \
+		userin.o \
+		usrout.o
+
+PACKAGENAME   = NNWWSpring
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+
+FSRCS         = $(strip $(subst .o,.F,$(FOBJS)))
+
+OBJS          = $(PACKAGENAME).$(ObjSuf) \
+		$(PACKAGENAME)Dict.$(ObjSuf)
+
+SRC           = $(PACKAGENAME).$(SrcSuf) 
+
+HDRS	      = $(PACKAGENAME).h
+
+DICTNAME      = $(PACKAGENAME)Dict
+
+SONAME	      = $(PACKAGENAME).$(DllSuf)
+
+JSFSOLIB      = prod/$(SONAME)
+
+JSFPROGRAM    = prod/jsf
+
+/*
+ * Make Targets
+ *
+ */
+
+#if defined(hitachiArchitecture)
+all::  $(JSFPROGRAM)
+#else
+all::  $(JSFSOLIB)
+#endif
+
+$(JSFPROGRAM): $(OBJS) jsfmain.o $(FOBJS)
+	$(LD) -o $(JSFPROGRAM) jsfmain.o $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS)
+
+prod/$(SONAME): $(OBJS) $(FOBJS)
+	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS)
+
+clean:: 
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
+
+depend:: 
+	makedepend -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) $(SRC)
+	makedepend $(INCPATH) $(FSRCS)
+
+distclean:: clean
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~
+	@rm -f $(JSFPROGRAM) $(JSFSOLIB) *.root Makefile
+	@(cd prod; rm -f *.root *.tdr *.out *~ core)
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I$(JSFROOT)/include $(HDRS) LinkDef.h
+
+/*
+ * Suffix Rules
+ *
+ */
+
+.SUFFIXES: .$(SrcSuf)
+
+.$(SrcSuf).$(ObjSuf):
+	$(CXX) $(CXXFLAGS) -c $<

@@ -1,0 +1,11 @@
+#!/bin/sh
+for i in *.f; do
+   if [ `grep -c EXPAND $i` != 0 -o `grep -c INCLUDE $i` != 0 ];then
+      sed -e "s;^=EXPAND *'.*/\(.*\)\.inc';#include \"\1\.inc\";" \
+          -e "s;^      INCLUDE *'\(.*\)\.inc';#include \"\1\.inc\";" \
+		     $i > `basename $i .f`.F
+      mv $i $i.old
+   fi
+done
+exit 0
+

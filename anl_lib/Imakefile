@@ -1,0 +1,39 @@
+XCOMM ############################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for Fujii's analysis library.
+XCOMM ## (Update Record) 
+XCOMM ##    97/07/26  K.Fujii 	Original version.
+XCOMM ##    99/05/16  K.Fujii 	Reorganized directory structure.
+XCOMM ############################################################################
+
+/* #define ENABLESHARED */
+#include "../config/lclib.tmpl"
+
+XCOMM #
+XCOMM # Define the name of the library.
+XCOMM #
+INSTALLDIR = ../lib
+LIBNAME   = ANLLIB
+XCOMM #
+XCOMM # Routines to compile.
+XCOMM #
+OBJS = btaggn2.o \
+		getecn.o \
+		gtecon.o \
+		idlptn.o \
+		plprnt.o \
+		slprnt.o \
+		solvkn.o \
+		u2vang.o
+
+ALLOBJ = $(OBJS)
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(ALLOBJ),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(ALLOBJ) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))
+
+distclean: clean
+	rm -f Makefile
+

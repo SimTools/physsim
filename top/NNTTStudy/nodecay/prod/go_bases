@@ -1,0 +1,44 @@
+#!/bin/sh
+set -x
+#--
+#  Set ISRB falg.
+#--
+isrb=3
+filen="mt150s15"
+#--
+echo "(  isrb = $isrb   $filen" > integ.dat
+echo "(  sqrts	sigma	    error	m_t	     m_H" >> integ.dat
+echo "(-----------------------------------------------------------" >> integ.dat
+#--
+#  Start bases.
+#--
+./go_command 150. 12000. 1000.  $isrb nohs10
+./go_command 150.   800. 1000.  $isrb mh800s10
+./go_command 150.   700. 1000.  $isrb mh700s10
+./go_command 150.   600. 1000.  $isrb mh600s10
+./go_command 150.   500. 1000.  $isrb mh500s10
+./go_command 150.   400. 1000.  $isrb mh400s10
+./go_command 150.   300. 1000.  $isrb mh300s10
+exit 0
+#
+./go_command 150.  800. 1000.  $isrb   $filen
+exit 0
+#
+./go_command 150.    0. 1500.  $isrb   $filen
+./go_command 150.  100. 1500.  $isrb   $filen
+./go_command 150.  200. 1500.  $isrb   $filen
+./go_command 150.  250. 1500.  $isrb   $filen
+./go_command 150.  300. 1500.  $isrb   $filen
+./go_command 150.  320. 1500.  $isrb   $filen
+./go_command 150.  340. 1500.  $isrb   $filen
+./go_command 150.  360. 1500.  $isrb   $filen
+./go_command 150.  380. 1500.  $isrb   $filen
+./go_command 150.  400. 1500.  $isrb   $filen
+./go_command 150.  420. 1500.  $isrb   $filen
+./go_command 150.  500. 1500.  $isrb   $filen
+./go_command 150.  600. 1500.  $isrb   $filen
+./go_command 150.  700. 1500.  $isrb   $filen
+./go_command 150.  800. 1500.  $isrb   $filen
+./go_command 150.  900. 1500.  $isrb   $filen
+./go_command 150. 1000. 1500.  $isrb   $filen
+exit 0

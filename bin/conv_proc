@@ -1,0 +1,57 @@
+#! /bin/sh
+###########################################################################
+### (Purpose)								###
+###    Carry out string conversion.					###
+### (Update Record)							###
+###    95/04/26  K.Fujii	Original version			### 
+###########################################################################
+#
+#--
+#  Set from and to directories.
+#--
+inproc=`echo $1 | tr [a-z] [A-Z]`
+outproc=`echo $2 | tr [a-z] [A-Z]`
+inproclo=`echo $1 | tr [A-Z] [a-z]`
+outproclo=`echo $2 | tr [A-Z] [a-z]`
+echo "Converting $inproc to $outproc"
+dir=..
+frdir=$dir/${inproc}Study
+todir=.
+#--
+#  Make a list of files.
+#--
+list=`ls $frdir`
+#--
+#  loop over files in the list.
+#--
+for file in $list; do
+#--
+#  Skip directories, executables, and object modues.
+#--
+   if [ ! -x $frdir/$file -a ! -d $frdir/$file ]; then
+      if [ `basename $frdir/$file .o` = `basename $frdir/$file` ]; then
+#--
+#  Set replacement rules.
+#--
+         sed -e s/$inproc/$outproc/g \
+	     -e s/$inproclo/$outproclo/g \
+                $frdir/$file > $todir/$file
+         new=`echo $file | sed -e s/$inproclo/$outproclo/ \
+			       -e s/$inproc/$outproc/`
+#--
+#  Rename if necessary.
+#--
+         if [ $file != $new ]; then
+            mv $todir/$file $todir/$new
+            echo "$frdir/$file --> $todir/$new"
+	 else
+	    echo "$frdir/$file --> $todir/$file"
+         fi
+      fi
+   fi
+done
+#--
+#  That's it.
+#--
+echo "(END)"
+exit

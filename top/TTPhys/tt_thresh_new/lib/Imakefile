@@ -1,0 +1,72 @@
+##############################################################################
+## (Description)
+##    Imake file for Fujii's tt_thresh_new library.
+## (Update Record) 
+##    97/08/30  K.Fujii 	Original version.
+##############################################################################
+
+/* #define ENABLESHARED */
+#include "../../../../config/lclib.tmpl"
+
+#--
+#  Define the name of the library.
+#--
+INSTALLDIR = ../../../../lib
+
+LIBNAME	= $(PHYLIBTTNEW)
+
+#--
+#  Routines to compile.
+#--
+OBJS		= adj1.o \
+		adj2.o \
+		bndcnd.o \
+		delfn.o \
+		dsgdp0.o \
+		dsgdpa.o \
+		dsgdpf.o \
+		epkhnt.o \
+		gamma0.o \
+		gmtwmb.o \
+		grqadj.o \
+		grqblk.o \
+		grqdsg.o \
+		grqint.o \
+		grqptp.o \
+		grqsga.o \
+		grqsum.o \
+		gtceff.o \
+		gtqcdp.o \
+		lnt0fi.o \
+		lnt0wa.o \
+		lnt1fi.o \
+		lnt2wa.o \
+		ntgrd1.o \
+		ntgrd2.o \
+		ntgrd3.o \
+		phs0.o \
+		phs2.o \
+		qcdp1.o \
+		qcdp2.o \
+		qcdp3.o \
+		qcds1.o \
+		qcds2.o \
+		qcds3.o \
+		rkutap.o \
+		rkutas.o \
+		runwid.o \
+		sgafb0.o \
+		sgafbf.o
+#--
+#  Libraries
+#--
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(OBJS),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(OBJS) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))
+
+distclean: clean
+	rm -f Makefile
+

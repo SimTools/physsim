@@ -1,0 +1,128 @@
+ ------------------------------------------------------------------
+   Physics study libraries				1999/10/08
+ ------------------------------------------------------------------
+ 
+[1] Version Information
+
+   Version: 99a
+   Release: 1
+
+[2] Update Record
+
+    1999/10/08  K.Fujii		A temporary JSF version (99a-1)
+				with C++ wrappers to be replaced
+				in future by a fully C++ version.
+				A C++ analysis utility package (Anlib)
+				has been added together with some
+				sample analysis programs using it.
+    1999/05/24  K.Fujii		A temporary JSF version (98a-1)
+				with C++ wrappers to be replaced
+				in future by a fully C++ version.
+
+[3] How to Install the Libraries
+
+   In order to use this package you should first set some
+   environmental variables:
+
+	$ cd <the directory containing this file>
+	$ export KFLIBROOT=`pwd`
+	$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$KFLIBROOT/lib
+	$ export IMAKEINCLUDE="$IMAKEINCLUDE -I$KFLIBROOT"
+	$ vi ~/.rootrc
+	Unix.*.Root.DynamicPath:.:$(ROOTSYS)/lib:$(JSFROOT)/lib:$(KFLIBROOT)/lib
+	Unix.*.Root.MacroPath:  .:$(ROOTSYS)/macros:$(JSFROOT)/example/guiexam1
+
+
+   where the JSF standard environmental variables such as
+   ROOTSYS, JSFROOT, LCLIBROOT, CERN_ROOT, .... are assumed
+   to be set beforehand (see HowToInstall of JSF for details).
+   Once the environment is set up, do:
+
+	$ make
+
+[4] How to Build Individual Generators
+
+   Step [3] will create libraries necessary to build various MC
+   event generators based on BASES/SPRING stored in
+	higgs	: zh, ...
+	susy	: sfsf, xcxc, ...
+	top	: eett, nntt, tth, tt, ttz, ...
+	twoph	: eeff (f=e,mu,tau,q)
+	wz	: eeww, eez, enw, nnww, nnz, ww, wwz, zz, ...
+   These subdirectories contain subsubdirectories named
+   <PROCESSNAME>Study. The top levelMakefile does NOT build 
+   individual Monte Carlo event generators: it only creates
+    necessary libraries for them.
+   You should "cd" to one of these subsubdirectories and do
+
+    	$ xmkmf -a
+	$ make
+
+
+[5] How to Use Individual Generators
+
+   Step [4] will create a shared object : prod/<PROCESSNAME>Spring.so
+   which can dynamically be loaded into "jsf".
+   Dynamic loading is automatically done by using macro files:
+	bases.C	: MC integration (BASES step) ʠnecessary for SPRING step.
+	sim.C	: event generation (SPRING step).
+ 	gui.C	: Miyamoto's GUI for jsf which loads:
+			MainMacro.C  : steers through events.
+			UserAnalysis : analyzes events (user defined).
+   You can use them as:
+
+	$ jsf -b -q bases.C >& bs.out &		# BASES step
+	$ tail -f bs.out			# monitor SYSOUT
+	.......
+	^C					# quit "tail"
+
+   Check "bs.out" if integration successfully converges.
+   This will also allow you to get the cross section of the 
+   process given usually in (pb).
+   Optionally, you can examine a TOPDRAW file (bases.tdr) by
+ 	$ tdr -v X bases.tdr
+   if "tdr" command is available. The integration conditions
+   can be controlled by editing "jsf.conf" which allows you
+   to change job parameters such as "m_t", "m_H", ..., etc.
+   If everything is OK. you can continue with event generation.
+
+	$ jsf -b -q sim.C >& sm.out &		# SPRING step
+	$ tail -f sm.out			# monitor SYSOUT
+	.......
+	^C					# quit "tail"
+
+   Again, you had better check "sm.out" to confirm that the
+   SPRNG step ended with no error.
+   You can change the input BASES file (bases.root) or the number 
+   of events to generate by editing "sim.C". 
+   Generated events can be browsed using Miyamoto's GUI:
+
+	$ jsf gui.C
+
+   which navigates you through generated events and allows you 
+   to display and analyze them using a user analysis macro 
+   called "UserAnalysis". 
+   Which "<PROCESS>Spring.so" is loaded and which file is read
+   in are controlled by editing "gui.C" and jsf.conf, respectively.
+   The input file can also be selected through the GUI's file
+   chooser. "<PROCESS>Spring.so" will be selectable from the GUI
+   in a future release, I hope.
+   Default UserAnalysis macros are meant to be a template and 
+   NOT very realistic yet, except for that of SFSFStudy.
+   When more useful ones become available I will include them.
+   Your contributions are very much welcome.
+
+
+[6] Known Problems
+
+   There is a pitfall known to exist in the current version
+   using C++ wrappers called function name confusion.
+   If multiple <PROCESS>Spring.so's are loaded into a single
+   JSF session, there can be function name confusions.
+   A typical example is HELAS/DHELAS confusion which is caused
+   by the fact that both single and double precision versions
+   have the same function names. To avoid this problem, NEVER
+   try to load multiple generator packages. 
+   Quit the JSF session before starting analysis of a different
+   process.
+

@@ -1,0 +1,2 @@
+      COMMON /BSITPR/  NCAL, ITM1, ITM2
+      INTEGER*4        NCAL, ITM1, ITM2

@@ -1,0 +1,42 @@
+##############################################################################
+## (Description)
+##    Imake file for Fujii's TT library.
+## (Update Record) 
+##    97/07/26  K.Fujii 	Original version.
+##############################################################################
+
+/* #define ENABLESHARED */
+#include "../../config/lclib.tmpl"
+
+#--
+#  Define the name of the library.
+#--
+INSTALLDIR = ../../lib
+LIBNAME   = GENLIBTT
+
+#--
+#  Routines to compile.
+#--
+OBJS = alphas.o \
+		greenq.o \
+		lambda.o \
+		qcdmod.o \
+		qcdmod_P.o \
+		tabulate_GreenP.o \
+		runalf.o \
+		qcdp2.o \
+		rkutta3.o \
+		setprm.o
+
+ALLOBJ = $(OBJS)
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(ALLOBJ),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+
+NormalLibraryTarget($(LIBNAME),$(OBJS))
+InstallLibrary($(LIBNAME),$(INSTALLDIR))
+
+distclean: clean
+	rm -f Makefile
+

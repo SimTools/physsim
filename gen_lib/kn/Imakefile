@@ -1,0 +1,46 @@
+XCOMM ###########################################################################
+XCOMM # (Description)
+XCOMM #    Imake file for Fujii's Kinematics library.
+XCOMM # (Update Record) 
+XCOMM #    97/07/26  K.Fujii 	Original version.
+XCOMM #    99/05/16  K.Fujii 	Reorganized directory structure.
+XCOMM ###########################################################################
+
+/* #define ENABLESHARED */
+#include "../../config/lclib.tmpl"
+
+XCOMM #
+XCOMM # Define the name of the library.
+XCOMM #
+INSTALLDIR = ../../lib
+LIBNAME   = GENLIBKN
+XCOMM #
+XCOMM # Routines to compile.
+XCOMM #
+OBJS = cdotxx.o \
+		conjgx.o \
+		pmirrx.o \
+		psignx.o \
+		psubxx.o \
+		psumxx.o \
+		rdotxx.o \
+		uhphs2.o \
+		uhphs3.o \
+		uhphsn.o \
+		uhq2bw.o \
+		uhqij3.o \
+		uhqlim.o \
+		uhsetf.o
+#--
+#  Library
+#--
+ALLOBJ = $(OBJS)
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(ALLOBJ),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(ALLOBJ) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))
+
+distclean: clean
+	rm -f Makefile

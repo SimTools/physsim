@@ -1,0 +1,30 @@
+README		: this file
+makefile	: makefile to build plotting programs
+pltepk		: program to plot E_pk of sg_tot against m_t
+pltfb1se	: programs to plot sg_tot and a_fb as a function of delta_E
+		  pltfb1se0	: for different alpha_s (w/o isr)
+		  pltfb1sea	: for different alpha_s (w/ isr + bm)
+		  pltfb1sem	: for different m_t	(w/ isr + bm)
+		  pltfb1sev	: for different |v_tb|^2(w/ isr + bm)
+pltfbx		: programs to plot a_fb at a given delta_E
+		  pltfbxa	: against alpha_s 	(w/ isr + bm) 
+		  pltfbxv	: against |v_tb|^2	(w/ isr + bm)
+pltppk		: programs to plot p_peak at a given delta_E
+		  pltppk0a	: for different alpha_s (w/o isr)
+		  pltppk0m	: for different m_t	(w/o isr)
+		  pltppk0v	: for different |v_tb|^2(w/o isr)		
+		  pltppka	: for different alpha_s (w/ isr + bm)
+		  pltppkm	: for different m_t	(w/ isr + bm)
+		  pltppkv	: for different |v_tb|^2(w/ isr + bm)		
+pltptop		: programs to plot p_top at a given delta_E
+		  pltptop0	: (w/o isr)
+		  pltptopa	: for different alpha_s (w/ isr + bm)
+		  pltptopm	: for different m_t	(w/ isr + bm)
+		  pltptopv	: for different |v_tb|^2(w/ isr + bm)	
+pltsga		: programs to plot sg_tot and a_fb as a function of E
+		  pltsga0a	: for different alpha_s (w/o isr)
+		  pltsga0v	: for different |v_tb|^2(w/o isr)
+		  pltsgaa	: for different alpha_s (w/ isr + bm)
+		  pltsgav	: for different |v_tb|^2(w/ isr + bm)
+		  
+After make in each directory you get executables in prod.

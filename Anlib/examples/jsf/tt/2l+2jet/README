@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+1999/08/19  K.Ikematsu 	Sample Analysis Module Using Anlib
+-------------------------------------------------------------------------------
+Reaction: 	e+e- -> ttbar -> 2leptons + 2jets
+Generator:	TTStudy
+Usage:		
+
+$ xmkmf -a; make
+$ jsf anl2L2J.C
+or to avoid a lot of debug messages
+$ jsf anl2L2J.C 2>/dev/null
+
+You have to prepare MC data(ttsim.root) in TTStudy/prod directory
+before you do the above.

@@ -1,0 +1,80 @@
+XCOMM ############################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for Fujii's Beam library.
+XCOMM ## (Update Record) 
+XCOMM ##    97/07/26  K.Fujii 	Original version.
+XCOMM ##    99/05/17  K.Fujii 	Reorganized directory structure.
+XCOMM ############################################################################
+
+/* #define ENABLESHARED */
+#include "../../config/lclib.tmpl"
+
+XCOMM #--
+XCOMM #  Define the name of the library.
+XCOMM #--
+INSTALLDIR = ../../lib
+LIBNAME   = GENLIBBM
+LIBNAME1    =   GBM_0
+LIBNAME2    =   GBM_N
+LIBNAME3    =   GBM
+XCOMM #--
+XCOMM #  Routines to compile.
+XCOMM #--
+OBJS 	    = 	probeb.o \
+		blkdbm.o
+OBJS1	    =	RSHDIS0.o \
+		ISRINT.o \
+		UDSRCH.o
+OBJS2	    =	RSHDISN.o \
+		ISRINT.o \
+		UDSRCH.o
+OBJS3	    =	RSHDIS.o \
+		ISRINT.o \
+		UDSRCH.o
+XCOMM #--
+XCOMM #  Library
+XCOMM #--
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(OBJS),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(OBJS) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))
+
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME1),$(SOREV),$(OBJS1),.,.)
+InstallSharedLibrary($(LIBNAME1),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME1), $(OBJS1) )
+InstallLibrary($(LIBNAME1),$(INSTALLDIR))
+
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME2),$(SOREV),$(OBJS2),.,.)
+InstallSharedLibrary($(LIBNAME2),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME2), $(OBJS2) )
+InstallLibrary($(LIBNAME2),$(INSTALLDIR))
+
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME3),$(SOREV),$(OBJS3),.,.)
+InstallSharedLibrary($(LIBNAME3),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME3), $(OBJS3) )
+InstallLibrary($(LIBNAME3),$(INSTALLDIR))
+
+blkdbm.o: blkdbm.F
+
+blkdbm.F: include/BEMCNS.inc
+	rm -f blkdbm.F
+	echo "      block data blkdbm" > blkdbm.F
+	echo "C--" >> blkdbm.F
+	echo "C  THIS FILE IS AUTOMATICALLY GENERAGED FROM" >> blkdbm.F
+	echo "C      include/BEMCNS.inc" >> blkdbm.F
+	echo "C  DO NOT EDIT. EDIT C= COMMENTS IN THESE INCLUDE FILES" >> blkdbm.F
+	echo "C--" >> blkdbm.F
+	sed -e 's/^C=/  /' include/BEMCNS.inc >> blkdbm.F
+	echo "      end" >> blkdbm.F
+
+distclean: clean
+	rm -f Makefile
+

@@ -1,0 +1,31 @@
+#!/bin/sh
+set -x
+#--
+#  Set ISRB falg.
+#--
+isrb=1
+#--
+echo "(  isrb = $isrb" > integ.dat
+echo "(  sqrts	sigma	    error	m_t	     m_H" >> integ.dat
+echo "(-----------------------------------------------------------" >> integ.dat
+#--
+#  Start bases.
+#--
+./go_command 150.    0. 1500.  $isrb
+./go_command 150.  100. 1500.  $isrb
+./go_command 150.  200. 1500.  $isrb
+./go_command 150.  250. 1500.  $isrb
+./go_command 150.  300. 1500.  $isrb
+./go_command 150.  320. 1500.  $isrb
+./go_command 150.  340. 1500.  $isrb
+./go_command 150.  360. 1500.  $isrb
+./go_command 150.  380. 1500.  $isrb
+./go_command 150.  400. 1500.  $isrb
+./go_command 150.  420. 1500.  $isrb
+./go_command 150.  500. 1500.  $isrb
+./go_command 150.  600. 1500.  $isrb
+./go_command 150.  700. 1500.  $isrb
+./go_command 150.  800. 1500.  $isrb
+./go_command 150.  900. 1500.  $isrb
+./go_command 150. 1000. 1500.  $isrb
+exit 0  

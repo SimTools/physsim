@@ -1,0 +1,61 @@
+XCOMM ############################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for XCXC analysis.
+XCOMM ## (Update Record) 
+XCOMM ##    99/05/22  K.Fujii   Original version.
+XCOMM ############################################################################
+
+/*
+ * Template Files
+ *
+ */
+#define CXXPACKAGE 
+#include "../../../config/lclib.tmpl"
+
+/*
+ * Headers
+ *
+ */
+
+INCPATH	= -I. -I../../src
+EXTRACXXOPT = $(INCPATH)
+
+/*
+ * Package Name
+ *
+ */
+
+PACKAGENAME	= UserAnalysis
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+
+OBJS		= $(PACKAGENAME).$(ObjSuf)
+
+SRCS		= $(subst .$(ObjSuf),.$(SrcSuf),$(OBJS))
+
+JSFPROGRAM	= $(PACKAGENAME)
+
+ANLLIB		= $(LDDIRFLAG)$(KFLIBROOT)/lib -lAnlib
+
+/*
+ * Make Targets
+ *
+ */
+
+all::  $(JSFPROGRAM)
+
+$(JSFPROGRAM): $(PACKAGENAME).$(ObjSuf)
+	$(LD) -o $(JSFPROGRAM) $(PACKAGENAME).$(ObjSuf) $(ANLLIB) $(LDFLAGS)
+
+clean:: 
+	@rm -f *.$(ObjSuf) core
+
+depend:: $(SRCS)
+	makedepend -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) $(SRCS)
+
+distclean:: clean
+	@rm -f $(JSFPROGRAM) Makefile
+	@rm -f *.root *.tdr *.out *~ core

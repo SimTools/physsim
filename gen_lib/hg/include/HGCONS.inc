@@ -1,0 +1,4 @@
+      COMMON /HGCONS/ TNBET, SNBET, CSBET, SNALF, CSALF, AMA, GMA,
+     .                AMHM, GMHM, AMHL, GMHL, AMHH, GMHH
+      REAL*4          TNBET, SNBET, CSBET, SNALF, CSALF, AMA, GMA,
+     .                AMHM, GMHM, AMHL, GMHL, AMHH, GMHH

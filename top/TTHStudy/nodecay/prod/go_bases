@@ -1,0 +1,106 @@
+#!/bin/sh
+set -x
+#--
+#  Set ISRB falg.
+#--
+title="All"
+isrb=1
+#--
+echo "(  $title" > integ.dat
+echo "(  isrb = $isrb" >> integ.dat
+echo "(  sqrts	sigma	    error	m_t	     m_H" >> integ.dat
+echo "(-----------------------------------------------------------" >> integ.dat
+#--
+#  Start bases.
+#    for m_H = 150
+#--
+amt=175.
+amh=150../go_command $amt $amh 1100. $isrb
+./go_command $amt $amh 1200. $isrb
+./go_command $amt $amh 1300. $isrb
+./go_command $amt $amh 1400. $isrb
+./go_command $amt $amh 1500. $isrb
+exit 0
+./go_command $amt $amh 501.  $isrb
+./go_command $amt $amh 505.  $isrb
+./go_command $amt $amh 510.  $isrb
+./go_command $amt $amh 520.  $isrb
+./go_command $amt $amh 540.  $isrb
+./go_command $amt $amh 560.  $isrb
+./go_command $amt $amh 600.  $isrb
+./go_command $amt $amh 650.  $isrb
+./go_command $amt $amh 700.  $isrb
+./go_command $amt $amh 800.  $isrb
+./go_command $amt $amh 900.  $isrb
+./go_command $amt $amh 1000. $isrb
+exit 0
+#--
+#  Start bases.
+#--
+sqrts=1000.
+amt=150.
+./go_command $amt   60.0  $sqrts  $isrb
+./go_command $amt   80.0  $sqrts  $isrb
+./go_command $amt  100.0  $sqrts  $isrb
+./go_command $amt  120.0  $sqrts  $isrb
+./go_command $amt  140.0  $sqrts  $isrb
+./go_command $amt  160.0  $sqrts  $isrb
+./go_command $amt  180.0  $sqrts  $isrb
+./go_command $amt  200.0  $sqrts  $isrb
+exit 0
+#--
+#  Start bases.
+#    for tanb = +30
+#--
+isrb=1
+./go_command 170. 133.0 700.  $isrb
+exit 0
+#--
+#  Start bases.
+#    for tanb = +2
+#--
+./go_command 170. 110.64 700.  $isrb
+./go_command 170. 116.00 700.  $isrb
+./go_command 170. 117.7 700.  $isrb
+./go_command 170. 118.4 700.  $isrb
+./go_command 170. 118.8 700.  $isrb
+./go_command 170. 119.1 700.  $isrb
+./go_command 170. 119.2 700.  $isrb
+./go_command 170. 119.4 700.  $isrb
+exit 0
+#--
+#  Start bases.
+#    for m_H = 150
+#--
+./go_command 170. 150. 491.  $isrb
+./go_command 170. 150. 495.  $isrb
+./go_command 170. 150. 500.  $isrb
+./go_command 170. 150. 510.  $isrb
+./go_command 170. 150. 530.  $isrb
+./go_command 170. 150. 550.  $isrb
+./go_command 170. 150. 600.  $isrb
+./go_command 170. 150. 650.  $isrb
+./go_command 170. 150. 700.  $isrb
+./go_command 170. 150. 800.  $isrb
+./go_command 170. 150. 900.  $isrb
+./go_command 170. 150. 1000. $isrb
+exit 0
+#--
+#  Start bases.
+#    for m_H = 100
+#--
+./go_command 170. 100. 441.  $isrb
+./go_command 170. 100. 445.  $isrb
+./go_command 170. 100. 450.  $isrb
+./go_command 170. 100. 460.  $isrb
+./go_command 170. 100. 480.  $isrb
+./go_command 170. 100. 500.  $isrb
+./go_command 170. 100. 550.  $isrb
+./go_command 170. 100. 600.  $isrb
+./go_command 170. 100. 650.  $isrb
+./go_command 170. 100. 700.  $isrb
+./go_command 170. 100. 800.  $isrb
+./go_command 170. 100. 900.  $isrb
+./go_command 170. 100. 1000. $isrb
+exit 0
+

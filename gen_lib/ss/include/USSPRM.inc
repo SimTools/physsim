@@ -1,0 +1,2 @@
+      COMMON /USSPRM/ AM0, AMU, AM2, TANB, AMA
+      REAL*4          AM0, AMU, AM2, TANB, AMA

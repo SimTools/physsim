@@ -1,0 +1,138 @@
+XCOMM ###########################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for TTH generator.
+XCOMM ##	exe      : to make an executable.
+XCOMM ##	run      : to run the executalbe.
+XCOMM ##	clean    : to clean the directory.
+XCOMM ##	cleanall : to remove everything reproducible.
+XCOMM ## (Update Record) 
+XCOMM ##    95/03/13  K.Fujii 	Original version for HELAS V204.
+XCOMM ##    95/06/07  K.Fujii 	Use 95a.
+XCOMM ##    97/07/28  K.Fujii	Use 97a.
+XCOMM ##    99/05/21  K.Fujii	Modified for JSF.
+XCOMM ###########################################################################
+
+/*
+ * Template Files
+ *
+ */
+
+#define CXXPACKAGE
+#include "../../config/lclib.tmpl"
+
+INCPATH	= -I. -I$(KFLIBROOT)/gen_lib/sm/include \
+	-I$(KFLIBROOT)/gen_lib/bm/include \
+	-I$(KFLIBROOT)/gen_lib/bs/include \
+	-I$(LCDIR)/simjlc/src -I$(LCDIR)/util/fortlib/src 
+
+/* EXTRADEFINES = -DHOFFT */
+/* EXTRADEFINES = -DHOFFZ */
+/* EXTRADEFINES = -DDEBUG */
+
+/*
+ * Libraries
+ *
+ */
+
+#if defined(hitachiArchitecture)
+ANALLIB   = $(LDDIRFLAG)$(JSFROOT)/lib -lJSF -lJSFLCFULL -lJSFQuickSim \
+	    $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
+	    -lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	    -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
+#else
+ANALLIB   = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
+	    -lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	    -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
+#endif
+
+KFLIB	= $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBSS -lGENLIBSM -lGENLIBHG \
+	  -lGENLIBKN -lGENLIBBM -lANLLIB
+
+TTGLIB	= $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBTT
+TTPLIB	= $(LDDIRFLAG)$(KFLIBDIR) -lPHYLIBTT -lPOTQCD
+
+/*
+ * Fortran Objects
+ *
+ */
+
+FOBJS = amptt.o \
+		amptth.o \
+		ampzh.o \
+		fultth.o \
+		functthf.o \
+		sgtthf.o \
+		spevnt.o \
+		spinit.o \
+		userin.o \
+		usrout.o
+
+PACKAGENAME   = TTHSpring
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+
+FSRCS         = $(strip $(subst .o,.F,$(FOBJS)))
+
+OBJS          = $(PACKAGENAME).$(ObjSuf) \
+		$(PACKAGENAME)Dict.$(ObjSuf)
+
+SRC           = $(PACKAGENAME).$(SrcSuf) 
+
+HDRS	      = $(PACKAGENAME).h
+
+DICTNAME      = $(PACKAGENAME)Dict
+
+SONAME	      = $(PACKAGENAME).$(DllSuf)
+
+JSFSOLIB      = prod/$(SONAME)
+
+JSFPROGRAM    = prod/jsf
+
+/*
+ * Make Targets
+ *
+ */
+
+#if defined(hitachiArchitecture)
+all::  $(JSFPROGRAM)
+#else
+all::  $(JSFSOLIB)
+#endif
+
+$(JSFPROGRAM): $(OBJS) jsfmain.o $(FOBJS)
+	$(LD) -o $(JSFPROGRAM) jsfmain.o $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS)
+
+prod/$(SONAME): $(OBJS) $(FOBJS)
+	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS)
+
+clean:: 
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
+
+depend:: 
+	makedepend -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) $(SRC)
+	makedepend $(INCPATH) $(FSRCS)
+
+distclean:: clean
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~
+	@rm -f $(JSFPROGRAM) $(JSFSOLIB) *.root Makefile
+	@(cd prod; rm -f *.root *.tdr *.out *~ core)
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I$(JSFROOT)/include $(HDRS) LinkDef.h
+
+/*
+ * Suffix Rules
+ *
+ */
+
+.SUFFIXES: .$(SrcSuf)
+
+.$(SrcSuf).$(ObjSuf):
+	$(CXX) $(CXXFLAGS) -c $<

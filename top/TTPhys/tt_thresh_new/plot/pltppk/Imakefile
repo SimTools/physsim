@@ -1,0 +1,126 @@
+##############################################################################
+## (Description)
+##    Imake file for tt_thresh_new.
+##	clean    : to clean the directory.
+##	cleanall : to remove everything reproducible.
+## (Update Record) 
+##    94/11/25  K.Fujii 	Original.
+##    97/08/30  K.Fujii 	Use 97a.
+##
+##
+##############################################################################
+
+#include "../../../../../config/lclib.tmpl"
+
+#--
+#  Define the name of the executable. 
+#--
+PROGRAM1      = pltppk0a
+PROGRAM2      = pltppk0v
+PROGRAM3      = pltppk0m
+PROGRAM4      = pltppka
+PROGRAM5      = pltppkv
+PROGRAM6      = pltppkm
+
+#--
+#  Directory to store executables.
+#--
+GODIR	      = prod
+
+#--
+#  Routines to complie.
+#--
+OBJS	      = pltppk0a.o \
+		pltppk0m.o \
+		pltppk0v.o \
+		pltppka.o \
+		pltppkm.o \
+		pltppkv.o
+
+#--
+#  Directories containing library routines.
+#--
+#ifdef HPArchitecture
+	LDDIRFLAG = -Wl,-L
+	EXTRALIBS = -lU77 -lm
+#else
+	LDDIRFLAG = -L
+	EXTRALIBS =
+#endif
+#--
+#  Libraries to link.
+#--
+#   GBM_0 for ISR only
+#   GBM_N for ISR + beam energy spread
+#   GBM   for ISR + full beam effects
+#
+# BEAMLIB    	 = GBM_0
+BEAMLIB	         = GBM
+# BEAMLIB        = GBM_N
+#
+#   pothig_lib.a for QCD + Higgs
+#   potqcd_lib.a for QCD only
+#
+POTLIB		= $(POTHIG)
+# POTLIB 	= $(POTQCD)
+#
+#   Top libraries
+#
+REQLIBS		= $(PHYLIBTTNEW) $(PHYLIBTT) $(BEAMLIB) $(POTLIB)
+LIBS		= $(LDDIRFLAG)$(KFLIBDIR) \
+		$(patsubst %,-l%,$(REQLIBS))
+
+#--
+#   Analysis libraries
+#--
+ANALLIB     = 
+#--
+#  Specify compiler and linker.
+#--
+LD	      = $(F77)
+#--
+#  Make options.
+#--
+all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) \
+		$(PROGRAM4) $(PROGRAM5) $(PROGRAM6) 
+
+$(PROGRAM1):     $(OBJS)
+		@echo "Linking $(PROGRAM1) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM1).exe
+		@echo "done"
+
+$(PROGRAM2):     $(OBJS)
+		@echo "Linking $(PROGRAM2) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM2).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM2).exe
+		@echo "done"
+
+$(PROGRAM3):     $(OBJS)
+		@echo "Linking $(PROGRAM3) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM3).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM3).exe
+		@echo "done"
+
+$(PROGRAM4):     $(OBJS)
+		@echo "Linking $(PROGRAM4) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM4).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM4).exe
+		@echo "done"
+
+$(PROGRAM5):     $(OBJS)
+		@echo "Linking $(PROGRAM5) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM5).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM5).exe
+		@echo "done"
+
+$(PROGRAM6):     $(OBJS)
+		@echo "Linking $(PROGRAM6) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM6).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM6).exe
+		@echo "done"
+
+clean::;	@rm -f $(OBJS) core
+
+cleanall:: clean
+		@(cd $(GODIR); rm -f $(OBJS) *.exe core)

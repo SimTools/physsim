@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+1999/08/17  K.Ikematsu 	Sample Analysis Module Using Anlib
+-------------------------------------------------------------------------------
+Reaction: 	e+e- -> ttbar -> lepton + 4jets
+Generator:	TTStudy
+Usage:		
+
+$ xmkmf -a; make
+$ jsf anlL4J.C
+or to avoid a lot of debug messages
+$ jsf anlL4J.C 2>/dev/null
+
+You have to prepare MC data(ttsim.root) in TTStudy/prod directory
+before you do the above.

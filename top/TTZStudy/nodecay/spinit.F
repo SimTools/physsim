@@ -1,0 +1,3 @@
+      SUBROUTINE SPINIT
+      RETURN
+      END

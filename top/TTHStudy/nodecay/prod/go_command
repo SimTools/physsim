@@ -1,0 +1,86 @@
+#!/bin/sh
+# set -v
+#--
+#  Specify job parameters.
+#--
+amst=$1
+amsh=$2
+sqrts=$3
+isrb=$4
+#--
+#  Specify the executalbe.
+#--
+dir=..
+todir=.
+program=fullgen
+outfile=bases
+if [ `uname -s | grep -c Linux` != 0 ]; then
+   ftn30=fort.30
+else
+   ftn30=ftn30
+fi
+#--
+#  Go.
+#--
+$dir/$program.exe << eof >> $todir/$outfile.out
+@!                                                                      
+@!*************************************************                     
+@! Input section for Steering part.                                     
+@!*************************************************                     
+@!                                                                      
+STEERING
+   EVENT GEN(20)             ! Number of event is just a dummy
+*  STEERING DEBUG(37)        ! Standard debug level
+   ANAL  SEQ(BASES)          ! Select only BASES module
+*  ANAL  SEQ(SPRING LUND_Frag GENE_LIST SWIMMER SMEARING)
+   OUTFILE FILE($todir/$outfile.tbs) ! Output file for BASES data
+EXIT
+@!
+@!*************************************************
+@! Input section for Spring part.
+@!*************************************************
+@!
+BASES
+  HELP    !  for PRINT command help
+  GETB 0  !  (0,1,2)=(Do BS,Read from TBS,Read from FT23)
+  PUTB 0  !  (0,1,2)=(No BS,BS to TBS,BS to FT23)
+  DOSP 0  !  (0,1)=(No SP,SP)
+  PHST 0  !  (0,1)=(No Hist,Hist)
+  PINF 0  !  (0,1)=(No Print,Print)
+  PLOG 1  !  (0,1)=(Np Print,Print) BS info
+  HSTF $todir/$outfile.tdr ! histogram file
+@!  INF  ft23.bs ! input file  for GETB=2
+@!  OUTF ft23.bs ! output file for PUTB=2
+@!
+@! Bases Integration Parameters
+@!
+  NCAL 20000  !  NCALL
+  ITM1 2      !  ITMAX1
+  ITM2 8      !  ITMAX2
+@!
+@! Standard Model Parameters
+@!
+  ALFI 128.   ! 1/alpha(m_Z)
+  ALFS 0.12   ! alpha_s(m_Z)
+  AMSW 80.0   ! m_W
+  AMSZ 91.19  ! m_Z
+  AMSH $amsh  ! m_H
+  AMST $amst  ! m_t
+@!
+@! TTH Parameters
+@!
+  ECM  $sqrts ! sqrt(s)
+  POLE 0.0    ! electron polarization
+  SGEB 0.005  ! beam energy spread (fraction)
+  ISRB $isrb  ! (1,2,3)=(None,ISR,ISR+BM)
+EXIT
+@!
+@!*************************************************
+@! Start execution.
+@!*************************************************
+@!
+GO
+eof
+cat $ftn30 >> integ.dat
+rm $ftn30
+exit 0

@@ -1,0 +1,137 @@
+C
+C ********************************************************
+C
+C -------------------------------------------------------
+C   SUBROUTINE MHIGGS(AMA, TANBET, AMT, AMSQ, AMSU, AT, AB, XMU,
+C            AMASS, ALPHA )
+C --------------=======================-----------------
+C
+C(FUNCTION)
+C   CALCULATE THE MASS OF HIGGS BOSON IN ON-LOOP LEVEL
+C   Call EWINIT prior to call this routine.  EWINIT is attached below
+C
+C(INPUT)
+C   AMA  : PSEUDO SCALAR HIGGS MASS.
+C   TANBET  : TAN(BETA) = V2/V1
+C   AMT     : TOP QUARK MASS
+C   AMSQ    : SCALAR QUARK MASS(Q)
+C   AMSU    : SCALAR QUARK MASS(U)
+C   AT      : TRILINEAR SOFT SUPERSYMMETRY-BREAKING PARAMETER FOR TOP
+C   AB      : TRILINEAR SOFT SUPERSYMMETRY-BREAKING PARAMETER FOR BOTTOM
+C   XMU     : HIGGSINO MASS
+C(OUTPUT)
+C   AMASS(6) : PARTICLE MASS
+C        (1) : THE MASS OF LIGHTER SCALOR HIGGS.
+C        (2) : THE MASS OF HEAVIER SCALOR HIGGS.
+C        (3) : THE MASS OF LIGHTER SCALAR TOP.
+C        (4) : THE MASS OF HEAVIER SCALAR TOP.
+C        (5) : THE MASS OF LIGHTER SCALAR BOTTOM.
+C        (6) : THE MASS OF HEAVIER SCALAR BOTOM.
+C   ALPHA    : MIXING ANGLE.
+C(AUTHOR)
+C   A. MIYAMOTO  8-APR-1991  ORIGINAL VERSION.
+C(REFERENCE)
+C   J.ELLIS, ET AL., PL 262B(1991)477
+C
+C **********************************************************************
+C23456
+      SUBROUTINE MHIGGS(AMA, TANBET, AMT, AMSQ, AMSU, AT, AB, XMU,
+     >            AMASS , ALPHA )
+C
+      IMPLICIT REAL*8 (A-H,O-Z)
+      REAL*8 AMASS(6)
+      REAL*8 EWPARA(50)
+      COMMON /EWCONS/ EWPARA
+CC    SAVE    EWCONS
+      DATA    AMB/5.0/
+      GFUNC(X1,X2) = 2.D0 - (X1+X2)/(X1-X2)*DLOG(X1/X2)
+C
+C =====< ENTRY POINT >==================================================
+C
+      BETA = DATAN(TANBET)
+      COSB = DCOS(BETA)
+      SINB = DSIN(BETA)
+      COS2B = COSB*COSB - SINB*SINB
+      COSBSQ = COSB*COSB
+      SINBSQ = SINB*SINB
+ 
+      AMZ2 = EWPARA(11)**2
+      AMW2 = EWPARA(13)**2
+ 
+C
+C (1) MASS OF SCALAR PARTICLES
+C
+C .. FOR SCALOR TOP
+      TERMSQ = ( 0.5D0*(AMSQ+AMSU)*(AMSQ-AMSU)
+     >             + (8.D0*AMW2-5.D0*AMZ2)*COS2B/12.D0 )**2
+     >       + (AMT*(AT+XMU/TANBET))**2
+      TERM2  = DSQRT(TERMSQ)
+      TERM1  = AMT*AMT+0.5D0*(AMSQ**2+AMSU**2)
+     >       + AMZ2*COS2B*0.25D0
+      STMS1  = TERM1 - TERM2
+      STMS2  = TERM1 + TERM2
+      AMASS(3) = DSQRT(STMS1)
+      AMASS(4) = DSQRT(STMS2)
+C
+C .. FOR SCALOR BOTTOM
+      TERMSQ = ( 0.5D0*(AMSQ+AMSU)*(AMSQ-AMSU)
+     >             + (4.D0*AMW2-AMZ2)*COS2B/12.D0 )**2
+     >       + (AMB*(AB + XMU*TANBET))**2
+      TERM2  = DSQRT(TERMSQ)
+      TERM1  = AMB*AMB + 0.5D0*(AMSQ**2+AMSU**2)
+     >       - 0.25D0*AMZ2*COS2B
+      SBMS1  = TERM1 - TERM2
+      SBMS2  = TERM1 + TERM2
+      AMASS(5) = DSQRT(STMS1)
+      AMASS(6) = DSQRT(STMS2)
+ 
+C
+C  ONE LOOP CORRECTION
+C
+      AMB4 = AMB**4
+      AMT4 = AMT**4
+      BBTERM  = AB*(AB+XMU*TANBET)/(SBMS1 - SBMS2)
+      BTTERM  = XMU*(AT+XMU/TANBET)/(STMS1-STMS2)
+      TTTERM  = AT*(AT+XMU/TANBET)/(STMS1 - STMS2)
+      TBTERM  = XMU*(AB+XMU*TANBET)/(SBMS1-SBMS2)
+      GBS     = GFUNC(SBMS1, SBMS2)
+      GTS     = GFUNC(STMS1, STMS2)
+      DLOGB   = DLOG(SBMS1/SBMS2)
+      DLOGT   = DLOG(STMS1/STMS2)
+ 
+      D11  = AMB4/COSBSQ*( DLOG(SBMS1*SBMS2/AMB4) + 2.*BBTERM*DLOGB )
+     >     + AMB4/COSBSQ*BBTERM**2*GBS
+     >     + AMT4/SINBSQ*BTTERM**2*GTS
+ 
+      D22  = AMT4/SINBSQ*( DLOG(STMS1*STMS2/AMT4) + 2.*TTTERM*DLOGT )
+     >       + AMT4/SINBSQ*TTTERM**2*GTS
+     >       + AMB4/COSBSQ*TBTERM**2*GBS
+ 
+      D12  = AMT4/SINBSQ*BTTERM*( DLOGT + TTTERM*GTS )
+     >       + AMB4/COSBSQ*TBTERM*( DLOGB + BBTERM*GBS )
+C
+C  MASS MATRIX.
+C
+      DELTA = AMA**2*2.*SINB*COSB
+      C1    = AMZ2*2.D0*SINB*COSB
+      C3    = 3.*EWPARA(23)**2/(8.D0*EWPARA(1)**2*AMW2)
+C      C3 = 0
+ 
+      A11   = C1/TANBET + TANBET*DELTA + C3*D11
+      A12   = -1.D0*C1 - DELTA + C3*D12
+      A22   = C1*TANBET + DELTA/TANBET + C3*D22
+      DSQ   = (A11+A22)**2 - 4.*(A11*A22-A12**2)
+ 
+      IF( DSQ.LT.0.D0 ) THEN
+            PRINT *,'IN HIGGS..D <0.  SOMETHING MUS BE WRONG.'
+        RETURN
+      ENDIF
+      AMH1S    = 0.25*( (A11+A22) - DSQRT(DSQ) )
+      AMH2S    = 0.25*( (A11+A22) + DSQRT(DSQ) )
+      AMASS(1) = DSQRT(AMH1S)
+      AMASS(2) = DSQRT(AMH2S)
+      TANALP = (AMH1S+AMH2S)*A12/( AMH2S*A11 - AMH1S*A22 )
+      ALPHA  = DATAN(TANALP)
+ 
+      RETURN
+      END

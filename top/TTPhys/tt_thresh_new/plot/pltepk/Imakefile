@@ -1,0 +1,88 @@
+##############################################################################
+## (Description)
+##    Imake file for tt_thresh_new.
+##	clean    : to clean the directory.
+##	cleanall : to remove everything reproducible.
+## (Update Record) 
+##    94/11/25  K.Fujii 	Original.
+##    97/08/30  K.Fujii 	Use 97a.
+##
+##
+##############################################################################
+
+#include "../../../../../config/lclib.tmpl"
+
+#--
+#  Define the name of the executable. 
+#--
+PROGRAM1      = pltepk
+
+#--
+#  Directory to store executables.
+#--
+GODIR	      = prod
+
+#--
+#  Routines to complie.
+#--
+OBJS	      = pltepk.o
+
+#--
+#  Directories containing library routines.
+#--
+#ifdef HPArchitecture
+	LDDIRFLAG = -Wl,-L
+	EXTRALIBS = -lU77 -lm
+#else
+	LDDIRFLAG = -L
+	EXTRALIBS =
+#endif
+#--
+#  Libraries to link.
+#--
+#   GBM_0 for ISR only
+#   GBM_N for ISR + beam energy spread
+#   GBM   for ISR + full beam effects
+#
+# BEAMLIB    	 = GBM_0
+BEAMLIB	         = GBM
+# BEAMLIB        = GBM_N
+#
+#   pothig_lib.a for QCD + Higgs
+#   potqcd_lib.a for QCD only
+#
+POTLIB		= $(POTHIG)
+# POTLIB 	= $(POTQCD)
+#
+#   Top libraries
+#
+LIBS	      = $(LDDIRFLAG)$(KFLIBDIR) \
+		-l$(PHYLIBTTNEW) \
+		-l$(PHYLIBTT) \
+		-l$(BEAMLIB) \
+		-l$(POTLIB)
+#--
+#   Analysis libraries
+#--
+ANALLIB     = 
+#--
+#  Specify compiler and linker.
+#--
+LD	      = $(F77)
+#--
+#  Make options.
+#--
+all::		$(PROGRAM1)
+
+$(PROGRAM1):     $(OBJS)
+		@echo "Linking $(PROGRAM1) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) \
+		-o $(GODIR)/$(PROGRAM1).exe
+		@echo "done"
+
+clean::;	@rm -f $(OBJS) core
+
+cleanall:: clean
+		@(cd $(GODIR); rm -f $(OBJS) *.exe core)
+
+

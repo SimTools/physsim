@@ -1,0 +1,154 @@
+XCOMM ##########################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for TTZ generator.
+XCOMM ##	exe      : to make an executable.
+XCOMM ##	run      : to run the executalbe.
+XCOMM ##	clean    : to clean the directory.
+XCOMM ##	cleanall : to remove everything reproducible.
+XCOMM ## (Update Record) 
+XCOMM ##    95/03/13  K.Fujii 	Original version for HELAS V204.
+XCOMM ##    95/06/07  K.Fujii 	Use 95a.
+XCOMM ##    99/05/21  K.Fujii	Modified for JSF.
+XCOMM ##########################################################################
+
+/*
+ * Template Files
+ *
+ */
+
+#include "../../../config/lclib.tmpl"
+
+INCPATH	= -I. -I$(KFLIBROOT)/gen_lib/sm/include \
+	-I$(KFLIBROOT)/gen_lib/bm/include \
+	-I$(KFLIBROOT)/gen_lib/bs/include \
+	-I$(LCLIBROOT)/simjlc/src \
+	-I$(LCLIBROOT)/util/fortlib/src \
+	-I$(LCLIBROOT)/util/lcfull/src
+
+EXTRADEFINES = -DUSEUSER -DUSESQZ
+
+XCOMM #--
+XCOMM #  Define the name of the executable. 
+XCOMM #--
+PROGRAM = fullgen
+COMMAND = $(PROGRAM)
+XCOMM #--
+XCOMM #  Routines to complie.
+XCOMM #--
+OBJS = amptt.o \
+		ampttz.o \
+		ampzh.o \
+		blkdat.o \
+		bs51cm.o \
+		flanli.o \
+		fulttz.o \
+		functtzf.o \
+		prmain.o \
+		sgttzf.o \
+		spevnt.o \
+		spinit.o \
+		spparm.o \
+		userin.o \
+		usrout.o
+
+XCOMM #--
+XCOMM #  Directories containing library routines.
+XCOMM #--
+GENLIBDIR	= $(KFLIBROOT)/gen_lib
+XCOMM #--
+XCOMM #  Libraries.
+XCOMM #--
+
+ANALLIB	= $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
+	-lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	-lHELASV204 -lFORTLIB \
+	-lHPKTOHBK -lCOM -lCLI \
+	$(CERNLIBS) $(EXTRALIBS)
+
+KFLIB	= $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBSS -lGENLIBSM -lGENLIBHG \
+	  -lGENLIBKN -lGENLIBBM -lANLLIB
+XCOMM #
+XCOMM #    TT libraries.
+XCOMM #
+TTGLIB     = $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBTT
+TTPLIB     = $(LDDIRFLAG)$(KFLIBDIR) -lPHYLIBTT -lPOTQCD
+
+XCOMM #--
+XCOMM #  Build, compiler, and linker options.
+XCOMM #--
+XCOMM # BLDOPT  = "R(UNIX,KEK,JLC,CDBG,USER)"
+XCOMM # FFLAGS  = -K +ppu  -g -C +T +FPVZOUID
+XCOMM #
+XCOMM # BLDOPT  = "R(UNIX,KEK,JLC,USER,SQZ,HOFFT)"
+XCOMM # BLDOPT  = "R(UNIX,KEK,JLC,USER,SQZ,HOFFZ)"
+BLDOPT  = "R(UNIX,KEK,JLC,USER,SQZ)"
+
+LD  = $(F77)
+
+XCOMM #--
+XCOMM #  Make options.
+XCOMM #--
+all::	exe
+
+exe:	$(COMMAND)
+
+XCOMM #--
+XCOMM #  Build and Compile the source codes.
+XCOMM #--
+.f.o :
+	build $*.f $(BLDOPT)
+	mv SYSPRINT SYSPRINT.$*.f
+	$(F77) SYSPRINT.$*.f -c $(FFLAGS) -o $*.o 
+	rm SYSPRINT.$*.f
+XCOMM #--
+XCOMM #  Link procedure
+XCOMM #--
+$(COMMAND): $(OBJS)
+	$(LD) -o $(PROGRAM).exe $(LDFLAGS) $(OBJS) \
+		$(TTGLIB) $(TTPLIB)  $(KFLIB) $(ANALLIB)
+				 
+XCOMM #
+XCOMM # Other options.
+XCOMM #
+run:
+	cd prod; sh go
+cleanall::
+	rm -f *.o; rm -f *.a; rm -f *~; rm -f *.exe
+clean::
+	rm -f *.o; rm -f *~
+help:
+	@echo " ##############################################################"
+	@echo "  This is a Makefile for TTZ."
+	@echo "  Following options are available."
+	@echo "      make exe         ; create an executable module "
+	@echo "      make run         ; run the executable "
+	@echo "      make clean       ; clean up the directory "
+	@echo "      make cleanall    ; remove everything reproducible "
+	@echo "      make             ; get this help "
+	@echo " ######################################### 95/03/15 K.Fujii ###"
+
+blkdat.o: blkdat.F
+blkdat.F: $(KFLIBROOT)/gen_lib/sm/include/SMPTAB.inc \
+	  $(KFLIBROOT)/gen_lib/bm/include/BEMCNS.inc	Imakefile
+	rm -f blkdat.F	
+	echo "      block data blkdat" > blkdat.F
+	echo "C--" >> blkdat.F
+	echo "C  THIS FILE IS AUTOMATICALLY GENERAGED FROM" >> blkdat.F
+	echo "C     include/SMPTAB.inc" >> blkdat.F
+	echo "C  DO NOT EDIT. EDIT C= COMMENTS IN THESE INCLUDE FILES" >> blkdat.F
+	echo "C--" >> blkdat.F
+	sed -e 's/^C=/  /' $(KFLIBROOT)/gen_lib/sm/include/SMPTAB.inc >> blkdat.F
+	echo "C--" >> blkdat.F
+	echo "C  THIS FILE IS AUTOMATICALLY GENERAGED FROM" >> blkdat.F
+	echo "C      include/BEMCNS.inc" >> blkdat.F
+	echo "C  DO NOT EDIT. EDIT C= COMMENTS IN THESE INCLUDE FILES" >> blkdat.F
+	echo "C--" >> blkdat.F
+	sed -e 's/^C=/  /' $(KFLIBROOT)/gen_lib/bm/include/BEMCNS.inc >> blkdat.F
+	echo "      end" >> blkdat.F
+
+###
+bs51cm.o: USRPRM.inc
+functtzf.o: TTZCNF.inc
+spparm.o: USRPRM.inc
+userin.o: USRPRM.inc TTZCNF.inc
+usrout.o: USRPRM.inc

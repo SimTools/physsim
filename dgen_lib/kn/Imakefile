@@ -1,0 +1,61 @@
+XCOMM ###########################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for Fujii's dkin library.
+XCOMM ## (Update Record) 
+XCOMM ##    97/07/26  K.Fujii 	Original version.
+XCOMM ##    99/05/16  K.Fujii 	Reorganized directory structure.
+XCOMM ###########################################################################
+
+/* #define ENABLESHARED */
+#include "../../config/lclib.tmpl"
+
+XCOMM #
+XCOMM # Define the name of the library.
+XCOMM #
+INSTALLDIR = ../../lib
+LIBNAME   = DGENLIBKN
+XCOMM #
+XCOMM # Routines to compile.
+XCOMM #
+OBJS = cdotxx.o \
+		conjgx.o \
+		pmirrx.o \
+		psignx.o \
+		psubxx.o \
+		psumxx.o \
+		rdotxx.o \
+		uhphs2.o \
+		uhphs3.o \
+		uhphsn.o \
+		uhq2bw.o \
+		uhqij3.o \
+		uhqlim.o \
+		uhsetf.o
+
+ALLOBJ = $(OBJS)
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(ALLOBJ),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(ALLOBJ) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))
+
+blkdat.o: blkdat.F
+
+blkdat.F: include/SMPTAB.inc include/BEMCNS.inc
+	rm -f blkdat.F
+	echo "      block data blkdat" > blkdat.F
+	echo "C--" >> blkdat.F
+	echo "C  THIS FILE IS AUTOMATICALLY GENERAGED FROM" >> blkdat.F
+	echo "C     include/SMPTAB.inc" >> blkdat.F
+	echo "C            /BEMCNS.inc" >> blkdat.F
+	echo "C  DO NOT EDIT. EDIT C= COMMENTS IN THESE" >> blkdat.F
+	echo "C  INCLUDE FILES" >> blkdat.F
+	echo "C--" >> blkdat.F
+	sed -e 's/^C=/  /' include/SMPTAB.inc >> blkdat.F
+	sed -e 's/^C=/  /' include/BEMCNS.inc >> blkdat.F
+	echo "      end" >> blkdat.F
+
+distclean: clean
+	rm -f Makefile
+

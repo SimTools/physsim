@@ -1,0 +1,74 @@
+/*
+ * ############################################################################
+ * ## (Description)
+ * ##    Imake file for XCXC analysis.
+ * ## (Update Record) 
+ * ##    99/05/22  K.Fujii   Original version.
+ * ############################################################################
+ *
+ */
+
+/* Template Files */
+
+#define CXXPACKAGE 
+#include "../../config/lclib.tmpl"
+
+/* Package Name */
+
+INSTALLDIR	= ../../lib
+LIBNAME		= Anlib
+SONAME		= lib$(LIBNAME).$(SOEXT).$(SOREV)
+JSFSOLIB	= $(SONAME)
+
+/* Headers */
+
+INCPATH	= -I. 
+
+/* Routines to compile */
+
+OBJS		= ANLJetFinder.$(ObjSuf) \
+		  ANLEventShape.$(ObjSuf) \
+		  ANLPairCombiner.$(ObjSuf) \
+                  ANLTrack.$(ObjSuf) \
+		  Lockable.$(ObjSuf) \
+		  ANL3DVector.$(ObjSuf) \
+		  ANL4DVector.$(ObjSuf) \
+		  ANLVTXTagger.$(ObjSuf)
+
+/* You don't have to edit anything below here */
+
+DICTNAME	= $(LIBNAME)Dict
+
+ALLOBJS 	= $(OBJS) $(DICTNAME).$(ObjSuf)
+
+SRCS		= $(subst .$(ObjSuf),.$(SrcSuf),$(ALLOBJS))
+
+HDRS		= $(LIBNAME).h
+
+/* Make Targets */
+
+all:: lib$(LIBNAME).$(SOEXT).$(SOREV)
+
+$(JSFSOLIB): $(ALLOBJS)
+	$(LD) -o $@ $(SOFLAGS) $(ALLOBJS)
+	$(RM) $(subst .$(SOREV),,$@)
+	$(LN) $@ $(subst .$(SOREV),,$@)
+
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+
+$(DICTNAME).$(ObjSuf): $(DICTNAME).$(SrcSuf)
+
+clean:: 
+	@rm -f *.$(ObjSuf) core $(DICTNAME).$(SrcSuf) $(DICTNAME).h
+
+depend:: $(SRCS) $(HDRS)
+	makedepend -- -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) -- $(SRCS)
+
+distclean:: clean
+	@rm -f $(JSFSOLIB) *.$(SOEXT) Makefile
+	@rm -f *.root *.tdr *.out *~ core
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I$(JSFROOT)/include $(HDRS) LinkDef.h

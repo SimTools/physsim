@@ -1,0 +1,10 @@
+      block data blkdbm
+C--
+C  THIS FILE IS AUTOMATICALLY GENERAGED FROM
+C      include/BEMCNS.inc
+C  DO NOT EDIT. EDIT C= COMMENTS IN THESE INCLUDE FILES
+C--
+      COMMON /BEMCNS/ SGEBM
+      REAL*4          SGEBM
+      DATA SGEBM / 0.007 /
+      end

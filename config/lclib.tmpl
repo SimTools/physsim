@@ -1,0 +1,46 @@
+/* 
+ * 97/08/30  K.Fujii	Original version.
+ *
+ */
+
+/* Define Library Names */
+
+KFLIBDIR   = $(KFLIBROOT)/lib
+LCLIBDIR   = $(LCLIBROOT)/lib
+CERNLIBDIR = $(CERN_ROOT)/lib
+
+PHYLIBTT    = PHYLIBTT
+PHYLIBTTNEW = PHYLIBTTNEW
+POTQCD      = POTQCD
+POTHIG      = POTHIG
+
+/* JLC Starndard Template */
+
+#include "config/lclib.tmpl"
+#ifdef CXXPACKAGE
+#include "conf/makejsf.tmpl"
+
+/* ROOT Related Libraries */
+
+ROOTLIBS = $(LDDIRFLAG)$(ROOTSYS)/lib -lNew -lBase -lCint -lClib -lCont \
+	-lFunc -lEGPythia -lEG \
+	-lGraf -lGraf3d -lHist -lHtml -lMatrix -lMeta -lMinuit -lNet \
+	-lPhysics -lPostscript -lProof -lTree -lUnix -lZip \
+	-Wl,-u,pytest_ \
+	$(CERNLIBS)
+
+ROOTGLIBS = -lGpad -lGui -lGX11 -lX3d
+
+#endif
+
+/* Tentative Architecture Dependent Treatments */
+
+#if defined(HPArchitecture)
+	LDDIRFLAG = -Wl,-L
+	EXTRALIBS = 
+	CERNLIBS = $(LDDIRFLAG)$(CERN_ROOT)/lib -ljetset74 -lpacklib
+#else
+	LDDIRFLAG = -L
+	EXTRALIBS = 
+	CERNLIBS = $(LDDIRFLAG)$(CERN_ROOT)/lib -ljetset74 -lpacklib
+#endif

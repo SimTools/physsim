@@ -1,0 +1,66 @@
+##############################################################################
+## (Description)
+##    Imake file for Fujii's tt_thresh library.
+## (Update Record) 
+##    97/08/30  K.Fujii 	Original version.
+##############################################################################
+
+/* #define ENABLESHARED */
+#include "../../../../config/lclib.tmpl"
+
+#--
+#  Define the name of the library.
+#--
+INSTALLDIR = ../../../../lib
+
+LIBNAME1 = $(PHYLIBTT)
+LIBNAME2 = $(POTQCD)
+LIBNAME3 = $(POTHIG)
+
+#--
+#  Routines to compile.
+#--
+OBJS1	    = 	F1.o \
+		F2.o \
+		F3.o \
+		FH.o \
+		FHIGGS.o \
+		FX.o \
+		GTGAMT.o \
+		RKUTTA2.o \
+		SETPRMC.o \
+		SGTTEF.o \
+		SGTTHR2.o \
+		ucont2.o \
+		usolve.o \
+		tbwcorr.o
+
+OBJS2	    = 	POTHIG.o EI.o
+OBJS3	    =	POTQCD.o EI.o
+#--
+#  Libraries
+#--
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME1),$(SOREV),$(OBJS1),.,.)
+InstallSharedLibrary($(LIBNAME1),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME1), $(OBJS1) )
+InstallLibrary($(LIBNAME1),$(INSTALLDIR))
+
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME2),$(SOREV),$(OBJS2),.,.)
+InstallSharedLibrary($(LIBNAME2),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME2), $(OBJS2) )
+InstallLibrary($(LIBNAME2),$(INSTALLDIR))
+
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME3),$(SOREV),$(OBJS3),.,.)
+InstallSharedLibrary($(LIBNAME3),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME3), $(OBJS3) )
+InstallLibrary($(LIBNAME3),$(INSTALLDIR))
+
+distclean: clean
+	rm -f Makefile
+
