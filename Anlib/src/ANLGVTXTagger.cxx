@@ -88,9 +88,6 @@ Double_t ANLGVTXTagger::Getb(const ANLTrack &t){
     //                                                                  ^^^^^
     Int_t gmsn = g->GetMother();
 
-    // temporary
-    fDEBUG = kFALSE;
-
     if (fDEBUG) cerr << "----------" << endl
                      << "S.N. = " << gsn << "  PID = " << g->GetID()
                      << " Mother S.N.  = " << gmsn << endl;
@@ -172,9 +169,6 @@ Double_t ANLGVTXTagger::Getbnorm(const ANLTrack &t){
     Double_t drdr = err[0];
 
     Double_t b = Getb(t);
-
-    // temporary
-    fDEBUG = kFALSE;
 
     if (fDEBUG) cerr << "VTX Resolution (Hit2D) = " << TMath::Sqrt(drdr) << endl
                      << "Normalized b (Gen2D) = " << TMath::Sqrt(b*b/drdr) << endl;
