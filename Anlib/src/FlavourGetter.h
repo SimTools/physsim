@@ -18,6 +18,7 @@
 //*    2000/04/28  K.Ikemtasu   Modified GetPrimaryHadronPID method
 //*    2001/07/20  K.Ikemtasu   Added GetPrimaryHadronSN method
 //*    2001/07/20  K.Ikemtasu   Added GetPartonID method
+//*    2001/07/26  K.Ikematsu   Added TTL4JFlavourGetter class
 //*
 //* $Id$
 //*************************************************************************
@@ -27,6 +28,7 @@
 #include "JSFSIMDST.h"
 #include "JSFGeneratorParticle.h"
 #include "JSFCDCTrack.h"
+#include "JSFSpring.h"
 #include "Anlib.h"
 //_____________________________________________________________________
 //  -------------------
@@ -39,7 +41,7 @@ public:
     JSFSIMDST     *sds     = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
     JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
     fGen   = evt->GetGeneratorParticles();
-    fGpid = 0; fGsn = 0; fGmsn = 0;
+    fGpid  = 0; fGsn = 0; fGmsn = 0;
   }                                                // default constructor
 
   virtual ~FlavourGetter() {}                      // default destructor
@@ -59,7 +61,27 @@ private:
   Int_t             fGsn;         //  S.N of GeneratorParticle
   Int_t             fGmsn;        //  Mother S.N of GeneratorParticle
 
-  ClassDef(FlavourGetter, 1)      //  FlavourGetter Example
+  ClassDef(FlavourGetter, 1)      //  FlavourGetter class
+};
+
+//_____________________________________________________________________
+//  ------------------------
+//  TTL4JFlavourGetter Class
+//  ------------------------
+//
+class TTL4JFlavourGetter : public FlavourGetter {
+public:
+  TTL4JFlavourGetter(JSFSpring &sp) {
+    JSFSpringBuf  *spptn   = (JSFSpringBuf *)sp.EventBuf();
+    fSpgen = spptn->GetPartons();
+  }                                                // default constructor
+
+  Int_t operator()(const ANLJet &jet);
+
+private:
+  TClonesArray     *fSpgen;       //! Pointer to SpringParton
+
+  ClassDef(TTL4JFlavourGetter, 1)    //  TTFlavourGetter class
 };
 
 #endif

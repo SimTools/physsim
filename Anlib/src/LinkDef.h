@@ -21,6 +21,7 @@
 #pragma link C++ class ANLTrack;
 #pragma link C++ class ANLVTXTagger;
 #pragma link C++ class FlavourGetter;
+#pragma link C++ class TTL4JFlavourGetter;
 #pragma link C++ class ANL2DSpline;
 #pragma link C++ class ANLGVTXTagger;
 
