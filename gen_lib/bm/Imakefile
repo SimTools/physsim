@@ -7,7 +7,7 @@ XCOMM ##    99/05/17  K.Fujii 	Reorganized directory structure.
 XCOMM ############################################################################
 
 /* #define ENABLESHARED */
-#include "../../config/lclib.tmpl"
+#include "config/kflib.tmpl"
 
 XCOMM #--
 XCOMM #  Define the name of the library.

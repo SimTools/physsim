@@ -9,6 +9,7 @@ C*                      included.
 C*   95/04/04  K.Fujii	Added an option to shuffle integration
 C*			variables.
 C*   95/04/06  K.Fujii	Changed integration variables.
+C*   00/06/24  K.Fujii	Modified for Bases++.
 C*
       REAL FUNCTION FUNC*8(ZZ)
  
@@ -65,6 +66,7 @@ C--
      .                   +1,-1,   +1, +1,-1,   +1, -1,+1/
 C--
       DATA NCALL /  0 /
+      EXTERNAL   XHFILL
 C
 C========< Entry Point >================================================
 C
@@ -365,47 +367,47 @@ C--
       QXM2  = XPHASE(1,4)
       Q72   = XPHASE(1,5)
       Q82   = XPHASE(2,5)
-C--      
-      CALL XHFILL(  1, DBLE(COST)        ,FUNC )
-      CALL XHFILL(  2, DBLE(PHIT)*xRD2DG ,FUNC )
-      CALL XHFILL(  3, DBLE(COSBB)       ,FUNC )
-      CALL XHFILL(  4, DBLE(PHIBB)*xRD2DG,FUNC )
-      CALL XHFILL(  5, DBLE(COSB )       ,FUNC )
-      CALL XHFILL(  6, DBLE(PHIB )*xRD2DG,FUNC )
-      CALL XHFILL(  7, DBLE(SQRT(Q42))   ,FUNC )
-      CALL XHFILL(  8, DBLE(SQRT(Q52))   ,FUNC )
-      CALL XHFILL(  9, DBLE(PTOP)        ,FUNC )
-      CALL XHFILL( 10, DBLE(ACOP)*xRD2DG ,FUNC )
-      CALL XHFILL( 11, DBLE(SQRT(Q72))   ,FUNC )
-      CALL XHFILL( 12, DBLE(SQRT(Q82))   ,FUNC )
-      CALL XHFILL( 13, DBLE(COMB)        ,FUNC )
+C-- 
+      CALL XHFILL( 'h01', DBLE(COST)        ,FUNC )
+      CALL XHFILL( 'h02', DBLE(PHIT)*xRD2DG ,FUNC )
+      CALL XHFILL( 'h03', DBLE(COSBB)       ,FUNC )
+      CALL XHFILL( 'h04', DBLE(PHIBB)*xRD2DG,FUNC )
+      CALL XHFILL( 'h05', DBLE(COSB )       ,FUNC )
+      CALL XHFILL( 'h06', DBLE(PHIB )*xRD2DG,FUNC )
+      CALL XHFILL( 'h07', DBLE(SQRT(Q42))   ,FUNC )
+      CALL XHFILL( 'h08', DBLE(SQRT(Q52))   ,FUNC )
+      CALL XHFILL( 'h09', DBLE(PTOP)        ,FUNC )
+      CALL XHFILL( 'h10', DBLE(ACOP)*xRD2DG ,FUNC )
+      CALL XHFILL( 'h11', DBLE(SQRT(Q72))   ,FUNC )
+      CALL XHFILL( 'h12', DBLE(SQRT(Q82))   ,FUNC )
+      CALL XHFILL( 'h13', DBLE(COMB)        ,FUNC )
       IF ( IDPTCL(3,5).EQ.1 .AND. IDPTCL(1,5).LE.2 ) THEN
-         CALL XHFILL( 14, DBLE(PV(0,5))     ,FUNC )
-         CALL XHFILL( 15, DBLE(COSLB)       ,FUNC )
-         CALL XHFILL( 26, DBLE(CS25)        ,FUNC )
+         CALL XHFILL( 'h14', DBLE(PV(0,5))     ,FUNC )
+         CALL XHFILL( 'h15', DBLE(COSLB)       ,FUNC )
+         CALL XHFILL( 'h26', DBLE(CS25)        ,FUNC )
       ENDIF
       IF ( IDPTCL(3,8).EQ.1 .AND. IDPTCL(1,8).LE.2 ) THEN
-         CALL XHFILL( 14, DBLE(PV(0,8))     ,FUNC )
-         CALL XHFILL( 15, DBLE(COSL)        ,FUNC )
-         CALL XHFILL( 27, DBLE(CS28)        ,FUNC )
+         CALL XHFILL( 'h14', DBLE(PV(0,8))     ,FUNC )
+         CALL XHFILL( 'h15', DBLE(COSL)        ,FUNC )
+         CALL XHFILL( 'h27', DBLE(CS28)        ,FUNC )
       ENDIF
       IF ( IDPTCL(3,5).EQ.2 ) THEN
-         CALL XHFILL( 16, DBLE(QV(0,2))     ,FUNC )
-         CALL XHFILL( 17, DBLE(COSJB)       ,FUNC )
+         CALL XHFILL( 'h16', DBLE(QV(0,2))     ,FUNC )
+         CALL XHFILL( 'h17', DBLE(COSJB)       ,FUNC )
       ENDIF
       IF ( IDPTCL(3,8).EQ.2 ) THEN
-         CALL XHFILL( 16, DBLE(QV(0,3))     ,FUNC )
-         CALL XHFILL( 17, DBLE(COSJ)        ,FUNC )
+         CALL XHFILL( 'h16', DBLE(QV(0,3))     ,FUNC )
+         CALL XHFILL( 'h17', DBLE(COSJ)        ,FUNC )
       ENDIF
       EVTYP = IDPTCL(3,4) + IDPTCL(3,7) - 0.9
-      CALL XHFILL( 18, DBLE(EVTYP)          ,FUNC )
-      CALL XHFILL( 19, DBLE(IMD1+.1)        ,FUNC )
-      CALL XHFILL( 20, DBLE(IMD2+.1)        ,FUNC )
-      CALL XHFILL( 21, DBLE(RS/ROOTS)       ,FUNC )
-      CALL XHFILL( 22, DBLE(CS15)           ,FUNC )
-      CALL XHFILL( 23, DBLE(CS18)           ,FUNC )
-      CALL XHFILL( 24, DBLE(SQRT(QXP2))     ,FUNC )
-      CALL XHFILL( 25, DBLE(SQRT(QXM2))     ,FUNC )
+      CALL XHFILL( 'h18', DBLE(EVTYP)          ,FUNC )
+      CALL XHFILL( 'h19', DBLE(IMD1+.1)        ,FUNC )
+      CALL XHFILL( 'h20', DBLE(IMD2+.1)        ,FUNC )
+      CALL XHFILL( 'h21', DBLE(RS/ROOTS)       ,FUNC )
+      CALL XHFILL( 'h22', DBLE(CS15)           ,FUNC )
+      CALL XHFILL( 'h23', DBLE(CS18)           ,FUNC )
+      CALL XHFILL( 'h24', DBLE(SQRT(QXP2))     ,FUNC )
+      CALL XHFILL( 'h25', DBLE(SQRT(QXM2))     ,FUNC )
 C--
 C  That's it.
 C--

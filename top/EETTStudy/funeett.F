@@ -42,6 +42,7 @@ C--
      .             +1,+1,   +1, +1,   -1,+1,-1, +1,-1,+1/
 C--
       DATA NCALL /  0 /
+      EXTERNAL   XHFILL
 C
 C========< Entry Point >================================================
 C
@@ -405,33 +406,33 @@ C--
       FIFDB   = XPHASE(3,5)
       DFI     = MOD(FI1-FI2+x2PI,x2PI)
 C--
-      CALL XHFILL(  1, DBLE(X1)          ,FUNC )
-      CALL XHFILL(  2, DBLE(CS1)         ,FUNC )
-      CALL XHFILL(  3, DBLE(FI1)*RDDG    ,FUNC )
-      CALL XHFILL(  4, DBLE(X2)          ,FUNC )
-      CALL XHFILL(  5, DBLE(CS2)         ,FUNC )
-      CALL XHFILL(  6, DBLE(DFI)*RDDG    ,FUNC )
-      CALL XHFILL(  7, DBLE(Q3/ROOTS)    ,FUNC )
-      CALL XHFILL(  8, DBLE(CSTP)        ,FUNC )
-      CALL XHFILL(  9, DBLE(FITP)*RDDG   ,FUNC )
-      CALL XHFILL( 10, DBLE(Q4)          ,FUNC )
-      CALL XHFILL( 11, DBLE(CSFD)        ,FUNC )
-      CALL XHFILL( 12, DBLE(FIFD)*RDDG   ,FUNC )
-      CALL XHFILL( 13, DBLE(Q5)          ,FUNC )
-      CALL XHFILL( 14, DBLE(CSFDB)       ,FUNC )
-      CALL XHFILL( 15, DBLE(FIFDB)*RDDG  ,FUNC )
-      CALL XHFILL( 16, DBLE(RS/ROOTS)    ,FUNC )
-      CALL XHFILL( 17, DBLE(IMD1+  .1)   ,FUNC )
-      CALL XHFILL( 17, DBLE(IMD2+12.1)   ,FUNC )
-      CALL XHFILL( 18, DBLE(XHCMB+.1)    ,FUNC )
-      CALL XHFILL( 19, DBLE(ET1)         ,FUNC )
-      CALL XHFILL( 20, DBLE(ET2)         ,FUNC )
-      CALL XHFILL( 21, DBLE(XTT1)        ,FUNC )
-      CALL XHFILL( 22, DBLE(XTT2)        ,FUNC )
-      CALL XHFILL( 23, DBLE(XNU)         ,FUNC )
-      CALL XHFILL( 24, DBLE(XNB)         ,FUNC )
-      CALL XHFILL( 25, DBLE(XTP)         ,FUNC )
-      CALL XHFILL( 26, DBLE(XTB)         ,FUNC )
+      CALL XHFILL( 'h01', DBLE(X1)          ,FUNC )
+      CALL XHFILL( 'h02', DBLE(CS1)         ,FUNC )
+      CALL XHFILL( 'h03', DBLE(FI1)*RDDG    ,FUNC )
+      CALL XHFILL( 'h04', DBLE(X2)          ,FUNC )
+      CALL XHFILL( 'h05', DBLE(CS2)         ,FUNC )
+      CALL XHFILL( 'h06', DBLE(DFI)*RDDG    ,FUNC )
+      CALL XHFILL( 'h07', DBLE(Q3/ROOTS)    ,FUNC )
+      CALL XHFILL( 'h08', DBLE(CSTP)        ,FUNC )
+      CALL XHFILL( 'h09', DBLE(FITP)*RDDG   ,FUNC )
+      CALL XHFILL( 'h10', DBLE(Q4)          ,FUNC )
+      CALL XHFILL( 'h11', DBLE(CSFD)        ,FUNC )
+      CALL XHFILL( 'h12', DBLE(FIFD)*RDDG   ,FUNC )
+      CALL XHFILL( 'h13', DBLE(Q5)          ,FUNC )
+      CALL XHFILL( 'h14', DBLE(CSFDB)       ,FUNC )
+      CALL XHFILL( 'h15', DBLE(FIFDB)*RDDG  ,FUNC )
+      CALL XHFILL( 'h16', DBLE(RS/ROOTS)    ,FUNC )
+      CALL XHFILL( 'h17', DBLE(IMD1+  .1)   ,FUNC )
+      CALL XHFILL( 'h17', DBLE(IMD2+12.1)   ,FUNC )
+      CALL XHFILL( 'h18', DBLE(XHCMB+.1)    ,FUNC )
+      CALL XHFILL( 'h19', DBLE(ET1)         ,FUNC )
+      CALL XHFILL( 'h20', DBLE(ET2)         ,FUNC )
+      CALL XHFILL( 'h21', DBLE(XTT1)        ,FUNC )
+      CALL XHFILL( 'h22', DBLE(XTT2)        ,FUNC )
+      CALL XHFILL( 'h23', DBLE(XNU)         ,FUNC )
+      CALL XHFILL( 'h24', DBLE(XNB)         ,FUNC )
+      CALL XHFILL( 'h25', DBLE(XTP)         ,FUNC )
+      CALL XHFILL( 'h26', DBLE(XTB)         ,FUNC )
 C--
 C  That's it.
 C--

@@ -38,12 +38,44 @@ ClassImp(ENWSpring)
 ClassImp(ENWSpringBuf)
 ClassImp(ENWBases)
 
+// Variable conversion.
+
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+#define Dhinit(id,xlo,xhi,nx,ylo,yhi,ny,title) H2Init(id,title,nx,xlo,xhi,ny,ylo,yhi)
+
 extern "C" {
-extern void usrout_();
 extern void userin_();
 extern Double_t func_(double x[]);
 extern void spevnt_(Int_t *nret);
 extern void exit(int);
+JSFBases *bso;			// need to map xhfill to h1fill
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H1Fill(tmp,*x,*w);
+}
+void dhfill_(char *t, double *x, double *y, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H2Fill(tmp,*x,*y,*w);
+}
 };
 
 //_____________________________________________________________________________
@@ -89,6 +121,9 @@ ENWBases::ENWBases(const char *name, const char *title)
 {
 //  Constructor of bases.  Default parameter should be initialized here
 //
+
+  bso = this;
+
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("ENWBases.ISRBM","3"),"%d",&fISRBM);
@@ -144,9 +179,7 @@ ENWBases::ENWBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("ENWBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("ENWBases.MassTop","170."),"%lg",&fMassTop);  
 
-  fPrintInfo = gJSF->Env()->GetValue("ENWBases.PrintInfo",kTRUE);
-  fPrintHist = gJSF->Env()->GetValue("ENWBases.PrintHist",kTRUE);
-
+  Userin();
 }
 
 
@@ -171,8 +204,17 @@ void ENWBases::PrintParameters()
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
 
-  return ;
 
+}
+
+//_____________________________________________________________________________
+Double_t ENWBases::Func()		// new style not yet implemented
+{
+  cerr << ":::::: ERROR "
+       << "  ENWBases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
 }
 
 //_____________________________________________________________________________
@@ -191,7 +233,6 @@ void ENWBases::Userin()
 //
 //   Initialize User parameters for Bases
 //
-  JSFBases::Userin();  // Call JSFBases::Userin() for standard setup.
 
   // Copy class data member into common /usmprm/
   usmprm_.alfi = fAlphai;
@@ -221,29 +262,36 @@ void ENWBases::Userin()
 
   // Define histograms
 
-  Xhinit( 1, -1.0, 1.0, 50,"cos(e)        ");
-  Xhinit( 2,  0.0,360., 50,"phi_e         ");
-  Xhinit( 3,   0., 1.0, 50,"E_e/E_bm      ");
-  Xhinit( 4,  60.,110., 50,"m(W)          ");
-  Xhinit( 5, -1.0, 1.0, 50,"cos(nu)       ");
-  Xhinit( 6,  0.0,360., 50,"phi_nu        ");
-  Xhinit( 7, -1.0, 1.0, 50,"cos(theta_fd) ");
-  Xhinit( 8,  0.0,360., 50,"phi_fd        ");
-  Xhinit( 9,  0.0, 1.0, 50,"RS/ROOTS      ");
-  Xhinit(10,  1.0,13.0, 12,"W decay mode  ");
-  Xhinit(11,  1.0,17.0, 16,"CP/helicity   ");
-  Xhinit(12, -10.,20.0, 40,"eta_e         ");
-  Xhinit(13,   0., 1.0, 50,"PT_W/E_bm     ");
-  Xhinit(14,   0., 1.0, 50,"E_e/E_bm      ");
-  Xhinit(15,   0., 1.0, 50,"E_nu/E_bm     ");
-  Xhinit(16,   0., 1.0, 50,"E_W/E_bm      ");
-  return ;
+  Xhinit("h01", -1.0, 1.0, 50,"cos(e)        ");
+  Xhinit("h02",  0.0,360., 50,"phi_e         ");
+  Xhinit("h03",   0., 1.0, 50,"E_e/E_bm      ");
+  Xhinit("h04",  60.,110., 50,"m(W)          ");
+  Xhinit("h05", -1.0, 1.0, 50,"cos(nu)       ");
+  Xhinit("h06",  0.0,360., 50,"phi_nu        ");
+  Xhinit("h07", -1.0, 1.0, 50,"cos(theta_fd) ");
+  Xhinit("h08",  0.0,360., 50,"phi_fd        ");
+  Xhinit("h09",  0.0, 1.0, 50,"RS/ROOTS      ");
+  Xhinit("h10",  1.0,13.0, 12,"W decay mode  ");
+  Xhinit("h11",  1.0,17.0, 16,"CP/helicity   ");
+  Xhinit("h12", -10.,20.0, 40,"eta_e         ");
+  Xhinit("h13",   0., 1.0, 50,"PT_W/E_bm     ");
+  Xhinit("h14",   0., 1.0, 50,"E_e/E_bm      ");
+  Xhinit("h15",   0., 1.0, 50,"E_nu/E_bm     ");
+  Xhinit("h16",   0., 1.0, 50,"E_W/E_bm      ");
 }
 
 //_____________________________________________________________________________
 void ENWBases::Userout()
 {
-  usrout_();
+  printf("End of ENWBases\n");
+  printf("ISRBM = %d\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
+  printf("       = 1 ; None\n");
+  printf("       = 2 ; ISR only\n");
+  printf("       = 3 ; ISR + BM\n");
+  printf("Ecm                  = %g (GeV)\n",fRoots);
+  printf("Total Cross section  = %g +- %g (fb)\n",GetEstimate(),GetError());
+  printf("Number of iterations = %d\n",GetNoOfIterate());  
 }
 
 

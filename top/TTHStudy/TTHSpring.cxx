@@ -53,12 +53,44 @@ ClassImp(TTHSpring)
 ClassImp(TTHSpringBuf)
 ClassImp(TTHBases)
 
+// Variable conversion.
+
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+#define Dhinit(id,xlo,xhi,nx,ylo,yhi,ny,title) H2Init(id,title,nx,xlo,xhi,ny,ylo,yhi)
+
 extern "C" {
-extern void usrout_();
 extern void userin_();
 extern Double_t func_(double x[]);
 extern void spevnt_(Int_t *nret);
 extern void exit(int);
+JSFBases *bso;			// need to map xhfill to h1fill
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H1Fill(tmp,*x,*w);
+}
+void dhfill_(char *t, double *x, double *y, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H2Fill(tmp,*x,*y,*w);
+}
 };
 
 //_____________________________________________________________________________
@@ -104,6 +136,9 @@ TTHBases::TTHBases(const char *name, const char *title)
 {
 //  Constructor of bases.  Default parameter should be initialized here
 //
+
+  bso = this;
+
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("TTHBases.ISRBM","3"),"%d",&fISRBM);
@@ -160,9 +195,7 @@ TTHBases::TTHBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("TTHBases.MassHiggs","120."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("TTHBases.MassTop","170."),"%lg",&fMassTop);  
 
-  fPrintInfo = gJSF->Env()->GetValue("TTHBases.PrintInfo",kTRUE);
-  fPrintHist = gJSF->Env()->GetValue("TTHBases.PrintHist",kTRUE);
-
+  Userin();
 }
 
 
@@ -185,8 +218,17 @@ void TTHBases::PrintParameters()
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
 
-  return ;
 
+}
+
+//_____________________________________________________________________________
+Double_t TTHBases::Func()		// new style not yet implemented
+{
+  cerr << ":::::: ERROR "
+       << "  TTHBases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
 }
 
 //_____________________________________________________________________________
@@ -205,7 +247,6 @@ void TTHBases::Userin()
 //
 //   Initialize User parameters for Bases
 //
-  JSFBases::Userin();  // Call JSFBases::Userin() for standard setup.
 
   // Copy class data member into common /usmprm/
   usmprm_.alfi = fAlphai;
@@ -233,27 +274,34 @@ void TTHBases::Userin()
 
   // Define histograms
 
-  Xhinit( 1, -1.0, 1.0, 50,"cos(theta_H) ");
-  Xhinit( 2,  0.0,360., 50,"phi_H        ");
-  Xhinit( 3,  0.0, 1.0, 50,"m(t-tb)/roots");
-  Xhinit( 4, -1.0, 1.0, 50,"cos(theta_t) ");
-  Xhinit( 5,  0.0,360., 50,"phi_t        ");
-  Xhinit( 6, -1.0, 1.0, 50,"cos(theta_t)_lab    ");
-  Xhinit( 7,  1.0,  5.,  4,"helicity combination");
-  Xhinit( 8, 90.0,200., 50,"m_tbar       ");
-  Xhinit( 9, 90.0,200., 50,"m_t          ");
-  Xhinit(10, 50.0,150., 50,"m_H          ");
-  Xhinit(11, 40.0,120., 50,"m_W-         ");
-  Xhinit(12, 40.0,120., 50,"m_W+         ");
-  Dhinit(21,0.,1.,50,-1.,1.,50,"E_H/E_bm-cos(th_H)");
-  Dhinit(22,0.,1.,50, 0.,1.,50,"E_t/E_bm-E_tb/E_bm");
-  return ;
+  Xhinit("h01", -1.0, 1.0, 50,"cos(theta_H) ");
+  Xhinit("h02",  0.0,360., 50,"phi_H        ");
+  Xhinit("h03",  0.0, 1.0, 50,"m(t-tb)/roots");
+  Xhinit("h04", -1.0, 1.0, 50,"cos(theta_t) ");
+  Xhinit("h05",  0.0,360., 50,"phi_t        ");
+  Xhinit("h06", -1.0, 1.0, 50,"cos(theta_t)_lab    ");
+  Xhinit("h07",  1.0,  5.,  4,"helicity combination");
+  Xhinit("h08", 90.0,200., 50,"m_tbar       ");
+  Xhinit("h09", 90.0,200., 50,"m_t          ");
+  Xhinit("h10", 50.0,150., 50,"m_H          ");
+  Xhinit("h11", 40.0,120., 50,"m_W-         ");
+  Xhinit("h12", 40.0,120., 50,"m_W+         ");
+  Dhinit("hd21",0.,1.,50,-1.,1.,50,"E_H/E_bm-cos(th_H)");
+  Dhinit("hd22",0.,1.,50, 0.,1.,50,"E_t/E_bm-E_tb/E_bm");
 }
 
 //_____________________________________________________________________________
 void TTHBases::Userout()
 {
-  usrout_();
+  printf("End of TTHBases\n");
+  printf("ISRBM = %d\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
+  printf("       = 1 ; None\n");
+  printf("       = 2 ; ISR only\n");
+  printf("       = 3 ; ISR + BM\n");
+  printf("Ecm                  = %g (GeV)\n",fRoots);
+  printf("Total Cross section  = %g +- %g (fb)\n",GetEstimate(),GetError());
+  printf("Number of iterations = %d\n",GetNoOfIterate());  
 }
 
 

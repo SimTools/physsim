@@ -23,6 +23,7 @@ C--
      .             +1,-1,   -1, +1,   +1,-1,   -1,+1,
      .             +1,-1,   -1, +1,   +1,-1,   +1,-1/
       DATA NCALL / 0 /
+      EXTERNAL   XHFILL, DHFILL
 C--
       DATA EPSL / 1.0 /
 C--
@@ -365,14 +366,14 @@ C--
       PHIZ  = XPHASE(3,1)
       COSWM = XPHASE(2,2)
       PHIWM = XPHASE(3,2)
-      CALL XHFILL(  1, DBLE(COSZ)        ,FUNC )
-      CALL XHFILL(  2, DBLE(PHIZ*RDDG)   ,FUNC )
-      CALL XHFILL(  3, DBLE(AMWW/ROOTS)  ,FUNC )
-      CALL XHFILL(  4, DBLE(COSWM)       ,FUNC )
-      CALL XHFILL(  5, DBLE(PHIWM*RDDG)  ,FUNC )
-      CALL XHFILL(  7, DBLE(ICMB)        ,FUNC )
-      CALL DHFILL(  9, DBLE(EZ/EBM),  DBLE(COSZ)   , FUNC )
-      CALL DHFILL( 10, DBLE(EWM/EBM), DBLE(EWP/EBM), FUNC )
+      CALL XHFILL( 'h01', DBLE(COSZ)        ,FUNC )
+      CALL XHFILL( 'h02', DBLE(PHIZ*RDDG)   ,FUNC )
+      CALL XHFILL( 'h03', DBLE(AMWW/ROOTS)  ,FUNC )
+      CALL XHFILL( 'h04', DBLE(COSWM)       ,FUNC )
+      CALL XHFILL( 'h05', DBLE(PHIWM*RDDG)  ,FUNC )
+      CALL XHFILL( 'h07', DBLE(ICMB)        ,FUNC )
+      CALL DHFILL( 'hd09', DBLE(EZ/EBM),  DBLE(COSZ)   , FUNC )
+      CALL DHFILL( 'hd10', DBLE(EWM/EBM), DBLE(EWP/EBM), FUNC )
 C--
 C  That's it.
 C--

@@ -69,7 +69,7 @@ C--
          NCALL  = 1
          SPIN   = 2
          NB     = 7
-         FACT   = xGV2PB*x2PI/(x4PI**(3*NB))/SPIN
+         FACT   = xGV2FB*x2PI/(x4PI**(3*NB))/SPIN
          AME    = AMF(1,2,1)
          CALL UVZERO(9,EC)
          EC(1,1) = 1

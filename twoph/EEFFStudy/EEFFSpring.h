@@ -9,6 +9,8 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
+#include "JSFConfig.h"
+
 #include "TNamed.h"
 #include "TMath.h"
 #include "TDatime.h"
@@ -167,6 +169,7 @@ public:
   void Userin();   // Bases user initialization
   void Userout();  // Bases user output 
   Double_t Func(Double_t x[]); // Bases integration function.
+  Double_t Func(); // Bases integration function.
   void PrintParameters(); // Print parameters
 
   ClassDef(EEFFBases,1)  // Bases for e+e- -> EEFFbar process

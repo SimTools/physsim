@@ -10,7 +10,7 @@ XCOMM ##########################################################################
  *
  */
 #define CXXPACKAGE 
-#include "../../../config/lclib.tmpl"
+#include "config/kflib.tmpl"
 
 /*
  * Headers
@@ -54,8 +54,8 @@ clean::
 	@rm -f *.$(ObjSuf) core
 
 depend:: $(SRCS)
-	makedepend -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) $(SRCS)
-
+	for i in $(SRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
 distclean:: clean
 	@rm -f $(JSFPROGRAM) Makefile
 	@rm -f *.root *.tdr *.out *~ core

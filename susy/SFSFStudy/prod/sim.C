@@ -2,9 +2,6 @@
   gROOT->Reset();
   TFile file("sfsfsim.root","RECREATE");  // Output file
  
-  jsf    = new JSFSteer();
-  full   = new JSFLCFULL();
- 
   if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
     if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
       gSystem->Load("SFSFSpring.sl");
@@ -14,10 +11,13 @@
    }
   }
  
+  jsf    = new JSFSteer();
+  full   = new JSFLCFULL();
+ 
   spring = new SFSFSpring();
   spring->ReadBases("bases.root");
  
-  printf(" Roots is %g\n",((SFSFBases*)spring->Bases())->GetRoots());
+  printf(" Roots is %g\n",((SFSFBases*)spring->GetBases())->GetRoots());
 
   hdr=new JSFHadronizer();
   sim=new JSFQuickSim();

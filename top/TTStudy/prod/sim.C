@@ -16,7 +16,7 @@
   spring = new TTSpring();
   spring->ReadBases("bases.root");
  
-  printf(" Roots is %g\n",((TTBases*)spring->Bases())->GetRoots());
+  printf(" Roots is %g\n",((TTBases*)spring->GetBases())->GetRoots());
 
   hdr=new JSFHadronizer();
   sim=new JSFQuickSim();

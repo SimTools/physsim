@@ -58,7 +58,7 @@ C--
          NCALL  = 1
          SPIN   = 2
          NB     = 3
-         FACT   = xGV2PB*x2PI/(x4PI**(3*NB))/SPIN
+         FACT   = xGV2FB*x2PI/(x4PI**(3*NB))/SPIN
          FACT   = FACT/(xALF*137.0359895D0)
          AME    = AMF(1,2,1)
          AMSW   = AMW

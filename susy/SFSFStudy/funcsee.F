@@ -4,6 +4,7 @@ C*                      ( 1 + 2*ALF0/PI * ( PI**2/6 - 1/4 ) )
 C*                      included.
 C*  95/05/05  K.Fujii	Random number shuffling and ISR and BMEFF
 C*			treatment on ISRBM.
+C*  00/06/24  K.Fujii	Modified for Bases++.
 C*
       REAL FUNCTION FUNC*8(ZZ)
  
@@ -60,6 +61,7 @@ CCDBG       INTEGER*4  JDP(2,NP)
 CCDBG       REAL   *4  PVTEST(0:3,10)
 C>>>
       DATA NCALL / 0 /
+      EXTERNAL   XHFILL
 C
 C========< Entry Point >================================================
 C
@@ -243,9 +245,9 @@ CCDBG       PRINT *, '*************************************'
 CCDBG       PRINT *, '      '
 C>>>
       CALL SGSEEF(IDPTCL,IHLCMB,XPHASE,SG,PV)
-      SG     = SG*QED
-      FUNC   = SG*WAT
-      DSGMDX = SG
+      SG      = SG*QED
+      FUNC    = SG*WAT
+      DSGMDX  = SG
 C--      
       IF ( FUNC.LE.0.D0 ) RETURN
 C>>>
@@ -316,21 +318,21 @@ C--
       PHIEM = XPHASE(3,2)
       COSEP = XPHASE(2,3)
       PHIEP = XPHASE(3,3)
-      CALL XHFILL(  1, DBLE(COSSE)       ,FUNC )
-      CALL XHFILL(  2, DBLE(PHISE)*xRD2DG,FUNC )
-      CALL XHFILL(  3, DBLE(COSEM)       ,FUNC )
-      CALL XHFILL(  4, DBLE(PHIEM)*xRD2DG,FUNC )
-      CALL XHFILL(  5, DBLE(COSEP)       ,FUNC )
-      CALL XHFILL(  6, DBLE(PHIEP)*xRD2DG,FUNC )
-      CALL XHFILL(  7, DBLE(SQRT(Q32))   ,FUNC )
-      CALL XHFILL(  8, DBLE(SQRT(Q42))   ,FUNC )
-      CALL XHFILL(  9, DBLE(PTOP)        ,FUNC )
-      CALL XHFILL( 10, DBLE(ACOP)*xRD2DG ,FUNC )
-      CALL XHFILL( 11, DBLE(ELM)         ,FUNC )
-      CALL XHFILL( 12, DBLE(ELP)         ,FUNC )
-      CALL XHFILL( 13, DBLE(COSLM)       ,FUNC )
-      CALL XHFILL( 14, DBLE(COSLP)       ,FUNC )
-      CALL XHFILL( 15, DBLE(COSLA)       ,FUNC )
+      CALL XHFILL('h01', DBLE(COSSE)       ,FUNC )
+      CALL XHFILL('h02', DBLE(PHISE)*xRD2DG,FUNC )
+      CALL XHFILL('h03', DBLE(COSEM)       ,FUNC )
+      CALL XHFILL('h04', DBLE(PHIEM)*xRD2DG,FUNC )
+      CALL XHFILL('h05', DBLE(COSEP)       ,FUNC )
+      CALL XHFILL('h06', DBLE(PHIEP)*xRD2DG,FUNC )
+      CALL XHFILL('h07', DBLE(SQRT(Q32))   ,FUNC )
+      CALL XHFILL('h08', DBLE(SQRT(Q42))   ,FUNC )
+      CALL XHFILL('h09', DBLE(PTOP)        ,FUNC )
+      CALL XHFILL('h10', DBLE(ACOP)*xRD2DG ,FUNC )
+      CALL XHFILL('h11', DBLE(ELM)         ,FUNC )
+      CALL XHFILL('h12', DBLE(ELP)         ,FUNC )
+      CALL XHFILL('h13', DBLE(COSLM)       ,FUNC )
+      CALL XHFILL('h14', DBLE(COSLP)       ,FUNC )
+      CALL XHFILL('h15', DBLE(COSLA)       ,FUNC )
 C--
 C  That's it.
 C--

@@ -11,7 +11,7 @@
 /* Template Files */
 
 #define CXXPACKAGE 
-#include "../../config/lclib.tmpl"
+#include "../../config/kflib.tmpl"
 
 /* Package Name */
 

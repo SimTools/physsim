@@ -17,17 +17,38 @@
 #include "JSFHadronizer.h"
 #include "EEFFSpring.h"
 
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+
 ClassImp(EEFFSpring)
 ClassImp(EEFFSpringBuf)
 ClassImp(EEFFBases)
 
 extern "C" {
-extern void usrout_();
 extern void userin_();
 extern Double_t func_(double x[]);
 extern void spevnt_(Int_t *nret);
 extern void exit(int);
 extern int snprintf ( char *, size_t, const char *, ... );
+JSFBases *bso;			// need to map xhfill to h1fill
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H1Fill(tmp,*x,*w);
+}
 };
 
 //_____________________________________________________________________________
@@ -74,6 +95,9 @@ EEFFBases::EEFFBases(const char *name, const char *title)
 {
 //  Constructor of bases.  Default parameter should be initialized here
 //
+
+  bso = this;				// set this for xhfill_
+
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("EEFFBases.ISRBM","1"),"%d",&fISRBM);
@@ -162,9 +186,7 @@ EEFFBases::EEFFBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("EEFFBases.CosfCut","0.8"),"%lg",&fCosfCut);
   sscanf(gJSF->Env()->GetValue("EEFFBases.MassffMin","5."),"%lg",&fMassffMin);
 
-  fPrintInfo = gJSF->Env()->GetValue("EEFFBases.PrintInfo",kTRUE);
-  fPrintHist = gJSF->Env()->GetValue("EEFFBases.PrintHist",kTRUE);
-
+  Userin();
 }
 
 
@@ -198,9 +220,6 @@ void EEFFBases::PrintParameters()
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
-
-  return ;
-
 }
 
 //_____________________________________________________________________________
@@ -210,7 +229,16 @@ Double_t EEFFBases::Func(Double_t x[])
 //
   double val=func_(x);
   return val;
+}
 
+//_____________________________________________________________________________
+Double_t EEFFBases::Func()		// new style not yet implemented
+{
+  cerr << ":::::: ERROR "
+       << "  EEFFBases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
 }
 
 //_____________________________________________________________________________
@@ -219,8 +247,6 @@ void EEFFBases::Userin()
 //
 //   Initialize User parameters for Bases
 //
-  JSFBases::Userin();  // Call JSFBases::Userin() for standard setup.
-
   // Copy class data member into common /usmprm/
   usmprm_.alfi = fAlphai;
   usmprm_.alfs = fAlphas;
@@ -260,22 +286,31 @@ void EEFFBases::Userin()
   // Define histograms
 
       Double_t qmx  = fRoots/4.;
-      Xhinit( 1, -1.0, 1.0, 50,"cos(theta_e-)      ");
-      Xhinit( 2, -1.0, 1.0, 50,"cos(theta_e+)      ");
-      Xhinit( 3,  0.0, 1.0, 50,"E_e-/E_bm          ");
-      Xhinit( 4,  0.0, 1.0, 50,"E_e+/E_bm          ");
-      Xhinit( 5,  0.0, 4.0, 50,"(M_ff/E_bm)**2     ");
-      Xhinit( 6, -1.0, 1.0, 50,"cos(theta_f)       ");
-      Xhinit( 7,  0.0, 1.0, 50,"E_f/E_bm           ");
-      Xhinit( 8,  0.0, 2.0, 50,"M_ff/E_bm          ");
-      Xhinit( 9,  0.0, qmx, 50,"M_ff (GeV)         ");
-  return ;
+      Xhinit("h01", -1.0, 1.0, 50,"cos(theta_e-)      ");
+      Xhinit("h02", -1.0, 1.0, 50,"cos(theta_e+)      ");
+      Xhinit("h03",  0.0, 1.0, 50,"E_e-/E_bm          ");
+      Xhinit("h04",  0.0, 1.0, 50,"E_e+/E_bm          ");
+      Xhinit("h05",  0.0, 4.0, 50,"(M_ff/E_bm)**2     ");
+      Xhinit("h06", -1.0, 1.0, 50,"cos(theta_f)       ");
+      Xhinit("h07",  0.0, 1.0, 50,"E_f/E_bm           ");
+      Xhinit("h08",  0.0, 2.0, 50,"M_ff/E_bm          ");
+      Xhinit("h09",  0.0, qmx, 50,"M_ff (GeV)         ");
 }
 
 //_____________________________________________________________________________
 void EEFFBases::Userout()
 {
-  usrout_();
+  printf("End of Bases of ee --> sf sf process\n");
+#if 0
+  printf("ISRBM = %d\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
+  printf("       = 1 ; None\n");
+  printf("       = 2 ; ISR only\n");
+  printf("       = 3 ; ISR + BM\n");
+#endif
+  printf("Ecm                  = %g (GeV)\n",fRoots);
+  printf("Total Cross section  = %g +- %g (pb)\n",GetEstimate(),GetError());
+  printf("Number of iteration  = %d\n",GetNoOfIterate());  
 }
 
 

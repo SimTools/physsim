@@ -39,12 +39,35 @@ ClassImp(SFSFSpring)
 ClassImp(SFSFSpringBuf)
 ClassImp(SFSFBases)
 
+// Variable conversion.
+
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+
 extern "C" {
-extern void usrout_();
 extern void userin_();
 extern Double_t func_(double x[]);
 extern void spevnt_(Int_t *nret);
 extern void exit(int);
+JSFBases *bso;
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H1Fill(tmp,*x,*w);
+}
 };
 
 //_____________________________________________________________________________
@@ -85,12 +108,14 @@ Bool_t SFSFSpring::Initialize()
 void SFSFSpringBuf::Spevnt(Int_t &iret) { spevnt_(&iret); }
 
 //_____________________________________________________________________________
-
 SFSFBases::SFSFBases(const char *name, const char *title)
            : JSFBases(name, title)
 {
 //  Constructor of bases.  Default parameter should be initialized here
 //
+
+  bso = this;
+
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("SFSFBases.ISRBM","3"),"%d",&fISRBM);
@@ -155,9 +180,7 @@ SFSFBases::SFSFBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("SFSFBases.HelTauMinus","0."),"%lg",&fHelTauMinus);
   sscanf(gJSF->Env()->GetValue("SFSFBases.HelTauPlus","0."),"%lg",&fHelTauPlus);
 
-  fPrintInfo = gJSF->Env()->GetValue("SFSFBases.PrintInfo",kTRUE);
-  fPrintHist = gJSF->Env()->GetValue("SFSFBases.PrintHist",kTRUE);
-
+  Userin();
 }
 
 
@@ -187,9 +210,15 @@ void SFSFBases::PrintParameters()
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
-
-  return ;
-
+}
+//_____________________________________________________________________________
+Double_t SFSFBases::Func()
+{
+  cerr << ":::::: ERROR "
+       << "  SFSFBases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
 }
 
 //_____________________________________________________________________________
@@ -208,7 +237,6 @@ void SFSFBases::Userin()
 //
 //   Initialize User parameters for Bases
 //
-  JSFBases::Userin();  // Call JSFBases::Userin() for standard setup.
 
   // Copy class data member into common /usmprm/
   usmprm_.alfi = fAlphai;
@@ -239,7 +267,8 @@ void SFSFBases::Userin()
 
   // Copy class data member into common /bshufl/
   bshufl_.nzz = fNDIM;
-  for (Int_t i=0; i<fNDIM; i++) bshufl_.ishufl[i] = fISHUFL[i];
+  Int_t i;
+  for (i=0; i<fNDIM; i++) bshufl_.ishufl[i] = fISHUFL[i];
   
   // Initialize physical constants, etc.
   userin_();
@@ -252,28 +281,35 @@ void SFSFBases::Userin()
       Double_t qmx  = fRoots/2.;
       Double_t ptmx = 150.;
       Double_t elmx = fRoots/2.;
-      Xhinit( 1, -1.0, 1.0, 50,"cos(theta_X-)      ");
-      Xhinit( 2,  0.0,360., 50,"phi_X-             ");
-      Xhinit( 3, -1.0, 1.0, 50,"cos(theta_l-)      ");
-      Xhinit( 4,  0.0,360., 50,"phi_l-             ");
-      Xhinit( 5, -1.0, 1.0, 50,"cos(theta_l+)      ");
-      Xhinit( 6,  0.0,360., 50,"phi_l+             ");
-      Xhinit( 7,  0.0, qmx, 50,"M_X-               ");
-      Xhinit( 8,  0.0, qmx, 50,"M_X+               ");
-      Xhinit( 9,  0.0,ptmx, 50,"Missing PT         ");
-      Xhinit(10,  0.0,180., 50,"Acop               ");
-      Xhinit(11,  0.0,elmx, 50,"E_l-               ");
-      Xhinit(12,  0.0,elmx, 50,"E_l+               ");
-      Xhinit(13, -1.0, 1.0, 50,"cos(theta_l-)_lab  ");
-      Xhinit(14, -1.0, 1.0, 50,"-cos(theta_l+)_lab ");
-      Xhinit(15, -1.0, 1.0, 50,"cos(theta_l)_lab   ");
-  return ;
+      Xhinit("h01", -1.0, 1.0, 50,"cos(theta_X-)      ");
+      Xhinit("h02",  0.0,360., 50,"phi_X-             ");
+      Xhinit("h03", -1.0, 1.0, 50,"cos(theta_l-)      ");
+      Xhinit("h04",  0.0,360., 50,"phi_l-             ");
+      Xhinit("h05", -1.0, 1.0, 50,"cos(theta_l+)      ");
+      Xhinit("h06",  0.0,360., 50,"phi_l+             ");
+      Xhinit("h07",  0.0, qmx, 50,"M_X-               ");
+      Xhinit("h08",  0.0, qmx, 50,"M_X+               ");
+      Xhinit("h09",  0.0,ptmx, 50,"Missing PT         ");
+      Xhinit("h10",  0.0,180., 50,"Acop               ");
+      Xhinit("h11",  0.0,elmx, 50,"E_l-               ");
+      Xhinit("h12",  0.0,elmx, 50,"E_l+               ");
+      Xhinit("h13", -1.0, 1.0, 50,"cos(theta_l-)_lab  ");
+      Xhinit("h14", -1.0, 1.0, 50,"-cos(theta_l+)_lab ");
+      Xhinit("h15", -1.0, 1.0, 50,"cos(theta_l)_lab   ");
 }
 
 //_____________________________________________________________________________
 void SFSFBases::Userout()
 {
-  usrout_();
+  printf("End of Bases of ee --> sf sf process\n");
+  printf("ISRBM = %d\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
+  printf("       = 1 ; None\n");
+  printf("       = 2 ; ISR only\n");
+  printf("       = 3 ; ISR + BM\n");
+  printf("Ecm                  = %g (GeV)\n",fRoots);
+  printf("Total Cross section  = %g +- %g (fb)\n",GetEstimate(),GetError());
+  printf("Number of iteration  = %d\n",GetNoOfIterate());  
 }
 
 

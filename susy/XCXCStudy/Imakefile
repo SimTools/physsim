@@ -13,6 +13,7 @@ XCOMM ##    95/05/09  K.Fujii 	Use gen_lib.
 XCOMM ##    95/05/10  K.Fujii 	Use 95a.
 XCOMM ##    97/07/26  K.Fujii   Use pro for LCLIB and new private libraries
 XCOMM ##    99/05/22  K.Fujii   Modified for JSF.
+XCOMM ##    00/06/24  K.Fujii   Modified for Bases++.
 XCOMM ############################################################################
 
 /*
@@ -20,7 +21,7 @@ XCOMM ##########################################################################
  *
  */
 #define CXXPACKAGE 
-#include "../../config/lclib.tmpl"
+#include "config/kflib.tmpl"
 
 /*
  * Headers
@@ -40,14 +41,13 @@ INCPATH	= -I. -I$(KFLIBROOT)/gen_lib/sm/include \
 #if defined(hitachiArchitecture)
 ANALLIB   = $(LDDIRFLAG)$(JSFROOT)/lib -lJSF -lJSFLCFULL -lJSFQuickSim \
 	    $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
-	    -lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	    -lSIMJLC -lLTKCL -lLCFULL -lTBS \
 	    -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
 #else
 ANALLIB   = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
-	    -lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	    -lSIMJLC -lLTKCL -lLCFULL -lTBS \
 	    -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
 #endif
-
 KFLIB	  = $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBSS -lGENLIBSM \
 	    -lGENLIBKN -lGENLIBBM  -lANLLIB
 
@@ -62,9 +62,7 @@ FOBJS = ampcxx.o \
 		getxph.o \
 		sgcxxf.o \
 		spevnt.o \
-		spinit.o \
-		userin.o \
-		usrout.o
+		userin.o
 
 PACKAGENAME   = XCXCSpring
 
@@ -78,7 +76,7 @@ FSRCS         = $(strip $(subst .o,.F,$(FOBJS)))
 OBJS          = $(PACKAGENAME).$(ObjSuf) \
 		$(PACKAGENAME)Dict.$(ObjSuf)
 
-SRC           = $(PACKAGENAME).$(SrcSuf) 
+SRCS          = $(PACKAGENAME).$(SrcSuf) 
 
 HDRS	      = $(PACKAGENAME).h
 
@@ -112,9 +110,9 @@ prod/$(SONAME): $(OBJS) $(FOBJS)
 clean:: 
 	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
 
-depend:: 
-	makedepend -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) $(SRC)
-	makedepend $(INCPATH) $(FSRCS)
+depend:: $(SRCS) $(HDRS) $(FSRCS)
+	for i in $(SRCS) $(FSRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
 
 distclean:: clean
 	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~

@@ -53,12 +53,44 @@ ClassImp(TTZSpring)
 ClassImp(TTZSpringBuf)
 ClassImp(TTZBases)
 
+// Variable conversion.
+
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+#define Dhinit(id,xlo,xhi,nx,ylo,yhi,ny,title) H2Init(id,title,nx,xlo,xhi,ny,ylo,yhi)
+
 extern "C" {
-extern void usrout_();
 extern void userin_();
 extern Double_t func_(double x[]);
 extern void spevnt_(Int_t *nret);
 extern void exit(int);
+JSFBases *bso;			// need to map xhfill to h1fill
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H1Fill(tmp,*x,*w);
+}
+void dhfill_(char *t, double *x, double *y, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H2Fill(tmp,*x,*y,*w);
+}
 };
 
 //_____________________________________________________________________________
@@ -104,6 +136,9 @@ TTZBases::TTZBases(const char *name, const char *title)
 {
 //  Constructor of bases.  Default parameter should be initialized here
 //
+
+  bso = this;
+
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("TTZBases.ISRBM","3"),"%d",&fISRBM);
@@ -160,9 +195,7 @@ TTZBases::TTZBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("TTZBases.MassHiggs","120."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("TTZBases.MassTop","170."),"%lg",&fMassTop);  
 
-  fPrintInfo = gJSF->Env()->GetValue("TTZBases.PrintInfo",kTRUE);
-  fPrintHist = gJSF->Env()->GetValue("TTZBases.PrintHist",kTRUE);
-
+  Userin();
 }
 
 
@@ -185,8 +218,17 @@ void TTZBases::PrintParameters()
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
 
-  return ;
 
+}
+
+//_____________________________________________________________________________
+Double_t TTZBases::Func()		// new style not yet implemented
+{
+  cerr << ":::::: ERROR "
+       << "  TTZBases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
 }
 
 //_____________________________________________________________________________
@@ -205,7 +247,6 @@ void TTZBases::Userin()
 //
 //   Initialize User parameters for Bases
 //
-  JSFBases::Userin();  // Call JSFBases::Userin() for standard setup.
 
   // Copy class data member into common /usmprm/
   usmprm_.alfi = fAlphai;
@@ -233,43 +274,28 @@ void TTZBases::Userin()
 
   // Define histograms
 
-  Xhinit( 1, -1.0, 1.0, 50,"cos(theta_Z) ");
-  Xhinit( 2,  0.0,360., 50,"phi_Z        ");
-  Xhinit( 3,  0.0, 1.0, 50,"m(t-tb)/roots");
-  Xhinit( 4, -1.0, 1.0, 50,"cos(theta_t) ");
-  Xhinit( 5,  0.0,360., 50,"phi_t        ");
-  Xhinit( 6, -1.0, 1.0, 50,"cos(theta_t)_lab    ");
-  Xhinit( 7,  1.0,  5.,  4,"helicity combination");
-  Dhinit( 9,0.,1.,50,-1.,1.,50,"E_Z/E_bm-cos(th_Z)");
-  Dhinit(10,0.,1.,50, 0.,1.,50,"E_t/E_bm-E_tb/E_bm");
-  return ;
+  Xhinit("h01", -1.0, 1.0, 50,"cos(theta_Z) ");
+  Xhinit("h02",  0.0,360., 50,"phi_Z        ");
+  Xhinit("h03",  0.0, 1.0, 50,"m(t-tb)/roots");
+  Xhinit("h04", -1.0, 1.0, 50,"cos(theta_t) ");
+  Xhinit("h05",  0.0,360., 50,"phi_t        ");
+  Xhinit("h06", -1.0, 1.0, 50,"cos(theta_t)_lab    ");
+  Xhinit("h07",  1.0,  5.,  4,"helicity combination");
+  Dhinit("hd09",0.,1.,50,-1.,1.,50,"E_Z/E_bm-cos(th_Z)");
+  Dhinit("hd10",0.,1.,50, 0.,1.,50,"E_t/E_bm-E_tb/E_bm");
 }
 
 //_____________________________________________________________________________
 void TTZBases::Userout()
 {
-  usrout_();
+  printf("End of TTZBases\n");
+  printf("ISRBM = %d\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
+  printf("       = 1 ; None\n");
+  printf("       = 2 ; ISR only\n");
+  printf("       = 3 ; ISR + BM\n");
+  printf("Ecm                  = %g (GeV)\n",fRoots);
+  printf("Total Cross section  = %g +- %g (fb)\n",GetEstimate(),GetError());
+  printf("Number of iterations = %d\n",GetNoOfIterate());  
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

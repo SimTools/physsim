@@ -33,6 +33,7 @@ CCDBG       INTEGER*4  JDP(2,NP)
 CCDBG       REAL   *4  PVTEST(0:3,10)
 C>>>
       DATA NCALL / 0 /
+      EXTERNAL   XHFILL, DHFILL
 C--
 C  Statement function.
 C--
@@ -353,21 +354,21 @@ C--
       PT1  = SQRT(QV(1,2)**2+QV(2,2)**2+QV(3,2)**2)
       PT2  = SQRT(QV(1,4)**2+QV(2,4)**2+QV(3,4)**2)
 C--
-      CALL XHFILL(  1, DBLE(COST)        ,FUNC )
-      CALL XHFILL(  2, DBLE(PHIT)*xRD2DG ,FUNC )
-      CALL XHFILL(  3, DBLE(COSBB)       ,FUNC )
-      CALL XHFILL(  4, DBLE(PHIBB)*xRD2DG,FUNC )
-      CALL XHFILL(  5, DBLE(COSB )       ,FUNC )
-      CALL XHFILL(  6, DBLE(PHIB )*xRD2DG,FUNC )
-      CALL XHFILL(  7, DBLE(RS/ROOTS)    ,FUNC )
-      CALL XHFILL(  8, DBLE(ROOTS-2*AMT) ,FUNC )
-      CALL XHFILL(  9, DBLE(Q42)         ,FUNC )
-      CALL XHFILL( 10, DBLE(Q32)         ,FUNC )
-      CALL XHFILL( 11, DBLE(PTOP)        ,FUNC )
-      CALL XHFILL( 12, DBLE(PT1 )        ,FUNC )
-      CALL XHFILL( 12, DBLE(PT2 )        ,FUNC )
-      CALL XHFILL( 13, DBLE(IMD1+.1)     ,FUNC )
-      CALL XHFILL( 14, DBLE(IMD2+.1)     ,FUNC )
+      CALL XHFILL( 'h01', DBLE(COST)        ,FUNC )
+      CALL XHFILL( 'h02', DBLE(PHIT)*xRD2DG ,FUNC )
+      CALL XHFILL( 'h03', DBLE(COSBB)       ,FUNC )
+      CALL XHFILL( 'h04', DBLE(PHIBB)*xRD2DG,FUNC )
+      CALL XHFILL( 'h05', DBLE(COSB )       ,FUNC )
+      CALL XHFILL( 'h06', DBLE(PHIB )*xRD2DG,FUNC )
+      CALL XHFILL( 'h07', DBLE(RS/ROOTS)    ,FUNC )
+      CALL XHFILL( 'h08', DBLE(ROOTS-2*AMT) ,FUNC )
+      CALL XHFILL( 'h09', DBLE(Q42)         ,FUNC )
+      CALL XHFILL( 'h10', DBLE(Q32)         ,FUNC )
+      CALL XHFILL( 'h11', DBLE(PTOP)        ,FUNC )
+      CALL XHFILL( 'h12', DBLE(PT1 )        ,FUNC )
+      CALL XHFILL( 'h12', DBLE(PT2 )        ,FUNC )
+      CALL XHFILL( 'h13', DBLE(IMD1+.1)     ,FUNC )
+      CALL XHFILL( 'h14', DBLE(IMD2+.1)     ,FUNC )
 C--
 C  That's it.
 C--

@@ -5,6 +5,7 @@ C*  			QED vtx correction ( 1+3*BTE/4 ) and
 C*                      ( 1 + 2*ALF0/PI * ( PI**2/6 - 1/4 ) )
 C*                      included.
 C*			Use INSMCN instead of CONINT.
+C*  00/06/24  K.Fujii	Modified for Bases++.
 C*
       REAL FUNCTION FUNC*8(ZZ)
  
@@ -36,6 +37,7 @@ C               ----------------------------------
      .             +1,-1,   +1, +1,  -1, +1,
      .             +1,-1,   +1, +1,  +1, -1 /
       DATA NCALL / 0 /
+      EXTERNAL   XHFILL
 C
 C========< Entry Point >================================================
 C
@@ -269,18 +271,18 @@ C--
       PHIB  = XPHASE(3,2)
       COSM  = XPHASE(2,3)
       PHIM  = XPHASE(3,3)
-      CALL XHFILL(  1, DBLE(RS  /ROOTS)  ,FUNC )
-      CALL XHFILL(  2, DBLE(Q2)          ,FUNC )
-      CALL XHFILL(  3, DBLE(Q3)          ,FUNC )
-      CALL XHFILL(  4, DBLE(QMIS/ROOTS)  ,FUNC )
-      CALL XHFILL(  5, DBLE(COSH)        ,FUNC )
-      CALL XHFILL(  6, DBLE(PHIH)*RDDG   ,FUNC )
-      CALL XHFILL(  7, DBLE(COSB)        ,FUNC )
-      CALL XHFILL(  8, DBLE(PHIB)*RDDG   ,FUNC )
-      CALL XHFILL(  9, DBLE(COSM)        ,FUNC )
-      CALL XHFILL( 10, DBLE(PHIM)*RDDG   ,FUNC )
-      CALL XHFILL( 11, DBLE(ICMB)+.1     ,FUNC )
-      CALL XHFILL( 12, DBLE(IMD1)+.1     ,FUNC )
+      CALL XHFILL( "h01", DBLE(RS  /ROOTS)  ,FUNC )
+      CALL XHFILL( "h02", DBLE(Q2)          ,FUNC )
+      CALL XHFILL( "h03", DBLE(Q3)          ,FUNC )
+      CALL XHFILL( "h04", DBLE(QMIS/ROOTS)  ,FUNC )
+      CALL XHFILL( "h05", DBLE(COSH)        ,FUNC )
+      CALL XHFILL( "h06", DBLE(PHIH)*RDDG   ,FUNC )
+      CALL XHFILL( "h07", DBLE(COSB)        ,FUNC )
+      CALL XHFILL( "h08", DBLE(PHIB)*RDDG   ,FUNC )
+      CALL XHFILL( "h09", DBLE(COSM)        ,FUNC )
+      CALL XHFILL( "h10", DBLE(PHIM)*RDDG   ,FUNC )
+      CALL XHFILL( "h11", DBLE(ICMB)+.1     ,FUNC )
+      CALL XHFILL( "h12", DBLE(IMD1)+.1     ,FUNC )
 C--
 C  That's it.
 C--

@@ -32,6 +32,7 @@ C*    Invokes UVZERO, UHSETF, UBTRAN, FULSEE, and library routines
 C*    in 'T#FP.HELAS.FORT'.
 C* (Update Record)
 C*    92/06/29  K.Fujii          Original version.
+C*    00/06/24  K.Fujii          Use fb instead of pb.
 C*
 CC**********************************************************************
  
@@ -57,7 +58,7 @@ C--
          NCALL  = 1
          SPIN   = 2
          NB     = 3
-         FACT   = xGV2PB*x2PI/(x4PI**(3*NB))/SPIN
+         FACT   = xGV2FB*x2PI/(x4PI**(3*NB))/SPIN
          AME    = AMF(1,2,1)
          CALL UVZERO(9,EC)
          EC(1,1) = 1

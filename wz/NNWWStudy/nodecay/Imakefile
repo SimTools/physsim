@@ -16,7 +16,7 @@ XCOMM ##########################################################################
  *
  */
 
-#include "../../../config/lclib.tmpl"
+#include "config/kflib.tmpl"
 
 INCPATH	= -I. -I$(KFLIBROOT)/dgen_lib/sm/include \
 	-I$(KFLIBROOT)/dgen_lib/bm/include \

@@ -19,6 +19,7 @@ C--
       xHPI   = xPI/2
       xSQRT2 = SQRT(2.0)
       xGV2PB = 3.8937966E8
+      xGV2FB = 3.8937966E11
       xRD2DG = 180/xPI
       xDG2RD = xPI/180
 C--

@@ -17,7 +17,7 @@
   spring = new WWSpring();
   spring->ReadBases("bases.root");
  
-  printf(" Roots is %g\n",((WWBases*)spring->Bases())->GetRoots());
+  printf(" Roots is %g\n",((WWBases*)spring->GetBases())->GetRoots());
 
   hdr=new JSFHadronizer();
   sim=new JSFQuickSim();

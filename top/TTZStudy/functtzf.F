@@ -44,6 +44,7 @@ C--
       INTEGER*4  JDP(2,NP)
 #endif
       DATA NCALL / 0 /
+      EXTERNAL   XHFILL, DHFILL
 C--
       DATA EPSL  / 0.5 /
 C
@@ -407,15 +408,15 @@ C--
       PHIZ  = XPHASE(3,1)
       COST  = XPHASE(2,2)
       PHIT  = XPHASE(3,2)
-      CALL XHFILL(  1, DBLE(COSZ)        ,FUNC )
-      CALL XHFILL(  2, DBLE(PHIZ)*RDDG   ,FUNC )
-      CALL XHFILL(  3, DBLE(AMTT/ROOTS)  ,FUNC )
-      CALL XHFILL(  4, DBLE(COST)        ,FUNC )
-      CALL XHFILL(  5, DBLE(PHIT)*RDDG   ,FUNC )
-      CALL XHFILL(  6, DBLE(CST)         ,FUNC )
-      CALL XHFILL(  7, DBLE(ICMB)        ,FUNC )
-      CALL DHFILL(  9, DBLE(EZ/EBM), DBLE(COSZ)    , FUNC )
-      CALL DHFILL( 10, DBLE(ET/EBM), DBLE(ETB/EBM) , FUNC )
+      CALL XHFILL( 'h01', DBLE(COSZ)        ,FUNC )
+      CALL XHFILL( 'h02', DBLE(PHIZ)*RDDG   ,FUNC )
+      CALL XHFILL( 'h03', DBLE(AMTT/ROOTS)  ,FUNC )
+      CALL XHFILL( 'h04', DBLE(COST)        ,FUNC )
+      CALL XHFILL( 'h05', DBLE(PHIT)*RDDG   ,FUNC )
+      CALL XHFILL( 'h06', DBLE(CST)         ,FUNC )
+      CALL XHFILL( 'h07', DBLE(ICMB)        ,FUNC )
+      CALL DHFILL( 'hd09', DBLE(EZ/EBM), DBLE(COSZ)    , FUNC )
+      CALL DHFILL( 'hd10', DBLE(ET/EBM), DBLE(ETB/EBM) , FUNC )
 C--
 C  That's it.
 C--

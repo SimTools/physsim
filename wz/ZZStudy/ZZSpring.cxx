@@ -39,12 +39,44 @@ ClassImp(ZZSpring)
 ClassImp(ZZSpringBuf)
 ClassImp(ZZBases)
 
+// Variable conversion.
+
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+#define Dhinit(id,xlo,xhi,nx,ylo,yhi,ny,title) H2Init(id,title,nx,xlo,xhi,ny,ylo,yhi)
+
 extern "C" {
-extern void usrout_();
 extern void userin_();
 extern Double_t func_(double x[]);
 extern void spevnt_(Int_t *nret);
 extern void exit(int);
+JSFBases *bso;			// need to map xhfill to h1fill
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H1Fill(tmp,*x,*w);
+}
+void dhfill_(char *t, double *x, double *y, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H2Fill(tmp,*x,*y,*w);
+}
 };
 
 //_____________________________________________________________________________
@@ -90,6 +122,9 @@ ZZBases::ZZBases(const char *name, const char *title)
 {
 //  Constructor of bases.  Default parameter should be initialized here
 //
+
+  bso = this;
+
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("ZZBases.ISRBM","3"),"%d",&fISRBM);
@@ -147,9 +182,7 @@ ZZBases::ZZBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("ZZBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("ZZBases.MassTop","170."),"%lg",&fMassTop);  
 
-  fPrintInfo = gJSF->Env()->GetValue("ZZBases.PrintInfo",kTRUE);
-  fPrintHist = gJSF->Env()->GetValue("ZZBases.PrintHist",kTRUE);
-
+  Userin();
 }
 
 
@@ -176,8 +209,17 @@ void ZZBases::PrintParameters()
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
 
-  return ;
 
+}
+
+//_____________________________________________________________________________
+Double_t ZZBases::Func()		// new style not yet implemented
+{
+  cerr << ":::::: ERROR "
+       << "  ZZBases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
 }
 
 //_____________________________________________________________________________
@@ -196,7 +238,6 @@ void ZZBases::Userin()
 //
 //   Initialize User parameters for Bases
 //
-  JSFBases::Userin();  // Call JSFBases::Userin() for standard setup.
 
   // Copy class data member into common /usmprm/
   usmprm_.alfi = fAlphai;
@@ -228,25 +269,32 @@ void ZZBases::Userin()
 
   // Define histograms
 
-  Xhinit( 1,  0.0,  1., 50,"rs/roots      ");
-  Xhinit( 2,  60.,110., 50,"m(Z1)         ");
-  Xhinit( 3,  60.,110., 50,"m(Z2)         ");
-  Xhinit( 4,  0.0,  1., 50,"miss/roots    ");
-  Xhinit( 5, -1.0, 1.0, 50,"cos(theta_Z)  ");
-  Xhinit( 6,  0.0,360., 50,"phi_Z         ");
-  Xhinit( 7, -1.0, 1.0, 50,"cos(theta_f1) ");
-  Xhinit( 8,  0.0,360., 50,"phi_f1        ");
-  Xhinit( 9, -1.0, 1.0, 50,"cos(theta_f2) ");
-  Xhinit(10,  0.0,360., 50,"phi_f2        ");
-  Xhinit(11,  1.0,  9.,  8,"helicity      ");
-  Xhinit(12,  1.0, 25., 24,"Z decay mode  ");
-  return ;
+  Xhinit("h01",  0.0,  1., 50,"rs/roots      ");
+  Xhinit("h02",  60.,110., 50,"m(Z1)         ");
+  Xhinit("h03",  60.,110., 50,"m(Z2)         ");
+  Xhinit("h04",  0.0,  1., 50,"miss/roots    ");
+  Xhinit("h05", -1.0, 1.0, 50,"cos(theta_Z)  ");
+  Xhinit("h06",  0.0,360., 50,"phi_Z         ");
+  Xhinit("h07", -1.0, 1.0, 50,"cos(theta_f1) ");
+  Xhinit("h08",  0.0,360., 50,"phi_f1        ");
+  Xhinit("h09", -1.0, 1.0, 50,"cos(theta_f2) ");
+  Xhinit("h10",  0.0,360., 50,"phi_f2        ");
+  Xhinit("h11",  1.0,  9.,  8,"helicity      ");
+  Xhinit("h12",  1.0, 25., 24,"Z decay mode  ");
 }
 
 //_____________________________________________________________________________
 void ZZBases::Userout()
 {
-  usrout_();
+  printf("End of ZZBases\n");
+  printf("ISRBM = %d\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
+  printf("       = 1 ; None\n");
+  printf("       = 2 ; ISR only\n");
+  printf("       = 3 ; ISR + BM\n");
+  printf("Ecm                  = %g (GeV)\n",fRoots);
+  printf("Total Cross section  = %g +- %g (fb)\n",GetEstimate(),GetError());
+  printf("Number of iterations = %d\n",GetNoOfIterate());  
 }
 
 

@@ -9,6 +9,8 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
+#include "JSFConfig.h"
+
 #include "TNamed.h"
 #include "TMath.h"
 #include "TDatime.h"
@@ -166,28 +168,11 @@ public:
   void Userin();   // Bases user initialization
   void Userout();  // Bases user output 
   Double_t Func(Double_t x[]); // Bases integration function.
+  Double_t Func(); // Bases integration function.
   void PrintParameters(); // Print parameters
 
   ClassDef(SFSFBases,1)  // Bases for e+e- -> SFSFbar process
 
-};
-
-class SFSFSpring;
-
-class SFSFSpringBuf : public JSFSpringBuf {
-public:
-//  <<+SFSFbar>>
-   Double_t fX[2];  // Two bases parameters, costh and phi.
-//  <<-SFSFbar>>
-public:
-  SFSFSpringBuf(const char *name="SFSFSpringBuf", 
-	     const char *title="SFSFSpring test event buffer",
-	     SFSFSpring *spring=NULL)
-	     : JSFSpringBuf(name,title,(JSFSpring*)spring) {} 
-  virtual ~SFSFSpringBuf(){}
-  virtual void Spevnt(Int_t &iret);
-
-  ClassDef(SFSFSpringBuf,1)  // SFSFSpring event buffer
 };
 
 class SFSFSpring : public JSFSpring {
@@ -200,6 +185,23 @@ public:
    virtual Bool_t Initialize(); // 
 
    ClassDef(SFSFSpring,1)  // SFSFSpring class
+};
+
+
+class SFSFSpringBuf : public JSFSpringBuf {
+public:
+//  <<+SFSFbar>>
+   Double_t fX[2];  // Two bases parameters, costh and phi.
+//  <<-SFSFbar>>
+public:
+  SFSFSpringBuf(const char *name="SFSFSpringBuf", 
+	     const char *title="SFSFSpring test event buffer",
+	     SFSFSpring *spring=NULL)
+	     : JSFSpringBuf(name,title,spring) {} 
+  virtual ~SFSFSpringBuf(){}
+  virtual void Spevnt(Int_t &iret);
+
+  ClassDef(SFSFSpringBuf,1)  // SFSFSpring event buffer
 };
 
 

@@ -8,6 +8,7 @@ XCOMM ##    95/03/13  K.Fujii 	Original version for HELAS V204.
 XCOMM ##    95/06/07  K.Fujii 	Use 95a.
 XCOMM ##    97/08/30  K.Fujii 	Use 97a.
 XCOMM ##    99/05/20  K.Fujii 	Modified for JSF.
+XCOMM ##    00/06/24  K.Fujii 	Modified for Bases++.
 XCOMM ###########################################################################
 
 /*
@@ -16,7 +17,7 @@ XCOMM ##########################################################################
  */
 
 #define CXXPACKAGE
-#include "../../config/lclib.tmpl"
+#include "config/kflib.tmpl"
 
 INCPATH = -I. -I$(KFLIBROOT)/gen_lib/sm/include \
 	-I$(KFLIBROOT)/gen_lib/hg/include \
@@ -30,11 +31,11 @@ INCPATH = -I. -I$(KFLIBROOT)/gen_lib/sm/include \
 #if defined(hitachiArchitecture)
 ANALLIB   = $(LDDIRFLAG)$(JSFROOT)/lib -lJSF -lJSFLCFULL -lJSFQuickSim \
 	    $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
-	    -lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	    -lSIMJLC -lLTKCL -lLCFULL -lTBS \
 	    -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
 #else
 ANALLIB	  = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
-	    -lSIMJLC -lLTKCL -lLCFULL -lBASESV5.1 -lTBS \
+	    -lSIMJLC -lLTKCL -lLCFULL -lTBS \
 	    -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
 #endif
 
@@ -53,9 +54,7 @@ FOBJS = ampzh.o \
 		funczhf.o \
 		sgzhff.o \
 		spevnt.o \
-		spinit.o \
-		userin.o \
-		usrout.o
+		userin.o
 
 /*
  * You don't have to edit anything below here
@@ -67,7 +66,7 @@ FSRCS         = $(strip $(subst .o,.F,$(FOBJS)))
 OBJS          = $(PACKAGENAME).$(ObjSuf) \
 		$(PACKAGENAME)Dict.$(ObjSuf)
 
-SRC           = $(PACKAGENAME).$(SrcSuf) 
+SRCS          = $(PACKAGENAME).$(SrcSuf) 
 
 HDRS	      = $(PACKAGENAME).h
 
@@ -98,12 +97,12 @@ prod/$(SONAME): $(OBJS) $(FOBJS)
 	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS) \
 	$(KFLIB) $(LDFLAGS)
 
+depend:: $(SRCS) $(HDRS) $(FSRCS)
+	for i in $(SRCS) $(FSRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
+
 clean:: 
 	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
-
-depend:: 
-	makedepend -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) $(SRC)
-	makedepend $(INCPATH) $(FSRCS)
 
 distclean:: clean
 	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~

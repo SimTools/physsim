@@ -31,7 +31,7 @@ void nsim()
 
   spring->ReadBases("bases.root");  // Bases must be initialized after 
                                     // GetLastRunInfo  
-  printf(" Roots is %g\n",((XCXCBases*)spring->Bases())->GetRoots());
+  printf(" Roots is %g\n",((XCXCBases*)spring->GetBases())->GetRoots());
 
   // Begin run
   jsf->BeginRun(31);      // Set run number to 31.

@@ -6,7 +6,7 @@ XCOMM ##    97/07/26  K.Fujii 	Original version.
 XCOMM ##    99/05/16  K.Fujii 	Reorganized directory structure.
 XCOMM ############################################################################
 /* #define ENABLESHARED */
-#include "../../config/lclib.tmpl"
+#include "config/kflib.tmpl"
 
 XCOMM #--
 XCOMM #  Define the name of the library.

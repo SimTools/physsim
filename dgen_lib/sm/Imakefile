@@ -6,7 +6,7 @@
 ##############################################################################
 
 /* #define ENABLESHARED */
-#include "../../config/lclib.tmpl"
+#include "config/kflib.tmpl"
 
 #
 # Define the name of the library.

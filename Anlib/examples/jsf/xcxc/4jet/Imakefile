@@ -10,7 +10,7 @@ XCOMM ##########################################################################
  *
  */
 #define CXXPACKAGE 
-#include "../../../../config/lclib.tmpl"
+#include "config/kflib.tmpl"
 
 /*
  * Headers
@@ -60,8 +60,9 @@ InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
 clean:: 
 	@rm -f *.$(ObjSuf) core $(DICTNAME)*
 
-depend:: $(SRCS)
-	makedepend -I$(ROOTSYS)/include -I$(JSFROOT)/include $(INCPATH) $(SRCS)
+depend:: $(SRCS) $(HDRS)
+	for i in $(SRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
 
 distclean:: clean
 	@rm -f Makefile $(JSFSOLIB) *.$(SOEXT)

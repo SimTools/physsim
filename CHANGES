@@ -1,0 +1,39 @@
+-------------------------------------------------------------------------------
+2000/06/26	K.Fujii		Physsim-2000a-2
+-------------------------------------------------------------------------------
+
+1) config/lclib.tmpl renamed to config/kflib.tmpl
+   All Imakefiles have been modified accordingly.
+
+2) "make depend" now uses rmkdepend
+
+depend:: $(SRCS) $(HDRS) $(FSRCS)
+        for i in $(SRCS) $(FSRCS); do \
+        rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
+
+3) xGV2FB added to SMCONS.inc and is initialized in insmcn.F
+   in both gen_lib/sm and dgen_lib/sm.
+
+4) Conversion to new BASES/SPRING using bin/tobasesxx
+
+susy/SFSFStudy  OK (but analysis abends with R__unzip error for 2k evts on HP.
+                    It's OK on linuxppc. This maybe true for all the rest of
+                    the generators.)
+    /XCXCStudy  OK  
+higgs/ZHStudy   OK
+twoph/EEFFStudy OK
+top/EETTStudy OK
+   /NNTTStudy OK
+   /TTHStudy  OK (but hd**'s are empty after sim.C, though they are nonempty
+                  ater sim.C??? Very strange.)
+   /TTStudy   OK
+   /TTZStudy  OK (same as TTHStudy.)
+wz/EEWWStudy  OK
+  /EEZStudy   OK
+  /ENWStudy   OK (itmx1/2=5/5 gives nan at the final iteration??? OK for 8/5)
+  /NNWWStudy  OK
+  /NNZStudy   OK
+  /WWStudy    OK
+  /WWZStudy   OK (mh >> Ecm to avoid bad convergency)
+  /ZZStudy    OK (ampzz.f had to be renamed to ampzz.F)
+

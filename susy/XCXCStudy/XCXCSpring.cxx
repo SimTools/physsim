@@ -47,12 +47,35 @@ ClassImp(XCXCSpring)
 ClassImp(XCXCSpringBuf)
 ClassImp(XCXCBases)
 
+// Variable conversion.
+
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+
 extern "C" {
-extern void usrout_();
 extern void userin_();
 extern Double_t func_(double x[]);
 extern void spevnt_(Int_t *nret);
 extern void exit(int);
+JSFBases *bso;			// need to map xhfill to h1fill
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H1Fill(tmp,*x,*w);
+}
 };
 
 //_____________________________________________________________________________
@@ -99,6 +122,9 @@ XCXCBases::XCXCBases(const char *name, const char *title)
 {
 //  Constructor of bases.  Default parameter should be initialized here
 //
+
+  bso = this;				// set this for xhfill_
+
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("XCXCBases.ISRBM","3"),"%d",&fISRBM);
@@ -158,9 +184,7 @@ XCXCBases::XCXCBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("XCXCBases.mA","-9999."),"%lg",&fmA);
   sscanf(gJSF->Env()->GetValue("XCXCBases.WidthChic1","-1."),"%lg",&fWidthChic1);
 
-  fPrintInfo = gJSF->Env()->GetValue("XCXCBases.PrintInfo",kTRUE);
-  fPrintHist = gJSF->Env()->GetValue("XCXCBases.PrintHist",kTRUE);
-
+  Userin();
 }
 
 
@@ -183,9 +207,15 @@ void XCXCBases::PrintParameters()
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
-
-  return ;
-
+}
+//_____________________________________________________________________________
+Double_t XCXCBases::Func()		// new style not yet implemented
+{
+  cerr << ":::::: ERROR "
+       << "  XCXCBases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
 }
 
 //_____________________________________________________________________________
@@ -204,7 +234,6 @@ void XCXCBases::Userin()
 //
 //   Initialize User parameters for Bases
 //
-  JSFBases::Userin();  // Call JSFBases::Userin() for standard setup.
 
   // Copy class data member into common /usmprm/
   usmprm_.alfi = fAlphai;
@@ -229,8 +258,9 @@ void XCXCBases::Userin()
   usrprm_.gamsw1 = fWidthChic1;
 
   // Copy class data member into common /bshufl/
+  Int_t i;
   bshufl_.nzz = fNDIM;
-  for (Int_t i=0; i<fNDIM; i++) bshufl_.ishufl[i] = fISHUFL[i];
+  for (i=0; i<fNDIM; i++) bshufl_.ishufl[i] = fISHUFL[i];
   
   // Initialize physical constants, etc.
   userin_();
@@ -241,40 +271,47 @@ void XCXCBases::Userin()
   // Define histograms
   Double_t ptmx = fRoots/2.;
   Double_t qmx  = fRoots/2;
-  Xhinit( 1, -1.0, 1.0, 50,"cos(theta_X-)        ");
-  Xhinit( 2,  0.0,360., 50,"phi_X-               ");
-  Xhinit( 3, -1.0, 1.0, 50,"cos(theta_a+)        ");
-  Xhinit( 4,  0.0,360., 50,"phi_b+               ");
-  Xhinit( 5, -1.0, 1.0, 50,"cos(theta_a-)        ");
-  Xhinit( 6,  0.0,360., 50,"phi_a-               ");
-  Xhinit( 7,  0.0, qmx, 50,"M_ab+                ");
-  Xhinit( 8,  0.0, qmx, 50,"M_ac+                ");
-  Xhinit( 9,  0.0,ptmx, 50,"Missing PT           ");
-  Xhinit(10,  0.0,180., 50,"Acop                 ");
-  Xhinit(11,  0.0, qmx, 50,"M_ab-                ");
-  Xhinit(12,  0.0, qmx, 50,"M_ac-                ");
-  Xhinit(13,  1.0, 33., 32,"Hel. comb.           ");
-  Xhinit(14,  0.0, qmx, 50,"E_e/mu               ");
-  Xhinit(15, -1.0, 1.0, 50,"cos(theta_l-)        ");
-  Xhinit(16,  0.0, qmx, 50,"E_qqbar              ");
-  Xhinit(17, -1.0, 1.0, 50,"cos(theta_J-)        ");
-  Xhinit(18,  1.0,  4.,  3,"Topology (LL,LJ,JJ)  ");
-  Xhinit(19,  1.0, 13., 12,"Decay mode( X+ )     ");
-  Xhinit(20,  1.0, 13., 12,"Decay mode( X- )     ");
-  Xhinit(21,   .0,  1., 50,"sqrt(rs)/sqrt(root)  ");
-  Xhinit(22, -1.0, 1.0, 50,"cos(theta_fdbar)     ");
-  Xhinit(23, -1.0, 1.0, 50,"cos(theta_fd)        ");
-  Xhinit(24,  0.0, qmx, 50,"M_X+                 ");
-  Xhinit(25,  0.0, qmx, 50,"M_X-                 ");
-  Xhinit(26, -1.0, 1.0, 50,"cos(theta_l+)_35     ");
-  Xhinit(27, -1.0, 1.0, 50,"cos(theta_l-)_68     ");
-  return ;
+  Xhinit("h01", -1.0, 1.0, 50,"cos(theta_X-)        ");
+  Xhinit("h02",  0.0,360., 50,"phi_X-               ");
+  Xhinit("h03", -1.0, 1.0, 50,"cos(theta_a+)        ");
+  Xhinit("h04",  0.0,360., 50,"phi_b+               ");
+  Xhinit("h05", -1.0, 1.0, 50,"cos(theta_a-)        ");
+  Xhinit("h06",  0.0,360., 50,"phi_a-               ");
+  Xhinit("h07",  0.0, qmx, 50,"M_ab+                ");
+  Xhinit("h08",  0.0, qmx, 50,"M_ac+                ");
+  Xhinit("h09",  0.0,ptmx, 50,"Missing PT           ");
+  Xhinit("h10",  0.0,180., 50,"Acop                 ");
+  Xhinit("h11",  0.0, qmx, 50,"M_ab-                ");
+  Xhinit("h12",  0.0, qmx, 50,"M_ac-                ");
+  Xhinit("h13",  1.0, 33., 32,"Hel. comb.           ");
+  Xhinit("h14",  0.0, qmx, 50,"E_e/mu               ");
+  Xhinit("h15", -1.0, 1.0, 50,"cos(theta_l-)        ");
+  Xhinit("h16",  0.0, qmx, 50,"E_qqbar              ");
+  Xhinit("h17", -1.0, 1.0, 50,"cos(theta_J-)        ");
+  Xhinit("h18",  1.0,  4.,  3,"Topology (LL,LJ,JJ)  ");
+  Xhinit("h19",  1.0, 13., 12,"Decay mode( X+ )     ");
+  Xhinit("h20",  1.0, 13., 12,"Decay mode( X- )     ");
+  Xhinit("h21",   .0,  1., 50,"sqrt(rs)/sqrt(root)  ");
+  Xhinit("h22", -1.0, 1.0, 50,"cos(theta_fdbar)     ");
+  Xhinit("h23", -1.0, 1.0, 50,"cos(theta_fd)        ");
+  Xhinit("h24",  0.0, qmx, 50,"M_X+                 ");
+  Xhinit("h25",  0.0, qmx, 50,"M_X-                 ");
+  Xhinit("h26", -1.0, 1.0, 50,"cos(theta_l+)_35     ");
+  Xhinit("h27", -1.0, 1.0, 50,"cos(theta_l-)_68     ");
 }
 
 //_____________________________________________________________________________
 void XCXCBases::Userout()
-{
-  usrout_();
+{ 
+  printf("End of Bases of ee --> sf sf process\n");
+  printf("ISRBM = %d\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
+  printf("       = 1 ; None\n");
+  printf("       = 2 ; ISR only\n");
+  printf("       = 3 ; ISR + BM\n");
+  printf("Ecm                  = %g (GeV)\n",fRoots);
+  printf("Total Cross section  = %g +- %g (fb)\n",GetEstimate(),GetError());
+  printf("Number of iteration  = %d\n",GetNoOfIterate());  
 }
 
 

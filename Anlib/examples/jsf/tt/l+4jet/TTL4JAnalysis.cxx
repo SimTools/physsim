@@ -122,7 +122,7 @@ Bool_t TTL4JAnalysis::Initialize()
   hElpp         = new TH1F("hElpp","E_l+"          ,  50,   0.0, 100.0);
   hCoslpm       = new TH1F("hCoslpm","cos(theta_l-)", 50,  -1.0,   1.0);
   hCoslpp       = new TH1F("hCoslpp","cos(theta_l+)", 50,  -1.0,   1.0);
-  hYcut         = new TH1F("hYcut","Ymax"           ,100,   0.0,   1.0);
+  hYcut         = new TH1F("hYcut","Ymax"           ,100,   0.0,   0.2);
 
   xNtracks  =     25;   // No. of tracks
   xEtrack   =   0.10;   // track energy

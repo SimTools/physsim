@@ -17,7 +17,7 @@
   spring = new XCXCSpring();
   spring->ReadBases("bases.root");
  
-  printf(" Roots is %g\n",((XCXCBases*)spring->Bases())->GetRoots());
+  printf(" Roots is %g\n",((XCXCBases*)spring->GetBases())->GetRoots());
 
   hdr=new JSFHadronizer();
   sim=new JSFQuickSim();

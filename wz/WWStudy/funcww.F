@@ -27,6 +27,7 @@ C--
      .             -1,+1,   -1, +1,   +1,-1,
      .             +1,-1,   -1, +1,   +1,-1/
       DATA NCALL / 0 /
+      EXTERNAL   XHFILL, DHFILL
 C--
       DATA EPSL / 1. /
 C>>>
@@ -275,17 +276,17 @@ C--
       PHID1 = XPHASE(3,2)
       COSD2 = XPHASE(2,3)
       PHID2 = XPHASE(3,3)
-      CALL XHFILL(  1, DBLE(COSW)        ,FUNC )
-      CALL XHFILL(  2, DBLE(PHIW)*RDDG   ,FUNC )
-      CALL XHFILL(  3, DBLE(Q2)          ,FUNC )
-      CALL XHFILL(  4, DBLE(Q3)          ,FUNC )
-      CALL XHFILL(  5, DBLE(COSD1)       ,FUNC )
-      CALL XHFILL(  6, DBLE(PHID1)*RDDG  ,FUNC )
-      CALL XHFILL(  7, DBLE(COSD2)       ,FUNC )
-      CALL XHFILL(  8, DBLE(PHID2)*RDDG  ,FUNC )
-      CALL XHFILL(  9, DBLE(RS/ROOTS)    ,FUNC )
-      CALL XHFILL( 10, DBLE(IMD1+.1)     ,FUNC )
-      CALL XHFILL( 11, DBLE(IMD2+.1)     ,FUNC )
+      CALL XHFILL( 'h01', DBLE(COSW)        ,FUNC )
+      CALL XHFILL( 'h02', DBLE(PHIW)*RDDG   ,FUNC )
+      CALL XHFILL( 'h03', DBLE(Q2)          ,FUNC )
+      CALL XHFILL( 'h04', DBLE(Q3)          ,FUNC )
+      CALL XHFILL( 'h05', DBLE(COSD1)       ,FUNC )
+      CALL XHFILL( 'h06', DBLE(PHID1)*RDDG  ,FUNC )
+      CALL XHFILL( 'h07', DBLE(COSD2)       ,FUNC )
+      CALL XHFILL( 'h08', DBLE(PHID2)*RDDG  ,FUNC )
+      CALL XHFILL( 'h09', DBLE(RS/ROOTS)    ,FUNC )
+      CALL XHFILL( 'h10', DBLE(IMD1+.1)     ,FUNC )
+      CALL XHFILL( 'h11', DBLE(IMD2+.1)     ,FUNC )
 C--
 C  That's it.
 C--

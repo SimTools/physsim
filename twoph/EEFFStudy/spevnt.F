@@ -1,3 +1,4 @@
+#define DRN ran
 C* (Update Record)
 C*  96/03/07  K.Fujii           FULL version for EEFF.
 C*

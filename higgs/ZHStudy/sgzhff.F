@@ -33,6 +33,7 @@ C*    in 'T#FP.HELAS.FORT'.
 C* (Update Record)
 C*    92/02/24  K.Fujii          Original version.
 C*    95/03/25  K.Fujii          Use INSMCN instead of CONINT.
+C*    00/06/24  K.Fujii          Use xGV2FB instead of xGV2PB.
 C*
 CC**********************************************************************
  
@@ -58,7 +59,7 @@ C--
          NCALL  = 1
          SPIN   = 2
          NB     = 3
-         FACT   = xGV2PB*x2PI/(x4PI**(3*NB))/SPIN
+         FACT   = xGV2FB*x2PI/(x4PI**(3*NB))/SPIN
          AME    = AMF(1,2,1)
          CALL UVZERO(9,EC)
          EC(1,1) = 1

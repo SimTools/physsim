@@ -36,6 +36,7 @@ C--
       INTEGER*4  JDP(2,NP)
 #endif
       DATA NCALL / 0 /
+      EXTERNAL   XHFILL, DHFILL
 C--
       DATA EPSL  / 0.0 /
 C
@@ -429,20 +430,20 @@ C--
       PHIT  = XPHASE(3,2)
       QMWM  = SQRT(Q72)
       QMWP  = SQRT(Q82)
-      CALL XHFILL(  1, DBLE(COSZ)        ,FUNC )
-      CALL XHFILL(  2, DBLE(PHIZ)*RDDG   ,FUNC )
-      CALL XHFILL(  3, DBLE(AMTT/ROOTS)  ,FUNC )
-      CALL XHFILL(  4, DBLE(COST)        ,FUNC )
-      CALL XHFILL(  5, DBLE(PHIT)*RDDG   ,FUNC )
-      CALL XHFILL(  6, DBLE(CST)         ,FUNC )
-      CALL XHFILL(  7, DBLE(ICMB)        ,FUNC )
-      CALL XHFILL(  8, DBLE(Q3)          ,FUNC )
-      CALL XHFILL(  9, DBLE(Q4)          ,FUNC )
-      CALL XHFILL( 10, DBLE(Q5)          ,FUNC )
-      CALL XHFILL( 11, DBLE(QMWM)        ,FUNC )
-      CALL XHFILL( 12, DBLE(QMWP)        ,FUNC )
-      CALL DHFILL( 21, DBLE(EZ/EBM), DBLE(COSZ)    , FUNC )
-      CALL DHFILL( 22, DBLE(ET/EBM), DBLE(ETB/EBM) , FUNC )
+      CALL XHFILL( 'h01', DBLE(COSZ)        ,FUNC )
+      CALL XHFILL( 'h02', DBLE(PHIZ)*RDDG   ,FUNC )
+      CALL XHFILL( 'h03', DBLE(AMTT/ROOTS)  ,FUNC )
+      CALL XHFILL( 'h04', DBLE(COST)        ,FUNC )
+      CALL XHFILL( 'h05', DBLE(PHIT)*RDDG   ,FUNC )
+      CALL XHFILL( 'h06', DBLE(CST)         ,FUNC )
+      CALL XHFILL( 'h07', DBLE(ICMB)        ,FUNC )
+      CALL XHFILL( 'h08', DBLE(Q3)          ,FUNC )
+      CALL XHFILL( 'h09', DBLE(Q4)          ,FUNC )
+      CALL XHFILL( 'h10', DBLE(Q5)          ,FUNC )
+      CALL XHFILL( 'h11', DBLE(QMWM)        ,FUNC )
+      CALL XHFILL( 'h12', DBLE(QMWP)        ,FUNC )
+      CALL DHFILL( 'hd21', DBLE(EZ/EBM), DBLE(COSZ)    , FUNC )
+      CALL DHFILL( 'hd22', DBLE(ET/EBM), DBLE(ETB/EBM) , FUNC )
 #ifdef DEBUG
        print *, 'That''s it.'
 #endif

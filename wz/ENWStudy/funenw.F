@@ -41,6 +41,7 @@ C--
      .             -1,-1,   +1, +1,   +1,-1/
 C--
       DATA NCALL /  0 /
+      EXTERNAL   XHFILL, DHFILL
 C
 C========< Entry Point >================================================
 C
@@ -305,22 +306,22 @@ C--
       XNU     = 2*PV(0,4)/ROOTS
       XWP     = 2*QV(0,5)/ROOTS
 C--
-      CALL XHFILL(  1, COSE              ,FUNC )
-      CALL XHFILL(  2, PHIE*RDDG         ,FUNC )
-      CALL XHFILL(  3, XE                ,FUNC )
-      CALL XHFILL(  4, QW                ,FUNC )
-      CALL XHFILL(  5, COSN              ,FUNC )
-      CALL XHFILL(  6, PHIN*RDDG         ,FUNC )
-      CALL XHFILL(  7, CSDA              ,FUNC )
-      CALL XHFILL(  8, PHID*RDDG         ,FUNC )
-      CALL XHFILL(  9, RS/ROOTS          ,FUNC )
-      CALL XHFILL( 10, IMD+.1D0          ,FUNC )
-      CALL XHFILL( 11, XHCMB+.1D0        ,FUNC )
-      CALL XHFILL( 12, ETA               ,FUNC )
-      CALL XHFILL( 13, XTW               ,FUNC )
-      CALL XHFILL( 14, XEL               ,FUNC )
-      CALL XHFILL( 15, XNU               ,FUNC )
-      CALL XHFILL( 16, XWP               ,FUNC )
+      CALL XHFILL( 'h01', COSE              ,FUNC )
+      CALL XHFILL( 'h02', PHIE*RDDG         ,FUNC )
+      CALL XHFILL( 'h03', XE                ,FUNC )
+      CALL XHFILL( 'h04', QW                ,FUNC )
+      CALL XHFILL( 'h05', COSN              ,FUNC )
+      CALL XHFILL( 'h06', PHIN*RDDG         ,FUNC )
+      CALL XHFILL( 'h07', CSDA              ,FUNC )
+      CALL XHFILL( 'h08', PHID*RDDG         ,FUNC )
+      CALL XHFILL( 'h09', RS/ROOTS          ,FUNC )
+      CALL XHFILL( 'h10', IMD+.1D0          ,FUNC )
+      CALL XHFILL( 'h11', XHCMB+.1D0        ,FUNC )
+      CALL XHFILL( 'h12', ETA               ,FUNC )
+      CALL XHFILL( 'h13', XTW               ,FUNC )
+      CALL XHFILL( 'h14', XEL               ,FUNC )
+      CALL XHFILL( 'h15', XNU               ,FUNC )
+      CALL XHFILL( 'h16', XWP               ,FUNC )
 C--
 C  That's it.
 C--

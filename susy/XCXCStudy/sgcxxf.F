@@ -47,6 +47,7 @@ C*    in 'T#FP.HELAS.FORT'.
 C* (Update Record)
 C*    92/06/09  K.Fujii		Original version.
 C*    95/04/06  K.Fujii		New kinematics.
+C*    00/06/24  K.Fujii		Use fb instead of pb.
 C*
 CC**********************************************************************
  
@@ -70,7 +71,7 @@ C--
       IF ( NCALL.EQ.0 ) THEN
          NCALL  = 1
          SPIN   = 2
-         FACT   = xGV2PB*2/(x4PI**4)/SPIN
+         FACT   = xGV2FB*2/(x4PI**4)/SPIN
          AME    = AMF(1,2,1)
          CALL UVZERO(9,EC)
          EC(1,1) = 1

@@ -1,3 +1,4 @@
+#define DRN ran
 C....................................................................
 C
 C           E(+) E(-) INTO E(+) E(-) Qbar Q
@@ -33,6 +34,7 @@ C--
       REAL*8   TMP
       QEXTD(TMP) = TMP
 #endif
+      EXTERNAL   XHFILL
 C
 C =====< Entry Point >==================================================
 C
@@ -388,15 +390,15 @@ C
       FUNCZ(I,II)=FUNCX
       FUNC=FUNC+FUNCX
 C--------------------------------------------------- HISTOGRAM PACKAGES
-                 CALL XHFILL( 1,COSTH2/AK2, FUNCX )
-                 CALL XHFILL( 2,COSTH1/AK1, FUNCX )
-                 CALL XHFILL( 3,OMEGA2, FUNCX )
-                 CALL XHFILL( 4,OMEGA1, FUNCX )
-                 CALL XHFILL( 5,Q32, FUNCX )
-                 CALL XHFILL( 6,COSTH, FUNCX )
-                 CALL XHFILL( 7,OMEGA, FUNCX )
-                 CALL XHFILL( 8,DSQRT(Q32), FUNCX )
-                 CALL XHFILL( 9,DSQRT(Q32)*E, FUNCX )
+                 CALL XHFILL( 'h01',COSTH2/AK2, FUNCX )
+                 CALL XHFILL( 'h02',COSTH1/AK1, FUNCX )
+                 CALL XHFILL( 'h03',OMEGA2, FUNCX )
+                 CALL XHFILL( 'h04',OMEGA1, FUNCX )
+                 CALL XHFILL( 'h05',Q32, FUNCX )
+                 CALL XHFILL( 'h06',COSTH, FUNCX )
+                 CALL XHFILL( 'h07',OMEGA, FUNCX )
+                 CALL XHFILL( 'h08',DSQRT(Q32), FUNCX )
+                 CALL XHFILL( 'h09',DSQRT(Q32)*E, FUNCX )
 C--------------------------------------------------------------------
   100 CONTINUE
  
@@ -414,13 +416,13 @@ C--------------------------------------------------------------------
          IBCOS=II
 C---- ONLY SPRING
          FUNC=FUNCZ(I,II)
-C                CALL XHFILL( 1,COSTH2/AK2, FUNC )
-C                CALL XHFILL( 2,COSTH1/AK1, FUNC )
-C        CALL XHFILL(1,OMEGA1,FUNC)
-C        CALL XHFILL(2,OMEGA2,FUNC)
-C        CALL DHFILL(1, ALQ12,        OMEGAZ(I,II), FUNC)
-C        CALL DHFILL(2, OMEGAZ(I,II), Q12,          FUNC)
-C        CALL DHFILL(3, OMEGAZ(I,II), OMEGA1,       FUNC)
+C                CALL XHFILL( 'h01',COSTH2/AK2, FUNC )
+C                CALL XHFILL( 'h02',COSTH1/AK1, FUNC )
+C        CALL XHFILL('h01',OMEGA1,FUNC)
+C        CALL XHFILL('h02',OMEGA2,FUNC)
+C        CALL DHFILL('hd01', ALQ12,        OMEGAZ(I,II), FUNC)
+C        CALL DHFILL('hd02', OMEGAZ(I,II), Q12,          FUNC)
+C        CALL DHFILL('hd03', OMEGAZ(I,II), OMEGA1,       FUNC)
          RETURN
       ENDIF
  910  CONTINUE

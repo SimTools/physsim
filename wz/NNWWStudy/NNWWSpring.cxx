@@ -38,12 +38,44 @@ ClassImp(NNWWSpring)
 ClassImp(NNWWSpringBuf)
 ClassImp(NNWWBases)
 
+// Variable conversion.
+
+#define fNDIM  ndim 
+#define fNWILD nwild
+#define fIG    ig
+#define fXL    xl
+#define fXU    xu
+#define fNCALL ncall
+#define fACC1  acc1
+#define fACC2  acc2
+#define fITMX1 itmx1
+#define fITMX2 itmx2
+
+#define Xhinit(id,xlo,xhi,n,title) H1Init(id,title,n,xlo,xhi)
+#define Dhinit(id,xlo,xhi,nx,ylo,yhi,ny,title) H2Init(id,title,nx,xlo,xhi,ny,ylo,yhi)
+
 extern "C" {
-extern void usrout_();
 extern void userin_();
 extern Double_t func_(double x[]);
 extern void spevnt_(Int_t *nret);
 extern void exit(int);
+JSFBases *bso;			// need to map xhfill to h1fill
+void xhfill_(char *t, double *x, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H1Fill(tmp,*x,*w);
+}
+void dhfill_(char *t, double *x, double *y, double *w, int len)
+{
+	char tmp[1024];
+	int i;
+	for (i=0; i<len; i++) tmp[i] = t[i];
+	tmp[len] = '\0';
+	bso->H2Fill(tmp,*x,*y,*w);
+}
 };
 
 //_____________________________________________________________________________
@@ -89,6 +121,9 @@ NNWWBases::NNWWBases(const char *name, const char *title)
 {
 //  Constructor of bases.  Default parameter should be initialized here
 //
+
+  bso = this;
+
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("NNWWBases.ISRBM","3"),"%d",&fISRBM);
@@ -146,9 +181,7 @@ NNWWBases::NNWWBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("NNWWBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("NNWWBases.MassTop","170."),"%lg",&fMassTop);  
 
-  fPrintInfo = gJSF->Env()->GetValue("NNWWBases.PrintInfo",kTRUE);
-  fPrintHist = gJSF->Env()->GetValue("NNWWBases.PrintHist",kTRUE);
-
+  Userin();
 }
 
 
@@ -175,8 +208,17 @@ void NNWWBases::PrintParameters()
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
 
-  return ;
 
+}
+
+//_____________________________________________________________________________
+Double_t NNWWBases::Func()		// new style not yet implemented
+{
+  cerr << ":::::: ERROR "
+       << "  NNWWBases::Func() not implemented !!!"
+       << "  Will STOP immediately." << endl;
+       exit(1);
+  return 0.;
 }
 
 //_____________________________________________________________________________
@@ -195,7 +237,6 @@ void NNWWBases::Userin()
 //
 //   Initialize User parameters for Bases
 //
-  JSFBases::Userin();  // Call JSFBases::Userin() for standard setup.
 
   // Copy class data member into common /usmprm/
   usmprm_.alfi = fAlphai;
@@ -226,40 +267,47 @@ void NNWWBases::Userin()
   PrintParameters();
 
   // Define histograms
-  Xhinit( 1,   0., 1.0, 50,"E_1/E_bm      ");
-  Xhinit( 2, -1.0, 1.0, 50,"cos_1         ");
-  Xhinit( 3,  0.0,360., 50,"phi_1         ");
-  Xhinit( 4,   0., 1.0, 50,"E_2/E_bm      ");
-  Xhinit( 5, -1.0, 1.0, 50,"cos_2         ");
-  Xhinit( 6,  0.0,360., 50,"phi_2         ");
-  Xhinit( 7,   0., 1.0, 50,"WW/ROOTS      ");
-  Xhinit( 8, -1.0, 1.0, 50,"cos_W-        ");
-  Xhinit( 9,  0.0,360., 50,"phi_W-        ");
-  Xhinit(10,  60.,110., 50,"m(W-)         ");
-  Xhinit(11, -1.0, 1.0, 50,"cos(theta_fd) ");
-  Xhinit(12,  0.0,360., 50,"phi_fd        ");
-  Xhinit(13,  60.,110., 50,"m(W+)         ");
-  Xhinit(14, -1.0, 1.0, 50,"cos(theta_fdb)");
-  Xhinit(15,  0.0,360., 50,"phi_fdb       ");
-  Xhinit(16,  0.0, 1.0, 50,"RS/ROOTS      ");
-  Xhinit(17,  1.0,25.0, 24,"W decay mode  ");
-  Xhinit(18,  1.0,17.0, 16,"helicity      ");
-  Xhinit(19, -20.,20.0, 50,"eta_1         ");
-  Xhinit(20, -20.,20.0, 50,"eta_2         ");
-  Xhinit(21,   0., 1.0, 50,"PT_W-/E_bm    ");
-  Xhinit(22,   0., 1.0, 50,"PT_W+/E_bm    ");
-  Xhinit(23,   0., 1.0, 50,"E_1/E_bm      ");
-  Xhinit(24,   0., 1.0, 50,"E_2/E_bm      ");
-  Xhinit(25,   0., 1.0, 50,"E_W-/E_bm     ");
-  Xhinit(26,   0., 1.0, 50,"E_W+/E_bm     ");
+  Xhinit("h01",   0., 1.0, 50,"E_1/E_bm      ");
+  Xhinit("h02", -1.0, 1.0, 50,"cos_1         ");
+  Xhinit("h03",  0.0,360., 50,"phi_1         ");
+  Xhinit("h04",   0., 1.0, 50,"E_2/E_bm      ");
+  Xhinit("h05", -1.0, 1.0, 50,"cos_2         ");
+  Xhinit("h06",  0.0,360., 50,"phi_2         ");
+  Xhinit("h07",   0., 1.0, 50,"WW/ROOTS      ");
+  Xhinit("h08", -1.0, 1.0, 50,"cos_W-        ");
+  Xhinit("h09",  0.0,360., 50,"phi_W-        ");
+  Xhinit("h10",  60.,110., 50,"m(W-)         ");
+  Xhinit("h11", -1.0, 1.0, 50,"cos(theta_fd) ");
+  Xhinit("h12",  0.0,360., 50,"phi_fd        ");
+  Xhinit("h13",  60.,110., 50,"m(W+)         ");
+  Xhinit("h14", -1.0, 1.0, 50,"cos(theta_fdb)");
+  Xhinit("h15",  0.0,360., 50,"phi_fdb       ");
+  Xhinit("h16",  0.0, 1.0, 50,"RS/ROOTS      ");
+  Xhinit("h17",  1.0,25.0, 24,"W decay mode  ");
+  Xhinit("h18",  1.0,17.0, 16,"helicity      ");
+  Xhinit("h19", -20.,20.0, 50,"eta_1         ");
+  Xhinit("h20", -20.,20.0, 50,"eta_2         ");
+  Xhinit("h21",   0., 1.0, 50,"PT_W-/E_bm    ");
+  Xhinit("h22",   0., 1.0, 50,"PT_W+/E_bm    ");
+  Xhinit("h23",   0., 1.0, 50,"E_1/E_bm      ");
+  Xhinit("h24",   0., 1.0, 50,"E_2/E_bm      ");
+  Xhinit("h25",   0., 1.0, 50,"E_W-/E_bm     ");
+  Xhinit("h26",   0., 1.0, 50,"E_W+/E_bm     ");
 
-  return ;
 }
 
 //_____________________________________________________________________________
 void NNWWBases::Userout()
 {
-  usrout_();
+  printf("End of NNWWBases\n");
+  printf("ISRBM = %d\n",fISRBM);
+  printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
+  printf("       = 1 ; None\n");
+  printf("       = 2 ; ISR only\n");
+  printf("       = 3 ; ISR + BM\n");
+  printf("Ecm                  = %g (GeV)\n",fRoots);
+  printf("Total Cross section  = %g +- %g (fb)\n",GetEstimate(),GetError());
+  printf("Number of iterations = %d\n",GetNoOfIterate());  
 }
 
 
