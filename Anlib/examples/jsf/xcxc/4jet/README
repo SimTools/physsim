@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+1999/08/01  K.Fujii 	Sample Analysis Module Using Anlib
+-------------------------------------------------------------------------------
+Reaction: 	e+e- -> chi+chi- -> w+w- + missing(2LSPs)
+Generator:	XCXCStudy
+Usage:		
+
+$ xmkmf -a; make
+$ jsf anl4J.C
+or to avoid a lot of debug messages
+$ jsf anl4J.C 2>/dev/null
+
+You have to prepare MC data(xcxcsim.root) in XCXCStudy/prod directory
+before you do the above.
