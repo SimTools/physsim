@@ -89,7 +89,7 @@ public:
    	else return 0;
    }
 
-   virtual void Delete() { delete fP[0]; delete fP[1]; }
+   virtual void Delete(Option_t *opt="") { delete fP[0]; delete fP[1]; }
    
    void DebugPrint(const Char_t *opt = "Brief") const
    {
