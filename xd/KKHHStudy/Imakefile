@@ -1,0 +1,36 @@
+#include "conf/makejsf.tmpl"
+
+PROGRAM       = KKhhSpring
+
+SOLIBNAME     = lib$(PROGRAM)
+
+OBJS          = $(PROGRAM).$(ObjSuf) $(SOLIBNAME).$(ObjSuf)
+
+SRC           = $(PROGRAM).$(SrcSuf) 
+
+HDRS	      = $(PROGRAM).h
+
+
+all::  lib
+lib: $(OBJS)
+	$(LD) $(SOFLAGS) $(OBJS) -o prod/$(SOLIBNAME).$(DllSuf) $(AIXLIBS)
+
+clean:: 
+	@rm -f $(OBJS) $(SOLIBNAME).$(SrcSuf) $(SOLIBNAME).h
+	@(cd prod; rm -f core *.$(DllSuf))
+
+depend:: $(SRC) $(HDRS)
+	for i in $(SRC); do \
+	rmkdepend -a -- $(DEPENDFILES) -- $$i; done
+
+distclean:: clean
+	@rm -f *.~ *.o *.bak Makefile
+	@rm -f PYTHIA.SEED
+	@(cd prod; rm -f *.root *.log)
+
+$(SOLIBNAME).$(SrcSuf): $(HDRS) LinkDef.h
+		@echo "Generating dictionary ..."
+		rootcint -f $(SOLIBNAME).$(SrcSuf) \
+	 	-c -I$(JSFROOT)/include $(HDRS) LinkDef.h
+
+
