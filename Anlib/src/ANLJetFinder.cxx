@@ -108,9 +108,6 @@ void ANLJet::Add(TObject *part) {
 void ANLJet::Merge(TObject *part) { Add(part); }
 
 void ANLJet::Merge(ANLJet *jet) {
-#ifdef __DEBUG__
-  cerr << "ANLJet::Merge() is called ..." << endl;
-#endif
    TIter next(&jet->fParts);
    TObject *obj;
    while ((obj = next())) fParts.Add(obj);
@@ -268,9 +265,6 @@ void ANLJetFinder::FindJets() {
    //
    // Initialize pair mass matrix.
    //
-#ifdef __DEBUG__
-   cerr << "ANLJetFinder::FindJets ; Initialized fYmass ..." << endl;
-#endif
    if (fYmass) delete fYmass;
    fYmass = new TMatrix(np,np);
    TMatrix &ymass = *fYmass;
@@ -315,9 +309,6 @@ void ANLJetFinder::FindJets() {
       //
       // Update the pair mass array.
       //
-#ifdef __DEBUG__
-      cerr << "ANLJetFinder::FindJets ; Updated fYmass ..." << endl;
-#endif
       for (j = 0; j < np; j++) {
          if (j == im) continue;
          ANLJet *oj = (ANLJet *)fJets.UncheckedAt(j);
@@ -351,14 +342,8 @@ void ANLJetFinder::ForceNJets(Int_t njets) {
    while (kTRUE) {
       ntrial++;
       ycut = (ycutLo + ycutHi)/2;
-#ifdef __DEBUG__
-      cerr << "ANLJetFinder::ForceNJets ; NewJetFinder() is called ..." << endl;
-#endif
       jf   = NewJetFinder(this);
       SetYcut(ycut);
-#ifdef __DEBUG__
-      cerr << "ANLJetFinder::ForceNJets ; FindJets() is called ..." << endl;
-#endif
       FindJets();
       Int_t nj = GetNjets();
       if (ntrial > 100) cerr << "ANLJetFinder::ForceNJets : Making "
@@ -371,9 +356,6 @@ void ANLJetFinder::ForceNJets(Int_t njets) {
          ycutHi = ycut;
          *this  = *jf;
       }
-#ifdef __DEBUG__
-      cerr << "ANLJetFinder::ForceNJets ; deleting jf ..." << endl;
-#endif
       delete jf;
    }
 }
@@ -424,9 +406,5 @@ ANLDurhamJetFinder::ANLDurhamJetFinder(Double_t y) : ANLJetFinder(y) {}
 Double_t ANLDurhamJetFinder::GetYmass(const ANL4DVector &p1,
 				      const ANL4DVector &p2) const {
    Double_t minE = TMath::Min(p1.E(),p2.E());
-#ifdef __DEBUG__
-   cerr << "ANLJetFinder::GetYmass ; Ymass = "
-	<< 2 * minE * minE * ( 1 - p1.CosTheta(p2) ) << endl;
-#endif
    return 2 * minE * minE * ( 1 - p1.CosTheta(p2) );
 }
