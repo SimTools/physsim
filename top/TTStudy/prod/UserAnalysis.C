@@ -130,7 +130,7 @@ void DrawHist()
 
   TDirectory *last = gDirectory;
   if( !cHist ) {
-    cHist = new TCanvas("cHist","Canvas 1",100, 100, kZoneX*200, kZoneY*200);
+    cHist = new TCanvas("cHist","Canvas 1",10, 10, kZoneX*200, kZoneY*200);
     cHist->Divide(kZoneX,kZoneY);
   } else {
     cHist->cd();
