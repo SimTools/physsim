@@ -171,6 +171,10 @@ XCXCBases::XCXCBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("XCXCBases.Roots","500."),"%lg",&fRoots);
   sscanf(gJSF->Env()->GetValue("XCXCBases.PolElectron","0."),"%lg",&fPolElectron);
   sscanf(gJSF->Env()->GetValue("XCXCBases.SigmaEbeam","0.005"),"%lg",&fSigmaEbeam);
+  sscanf(gJSF->Env()->GetValue("XCXCBases.WmModesLo","1"),"%d",&fWmModesLo);
+  sscanf(gJSF->Env()->GetValue("XCXCBases.WmModesHi","12"),"%d",&fWmModesHi);
+  sscanf(gJSF->Env()->GetValue("XCXCBases.WpModesLo","1"),"%d",&fWpModesLo);
+  sscanf(gJSF->Env()->GetValue("XCXCBases.WpModesHi","12"),"%d",&fWpModesHi);
   sscanf(gJSF->Env()->GetValue("XCXCBases.Alphai","128."),"%lg",&fAlphai);
   sscanf(gJSF->Env()->GetValue("XCXCBases.Alphas","0.120"),"%lg",&fAlphas);
   sscanf(gJSF->Env()->GetValue("XCXCBases.MassW","80.0"),"%lg",&fMassW);
@@ -205,6 +209,10 @@ void XCXCBases::PrintParameters()
   printf("       = 2 ; ISR only\n");
   printf("       = 3 ; ISR + BM\n");
   printf("  XC_1 width = %g\n",fWidthChic1);
+  printf("  W- Decey Mode Lo =%d\n",fWmModesLo);
+  printf("                Hi =%d\n",fWmModesHi);
+  printf("  W+ Decey Mode Lo =%d\n",fWpModesLo);
+  printf("                Hi =%d\n",fWpModesHi);
 
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
@@ -260,6 +268,10 @@ void XCXCBases::Userin()
   usrprm_.polebm = fPolElectron;
   usrprm_.sgmebm = fSigmaEbeam;
   usrprm_.isrb   = fISRBM;
+  usrprm_.imd1lo = fWmModesLo;
+  usrprm_.imd1hi = fWmModesHi;
+  usrprm_.imd2lo = fWpModesLo;
+  usrprm_.imd2hi = fWpModesHi;
   usrprm_.gamsw1 = fWidthChic1;
 
   // Copy class data member into common /bshufl/

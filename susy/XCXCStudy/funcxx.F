@@ -209,7 +209,7 @@ C  Then select final states.
 C--
 C-- W+ from X+.
       XW1 = Z(4)
-      DO 200 IMD = 1, 12
+      DO 200 IMD = IMD1MN, IMD1MX 
          IF ( XW1.LT.BRVDK(IMD,1) )              GO TO 210
 200   CONTINUE
 C--
@@ -226,7 +226,7 @@ C--
 C
 C-- W- from X-.
       XW2 = Z(5)
-      DO 300 IMD = 1, 12
+      DO 300 IMD = IMD2MN, IMD2MX
          IF ( XW2.LT.BRVDK(IMD,1) )              GO TO 310
 300   CONTINUE
 C--

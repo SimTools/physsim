@@ -58,8 +58,11 @@
 SHELL	= /bin/bash
 MFLAGS	=
 CURRDIR	= .
-
+feq ($(strip $(LCBASEDIR)),)
 SUBDIR1	= dgen_lib gen_lib Anlib
+else
+SUBDIR1	= dgen_lib gen_lib
+endif
 SUBDIR2	= anl_lib top/TTLib top/TTPhys/tt_thresh/lib \
 	  top/TTPhys/tt_thresh_new/lib
 SUBDIRS = $(SUBDIR1) $(SUBDIR2)
