@@ -182,6 +182,9 @@ XCXCBases::XCXCBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("XCXCBases.M2","250."),"%lg",&fM2);
   sscanf(gJSF->Env()->GetValue("XCXCBases.tanb","+2."),"%lg",&ftanb);
   sscanf(gJSF->Env()->GetValue("XCXCBases.mA","-9999."),"%lg",&fmA);
+  sscanf(gJSF->Env()->GetValue("SFSFBases.Atau","0."),"%lg",&fAsoft[0]);
+  sscanf(gJSF->Env()->GetValue("SFSFBases.At","0."),"%lg",&fAsoft[1]);
+  sscanf(gJSF->Env()->GetValue("SFSFBases.Ab","0."),"%lg",&fAsoft[2]);
   sscanf(gJSF->Env()->GetValue("XCXCBases.WidthChic1","-1."),"%lg",&fWidthChic1);
 }
 
@@ -247,6 +250,9 @@ void XCXCBases::Userin()
   ussprm_.am2  = fM2;
   ussprm_.tanb = ftanb;
   ussprm_.ama  = fmA;
+  ussprm_.asft[0] = fAsoft[0];
+  ussprm_.asft[1] = fAsoft[1];
+  ussprm_.asft[2] = fAsoft[2];
 
   // Copy class data member into common /usrprm/
   usrprm_.sqrts  = fRoots;

@@ -49,7 +49,7 @@ extern COMMON_USMPRM usmprm_;
 //  COMMONs for SS parameters, see USSPRM.inc for more details.
 // =====================================================================
 typedef struct {
-  Float_t  am0, amu, am2, tanb, ama;
+  Float_t  am0, amu, am2, tanb, ama, asft[3];
 } COMMON_USSPRM;             //  Common /USSPRM/
 
 extern COMMON_USSPRM ussprm_;
@@ -84,6 +84,7 @@ protected:
   Double_t fM2;			// M2 (GeV)
   Double_t ftanb;		// tan(beta)
   Double_t fmA;			// mA (GeV)
+  Double_t fAsoft[3];           // (A_tau, A_t, A_b) (GeV)
   Double_t fWidthChic1;		// XC1 width (GeV)
   Int_t    fISHUFL[50];  	// random number shuffler
 
@@ -136,6 +137,9 @@ public:
   
   void SetMA(Double_t m){ fmA = m; }
   Double_t GetMA(){ return fmA;}
+
+  void SetAsoft(Int_t i, Double_t m){ fAsoft[i] = m; }
+  Double_t GetAsoft(Int_t i) { return fAsoft[i];}
   
   void SetWidthChic1(Double_t g){ fWidthChic1 = g; }
   Double_t GetWidthChic1(){ return fWidthChic1;}

@@ -27,7 +27,7 @@ C  Initialize numerical constants and particle table.
 C--
       ALF   = 1/ALFI
       CALL INSMCN(ALF,ALFS,AMSW,AMSZ,AMSH,AMST)
-      CALL INSSCN(ALF,ALFS,AMSW,AMSZ,AM0,AMU,AM2,TANB,AMA)
+      CALL INSSCN(ALF,ALFS,AMSW,AMSZ,AM0,AMU,AM2,TANB,AMA,ASFT)
 C--
       IF ( GAMSW1.GT.0.0 ) THEN
          CALL MODGAM('SW',1,GAMSW1)

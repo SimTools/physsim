@@ -42,7 +42,7 @@ C  Initialize numerical constants and particle table.
 C--
       ALF   = 1/ALFI
       CALL INSMCN(ALF,ALFS,AMSW,AMSZ,AMSH,AMST)
-      CALL INSSCT(ALF,ALFS,AMSW,AMSZ,AM0,AMU,AM2,TANB,AMA,IDOTAU)
+      CALL INSSCT(ALF,ALFS,AMSW,AMSZ,AM0,AMU,AM2,TANB,AMA,ASFT,IDOTAU)
 C--
 C  Set user constants.
 C--
