@@ -20,7 +20,7 @@ XCOMM ##########################################################################
  *
  */
 
-INCPATH	= -I. -I../../../../src
+INCPATH	= -I. -I$(LEDAROOT)/include -I$(JSFROOT)/include
 EXTRACXXOPT = $(INCPATH)
 
 /*

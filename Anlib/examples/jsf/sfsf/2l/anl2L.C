@@ -22,7 +22,9 @@ int anl2L()
   Char_t *outputfile="jsf.s.root";  // A file to output histograms
   Char_t *inputfile="../../../../../susy/SFSFStudy/prod/sfsfsim.root";
 
+  gSystem->Load("libS4Utils.so");
   gSystem->Load("libAnlib.so");
+  gSystem->Load("libJSFAnlib.so");
   gSystem->Load("../../../../../susy/SFSFStudy/prod/SFSFSpring.so");
   gSystem->Load("libSFSF2LAnalysis.so");
 

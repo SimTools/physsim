@@ -23,7 +23,9 @@ int anl2Lbg()
   // Char_t *inputfile="../../../../../wz/WWStudy/prod/wwsim.p+0.90.mutauonly.root";
   Char_t *inputfile="../../../../../wz/WWStudy/prod/wwsim.p+0.00.mutauonly.root";
 
+  gSystem->Load("libS4Utils.so");
   gSystem->Load("libAnlib.so");
+  gSystem->Load("libJSFAnlib.so");
   gSystem->Load("../../../../../wz/WWStudy/prod/WWSpring.so");
   gSystem->Load("libSFSF2LAnalysis.so");
 
