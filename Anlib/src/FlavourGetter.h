@@ -1,3 +1,5 @@
+#define __DEBUG__
+
 #ifndef __FLAVOURGETTER__
 #define __FLAVOURGETTER__
 //*************************************************************************
@@ -46,7 +48,12 @@ public:
     fPIDGen.Delete();
     fSNGen.Delete();
     fMSNGen.Delete();
+    fPIDOffVT.Delete();
+    fSNOffVT.Delete();
+    fMSNOffVT.Delete();
+#ifdef __DEBUG__
     fDEBUG = kFALSE;
+#endif
   }                                                // default constructor
 
   virtual  ~FlavourGetter() {}                     // default destructor
@@ -62,6 +69,7 @@ protected:
 
 private:
   void      SearchPrimaryHadron(const ANLTrack &t);
+  void      SearchOffVertexHadron(const ANLTrack &t);
 
 private:
   TClonesArray     *fGen;         //! Pointer to GeneratorParticles Array
@@ -69,10 +77,16 @@ private:
   TObjArray         fSNGen;       //  Array of primary hadron's S.N
   TObjArray         fMSNGen;      //  Array of primary hadron's Mother S.N
                                   //  (corresponding to PartonID)
+  TObjArray         fPIDOffVT;    //  Array of off-vertex hadron's PID
+  TObjArray         fSNOffVT;     //  Array of off-vertex hadron's S.N
+  TObjArray         fMSNOffVT;    //  Array of off-vertex hadron's Mother S.N
+                                  //  (corresponding to PartonID)
+#ifdef __DEBUG__
 public:
   virtual void      SetDebug(Bool_t flag);  // sets debug flag
 protected:
   Bool_t            fDEBUG;
+#endif
 
   ClassDef(FlavourGetter, 2)      //  FlavourGetter class
 };
@@ -111,8 +125,9 @@ private:
 public:
   TObjNum(int i = 0) : num(i) { }
   ~TObjNum() {
-    //Printf("~TObjNum = %d", num);
+#ifdef __DEBUG__
     cerr << "~TObjNum = " << num << endl;
+#endif
   }
   void    SetNum(int i) { num = i; }
   int     GetNum() { return num; }
