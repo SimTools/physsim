@@ -1,5 +1,3 @@
-#define __DEBUG__
-
 #ifndef __FLAVOURGETTER__
 #define __FLAVOURGETTER__
 //*************************************************************************
