@@ -1,0 +1,99 @@
+XCOMM ##########################################################################
+XCOMM ## (Description)
+XCOMM ##    Make file for BM generator.
+XCOMM ##	all       : to make an executable.
+XCOMM ##	clean     : to clean the directory.
+XCOMM ##	distclean : to remove everything reproducible.
+XCOMM ## (Update Record) 
+XCOMM ##    95/03/13  K.Fujii 	Original version for HELAS V204.
+XCOMM ##    95/06/07  K.Fujii 	Use 95a.
+XCOMM ##    00/10/12  K.Fujii	Imakefile for physsim-2000a-5
+XCOMM ##
+XCOMM ##########################################################################
+
+/*
+ * Template Files
+ *
+ */
+
+#define CXXPACKAGE
+#include "config/kflib.tmpl"
+
+INCPATH = -I$(LCLIBROOT)/util/lcfull/src \
+	  -I$(KFLIBROOT)/gen_lib/bm/include \
+	  -I$(KFLIBROOT)/gen_lib/bs/include
+
+/*
+ *  Define the name of the executable. 
+ */
+
+PROGRAM = fullgen
+COMMAND = $(PROGRAM)
+
+/*
+ *  Routines to complie.
+ */
+
+OBJS = bs51cm.o \
+		ebdist.o \
+		eprobx.o \
+		flanli.o \
+		func.o \
+		prmain.o \
+		prucom.o \
+		prujin.o \
+		prujtm.o \
+		pruser.o \
+		spevnt.o \
+		spinit.o \
+		spparm.o \
+		userin.o \
+		usrout.o
+
+HDRS =  BEMCNF.inc \
+		OUTHBK.inc \
+		USRPRM.inc
+/*
+ * Libraries
+ *
+ */
+ANALLIB   = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL \
+            -lLCFULL -lTBS -lBASESV5.1 \
+            -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
+
+EXTRALIBS = -lHPKTOHBK $(CERNLIBS)
+#ifdef HPArchitecture
+        EXTRALIBS += -lU77 -lm
+#endif
+
+
+KFLIB   = $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBBM -lANLLIB
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+
+SRCS         = $(strip $(subst .o,.F,$(OBJS)))
+
+LD           = $(FF)
+
+/*
+ * Make Targets
+ *
+ */
+
+all::	$(COMMAND)
+ 
+$(COMMAND):: $(OBJS) $(ALL_EXTER_LIBS)
+	$(LD) -o $(PROGRAM).exe $(OBJS) $(ANALLIB)
+
+depend:: $(SRCS) $(HDRS)
+        for i in $(SRCS); do \
+        rmkdepend -a -- $(FFLAGS) $(INCPATH) -- $$i; done
+				 
+clean::                                          
+	rm -f *.o; rm -f *~
+
+distclean:: clean                                                     
+	rm -f *.o; rm -f *.a; rm -f *~; rm -f *.exe Makefile

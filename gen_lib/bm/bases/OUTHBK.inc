@@ -1,0 +1,3 @@
+C--
+      COMMON /OUTHBK/ HFILEN
+      CHARACTER*44    HFILEN      

@@ -1,0 +1,5 @@
+      SUBROUTINE SPEVNT(IRET)
+      INTEGER*4   IRET
+      INCLUDE 'BEMCNF.inc'
+      RETURN
+      END

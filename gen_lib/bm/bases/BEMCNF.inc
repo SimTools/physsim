@@ -1,0 +1,3 @@
+      COMMON /BEMCNF/  ROOTS, SGEBM, ISRBM, IBMTP, XM, XP, FS
+      REAL   *4        ROOTS, SGEBM, XM, XP, FS
+      INTEGER*4        ISRBM, IBMTP

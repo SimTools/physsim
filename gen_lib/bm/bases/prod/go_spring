@@ -1,0 +1,62 @@
+#!/bin/sh
+set -v
+#--
+#  Specify job parameters.
+#--
+maxevt=100000
+#--
+#  Specify the executalbe.
+#--
+dir=../
+outdir=./
+program=fullgen
+#--
+#  Set output file names.
+#--
+jobname=isr300
+disfile=$jobname.hbook
+#--
+#  Go.
+#--
+time $dir/$program.exe << eof > $outdir/$jobname.out &
+@!                                                                      
+@!*************************************************                     
+@! Input section for Steering part.                                     
+@!*************************************************                     
+@!                                                                      
+STEERING
+   EVENT GEN($maxevt)             ! Number of event is just a dummy
+*  STEERING DEBUG(37)        ! Standard debug level
+*  ANAL  SEQ(BASES)          ! Select only BASES module
+*  ANAL  SEQ(BASES LUND_Frag GENE_LIST SWIMMER SMEARING)
+*  ANAL  SEQ(BASES LUND_Frag SWIMMER SMEARING)
+   INPUT FILE(bases.tbs)            ! Input file for BASES data
+*  OUTFILE FILE($outdir/ft21.tbs)   ! Output file for SPRING data
+EXIT
+@!                                                                      
+@!*************************************************                     
+@! Input section for Spring part.                                       
+@!*************************************************                     
+@!                                                                      
+BASES
+  HELP    !  for PRINT command help
+  GETB 1  !  (0,1,2)=(Do BS,Read from TBS,Read from FT23)
+  PUTB 0  !  (0,1,2)=(No BS,BS to TBS,BS to FT23)
+  DOSP 1  !  (0,1)=(No SP,SP)
+EXIT                                        
+@!                                                                      
+@!*************************************************                     
+@! Input section for USER routine.                                      
+@!*************************************************                     
+@!                                                                      
+USER                                                                 
+   DISF $disfile    
+EXIT                                                                 
+@!                                                                      
+@!*************************************************                     
+@! Start execution.                                                     
+@!*************************************************                     
+@!                                                                      
+GO
+eof
+exit 0  
