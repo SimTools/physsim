@@ -47,10 +47,8 @@ void FlavourGetter::SetData(const ANLJet &jet) {
   TIter next(&jet.GetParticlesInJet());
   ANLTrack *tp;
   while ((tp = (ANLTrack *)next())) {
-#if 0
     SearchPrimaryHadron(*tp);
-#endif
-    SearchOffVertexHadron(*tp);
+    //SearchOffVertexHadron(*tp);
   }
 
   fPIDGen.SetOwner();  // SetOwner() method only enabled
@@ -162,18 +160,46 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
       Int_t gpid = 0;
       Int_t gsn  = 0;
       Int_t gmsn = ctp->GetEMGenAt(i)->GetSerial();
+      Double_t gdln = 0;
+      Int_t gpidoffvt = 0;
+      Int_t gsnoffvt  = 0;
+      Int_t gmsnoffvt = 0;
       while ( gmsn >= 0 ) {
 	JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
 	gpid = g->GetID();
 	gsn  = g->GetSerial();
 	gmsn = g->GetMother();
+	gdln = g->GetDecayLength();
 
-	if (fDEBUG) cerr << "(PID, S.N, M.S.N) = ("
-			 << gpid << ","
-			 << gsn  << ","
-			 << gmsn << ")" << endl;
+        if (fDEBUG) cerr << "(PID, S.N, M.S.N, DLength) = ("
+                         << gpid << ","
+                         << gsn  << ","
+                         << gmsn << ","
+                         << gdln << ")" << endl;
+
+        if ( gdln > 0 ) {
+          if (fDEBUG) cerr << "This generator particle has a finite decay length." << endl;
+          gpidoffvt = gpid;
+          gsnoffvt  = gsn;
+          gmsnoffvt = gmsn;
+        }
       }
       if (fDEBUG) cerr << "-- Search ended --" << endl;
+
+      if (TMath::Abs(gpidoffvt) == 310  || TMath::Abs(gpidoffvt) == 3122 ||
+          TMath::Abs(gpidoffvt) == 3112 || TMath::Abs(gpidoffvt) == 3222)
+        if (fDEBUG) cerr << "This off-vertex generator particle is weak decayinghadron." << endl;
+
+      if ( TMath::Abs(gpidoffvt) > 0 &&
+           TMath::Abs(gpidoffvt) != 310  && TMath::Abs(gpidoffvt) != 3122 &&
+           TMath::Abs(gpidoffvt) != 3112 && TMath::Abs(gpidoffvt) != 3222 ) {
+        TObjNum *gpidoffvtp = new TObjNum(gpidoffvt);
+        TObjNum *gsnoffvtp  = new TObjNum(gsnoffvt);
+        TObjNum *gmsnoffvtp = new TObjNum(gmsnoffvt);
+        fPIDOffVT.Add(gpidoffvtp);  // *gpidoffvtp, *gsnoffvtp and *gmsnoffvtp stays
+	fSNOffVT.Add(gsnoffvtp);    // but (TObjArray *)obj->SetOwner() deletes
+	fMSNOffVT.Add(gmsnoffvtp);  // its elements.
+      }
       TObjNum *gpidp = new TObjNum(gpid);
       TObjNum *gsnp  = new TObjNum(gsn);
       TObjNum *gmsnp = new TObjNum(gmsn);
@@ -201,18 +227,46 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
       Int_t gpid = 0;
       Int_t gsn  = 0;
       Int_t gmsn = ctp->GetCDCTrackAt(i)->GetGenID();
+      Double_t gdln = 0;
+      Int_t gpidoffvt = 0;
+      Int_t gsnoffvt  = 0;
+      Int_t gmsnoffvt = 0;
       while ( gmsn >= 0 ) {
         JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
         gpid = g->GetID();
         gsn  = g->GetSerial();
         gmsn = g->GetMother();
+	gdln = g->GetDecayLength();
 
-        if (fDEBUG) cerr << "(PID, S.N, M.S.N) = ("
+        if (fDEBUG) cerr << "(PID, S.N, M.S.N, DLength) = ("
                          << gpid << ","
                          << gsn  << ","
-                         << gmsn << ")" << endl;
+                         << gmsn << ","
+                         << gdln << ")" << endl;
+
+        if ( gdln > 0 ) {
+          if (fDEBUG) cerr << "This generator particle has a finite decay length." << endl;
+          gpidoffvt = gpid;
+          gsnoffvt  = gsn;
+          gmsnoffvt = gmsn;
+        }
       }
       if (fDEBUG) cerr << "-- Search ended --" << endl;
+
+      if (TMath::Abs(gpidoffvt) == 310  || TMath::Abs(gpidoffvt) == 3122 ||
+          TMath::Abs(gpidoffvt) == 3112 || TMath::Abs(gpidoffvt) == 3222)
+        if (fDEBUG) cerr << "This off-vertex generator particle is weak decayinghadron." << endl;
+
+      if ( TMath::Abs(gpidoffvt) > 0 &&
+           TMath::Abs(gpidoffvt) != 310  && TMath::Abs(gpidoffvt) != 3122 &&
+           TMath::Abs(gpidoffvt) != 3112 && TMath::Abs(gpidoffvt) != 3222 ) {
+        TObjNum *gpidoffvtp = new TObjNum(gpidoffvt);
+        TObjNum *gsnoffvtp  = new TObjNum(gsnoffvt);
+        TObjNum *gmsnoffvtp = new TObjNum(gmsnoffvt);
+        fPIDOffVT.Add(gpidoffvtp);  // *gpidoffvtp, *gsnoffvtp and *gmsnoffvtp stays
+	fSNOffVT.Add(gsnoffvtp);    // but (TObjArray *)obj->SetOwner() deletes
+	fMSNOffVT.Add(gmsnoffvtp);  // its elements.
+      }
       TObjNum *gpidp = new TObjNum(gpid);
       TObjNum *gsnp  = new TObjNum(gsn);
       TObjNum *gmsnp = new TObjNum(gmsn);
