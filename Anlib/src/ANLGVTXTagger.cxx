@@ -180,7 +180,7 @@ Double_t ANLGVTXTagger::Getbnorm(const ANLTrack &t){
     if (fDEBUG) cerr << "VTX Resolution (Hit2D) = " << TMath::Sqrt(drdr) << endl
                      << "Normalized b (Gen2D) = " << TMath::Sqrt(b*b/drdr) << endl;
 
-    if ( b == -9999.) return 9999.;
+    if ( b == -9999.) return -9999.;
     return TMath::Sqrt(b*b/drdr);
   }
 }
