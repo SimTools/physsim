@@ -158,7 +158,7 @@ public:
    Double_t fX[2];  // Two bases parameters, costh and phi.
 //  <<-TTbar>>
 public:
-  TTSpringBuf(const char *name="TTSpringBuf", 
+  TTSpringBuf(const char *name="TTSpring", 
 	     const char *title="TTSpring test event buffer",
 	     TTSpring *spring=NULL)
 	     : JSFSpringBuf(name,title,(JSFSpring*)spring) {} 
@@ -170,7 +170,7 @@ public:
 
 class TTSpring : public JSFSpring {
 public:
-   TTSpring(const char *name="TTSpring", 
+   TTSpring(const char *name="TTSpringBuf",
 	      const char *title="TTSpring test",
              TTBases *bases=NULL);
    virtual ~TTSpring();

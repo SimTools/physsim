@@ -4,7 +4,7 @@
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
  
-  spring = new TTSpring();
+  spring = new TTSpring("TTSpring");
   spring->ReadBases("bases.root");
  
   printf(" Roots is %g\n",((TTBases*)spring->GetBases())->GetRoots());

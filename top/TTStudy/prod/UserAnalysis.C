@@ -189,6 +189,7 @@ void UserAnalysis()
   
   ANL4DVector qsum;
   TObjArray tracks(1000);
+  tracks.SetOwner();
   fNtracks = 0;
   for ( Int_t i = 0; i < ntrks; i++ ) {
     JSFLTKCLTrack *t = (JSFLTKCLTrack*)trks->UncheckedAt(i);
@@ -203,7 +204,7 @@ void UserAnalysis()
   // Cut on No. of tracks.
   
   hNtracks->Fill(fNtracks);
-  if ( fNtracks < xNtracks ) { tracks.Delete(); last->cd(); return; }
+  if ( fNtracks < xNtracks ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"N_tracks > %i",xNtracks);
@@ -217,7 +218,7 @@ void UserAnalysis()
   // Cut on Evis.
 
   hEvis->Fill(fEvis);
-  if ( fEvis < xEvis ) { tracks.Delete(); last->cd(); return; }
+  if ( fEvis < xEvis ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"E_vis > %g",xEvis);
@@ -227,7 +228,7 @@ void UserAnalysis()
   // Cut on Pt.
 
   hPt->Fill(fPt);
-  if ( fPt > xPt ) { tracks.Delete(); last->cd(); return; }
+  if ( fPt > xPt ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Pt <= %g",xPt);
@@ -236,7 +237,7 @@ void UserAnalysis()
  
   // Cut on Pl.
 
-  if ( TMath::Abs(fPl) > xPl ) { tracks.Delete(); last->cd(); return; }
+  if ( TMath::Abs(fPl) > xPl ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"|Pl| <= %g",xPl);
@@ -255,7 +256,7 @@ void UserAnalysis()
   // Cut on No. of jets.
     
   hNjets->Fill(fNjets);
-  if ( fNjets < xNjets ) { tracks.Delete(); last->cd(); return; }
+  if ( fNjets < xNjets ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
@@ -270,7 +271,7 @@ void UserAnalysis()
 
   // Make sure that No. of jets is xNjets.
     
-  if ( fNjets != xNjets ) { tracks.Delete(); last->cd(); return; }
+  if ( fNjets != xNjets ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Njets = %i",xNjets);
@@ -301,7 +302,7 @@ void UserAnalysis()
 
   // Cut on Ejet_min.
   
-  if ( ejetmin < xEjet ) { tracks.Delete(); last->cd(); return; }
+  if ( ejetmin < xEjet ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Ejet > %g",xEjet);
@@ -310,7 +311,7 @@ void UserAnalysis()
 
   // Cut on |cos(theta_j)|_max.
     
-  if ( TMath::Abs(cosjmax) > xCosjet ) { tracks.Delete(); last->cd(); return; }
+  if ( TMath::Abs(cosjmax) > xCosjet ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"|cos(theta_j)| <= %g",xCosjet);
@@ -321,6 +322,7 @@ void UserAnalysis()
   // Avoid using indices since there might be empty slots.
     
   TObjArray solutions(10);
+  solutions.SetOwner();
   ANLPairCombiner w1candidates(jets,jets);
 
   if (gDEBUG/* || kTRUE */) {
@@ -332,22 +334,26 @@ void UserAnalysis()
 
   ANLPair *w1p, *w2p, *bbp;
   while ((w1p = (ANLPair *)w1candidates())) {
+    ANLPairCombiner *w2candidp = 0;
     ANLPair &w1 = *w1p;
     Double_t w1mass = w1().GetMass();
     if (TMath::Abs(w1mass - kMassW) > xM2j) continue;	// w1 candidate found
     w1.LockChildren();					// now lock w1 daughters
-    ANLPairCombiner w2candidates(w1candidates);		// w2 after w1
+    w2candidp = new ANLPairCombiner(w1candidates);	// w2 after w1
+    ANLPairCombiner &w2candidates = *w2candidp;
     if (gDEBUG) {
       cerr << "-- w2candidates:" << endl;
       w2candidates.DebugPrint();
     }
     while ((w2p = (ANLPair *)w2candidates())) {
+    ANLPairCombiner *bbcandidp = 0;
       ANLPair &w2 = *w2p;
       if (w2.IsLocked()) continue;			// skip if locked
       Double_t w2mass = w2().GetMass();
       if (TMath::Abs(w2mass - kMassW) > xM2j) continue;	// w2 candidate found
       w2.LockChildren();				// now lock w2 daughters
-      ANLPairCombiner bbcandidates(w2candidates);	// bbar from the rest
+    bbcandidp = new ANLPairCombiner(w2candidates);	// w2 after w1
+    ANLPairCombiner &bbcandidates = *bbcandidp;
       bbcandidates.Reset();				// bb can be before w1/2
       if (gDEBUG) {
         cerr << "---- bbcandidates:" << endl;
@@ -400,14 +406,16 @@ void UserAnalysis()
 #endif
         }
       }
+    if (bbcandidp) delete bbcandidp;
       w2.UnlockChildren();
     }
+    if (w2candidp) delete w2candidp;
     w1.UnlockChildren();
   }
   
   // Cut on No. of solutions.
 
-  if ( !solutions.GetEntries() ) { tracks.Delete(); last->cd(); return; }
+  if ( !solutions.GetEntries() ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"|m_jj - m_W| <= %g && |m_3j - m_t| <= %g",xM2j,xM3j);
@@ -446,7 +454,7 @@ void UserAnalysis()
             cerr << endl;
     }
   }
-  if ( !solutions.GetEntries() ) { tracks.Delete(); last->cd(); return; }
+  if ( !solutions.GetEntries() ) { last->cd(); return; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"|cos(theta_bw)| > %g",xCosbw);
@@ -517,8 +525,8 @@ void UserAnalysis()
 
   // Clean up
 
-  solutions.Delete();
-  tracks.Delete();
+  nextsol.Reset();
+  while ((solp = (ANLPair *)nextsol())) solp->Delete();
 
   last->cd();
   return;

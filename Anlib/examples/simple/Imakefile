@@ -55,7 +55,7 @@ clean::
 
 depend:: $(SRCS)
 	for i in $(SRCS); do \
-	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
 distclean:: clean
 	@rm -f $(JSFPROGRAM) Makefile
 	@rm -f *.root *.tdr *.out *~ core

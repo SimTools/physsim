@@ -27,16 +27,7 @@ INCPATH = -I. -I$(KFLIBROOT)/gen_lib/sm/include \
 	-I$(KFLIBROOT)/gen_lib/bs/include \
 	-I$(LCDIR)/simjlc/src -I$(LCDIR)/util/fortlib/src 
 
-#if defined(hitachiArchitecture)
-ANALLIB   = $(LDDIRFLAG)$(JSFROOT)/lib -lJSF -lJSFLCFULL -lJSFQuickSim \
-	    $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
-	    -lSIMJLC -lLTKCL -lLCFULL -lTBS \
-	    -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
-#else
-ANALLIB   = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
-	    -lSIMJLC -lLTKCL -lLCFULL -lTBS \
-	    -lHELASV204 -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
-#endif
+HELASV204 = HELASV204
 
 KFLIB   = $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBSS -lGENLIBSM \
 	-lGENLIBKN -lGENLIBBM  -lANLLIB
@@ -101,7 +92,7 @@ clean::
 
 depend:: $(SRCS) $(HDRS) $(FSRCS)
 	for i in $(SRCS) $(FSRCS); do \
-	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
 
 distclean:: clean
 	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~

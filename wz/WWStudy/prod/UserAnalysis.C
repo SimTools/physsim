@@ -186,6 +186,7 @@ void UserAnalysis()
   
   ANL4DVector qsum;
   TObjArray tracks(500);
+  tracks.SetOwner();
    
   // Select good tracks
 
@@ -203,7 +204,7 @@ void UserAnalysis()
   // Cut on No. of tracks.
   
   hNtracks->Fill(fNtracks);
-  if ( fNtracks < xNtracks ) { tracks.Delete(); return; }
+  if ( fNtracks < xNtracks )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"N_tracks > %g",xNtracks);
@@ -217,7 +218,7 @@ void UserAnalysis()
   // Cut on Evis.
 
   hEvis->Fill(fEvis);
-  if ( fEvis < xEvis ) { tracks.Delete(); return; }
+  if ( fEvis < xEvis )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"E_vis > %g",xEvis);
@@ -227,7 +228,7 @@ void UserAnalysis()
   // Cut on Pt.
 
   hPt->Fill(fPt);
-  if ( fPt > xPt ) { tracks.Delete(); return; }
+  if ( fPt > xPt )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Pt <= %g",xPt);
@@ -236,7 +237,7 @@ void UserAnalysis()
  
   // Cut on Pl.
 
-  if ( TMath::Abs(fPl) > xPl ) { tracks.Delete(); return; }
+  if ( TMath::Abs(fPl) > xPl )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"|Pl| <= %g",xPl);
@@ -255,7 +256,7 @@ void UserAnalysis()
   // Cut on No. of jets.
     
   hNjets->Fill(fNjets);
-  if ( fNjets < xNjets ) { tracks.Delete(); return; }
+  if ( fNjets < xNjets )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
@@ -270,7 +271,7 @@ void UserAnalysis()
 
   // Make sure that No. of jets is xNjets.
     
-  if ( fNjets != xNjets ) { tracks.Delete(); return; }
+  if ( fNjets != xNjets )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Njets = %i",xNjets);
@@ -297,7 +298,7 @@ void UserAnalysis()
 
   // Cut on Ejet_min.
   
-  if ( ejetmin < xEjet ) { tracks.Delete(); return; }
+  if ( ejetmin < xEjet )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Ejet > %g",xEjet);
@@ -306,7 +307,7 @@ void UserAnalysis()
 
   // Cut on |cos(theta_j)|_max.
     
-  if ( TMath::Abs(cosjmax) > xCosjet ) { tracks.Delete(); return; }
+  if ( TMath::Abs(cosjmax) > xCosjet )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"|cos(theta_j)| <= %g",xCosjet);
@@ -315,16 +316,21 @@ void UserAnalysis()
 
   // Find W candidates in given mass windows.
   // Avoid using indices since there might be empty slots.
-  
+
   TObjArray solutions(10);
+  solutions.SetOwner();
+  
   ANLPairCombiner w1candidates(jets,jets);
+  ANLPairCombiner *w2candidp = 0;
   ANLPair *w1p, *w2p;
   while ((w1p = (ANLPair *)w1candidates())) {
+    w2candidp = 0;
     ANLPair &w1 = *w1p;
     Double_t w1mass = w1().GetMass();
     if (TMath::Abs(w1mass - kMassW) > xM2j) continue;	// w1 candidate found
     w1.LockChildren();					// now lock w1 daughters
-    ANLPairCombiner w2candidates(w1candidates);		// w2 after w1
+    w2candid = new ANLPairCombiner(w1candidates);	// w2 after w1
+    ANLPairCombiner &w2candidates = *w2candid;
     while ((w2p = (ANLPair *)w2candidates())) {
       ANLPair &w2 = *w2p;
       if (w2.IsLocked()) continue;			// skip if locked
@@ -335,12 +341,13 @@ void UserAnalysis()
       solutions.Add(new ANLPair(w1p,w2p,chi2));
       // hMw1Mw2->Fill(w1mass,w2mass,1.0);
     }
+    if (w2candidp) delete w2candidp;
     w1.UnlockChildren();
   }
   
   // Cut on No. of solutions.
 
-  if ( !solutions.GetEntries() ) { tracks.Delete(); return; }
+  if ( !solutions.GetEntries() )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"|m_jj - m_W| <= %g",xM2j);
@@ -365,7 +372,7 @@ void UserAnalysis()
       delete sol;
     }
   }
-  if ( !solutions.GetEntries() ) { tracks.Delete(); return; }
+  if ( !solutions.GetEntries() )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"|cos(theta_w)| <= %g",xCosw);
@@ -385,7 +392,7 @@ void UserAnalysis()
       delete sol;
     }
   }
-  if ( !solutions.GetEntries() ) { tracks.Delete(); return; }
+  if ( !solutions.GetEntries() )  return;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg,"Acop <= %g",xAcop);
@@ -441,11 +448,6 @@ void UserAnalysis()
           hMw1Mw2->Fill(w1mass,w2mass,1.0);
   }
   
-  // Clean up
-  
-  solutions.Delete();
-  tracks.Delete();
-
   return;
  }
 

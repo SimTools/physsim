@@ -82,7 +82,7 @@ public:
    inline Double_t GetQuality() const { return fQuality; }
    
    Bool_t IsSortable() const { return kTRUE; }
-   Int_t  Compare(TObject *obj)
+   Int_t  Compare(const TObject *obj) const
    {
    	if (fQuality < ((ANLPair *)obj)->fQuality) return -1;
    	else if (fQuality > ((ANLPair *)obj)->fQuality) return 1;

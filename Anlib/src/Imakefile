@@ -64,7 +64,7 @@ clean::
 
 depend:: $(SRCS) $(HDRS)
 	for i in $(SRCS); do \
-	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) -- $$i; done
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
 
 distclean:: clean
 	@rm -f $(JSFSOLIB) *.$(SOEXT) Makefile

@@ -90,7 +90,7 @@ $(COMMAND):: $(OBJS) $(ALL_EXTER_LIBS)
 
 depend:: $(SRCS) $(HDRS)
         for i in $(SRCS); do \
-        rmkdepend -a -- $(FFLAGS) $(INCPATH) -- $$i; done
+        rmkdepend -a -- $(FFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
 				 
 clean::                                          
 	rm -f *.o; rm -f *~

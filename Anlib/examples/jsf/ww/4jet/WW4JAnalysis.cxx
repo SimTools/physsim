@@ -77,12 +77,16 @@ WW4JAnalysis::~WW4JAnalysis()
 //_____________________________________________________________________
 void WW4JAnalysis::CleanUp(TObjArray *objs)
 {
+#if 0
   TIter next(objs);
   TObject *obj;
   while ((obj = next())) {
   	objs->Remove(obj);
   	delete obj;
   }
+#else
+  objs->SetOwner();
+#endif
 }
 
 //_____________________________________________________________________
@@ -184,6 +188,12 @@ Bool_t WW4JAnalysis::Process(Int_t ev)
   // ---------------------
   // Analysis starts here.
   // ---------------------
+
+  if (gDEBUG) {
+    cerr << "------------------------------------------" << endl
+         << "Event " << gJSF->GetEventNumber() 	       << endl
+         << "------------------------------------------" << endl;
+  }
 
   Float_t selid = -0.5;
   hStat->Fill(++selid);
@@ -485,7 +495,14 @@ Bool_t WW4JAnalysis::Process(Int_t ev)
   // Clean up
 
   nextsol.Reset();
+#if 0
+// Bug:
+// we should not delete w's contained in sol since they
+// belong to ANLPairCombiner w1candidates which will delete
+// them in its dtor.
+//
   while ((sol = (ANLPair *)nextsol())) sol->Delete();
+#endif
   CleanUp(&solutions);
   CleanUp(&tracks);
 

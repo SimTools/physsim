@@ -125,6 +125,10 @@ Bool_t WWL2JAnalysis::Initialize()
   xM2j      =    0.0;	// |m_jj-m_W| maximum
   xAcop     =    0.0;	// Acoplanarity maximum
 
+  for (Int_t i = 0; i < MAXCUT; i++) {
+    strcpy(&cutName[i][0],"     ");
+  }
+
   last->cd();
   return 0;
 }

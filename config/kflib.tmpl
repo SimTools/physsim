@@ -17,13 +17,29 @@ POTHIG      = POTHIG
 /* JLC Starndard Template */
 
 #include "config/lclib.tmpl"
+
 #ifdef CXXPACKAGE
-#include "conf/makejsf.tmpl"
+# include "conf/makejsf.tmpl"
 
 /* ROOT Related Libraries */
 
+# if defined(MacOSXArchitecture) || defined(DarwinArchitecture)
+ROOTLIBS     += -lEGPythia -lEG $(CERNLIBS)
+# else
 ROOTLIBS     += -lEGPythia -lEG -Wl,-u,pytest_ $(CERNLIBS)
+# endif
+#endif
 
+
+/* Analysis Related Fortran Libraries */
+
+#if defined(MacOSXArchitecture) || defined(DarwinArchitecture)
+LDFLAGS       = $(ANALLIB) -L/usr/local/lib -lg2c
+ANALLIB	      = $(LDDIRFLAG)$(LCLIBDIR) -lFORTLIB -l$(HELASV204) $(EXTRALIBS)
+#else
+ANALLIB       = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
+                -lSIMJLC -lLTKCL -lLCFULL -lTBS \
+                -l$(HELASV204) -lFORTLIB -lCOM -lCLI $(EXTRALIBS)
 #endif
 
 /* Tentative Architecture Dependent Treatments */
@@ -36,5 +52,22 @@ ROOTLIBS     += -lEGPythia -lEG -Wl,-u,pytest_ $(CERNLIBS)
 	LDDIRFLAG = -L
 	EXTRALIBS = 
 	CERNLIBS = $(LDDIRFLAG)$(CERN_ROOT)/lib -ljetset74 -lpacklib
+
+# if defined(MacOSXArchitecture) || defined(DarwinArchitecture)
+	SOFLAGS += -install_name $(SONAME)
+
+#  ifndef InstallSharedLibrary
+#  define InstallSharedLibrary(libname,rev,dest)                        @@\
+install:: Concat(lib,libname.so.rev)                                    @@\
+	MakeDir($(DESTDIR)dest)                                         @@\
+	$(INSTALL) $(INSTALLFLAGS) $(INSTBINFLAGS) Concat(lib,libname.so.rev) $(DESTDIR)dest @@\
+	@T=`echo Concat($(DESTDIR)dest/lib,libname.so.rev) | sed 's/\.[^\.]*$$//'`;\
+	set -x; $(RM) $$T && $(LN) Concat(lib,libname.so.rev) $$T     @@\
+	@if $(SOSYMLINK); then (set -x; \
+	$(RM) Concat($(DESTDIR)dest/lib,libname.so); \                @@\
+	$(LN) Concat(lib,libname.so.rev) Concat($(DESTDIR)dest/lib,libname.so)); fi
+#  endif
+# else
 	SOFLAGS += -Wl,-soname,$(SONAME)
+# endif
 #endif
