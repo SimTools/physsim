@@ -118,6 +118,8 @@ void UserInitialize()
   hMt1Mt2       = new TH2F("hMt1Mt2","(m_t1,m_t2)" , 
   				    50,120.0, 220.0,  50, 120.0, 220.0);
 
+  cHist = 0;
+
   last->cd();
   return;
 }

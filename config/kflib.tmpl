@@ -56,7 +56,9 @@ ANALLIB       = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
 # if defined(MacOSXArchitecture) || defined(DarwinArchitecture)
 	SOFLAGS += -install_name $(SONAME)
 
-#  ifndef InstallSharedLibrary
+#  ifdef InstallSharedLibrary
+#  undef InstallSharedLibrary
+#  endif
 #  define InstallSharedLibrary(libname,rev,dest)                        @@\
 install:: Concat(lib,libname.so.rev)                                    @@\
 	MakeDir($(DESTDIR)dest)                                         @@\
@@ -66,7 +68,6 @@ install:: Concat(lib,libname.so.rev)                                    @@\
 	@if $(SOSYMLINK); then (set -x; \
 	$(RM) Concat($(DESTDIR)dest/lib,libname.so); \                @@\
 	$(LN) Concat(lib,libname.so.rev) Concat($(DESTDIR)dest/lib,libname.so)); fi
-#  endif
 # else
 	SOFLAGS += -Wl,-soname,$(SONAME)
 # endif

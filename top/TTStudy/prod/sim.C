@@ -12,6 +12,7 @@
   hdr=new JSFHadronizer();
   sim=new JSFQuickSim();
   
+//  TTree::SetBranchStyle(0);
 //  full->SetMakeBranch(kFALSE);   // suppress output of EventBuf 
 //  hdr->SetMakeBranch(kFALSE);    // suppress output of EventBuf 
 //  sim->SetMakeBranch(kFALSE);    // suppress output of EventBuf

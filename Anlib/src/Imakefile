@@ -50,7 +50,7 @@ HDRS		= $(LIBNAME).h
 
 /* Make Targets */
 
-all:: lib$(LIBNAME).$(SOEXT).$(SOREV)
+all:: $(JSFSOLIB)
 
 $(JSFSOLIB): $(ALLOBJS)
 	$(LD) -o $@ $(SOFLAGS) $(ALLOBJS)
