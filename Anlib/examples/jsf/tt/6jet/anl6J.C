@@ -1,14 +1,28 @@
+//*************************************************************************
+//* ===================
+//*  anl6J.C JSF Macro
+//* ===================
+//*
+//* (Description)
+//*   JSF macro for analyze MC ttbar data to select 6-jet events.
+//* (Update Recored)
+//*   1999/08/03  K.Fujii       Original version
+//*   2001/07/07  K.Ikematsu    Minor update
+//*
+//* $Id$
+//*************************************************************************
+//
 Int_t maxevt = 5000;
 Int_t freq   = 10;
 
 int anl6J()
-{  
+{
   TFile *file;
   TFile *fin;
   JSFSteer *jsf;
 
   Char_t *outputfile="jsf.root";  // A file to output histograms
-  Char_t *inputfile="../../../../../top/TTStudy/prod/ttsim.root"; 
+  Char_t *inputfile="../../../../../top/TTStudy/prod/ttsim.root";
   // Char_t *inputfile="ttsim.root";	// Input simulator file.
 
   if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
@@ -33,10 +47,10 @@ int anl6J()
 
   // Define modules to use. //
 
-  JSFSIMDST    *simdst = new JSFSIMDST();	// Necessary to create SIMDST 
+  JSFSIMDST    *simdst = new JSFSIMDST();	// Necessary to create SIMDST
   simdst->SetFile(file);			// since we analyze SIMDST
   simdst->NoReadWrite();			// instead of QuickSim data.
-  
+
   TT6JAnalysis *myanl  = new TT6JAnalysis("TT6JAnalysis","My Analysis");
 
   jsf->Initialize();             		// JSF Module initialization.
@@ -80,4 +94,3 @@ int anl6J()
   file->Write();
   return 0;
 }
-

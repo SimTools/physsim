@@ -8,4 +8,3 @@
 #pragma link C++ class TT6JAnalysisBuf;
 
 #endif
-

@@ -8,4 +8,3 @@
 #pragma link C++ class TTL4JAnalysisBuf;
 
 #endif
-

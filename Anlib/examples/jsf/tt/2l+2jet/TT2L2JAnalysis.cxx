@@ -1,11 +1,11 @@
 //*************************************************************************
-//* =======================
+//* ========================
 //*  TT2L2JAnalysis Classes
-//* =======================
+//* ========================
 //*
 //* (Description)
 //*   A sample user analysis classes for JLC analyses.
-//*   This reads and analyze MC ttbar data to select Lepton + 4-jet events.
+//*   This reads and analyze MC ttbar data to select 2-lepton + 2-jet events.
 //* (Requires)
 //* 	library Anlib
 //* 	library TTStudy
@@ -13,10 +13,12 @@
 //* 	class TT2L2JAnalysis
 //* 	class TT2L2JAnalysisBuf
 //* (Usage)
-//*   Take a look at Anl.C.
+//*   Take a look at anl2L2J.C.
 //* (Update Recored)
-//*   1999/08/16  K.Ikematsu    Derived from TT6JAnalysis.cxx.
+//*   1999/08/19  K.Ikematsu    Derived from TTL4JAnalysis.cxx.
+//*   2001/07/07  K.Ikematsu    Modified for MacOS X.
 //*
+//* $Id$
 //*************************************************************************
 //
 #include "TT2L2JAnalysis.h"
@@ -42,7 +44,7 @@ Bool_t gDEBUG = kFALSE;
 ClassImp(TT2L2JAnalysisBuf)
 
 //_________________________________________________________
-TT2L2JAnalysisBuf::TT2L2JAnalysisBuf(const Char_t *name, const Char_t *title, 
+TT2L2JAnalysisBuf::TT2L2JAnalysisBuf(const Char_t *name, const Char_t *title,
    TT2L2JAnalysis *module) : JSFEventBuf(name, title, (JSFModule*)module) {}
 
 //_________________________________________________________
@@ -60,18 +62,18 @@ TT2L2JAnalysisBuf::TT2L2JAnalysisBuf(TT2L2JAnalysis *module, const Char_t *name,
 ClassImp(TT2L2JAnalysis)
 
 TT2L2JAnalysis::TT2L2JAnalysis(const Char_t *name, const Char_t *title)
-	       : JSFModule(name, title) 
+  : JSFModule(name, title), cHist(0)
 {
   fEventBuf = new TT2L2JAnalysisBuf(this);
   SetBufferSize(2000);  // buffer size for event data.
-  cout << "TT2L2JAnalysisBuf is created...fEventBuf is " 
+  cout << "TT2L2JAnalysisBuf is created...fEventBuf is "
        << (Int_t)fEventBuf << endl;
 }
 
 //_____________________________________________________________________
 TT2L2JAnalysis::~TT2L2JAnalysis()
 {
-  cout << "TT2L2JAnalysisBuf will be deleted...fEventBuf is " 
+  cout << "TT2L2JAnalysisBuf will be deleted...fEventBuf is "
        << (Int_t)fEventBuf << endl;
   delete fEventBuf; fEventBuf = 0;
 }
@@ -79,12 +81,7 @@ TT2L2JAnalysis::~TT2L2JAnalysis()
 //_____________________________________________________________________
 void TT2L2JAnalysis::CleanUp(TObjArray *objs)
 {
-  TIter next(objs);
-  TObject *obj;
-  while ((obj = next())) {
-  	objs->Remove(obj);
-  	delete obj;
-  }
+  objs->SetOwner();
 }
 
 //_____________________________________________________________________
@@ -107,7 +104,7 @@ Bool_t TT2L2JAnalysis::Initialize()
   hNjets        = new TH1F("hNjets","No. jets"      ,  20,   0.0,  20.0);
   hEjet         = new TH1F("hEjet","Jet energy"     ,  50,   0.0, 100.0);
   hCosjet       = new TH1F("hCosjet","cos(theta_j)" ,  50,  -1.0,  +1.0);
-  hEvisPl       = new TH2F("hEvisPl","(Evis,Pl)"    , 
+  hEvisPl       = new TH2F("hEvisPl","(Evis,Pl)"    ,
   				     60,  0.0, 600.0,  50,-100.0,+100.0);
   hThrust       = new TH1F("hThrust","Thrust"       ,  50,   0.0,   1.0);
   hYcut         = new TH1F("hYcut","Ymax"           , 100,   0.0,   1.0);
@@ -125,6 +122,10 @@ Bool_t TT2L2JAnalysis::Initialize()
   xEjet     =   5.00;	// E_jet minimum
   xCosjet   =   0.99;	// |cos(theta_j)| maximum
   xThrust   =   1.00;   // Thrust maximum
+
+  for (Int_t i = 0; i < MAXCUT; i++) {
+    strcpy(&cutName[i][0],"     ");
+  }
 
   last->cd();
   return 0;
@@ -159,7 +160,7 @@ void TT2L2JAnalysis::DrawHist()
   cHist->cd(++Ihist);	hYcut->Draw();
 
   cHist->Update();
-  
+
   last->cd();
 }
 
@@ -178,9 +179,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   Double_t  	fYcut;		// y_cut to force the event to 2 jets
   Int_t        	fNjets;		// jet multiplicity
   Double_t  	fThrust;	// thrust
- 
+
   // Remember the previous directory.
-  
+
   TDirectory *last = gDirectory;
   gFile->cd("/");
 
@@ -189,7 +190,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // ---------------------
   // Analysis starts here.
   // ---------------------
-  
+
   Float_t selid = -0.5;
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) strcpy(&cutName[(Int_t)selid][0],"No cut");
@@ -201,7 +202,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   TT2L2JAnalysisBuf *ua    = (TT2L2JAnalysisBuf *)fEventBuf;
   TT2L2JAnalysisBuf &a     = *ua;
 
-  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
+  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks
   TClonesArray  *trks    = evt->GetLTKCLTracks(); 	// combined tracks
 
   // Select good tracks and store them in "TObjArray tracks".
@@ -221,7 +222,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   if (gDEBUG) cerr << "Ntracks = " << fNtracks << endl;
 
   // Cut on No. of tracks.
-  
+
   hNtracks->Fill(fNtracks);
   if ( fNtracks < xNtracks ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
@@ -233,8 +234,8 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   fEvis = qsum(0);		// E_vis
   fPt   = qsum.GetPt();		// P_t
   fPl   = qsum(3);		// P_l
-  
-  if (gDEBUG) cerr << "Evis = " << fEvis << " Pt = " 
+
+  if (gDEBUG) cerr << "Evis = " << fEvis << " Pt = "
        << fPt << " Pl = " << fPl << endl;
 
   // Cut on Evis.
@@ -246,7 +247,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
     sprintf(msg,"E_vis < %g",xEvis);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
- 
+
   // Cut on Pt.
 
   hPt->Fill(fPt);
@@ -256,7 +257,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
     sprintf(msg,"Pt <= %g",xPt);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
- 
+
   // Cut on Pl.
 
   if ( TMath::Abs(fPl) > xPl ) { CleanUp(&tracks); return kFALSE; }
@@ -306,11 +307,11 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
 
-  // Require Charge oppositeness of two Isolated Leptons. 
+  // Require Charge oppositeness of two Isolated Leptons.
 
   hNlpmtracks->Fill(fNlpmtracks);
   hNlpptracks->Fill(fNlpptracks);
-  if ( fNlpmtracks != 1 && fNlpptracks != 1) { 
+  if ( fNlpmtracks != 1 && fNlpptracks != 1) {
     CleanUp(&tracks); return kFALSE;
   }
   hStat->Fill(++selid);
@@ -327,11 +328,11 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   jclust.FindJets();
   fYcut  = jclust.GetYmax();
   fNjets = jclust.GetNjets();
-  
+
   if (gDEBUG) cerr << "Ycut = " << fYcut << " Njets = " << fNjets << endl;
 
   // Cut on No. of jets.
-    
+
   hNjets->Fill(fNjets);
   if ( fNjets < xNjets ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
@@ -339,9 +340,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
     sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
-  
+
   // Now force the event to be xNjets.
-  
+
   jclust.ForceNJets(xNjets);
   fNjets = jclust.GetNjets();
   fYcut  = jclust.GetYmax();
@@ -349,7 +350,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   if (gDEBUG) cerr << "Ycut = " << fYcut << " Njets = " << fNjets << endl;
 
   // Make sure that No. of jets is xNjets.
-    
+
   hYcut->Fill(fYcut);
   if ( fNjets != xNjets ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
@@ -357,9 +358,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
     sprintf(msg,"Njets = %i",xNjets);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
-  
+
   // Loop over jets and decide Ejet_min and |cos(theta_j)|_max.
-  
+
   TObjArray &jets = jclust.GetJets();
   TIter nextjet(&jets);
   ANLJet *jetp;
@@ -377,7 +378,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   }
 
   // Cut on Ejet_min.
-  
+
   if ( ejetmin < xEjet ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
@@ -386,7 +387,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   }
 
   // Cut on |cos(theta_j)|_max.
-    
+
   if ( TMath::Abs(cosjmax) > xCosjet ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
@@ -417,13 +418,13 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
   Ngoods++;
-  
+
   cerr << "------------------------------------------" << endl
        << "Event " << gJSF->GetEventNumber() << endl
        << "------------------------------------------" << endl;
 
   // Now store this in TT2L2JAnalysisBuf.
-  
+
   a.fNtracks	= fNtracks;
   a.fEvis	= fEvis;
   a.fPt		= fPt;
@@ -446,7 +447,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
 
   ANLTrack qm, qp;
 
-  if ( ((ANLTrack *)lptracks.UncheckedAt(0))->GetCharge() < 0. ) {  
+  if ( ((ANLTrack *)lptracks.UncheckedAt(0))->GetCharge() < 0. ) {
     qm = *((ANLTrack *)lptracks.UncheckedAt(0));
     qp = *((ANLTrack *)lptracks.UncheckedAt(1));
   } else {
@@ -488,7 +489,7 @@ Bool_t TT2L2JAnalysis::Terminate()
   Int_t i;
   for ( i = 0; strncmp(&cutName[i][0],"END",4) && i < MAXCUT ; i++ ) {
     printf("  %3d  %10d  : %s\n",i,(int)hStat->GetBinContent(i+1),&cutName[i][0]);
-  } 
+  }
   cout << "  -----------------------------------------------------------" << endl;
   return 0;
 }

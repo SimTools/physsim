@@ -7,7 +7,7 @@
 //*
 //* (Description)
 //*   A sample user analysis classes for JLC analyses.
-//*   This reads and analyze MC chargino pair data. 
+//*   This reads and analyze MC ttbar data to select lepton + 4-jet events.
 //* (Requires)
 //* 	library Anlib
 //* 	library TTStudy
@@ -15,10 +15,12 @@
 //* 	class TTL4JAnalysis
 //* 	class TTL4JAnalysisBuf
 //* (Usage)
-//*   Take a look at anl.C.  
+//*   Take a look at anlL4J.C.
 //* (Update Recored)
 //*   1999/08/16  K.Ikematsu	Derived from TT6JAnalysis.h.
+//*   2001/07/07  K.Ikematsu    Modified for MacOS X.
 //*
+//* $Id$
 //*************************************************************************
 //
 #include "TROOT.h"
@@ -36,7 +38,7 @@
 //  ----------------------
 //  TTL4JAnalysisBuf Class
 //  ----------------------
-//  
+//
 //  This class is to store data summary of a selected event.
 //  Add more data members as needed.
 //
@@ -50,7 +52,7 @@ public:
   TTL4JAnalysisBuf(TTL4JAnalysis *mod, const char *name="TTL4JAnalysisBuf",
 		   const char *title="TT Lepton+4-Jet Data");
   virtual ~TTL4JAnalysisBuf() {}
-  
+
   inline Int_t    GetNtracks()	const { return fNtracks; }
   inline Double_t GetEvis()	const { return fEvis; }
   inline Double_t GetPt()	const { return fPt; }
@@ -139,7 +141,7 @@ public:
   inline void SetPtCut    (Double_t x) { xPt = x; }
   inline void SetPlCut    (Double_t x) { xPl = x; }
   inline void SetElpCut   (Double_t x) { xElepton = x; }
-  inline void SetConeAngle(Double_t x) 
+  inline void SetConeAngle(Double_t x)
                           { xCosCone = TMath::Cos(TMath::Pi()*x/180.); }
   inline void SetEconeCut (Double_t x) { xEcone = x; }
   inline void SetMinYcut  (Double_t x) { xYcut  = x; }
@@ -150,10 +152,10 @@ public:
   inline void SetM2jCut   (Double_t x) { xM2j = x; }
   inline void SetM3jCut   (Double_t x) { xM3j = x; }
   inline void SetThrustCut(Double_t x) { xThrust = x; }
-  
+
   Bool_t Initialize();
   Bool_t Process(Int_t ev);
-  Bool_t Terminate();   
+  Bool_t Terminate();
   void DrawHist();
 
   ClassDef(TTL4JAnalysis, 1) // TTL4JAnalysis Example

@@ -7,7 +7,7 @@
 //*
 //* (Description)
 //*   A sample user analysis classes for JLC analyses.
-//*   This reads and analyze MC chargino pair data. 
+//*   This reads and analyze MC ttbar data to select 6-jet events.
 //* (Requires)
 //* 	library Anlib
 //* 	library TTStudy
@@ -15,10 +15,12 @@
 //* 	class TT6JAnalysis
 //* 	class TT6JAnalysisBuf
 //* (Usage)
-//*   Take a look at anl.C.  
+//*   Take a look at anl6J.C.
 //* (Update Recored)
 //*   1999/08/01  K.Fujii	Original version.
+//*   2001/07/07  K.Ikematsu    Modified for MacOS X.
 //*
+//* $Id$
 //*************************************************************************
 //
 #include "TROOT.h"
@@ -36,7 +38,7 @@
 //  ---------------------
 //  TT6JAnalysisBuf Class
 //  ---------------------
-//  
+//
 //  This class is to store data summary of a selected event.
 //  Add more data members as needed.
 //
@@ -50,7 +52,7 @@ public:
   TT6JAnalysisBuf(TT6JAnalysis *mod, const char *name="TT6JAnalysisBuf",
                   const char *title="TT 6-Jet Data");
   virtual ~TT6JAnalysisBuf() {}
-  
+
   inline Int_t    GetNtracks()	const { return fNtracks; }
   inline Double_t GetEvis()	const { return fEvis; }
   inline Double_t GetPt()	const { return fPt; }
@@ -133,16 +135,13 @@ public:
   inline void SetM2jCut   (Double_t x) { xM2j = x; }
   inline void SetM3jCut   (Double_t x) { xM3j = x; }
   inline void SetThrustCut(Double_t x) { xThrust = x; }
-  
+
   Bool_t Initialize();
   Bool_t Process(Int_t ev);
-  Bool_t Terminate();   
+  Bool_t Terminate();
   void DrawHist();
 
   ClassDef(TT6JAnalysis, 1) // TT6JAnalysis Example
 };
 
 #endif
-
-
-

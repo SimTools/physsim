@@ -1,13 +1,13 @@
 #ifndef __TT2L2JAnalysis__
 #define __TT2L2JAnalysis__
 //*************************************************************************
-//* =========================
+//* ========================
 //*  TT2L2JAnalysis Classes
-//* =========================
+//* ========================
 //*
 //* (Description)
 //*   A sample user analysis classes for JLC analyses.
-//*   This reads and analyze MC chargino pair data. 
+//*   This reads and analyze MC ttbar data to select 2-lepton + 2-jet events.
 //* (Requires)
 //* 	library Anlib
 //* 	library TTStudy
@@ -15,10 +15,12 @@
 //* 	class TT2L2JAnalysis
 //* 	class TT2L2JAnalysisBuf
 //* (Usage)
-//*   Take a look at anl.C.  
+//*   Take a look at anl2L2J.C.
 //* (Update Recored)
 //*   1999/08/19  K.Ikematsu    Derived from TTL4JAnalysis.h.
+//*   2001/07/07  K.Ikematsu    Modified for MacOS X.
 //*
+//* $Id$
 //*************************************************************************
 //
 #include "TROOT.h"
@@ -36,7 +38,7 @@
 //  -----------------------
 //  TT2L2JAnalysisBuf Class
 //  -----------------------
-//  
+//
 //  This class is to store data summary of a selected event.
 //  Add more data members as needed.
 //
@@ -50,7 +52,7 @@ public:
   TT2L2JAnalysisBuf(TT2L2JAnalysis *mod, const char *name="TT2L2JAnalysisBuf",
 		   const char *title="TT Lepton+4-Jet Data");
   virtual ~TT2L2JAnalysisBuf() {}
-  
+
   inline Int_t    GetNtracks()	const { return fNtracks; }
   inline Double_t GetEvis()	const { return fEvis; }
   inline Double_t GetPt()	const { return fPt; }
@@ -136,10 +138,10 @@ public:
   inline void SetEjetCut  (Double_t x) { xEjet = x; }
   inline void SetCosjetCut(Double_t x) { xCosjet = x; }
   inline void SetThrustCut(Double_t x) { xThrust = x; }
-  
+
   Bool_t Initialize();
   Bool_t Process(Int_t ev);
-  Bool_t Terminate();   
+  Bool_t Terminate();
   void DrawHist();
 
   ClassDef(TT2L2JAnalysis, 1) // TT2L2JAnalysis Example
