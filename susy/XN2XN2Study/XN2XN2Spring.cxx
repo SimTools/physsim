@@ -328,7 +328,7 @@ void XN2XN2Bases::Userin()
 //_____________________________________________________________________________
 void XN2XN2Bases::Userout()
 { 
-  printf("End of Bases of ee --> XN1 XN2 process\n");
+  printf("End of Bases of ee --> XN2 XN2 process\n");
   printf("ISRBM = %d\n",fISRBM);
   printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
   printf("       = 1 ; None\n");
