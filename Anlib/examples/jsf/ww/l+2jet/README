@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+2000/04/28  K.Ikematsu	Sample Analysis Module Using Anlib
+-------------------------------------------------------------------------------
+Reaction: 	e+e- -> w+w- -> lepton + 2jets
+Generator:	WWStudy
+Usage:		
+
+$ xmkmf -a; make
+$ jsf anlL2J.C
+or to avoid a lot of debug messages
+$ jsf anlL2J.C 2>/dev/null
+
+You have to prepare MC data(wwsim.root) in WWStudy/prod directory
+before you do the above.
