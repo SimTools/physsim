@@ -1,4 +1,13 @@
 -------------------------------------------------------------------------------
+2000/08/24	K.Fujii		Physsim-2000a-4
+-------------------------------------------------------------------------------
+1) Now uses the standard gui.C, since shared library loading can be
+   handled by JSF through jsf.conf:
+   e.g.)
+   	JSF.SharedLibraries:	TTSpring.so:libAnlib.so 
+   This version requires root_v.2.25.02 or greater.
+
+-------------------------------------------------------------------------------
 2000/07/13	K.Fujii		Physsim-2000a-3
 -------------------------------------------------------------------------------
 1) Userin() call removed from ctor of XXBases. Because of this, 

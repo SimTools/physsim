@@ -1,14 +1,19 @@
 ------------------------------------------------------------------------
-   Physics study libraries				2000/06/26
+   Physics study libraries				2000/08/24
 ------------------------------------------------------------------------
  
 [1] Version Information
 
    Version: 2000a
-   Release: 3
+   Release: 4
 
 [2] Update Record
 
+    2000/08/24  K.Fujii		Now used the standard gui.C.
+    				This version requires root v.2.25.02
+				or later.
+    2000/07/13  K.Fujii		Userin() call removed from XXBases' ctor.
+    				This version requires jsf-1-15 or later.
     2000/06/26  K.Fujii		A temporary JSF version (2000a-2)
     				This version uses Bases++ and requires
 				JSF-1-14 or later.

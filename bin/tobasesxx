@@ -219,7 +219,7 @@ END_MARK3
       } elsif (/fPrintInfo/) {
       } elsif (/fPrintHist/) {
          if ($bsctor == 1) {
-	    print OUTFILE "  Userin();";
+	    # print OUTFILE "  Userin();";
 	    $bsctor = 0;
          }
       } elsif (/ *return *;/) {

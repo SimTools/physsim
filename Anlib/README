@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 		JLC Physics Analysis Library
 -------------------------------------------------------------------------------
-Version: 	0.8c
+Version: 	0.9a
 Description:	C++ library for physics analysis, containing
 		4-vectors, combiners, jet finders, ....
 UpdateRecord:	
