@@ -301,7 +301,7 @@ void XCXCBases::Userin()
 //_____________________________________________________________________________
 void XCXCBases::Userout()
 { 
-  printf("End of Bases of ee --> sf sf process\n");
+  printf("End of Bases of ee --> XC XC process\n");
   printf("ISRBM = %d\n",fISRBM);
   printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
   printf("       = 1 ; None\n");

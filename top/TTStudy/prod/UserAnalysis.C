@@ -185,7 +185,7 @@ void UserAnalysis()
   JSFSIMDST     *sds     = (JSFSIMDST*)jsf->FindModule("JSFSIMDST");
   JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
   Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
-  TClonesArray  *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
    
   // Select good tracks and store them in "TObjArray tracks".
   
@@ -524,11 +524,6 @@ void UserAnalysis()
           hMt1Mt2->Fill(t1mass,t2mass,1.0);
 #endif
   }
-
-  // Clean up
-
-  nextsol.Reset();
-  while ((solp = (ANLPair *)nextsol())) solp->Delete();
 
   last->cd();
   return;

@@ -156,7 +156,7 @@ void UserAnalysis()
   JSFSIMDST    *sds     = (JSFSIMDST*)jsf->FindModule("JSFSIMDST");
   JSFSIMDSTBuf *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
   Int_t         ntracks = evt->GetNLTKCLTracks(); 	// No. of tracks 
-  TClonesArray *tracks  = evt->GetLTKCLTracks(); 	// combined tracks
+  TObjArray *tracks     = evt->GetLTKCLTracks(); 	// combined tracks
 
   // Cut on No. of tracks.
   
