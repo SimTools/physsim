@@ -16,9 +16,9 @@ C*       PV(*, i) : (R*8) : 4-momentum of i-th particle.
 C*                        : i =  1 for  e-.
 C*                        :   =  2 for  e+.
 C*                        :   =  3 for  X0_1 = LSP.
-C*                        :   =  4 for  tau- from X0_2
-C*                        :   =  5 for  tau+ from X0_2
-C*                        :   =  6 for  LSP  from X0=2
+C*                        :   =  4 for  f    from X0_2
+C*                        :   =  5 for  fbar from X0_2
+C*                        :   =  6 for  LSP  from X0_2
 C* (Outputs)
 C*    AMP2(0)     : (R*8) : (amplitude sum)**2.
 C*        (1)     : (R*8) : s-channel Z.
@@ -284,7 +284,7 @@ C--
       CALL OXXXXX(PV(0,6),SZM(1),IHEL(6),+1,SPINOR(1, 6))
       CALL IXXXXX(PV(0,6),SZM(1),IHEL(6),-1,SPINOR(1,16))
 C--
-C  Prepare wave functions for Z, stau1-, and stau1+.
+C  Prepare wave functions for Z, sf, and sfbar.
 C--
       CALL JIOXXX(SPINOR(1, 5),SPINOR(1, 4),GZF,AMSZ,GAMZ,ZVCT)
 C-- sf

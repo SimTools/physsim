@@ -4,11 +4,13 @@
  
 [1] Version Information
 
-   Version: 2004a
-   Release: 1
+   Version: 2005a
+   Release: 2
 
 [2] Version History
 
+    2005/03/26  K.Fujii		2005a-2
+    2005/03/02  K.Fujii		2005a-1
     2004/11/23  K.Fujii		2004a-1
     2001/05/25  K.Fujii		2001a-1
     2000/08/29  K.Fujii		2000a-5
@@ -23,30 +25,22 @@
 [3] How to Install the Libraries
 
    Before you install physsim, you have to install
+        lcbase
+        leda
 	lclib
         jsf
-        Satellites/src/leda/utils
-        Anlib
-   Since we moved some of the Anlib classes to Satellites/src/leda/utils,
-   now we need Satellites to install physsim.
-   You don't have to build all of Satellites, just go to src/leda/utils
-   and "make install" it.
-   We are planning to remove leda/utils from Satellites in the future
-   in order to fix this problem.  Sorry for the inconvenience.
+   Since we separated configuration files from JSF as lcbase and leda
+   from Satellites, now we need lcbase and leda to install physsim.
+   For installation of these packages, see the instruction files that
+   come with them.
 
-   In order to use this package you should first set some
+   In order to use this package you should set some additional
    environmental variables:
 
-        $ export ANLIBROOT=<the directory where Anlib has been installed>
-        $ export SATELLITESROOT=<the directory where Satellites has been installed>
 	$ cd <the directory containing this file>
 	$ export KFLIBROOT=`pwd`
-	$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$KFLIBROOT/lib
 	$ export IMAKEINCLUDE="$IMAKEINCLUDE -I$KFLIBROOT"
 	$ vi ~/.rootrc
-	Unix.*.Root.DynamicPath:.:$(ROOTSYS)/lib:$(JSFROOT)/lib:$(KFLIBROOT)/lib
-	Unix.*.Root.MacroPath:  .:$(ROOTSYS)/macros:$(JSFROOT)/example/guiexam1
-
 
    where the JSF standard environmental variables such as
    ROOTSYS, JSFROOT, LCLIBROOT, CERN_ROOT, .... are assumed
@@ -60,10 +54,10 @@
    Step [3] will create libraries necessary to build various MC
    event generators based on BASES/SPRING stored in
 	higgs	: zh, ...
-	susy	: sfsf, xcxc, ...
+	susy	: sfsf, xcxc, xn1xn2, xn2xn2, ...
 	top	: eett, nntt, tth, tt, ttz, ...
 	twoph	: eeff (f=e,mu,tau,q)
-	wz	: eeww, eez, enw, nnww, nnz, ww, wwz, zz, ...
+	wz	: eeww, eezz, eez, enw, nnww, nnzz, nnz, ww, wwz, zz, ...
    These subdirectories contain subsubdirectories named
    <PROCESSNAME>Study. The top levelMakefile does NOT build 
    individual Monte Carlo event generators: it only creates

@@ -290,16 +290,16 @@ void XN1XN2Bases::Userin()
   Xhinit("h07",  0.0,ptmx, 50,"Missing PT           ");
   Xhinit("h08",  0.0,180., 50,"Acop                 ");
   Xhinit("h09",  1.0, 33., 32,"Hel. comb.           ");
-  Xhinit("h10",  0.0, qmx, 50,"E_tau-               ");
-  Xhinit("h11",  0.0, qmx, 50,"E_tau+               ");
-  Xhinit("h12", -1.0, 1.0, 50,"cos(theta_tau-)      ");
-  Xhinit("h13", -1.0, 1.0, 50,"cos(theta_tau+)      ");
+  Xhinit("h10",  0.0, qmx, 50,"E_f                  ");
+  Xhinit("h11",  0.0, qmx, 50,"E_fbar               ");
+  Xhinit("h12", -1.0, 1.0, 50,"cos(theta_f)         ");
+  Xhinit("h13", -1.0, 1.0, 50,"cos(theta_fbar)      ");
   Xhinit("h14",   .0,  1., 50,"sqrt(rs)/sqrt(root)  ");
-  Xhinit("h15", -1.0, 1.0, 50,"cos(theta_tau-)      ");
-  Xhinit("h16", -1.0, 1.0, 50,"cos(theta_tau+)      ");
+  Xhinit("h15", -1.0, 1.0, 50,"cos(theta_f)         ");
+  Xhinit("h16", -1.0, 1.0, 50,"cos(theta_fbar)      ");
   Xhinit("h17",  0.0, qmx, 50,"M_X0j                ");
-  Xhinit("h18", -1.0, 1.0, 50,"cos(theta_stau-)     ");
-  Xhinit("h19", -1.0, 1.0, 50,"cos(theta_stau+)     ");
+  Xhinit("h18", -1.0, 1.0, 50,"cos(theta_sf)        ");
+  Xhinit("h19", -1.0, 1.0, 50,"cos(theta_sfbar)     ");
   Xhinit("h20",  1.0, 13., 12,"Decay mode           ");
 }
 

@@ -1,4 +1,27 @@
 -------------------------------------------------------------------------------
+2005/03/26	K.Fujii		Physsim-2005a-2
+-------------------------------------------------------------------------------
+1) Fixed bugs (mostly typos in comments and a problem with sfermion masses
+   that would have affected the results when non-degenerate sfermions are
+   active in decay chains) in susy/XN2XN2Study.
+-------------------------------------------------------------------------------
+2005/03/02	K.Fujii		Physsim-2005a-1
+-------------------------------------------------------------------------------
+1) JSF-dependent part of Anlib (libJSFAnlib.so) will not be built if LCBASEDIR
+   is set, since it is now distributed with JSF.
+   The version is now compatible with new package layout.
+2) JSFHadronizer in the latest JSF package is now compatible with Pythia6.
+   The default hadronizer for Physsim generators are hence Pythia6 now.
+3) new generators and corresponding analysis examples:
+   xd/KKhhStudy               : e+e- --> hh generator by Nicolas
+   Anlib/examples/jsf/kk/hh   : its analysis example
+   susy/XN1XN2Study           : e+e- --> chi^0_1 chi^0_2
+   susy/XN2XN2Study           : e+e- --> chi^0_2 chi^0_2
+   wz/EEZZStudy               : e+e- --> e+e-ZZ
+   wz/NNZZStudy               : e+e- --> nu nubar Z Z
+   Anlib/examples/jsf/tth     : tth analysis examples
+
+-------------------------------------------------------------------------------
 2004/11/23	K.Fujii		Physsim-2004a-1
 -------------------------------------------------------------------------------
 1) Separated JSF-independent part of Anlib and renamed those that depend on

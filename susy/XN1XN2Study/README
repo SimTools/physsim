@@ -1,0 +1,14 @@
+CAUTION:
+
+Currently chi^0_2 is supposed to decay via
+chi^0_2 --> sf + fbar --> chi^0_1 + f + fbar
+        --> f + sfbar --> f + fbar + chi^0_1
+        --> chi^0_1 + Z --> chi^0_1 + f + fbar
+where sf or sfbar are the lightest in each species: snu_e, se_R,
+su_R, sd_R, snu_mu, smu_R, sc_R, ss_R, snu_tau. stau_1, st_1,
+and sb_1. See fulnxx.F for details.
+
+When all of the above three decay channels are open, one usually
+needs to make NCALL very large, to correctly detect mass peaks
+in the phase space. Check BASES outputs to confirm convergence 
+of the Monte Carlo integration.
