@@ -14,7 +14,9 @@
 //* 	class ANL2DVector
 //* (Update Recored)
 //*    2001/02/16  K.Ikematsu	Original version.
+//*    2001/07/12  K.Ikematsu   Added DebugPrint() function.
 //*
+//* $Id$
 //*************************************************************************
 //
 #include <iostream.h>
@@ -61,6 +63,13 @@ public:
    inline friend ANL2DVector operator+ (const ANL2DVector &q1) { return q1; }
    inline friend ANL2DVector operator- (const ANL2DVector &q1) {
        ANL2DVector ans(-q1.Px(),-q1.Py()); return ans;
+   }
+
+   inline virtual void DebugPrint(const Char_t *opt = "Brief") const {
+     cerr << "p    = " << operator()(1) << " " << operator()(2) << endl;
+     if (opt == "Detailed") {
+       cerr << "ap   = " << Mod()  << endl;
+     }
    }
 
    ClassDef(ANL2DVector,1)  // Lockable 2D vector class
