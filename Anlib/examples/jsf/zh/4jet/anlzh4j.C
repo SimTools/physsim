@@ -16,11 +16,11 @@ Int_t maxnevt = 2000;
 Int_t freq = 10;
 
 Char_t *anlib_so = "libAnlib.so";
-Char_t *zhspr_so = "../../../../higgs/ZHStudy/prod/ZHSpring.so";
+Char_t *zhspr_so = "../../../../../higgs/ZHStudy/prod/ZHSpring.so";
 Char_t *procanl_so = "libZH4JAnalysis.so";
 
 Char_t *outputfile = "jsf.root";	// A file to output histograms
-Char_t *inputfile = "../../../../higgs/ZHStudy/prod/zhsim.root";	// Input simulator file
+Char_t *inputfile = "../../../../../higgs/ZHStudy/prod/zhsim.root";	// Input simulator file
 
 
 int anlzh4j()

@@ -8,18 +8,18 @@ int anl4J()
   JSFSteer *jsf;
 
   Char_t *outputfile="jsf.root";  // A file to output histograms
-  Char_t *inputfile="../../../../susy/XCXCStudy/prod/xcxcsim.root"; 
+  Char_t *inputfile="../../../../../susy/XCXCStudy/prod/xcxcsim.root"; 
   // Char_t *inputfile="xcxcsim.root";	// Input simulator file.
 
   if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
     if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
       gSystem->Load("libAnlib.sl");
-      gSystem->Load("../../../../susy/XCXCStudy/prod/XCXCSpring.sl");
+      gSystem->Load("../../../../../susy/XCXCStudy/prod/XCXCSpring.sl");
       gSystem->Load("libXCXC4JAnalysis.sl");
     }
     else {
       gSystem->Load("libAnlib.so");
-      gSystem->Load("../../../../susy/XCXCStudy/prod/XCXCSpring.so");
+      gSystem->Load("../../../../../susy/XCXCStudy/prod/XCXCSpring.so");
       gSystem->Load("libXCXC4JAnalysis.so");
    }
   }

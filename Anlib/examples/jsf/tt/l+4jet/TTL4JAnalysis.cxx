@@ -141,6 +141,10 @@ Bool_t TTL4JAnalysis::Initialize()
   xM3j      =  24.00;	// |m_3j-m_t| maximum
   xThrust   =   0.90;   // Thrust maximum
 
+  for (Int_t i = 0; i < MAXCUT; i++) {
+    strcpy(&cutName[i][0],"     ");
+  }
+
   last->cd();
   return 0;
 }
