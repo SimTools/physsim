@@ -45,7 +45,13 @@
 //*    1999/08/14  K.Fujii	Modified GetYmass as suggested by M.Iwasaki.
 //*    1999/09/05  K.Ikematsu   Replaced LockableLVector with ANL4DVector.
 //*    1999/09/14  K.Ikematsu   Added GetYmax method.
-//*    2000/03/28  K.Ikematsu   Bug fixed about fYmassMax
+//*    2000/03/28  K.Ikematsu   Bug fixed about fYmassMax.
+//*    2000/10/12  K.Ikematsu   Added maximum trial in ycut search part
+//*                             of ForceNJets method. If binary search
+//*                             reaches maximum trial, ForceNJets method
+//*                             aborts to find ycut making "n" jets.
+//*                             So you have to confirm to be "n" jets in
+//*                             your analysis program.
 //*
 //*************************************************************************
 //
@@ -232,7 +238,6 @@ ANLJetFinder & ANLJetFinder::operator=(const ANLJetFinder & jf) {
    return *this;
 }
 
-
 //*--
 //*  Basic Services
 //*--
@@ -321,13 +326,19 @@ void ANLJetFinder::ForceNJets(Int_t njets) {
    Double_t   ycutHi = 1.0;
    Double_t   ycut;
    ANLJetFinder *jf  = 0;
+
+   Int_t ntrial = 0;
    while (kTRUE) {
+      ntrial++;
       ycut = (ycutLo + ycutHi)/2;
       jf   = new ANLJetFinder(*this);
       SetYcut(ycut);
       FindJets();
       Int_t nj = GetNjets();
-      if (nj == njets) { delete jf; break; } // Found a valid ycut, quit looping.
+      if (ntrial > 100) cerr << "ANLJetFinder::ForceNJets : Making "
+			     << njets << "Jets was aborted ! Njets = "
+			     << nj << endl;
+      if (nj == njets || ntrial > 100) { delete jf; break; } // Found a valid ycut, quit looping.
       if (nj > njets) {
          ycutLo = ycut;
       } else {
