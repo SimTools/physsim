@@ -51,6 +51,11 @@ C--
          AMZ2  = AMZ*AMZ
          AMGZ2 = AMGZ*AMGZ
 C--
+         GMH   = GMHTOT
+         AMGH  = AMH*GMH
+         AMH2  = AMH*AMH
+         AMGH2 = AMHZ*AMHZ
+C--
          AME   = AMF(1,2,1)
          xALF0 = 1/137.0359895E0
 C--
@@ -267,10 +272,20 @@ C-- Z.
       Q2    = SQRT(Q22)
       WAT   = WAT*(TH2MX-TH2MN)*( (Q22-AMZ2)**2 + AMGZ2 )/AMGZ
 C-- W-W+.
+#ifdef HIGGSONLY
+      Q32MN = Q4+Q5
+      Q32MX = MAX( RS-Q2, Q32MN )
+      TH32MN = ATAN((Q32MN-AMH)*(Q32MN+AMH)/AMGH)
+      TH32MX = ATAN((Q32MX-AMH)*(Q32MX+AMH)/AMGH)
+      TH32   = TH32MN + (TH32MX-TH32MN)*Z(11)
+      Q32    = AMGH*TAN(TH32) + AMH2
+      WAT   = WAT*(TH32MX-TH32MN)*( (Q32-AMH2)**2 + AMGH2 )/AMGH
+#else
       Q32MN = (Q4+Q5)**2
       Q32MX = MAX( (RS-Q2)**2, Q32MN )
       Q32   = Q32MN + (Q32MX-Q32MN)*Z(11)
       WAT   = WAT*(Q32MX-Q32MN)
+#endif
 C--
 #ifdef ZEROWIDTH
       Q32MN = (AMW+AMW)**2

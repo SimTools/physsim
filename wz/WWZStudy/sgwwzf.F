@@ -142,9 +142,13 @@ CPHASE         RETURN
 C--
 C  Differenctial cross section.
 C--
-      SG  = AMP2(0)*WAT
-CNOHIGGS       SG = AMP2(1)*WAT
-CHIGGS         SG = AMP2(2)*WAT
+#if defined(NOHIGGS)
+      SG = AMP2(1)*WAT
+#elif defined(HIGGSONLY)
+      SG = AMP2(2)*WAT
+#else
+      SG = AMP2(0)*WAT
+#endif
 C--
 C  That's it.
 C--
