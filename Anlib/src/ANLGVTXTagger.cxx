@@ -88,25 +88,24 @@ Double_t ANLGVTXTagger::Getb(const ANLTrack &t){
     //                                                                  ^^^^^
     Int_t gmsn = g->GetMother();
 
-    // If this generator particle comes from SpringParton directly,
-    // we cannot get pointer to JSFGeneratorParticle.
-    if (gmsn < 0) {
-      return 0.;
-    }
-    JSFGeneratorParticle *gm = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
-    Int_t gmpid = gm->GetID();
-
-    if (TMath::Abs(gmpid) == 310  || TMath::Abs(gmpid) == 3122 ||
-        TMath::Abs(gmpid) == 3112 || TMath::Abs(gmpid) == 3222) {
-      return -9999.;
-    }
-
     // temporary
     fDEBUG = kFALSE;
 
     if (fDEBUG) cerr << "----------" << endl
-                     << "S.N. = " << g->GetSerial() << "  PID = " << g->GetID()
-                     << " Charge = " << g->GetCharge() << endl;
+                     << "S.N. = " << gsn << "  PID = " << g->GetID()
+                     << " Mother S.N.  = " << gmsn << endl;
+
+    // If this generator particle comes from SpringParton directly,
+    // we cannot get pointer to JSFGeneratorParticle.
+    if (gmsn > 0) {
+      JSFGeneratorParticle *gm = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
+      Int_t gmpid = gm->GetID();
+      if (fDEBUG) cerr << "Mother PID = " << gm->GetID() << endl;
+      if (TMath::Abs(gmpid) == 310  || TMath::Abs(gmpid) == 3122 ||
+          TMath::Abs(gmpid) == 3112 || TMath::Abs(gmpid) == 3222) {
+        return -9999.;
+      }
+    }
 
     // Get decay point of final state stable particle
 

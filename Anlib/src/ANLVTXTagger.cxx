@@ -81,15 +81,13 @@ Double_t ANLVTXTagger::Getb(const ANLTrack &t){
 
     // If this generator particle comes from SpringParton directly,
     // we cannot get pointer to JSFGeneratorParticle.
-    if (gmsn < 0) {
-      return 0.;
-    }
-    JSFGeneratorParticle *gm = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
-    Int_t gmpid = gm->GetID();
-
-    if (TMath::Abs(gmpid) == 310  || TMath::Abs(gmpid) == 3122 ||
-        TMath::Abs(gmpid) == 3112 || TMath::Abs(gmpid) == 3222) {
-      return -9999.;
+    if (gmsn > 0) {
+      JSFGeneratorParticle *gm = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
+      Int_t gmpid = gm->GetID();
+      if (TMath::Abs(gmpid) == 310  || TMath::Abs(gmpid) == 3122 ||
+	  TMath::Abs(gmpid) == 3112 || TMath::Abs(gmpid) == 3222) {
+	return -9999.;
+      }
     }
 
     // Access to Helix parameters
@@ -124,15 +122,13 @@ Double_t ANLVTXTagger::Getbnorm(const ANLTrack &t){
 
     // If this generator particle comes from SpringParton directly,
     // we cannot get pointer to JSFGeneratorParticle.
-    if (gmsn < 0) {
-      return 0.;
-    }
-    JSFGeneratorParticle *gm = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
-    Int_t gmpid = gm->GetID();
-
-    if (TMath::Abs(gmpid) == 310  || TMath::Abs(gmpid) == 3122 ||
-        TMath::Abs(gmpid) == 3112 || TMath::Abs(gmpid) == 3222) {
-      return -9999.;
+    if (gmsn > 0) {
+      JSFGeneratorParticle *gm = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
+      Int_t gmpid = gm->GetID();
+      if (TMath::Abs(gmpid) == 310  || TMath::Abs(gmpid) == 3122 ||
+          TMath::Abs(gmpid) == 3112 || TMath::Abs(gmpid) == 3222) {
+        return -9999.;
+      }
     }
 
     // Access to Helix parameters
