@@ -23,7 +23,7 @@
 //*	ANLJadeEJetFinder jclust(ycut);
 //*     jclust.Initialize(tracks); // tracks: TObjArray of LVector derivatives.
 //*     jclust.FindJets();	   // finds jets with ycut = 0.01.
-//*     ycut = 0.015;		   
+//*     ycut = 0.015;
 //*	jclust.SetYcut(ycut);	   // One can make the ycut "bigger"
 //*	jclust.FindJets();	   // and resume with the new ycut.
 //*     ycut = 0.05;
@@ -68,9 +68,9 @@
 //  ------------
 //
 //  For the moment, the ANLJet class only accepts, as its elements,
-//  objects derived from ANL4DVector's or ANLJet's themselves, 
+//  objects derived from ANL4DVector's or ANLJet's themselves,
 //  although it is more desirable that it accepts any TObjects
-//  that contain ANL4DVector's. 
+//  that contain ANL4DVector's.
 //
 
 class ANLJet : public ANL4DVector {
@@ -103,46 +103,46 @@ private:
 //  ------------------
 //
 //  For the moment, the ANLJet class only accepts, as its elements,
-//  objects derived from ANL4DVector's or ANLJet's themselves, 
+//  objects derived from ANL4DVector's or ANLJet's themselves,
 //  although it is more desirable that it accepts any TObjects
-//  that contain ANL4DVector's. 
+//  that contain ANL4DVector's.
 //
 class ANLJetFinder {
 public:
-   ANLJetFinder(Double_t y = 0.);		// default constructor
-   ANLJetFinder(const ANLJetFinder &jf);	// copy constructor
-   virtual ~ANLJetFinder();			// default destructor
-   
-   Bool_t     IsInitialized() const;		// inquires if fJets set
-   Double_t   GetYcut() const;			// returns ycut
-   Double_t   GetYmax();                        // returns ymax
-   Int_t      GetNjets();			// returns No. of jets   
-   TObjArray &GetJets();			// returns array of jets
+   ANLJetFinder(Double_t y = 0.);         // default constructor
+   ANLJetFinder(const ANLJetFinder &jf);  // copy constructor
+   virtual ~ANLJetFinder();               // default destructor
 
-   void SetYcut(Double_t ycut);			// sets ycut
-   void Initialize(const TObjArray &parts);	// sets each particle as a jet
-   void FindJets();				// finds jets
-   void ForceNJets(Int_t njets);		// forces the event to njets
+   Bool_t     IsInitialized() const;      // inquires if fJets set
+   Double_t   GetYcut() const;            // returns ycut
+   Double_t   GetYmax();                  // returns ymax
+   Int_t      GetNjets();                 // returns No. of jets
+   TObjArray &GetJets();                  // returns array of jets
 
-   ANLJetFinder & operator=(const ANLJetFinder & jf); 	// copys a jet finder
+   void SetYcut(Double_t ycut);           // sets ycut
+   virtual void Initialize(const TObjArray &parts);  // sets each particle as a jet
+   void FindJets();                       // finds jets
+   void ForceNJets(Int_t njets);          // forces the event to njets
 
-   virtual Double_t GetYmass(const ANL4DVector &p1, 
-   			     const ANL4DVector &p2) const; 
-private:
-   void CopyJets(const TObjArray &jets);
+   ANLJetFinder & operator=(const ANLJetFinder & jf);  // copys a jet finder
+
+   virtual Double_t GetYmass(const ANL4DVector &p1,
+   			     const ANL4DVector &p2) const;
+protected:
+   virtual void CopyJets(const TObjArray &jets);
    void DeleteJets();
 
-private:
+protected:
    Bool_t	   fDone;	//  (1,0) = (jet finding done, not yet)
-   Double_t 	   fYcut;	//  ycut
    Double_t	   fEvis;	//  Evis
    TObjArray	   fJets;	//  Jets in the event
+private:
+   Double_t 	   fYcut;	//  ycut
    TMatrix        *fYmass;	//! pointer to pair mass array
    Double_t        fYmassMax;   //  Ymass_max
 
    ClassDef(ANLJetFinder,1)  	// ANLJetFinder class
 };
-
 
 //_____________________________________________________________________
 //  ----------------------
@@ -154,7 +154,7 @@ public:
    ANLJadeJetFinder(Double_t y = 0.);
 
    Double_t GetYmass(const ANL4DVector &p1, const ANL4DVector &p2) const;
-   
+
    ClassDef(ANLJadeJetFinder,1) 	// Jade Jet Finder class
 };
 
@@ -168,7 +168,7 @@ public:
    ANLJadeEJetFinder(Double_t y = 0.);
 
    Double_t GetYmass(const ANL4DVector &p1, const ANL4DVector &p2) const;
-   
+
    ClassDef(ANLJadeEJetFinder,1) 	// Jade EJet Finder class
 };
 
@@ -182,7 +182,7 @@ public:
    ANLDurhamJetFinder(Double_t y = 0.);
 
    Double_t GetYmass(const ANL4DVector &p1, const ANL4DVector &p2) const;
-   
+
    ClassDef(ANLDurhamJetFinder,1) 	// Durham Jet Finder class
 };
 

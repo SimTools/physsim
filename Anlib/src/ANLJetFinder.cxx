@@ -136,13 +136,13 @@ ClassImp(ANLJet)
 //*  Constructors
 //*--
 ANLJetFinder::ANLJetFinder(Double_t y) 
-	    : fDone(kFALSE), fYcut(y), fEvis(0.), fJets(1),
-	      fYmass(0), fYmassMax(0.) {}
+            : fDone(kFALSE), fEvis(0.), fJets(1), fYcut(y),
+              fYmass(0), fYmassMax(0.) {}
 
 ANLJetFinder::ANLJetFinder(const ANLJetFinder &jf) 
-	    : fDone(jf.fDone), fYcut(jf.fYcut),
-              fEvis(jf.fEvis), fJets(1), 
-	      fYmass(0), fYmassMax(jf.fYmassMax) {
+            : fDone(jf.fDone), fEvis(jf.fEvis),
+              fJets(1), fYcut(jf.fYcut),
+              fYmass(0), fYmassMax(jf.fYmassMax) {
    CopyJets(jf.fJets);
 }
 

@@ -41,6 +41,7 @@ OBJS		= ANLJetFinder.$(ObjSuf) \
 		  ANLVTXTagger.$(ObjSuf) \
 		  FlavourGetter.$(ObjSuf) \
 		  ANL2DSpline.$(ObjSuf) \
+		  ANLCheatedJetFinder.$(ObjSuf) \
 		  ANLGVTXTagger.$(ObjSuf)
 
 /* You don't have to edit anything below here */

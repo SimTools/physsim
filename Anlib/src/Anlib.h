@@ -23,6 +23,8 @@
 //* 	class ANLVTXTagger
 //* 	class ANLGVTXTagger
 //* 	class ANL2DSpline
+//*     class ANLTaggedJet
+//*     class ANLCheatedJetFinder
 //* 	class ANLCut			: not yet :-)
 //* 	class ANLCutSet : Stack<Cut>	: not yet :-)
 //* 	class FlavourGetter
@@ -38,6 +40,7 @@
 //*    2000/06/01  K.Ikematsu   Added ANL2DVector class.
 //*    2000/06/01  K.Ikematsu   Added ANL2DSpline class.
 //*    2000/07/10  K.Ikematsu   Added ANLGVTXTagger class.
+//*    2000/10/20  K.Ikematsu   Added ANLCheatedJetFinder class.
 //*
 //* $Id$
 //*************************************************************************
@@ -53,6 +56,7 @@
 #include "ANLVTXTagger.h"
 #include "ANLGVTXTagger.h"
 #include "ANL2DSpline.h"
+#include "ANLCheatedJetFinder.h"
 #include "FlavourGetter.h"
 
 #endif
