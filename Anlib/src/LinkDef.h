@@ -5,8 +5,9 @@
 #pragma link off all functions;
 
 #pragma link C++ class Lockable;
-#pragma link C++ class ANL4DVector;
+#pragma link C++ class ANL2DVector;
 #pragma link C++ class ANL3DVector;
+#pragma link C++ class ANL4DVector;
 #pragma link C++ class ANLPair;
 #pragma link C++ class ANLPairCombiner;
 #pragma link C++ class ANLJet;
@@ -18,5 +19,6 @@
 #pragma link C++ class ANLTrack;
 #pragma link C++ class ANLVTXTagger;
 #pragma link C++ class FlavourGetter;
+#pragma link C++ class ANL2DSpline;
 
 #endif

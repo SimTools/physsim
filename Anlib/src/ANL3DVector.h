@@ -8,8 +8,9 @@
 //* (Description)
 //*    A very primitive lockable 3D vector class.
 //* (Requires)
-//* 	class Lockable
 //*	class TVector3
+//* 	class Lockable
+//* 	class ANL2DVector
 //* (Provides)
 //* 	class ANL3DVector
 //* (Update Recored)
@@ -17,12 +18,14 @@
 //*    2000/03/23  K.Ikematsu	Added GetNorm method.
 //*    2000/03/23  K.Ikematsu	Added GetTheta method.
 //*    2000/03/28  K.Ikematsu	Added Acol method.
+//*    2001/02/16  K.Ikematsu	Added GetTrans and GetLong method.
 //*
 //*************************************************************************
 //
 #include <iostream.h>
-#include "Lockable.h"
 #include "TVector3.h"
+#include "Lockable.h"
+#include "ANL2DVector.h"
 //_____________________________________________________________________
 //  -----------------
 //  Lockable TVector3
@@ -38,9 +41,9 @@ public:
      TVector3::operator[](2) = pz;
    }
    ANL3DVector(const TVector &q) {
-     TVector3::operator[](0) = q(1);
-     TVector3::operator[](1) = q(2);
-     TVector3::operator[](2) = q(3);
+     TVector3::operator[](0) = q(0);
+     TVector3::operator[](1) = q(1);
+     TVector3::operator[](2) = q(2);
    }
    ANL3DVector(const TVector3 &q) : TVector3(q) {}
    ANL3DVector(const ANL3DVector &q) : TVector3(q), Lockable(q) {}
@@ -107,6 +110,13 @@ public:
 		   operator()(2)/GetMag(),
 		   operator()(3)/GetMag());
      return n;
+   }
+   inline ANL2DVector GetTrans() const {
+     ANL2DVector n(operator()(1),operator()(2));
+     return n;
+   }
+   inline Double_t GetLong() const {
+     return operator()(3);
    }
 
    inline Double_t Acol(const ANL3DVector &q) const {

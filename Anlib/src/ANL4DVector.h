@@ -8,8 +8,9 @@
 //* (Description)
 //*    A very primitive lockable Lorentz vector class.
 //* (Requires)
-//* 	class Lockable
 //*	class TLorentzVector
+//* 	class Lockable
+//*     class ANL3DVector
 //* (Provides)
 //* 	class ANL4DVector
 //* (Update Recored)
@@ -21,9 +22,9 @@
 //*************************************************************************
 //
 #include <iostream.h>
+#include "TLorentzVector.h"
 #include "Lockable.h"
 #include "ANL3DVector.h"
-#include "TLorentzVector.h"
 //_____________________________________________________________________
 //  -----------------------
 //  Lockable TLorentzVector

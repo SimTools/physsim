@@ -9,8 +9,9 @@
 //*    A very primitive class library for JLC analyses
 //* (Provides)
 //* 	class Lockable
-//* 	class ANL4DVector
+//* 	class ANL2DVector
 //* 	class ANL3DVector
+//* 	class ANL4DVector
 //* 	class ANLPair
 //* 	class ANLPairCombiner
 //* 	class ANLJet
@@ -18,6 +19,8 @@
 //* 	class ANLJadeEJetFinder
 //* 	class ANLDurhamJetFinder
 //* 	class ANLVTXTagger
+//* 	class FlavourGetter.h
+//* 	class ANL2DSpline
 //* 	class ANLCut			: not yet :-)
 //* 	class ANLCutSet : Stack<Cut>	: not yet :-)
 //* 	class FlavourGetter
@@ -30,17 +33,21 @@
 //*    1999/08/13  K.Ikematsu	Added ANL3DVector class.
 //*    1999/10/09  K.Fujii	Added ANLVTXTagger class.
 //*    2000/02/13  K.Ikematsu   Added FlavourGetter class.
+//*    2000/06/01  K.Ikematsu   Added ANL2DVector class.
+//*    2000/06/01  K.Ikematsu   Added ANL2DSpline class.
 //*
 //*************************************************************************
 //
 #include <iostream.h>
-#include "ANL4DVector.h"
+#include "ANL2DVector.h"
 #include "ANL3DVector.h"
+#include "ANL4DVector.h"
 #include "ANLPairCombiner.h"
 #include "ANLJetFinder.h"
 #include "ANLEventShape.h"
 #include "ANLTrack.h"
 #include "ANLVTXTagger.h"
 #include "FlavourGetter.h"
+#include "ANL2DSpline.h"
 
 #endif

@@ -31,10 +31,12 @@ OBJS		= ANLJetFinder.$(ObjSuf) \
 		  ANLPairCombiner.$(ObjSuf) \
                   ANLTrack.$(ObjSuf) \
 		  Lockable.$(ObjSuf) \
+		  ANL2DVector.$(ObjSuf) \
 		  ANL3DVector.$(ObjSuf) \
 		  ANL4DVector.$(ObjSuf) \
 		  ANLVTXTagger.$(ObjSuf) \
-		  FlavourGetter.$(ObjSuf)
+		  FlavourGetter.$(ObjSuf) \
+		  ANL2DSpline.$(ObjSuf)
 	
 /* You don't have to edit anything below here */
 
