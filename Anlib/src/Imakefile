@@ -1,16 +1,18 @@
 /*
  * ############################################################################
  * ## (Description)
- * ##    Imake file for XCXC analysis.
- * ## (Update Record) 
+ * ##    Imake file for Anlib: C++ analysis library
+ * ## (Update Record)
  * ##    99/05/22  K.Fujii   Original version.
+ * ##
+ * ## $Id$
  * ############################################################################
  *
  */
 
 /* Template Files */
 
-#define CXXPACKAGE 
+#define CXXPACKAGE
 #include "../../config/kflib.tmpl"
 
 /* Package Name */
@@ -22,22 +24,23 @@ JSFSOLIB	= $(SONAME)
 
 /* Headers */
 
-INCPATH	= -I. 
+INCPATH	= -I.
 
 /* Routines to compile */
 
 OBJS		= ANLJetFinder.$(ObjSuf) \
 		  ANLEventShape.$(ObjSuf) \
 		  ANLPairCombiner.$(ObjSuf) \
-                  ANLTrack.$(ObjSuf) \
+		  ANLTrack.$(ObjSuf) \
 		  Lockable.$(ObjSuf) \
 		  ANL2DVector.$(ObjSuf) \
 		  ANL3DVector.$(ObjSuf) \
 		  ANL4DVector.$(ObjSuf) \
 		  ANLVTXTagger.$(ObjSuf) \
 		  FlavourGetter.$(ObjSuf) \
-		  ANL2DSpline.$(ObjSuf)
-	
+		  ANL2DSpline.$(ObjSuf) \
+		  ANLGVTXTagger.$(ObjSuf)
+
 /* You don't have to edit anything below here */
 
 DICTNAME	= $(LIBNAME)Dict
@@ -61,7 +64,7 @@ InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
 
 $(DICTNAME).$(ObjSuf): $(DICTNAME).$(SrcSuf)
 
-clean:: 
+clean::
 	@rm -f *.$(ObjSuf) core $(DICTNAME).$(SrcSuf) $(DICTNAME).h
 
 depend:: $(SRCS) $(HDRS)

@@ -1,3 +1,5 @@
+// $Id$
+
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -20,5 +22,6 @@
 #pragma link C++ class ANLVTXTagger;
 #pragma link C++ class FlavourGetter;
 #pragma link C++ class ANL2DSpline;
+#pragma link C++ class ANLGVTXTagger;
 
 #endif

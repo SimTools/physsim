@@ -18,8 +18,10 @@
 //* 	class ANLJetFinder
 //* 	class ANLJadeEJetFinder
 //* 	class ANLDurhamJetFinder
+//* 	class ANLEventShape
+//* 	class ANLTrack
 //* 	class ANLVTXTagger
-//* 	class FlavourGetter.h
+//* 	class ANLGVTXTagger
 //* 	class ANL2DSpline
 //* 	class ANLCut			: not yet :-)
 //* 	class ANLCutSet : Stack<Cut>	: not yet :-)
@@ -35,7 +37,9 @@
 //*    2000/02/13  K.Ikematsu   Added FlavourGetter class.
 //*    2000/06/01  K.Ikematsu   Added ANL2DVector class.
 //*    2000/06/01  K.Ikematsu   Added ANL2DSpline class.
+//*    2000/07/10  K.Ikematsu   Added ANLGVTXTagger class.
 //*
+//* $Id$
 //*************************************************************************
 //
 #include <iostream.h>
@@ -47,7 +51,8 @@
 #include "ANLEventShape.h"
 #include "ANLTrack.h"
 #include "ANLVTXTagger.h"
-#include "FlavourGetter.h"
+#include "ANLGVTXTagger.h"
 #include "ANL2DSpline.h"
+#include "FlavourGetter.h"
 
 #endif
