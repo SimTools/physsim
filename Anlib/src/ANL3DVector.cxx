@@ -17,7 +17,7 @@
 //*    2000/03/23  K.Ikematsu	Added GetTheta method.
 //*    2000/03/28  K.Ikematsu	Added Acol method.
 //*    2001/02/16  K.Ikematsu	Added GetTrans and GetLong method.
-//*    2001/12/25  K.Ikematsu	Added Long2 and Long method.
+//*    2001/12/25  K.Ikematsu	Added Para2 and Para method.
 //*
 //* $Id$
 //*************************************************************************

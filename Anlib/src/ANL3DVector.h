@@ -19,7 +19,7 @@
 //*    2000/03/23  K.Ikematsu	Added GetTheta method.
 //*    2000/03/28  K.Ikematsu	Added Acol method.
 //*    2001/02/16  K.Ikematsu	Added GetTrans and GetLong method.
-//*    2001/12/25  K.Ikematsu	Added Long2 and Long method.
+//*    2001/12/25  K.Ikematsu	Added Para2 and Para method.
 //*
 //* $Id$
 //*************************************************************************
@@ -119,17 +119,12 @@ public:
    inline Double_t GetLong() const {
      return operator()(3);
    }
-   inline Double_t GetLong2(const ANL3DVector &q) const {
+
+   inline Double_t Para2(const ANL3DVector &q) const {
      return Mag2() - Perp2(q);
    }
-   inline Double_t GetLong(const ANL3DVector &q) const {
-     return TMath::Sqrt(Long2(q));
-   }
-   inline Double_t Long2(const ANL3DVector &q) const {
-     return GetLong2(q);
-   }
-   inline Double_t Long(const ANL3DVector &q) const {
-     return GetLong(q);
+   inline Double_t Para(const ANL3DVector &q) const {
+     return TMath::Sqrt(Para2(q));
    }
 
    inline Double_t Acol(const ANL3DVector &q) const {
