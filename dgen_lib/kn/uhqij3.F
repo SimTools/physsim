@@ -27,7 +27,7 @@ C*       QIJ2     : (R*16) : (Q_ij)^2.
 C*       QIK2     : (R*16) : (Q_ik)^2.
 C*       WAT      : (R*16) : Jacobian weight.
 C* (Relation)
-C*    Invokes USORTR in FORTLIB and UHQLIM and UHQ2BW in ttz_lib.
+C*    Invokes USORTD in FORTLIB and UHQLIM and UHQ2BW in ttz_lib.
 C* (Update Record)
 C*   95/04/07  K.Fujii	Original version using BW parametrization.
 C*
@@ -65,7 +65,7 @@ C  daughter particles (i,j,k). Notice that i, j, and k point
 C  to AM and PV and not necessarily congiguous.
 C     ISHF(r) = r' for the r-th resonance from the lightest.
 C--
-      CALL USORTR(3,3,3,AMR(1,1),ISHF(1))
+      CALL USORTD(3,3,3,AMR(1,1),ISHF(1))
 C--
 C  Check if there are more than 2 poles.
 C--
