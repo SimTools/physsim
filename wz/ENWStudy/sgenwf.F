@@ -59,7 +59,7 @@ C--
          SPIN   = 2
          NB     = 3
          FACT   = xGV2FB*x2PI/(x4PI**(3*NB))/SPIN
-         FACT   = FACT/(xALF*137.0359895D0)
+C        FACT   = FACT/(xALF*137.0359895D0)
          AME    = AMF(1,2,1)
          AMSW   = AMW
          CALL UVZERO(2*9,EC)

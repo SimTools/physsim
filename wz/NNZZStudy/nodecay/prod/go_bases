@@ -1,0 +1,51 @@
+#!/bin/sh
+set -x
+#--
+#  Set ISRB falg.
+#--
+isrb=1
+filen="mt170s15"
+#--
+echo "(  isrb = $isrb   $filen" >> integ.dat
+echo "(  sqrts	sigma	    error	m_t	     m_H" >> integ.dat
+echo "(-----------------------------------------------------------" >> integ.dat
+#--
+#  Start bases.
+#--
+echo "set order x y dy dummy dummy" > integ.dat
+./go_command 170.   0.  400.  $isrb mh0s0400
+./go_command 170.   0.  500.  $isrb mh0s0500
+./go_command 170.   0.  600.  $isrb mh0s0600
+./go_command 170.   0.  800.  $isrb mh0s0800
+./go_command 170.   0. 1000.  $isrb mh0s1000
+./go_command 170.   0. 2000.  $isrb mh0s1000
+./go_command 170.   0. 5000.  $isrb mh0s1000
+./go_command 170.   0. 10000.  $isrb mh0s1000
+echo "join" >> integ.dat
+exit 0
+./go_command 170.   120.  400.  $isrb mh120s0400
+./go_command 170.   120.  500.  $isrb mh120s0500
+./go_command 170.   120.  600.  $isrb mh120s0600
+./go_command 170.   120.  700.  $isrb mh120s0700
+./go_command 170.   120.  800.  $isrb mh120s0800
+./go_command 170.   120.  900.  $isrb mh120s0900
+./go_command 170.   120. 1000.  $isrb mh120s1000
+echo "join" >> integ.dat
+exit 0
+echo "set order dummy y dy dummy x" > integ.dat
+./go_command 170. 12000. 1500.  $isrb nohs10
+./go_command 170.   800. 1500.  $isrb mh800s10
+./go_command 170.   700. 1500.  $isrb mh700s10
+./go_command 170.   600. 1500.  $isrb mh600s10
+./go_command 170.   500. 1500.  $isrb mh500s10
+./go_command 170.   400. 1500.  $isrb mh400s10
+./go_command 170.   300. 1500.  $isrb mh300s10
+./go_command 170.   200. 1500.  $isrb mh200s10
+./go_command 170.   190. 1500.  $isrb mh190s10
+./go_command 170.   184. 1500.  $isrb mh184s10
+./go_command 170.   182. 1500.  $isrb mh182s10
+./go_command 170.   180. 1500.  $isrb mh180s10
+./go_command 170.   100. 1500.  $isrb mh100s10
+./go_command 170.    50. 1500.  $isrb mh050s10
+echo "join" >> integ.dat
+exit 0
