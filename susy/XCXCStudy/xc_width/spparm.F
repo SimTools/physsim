@@ -95,9 +95,12 @@ C--
             RDATA(3) = AM2
             RDATA(4) = TANB
             RDATA(5) = AMA
+            RDATA(6) = ASFT(1)
+            RDATA(7) = ASFT(2)
+            RDATA(8) = ASFT(3)
 C--
             IE = 3
-            NW = 5
+            NW = 8
             CALL TBPUT(2,BKNAME,IE,NW,IDATA,IRT)
             IF ( IRT.LT.0 ) THEN
                PRINT *, ' >>>SPPARM: TBPUT IRT=', IRT, ' for element #',
@@ -144,11 +147,14 @@ C--
             STOP
          ENDIF
 C--
-         AM0  = RDATA(1)
-         AMU  = RDATA(2)
-         AM2  = RDATA(3)
-         TANB = RDATA(4)
-         AMA  = RDATA(5)
+         AM0     = RDATA(1)
+         AMU     = RDATA(2)
+         AM2     = RDATA(3)
+         TANB    = RDATA(4)
+         AMA     = RDATA(5)
+         ASFT(1) = RDATA(6)
+         ASFT(2) = RDATA(7)
+         ASFT(3) = RDATA(8)
 C--
 C  Print modified user parameters.
 C--
@@ -164,6 +170,9 @@ C--
          PRINT *,' AM2=',AM2
          PRINT *,' TNB=',TANB
          PRINT *,' AMA=',AMA
+         DO 95 I = 1, 3
+            PRINT *,' ASFT(',I,') = ', ASFT(I)
+95       CONTINUE
          PRINT *,' '
          PRINT *,' ECM =',SQRTS
          PRINT *,' POLE=',POLEBM

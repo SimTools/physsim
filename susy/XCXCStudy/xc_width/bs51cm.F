@@ -47,6 +47,9 @@ C--
       AM2    = 250.
       TANB   = +2.
       AMA    = -9999.
+      ASFT(1) = 0.
+      ASFT(2) = 0.
+      ASFT(3) = 0.
 C--
 C  Loop over input cards.
 C--
@@ -128,6 +131,9 @@ C--
 	 CALL FLTRD('TNB: ',TANB)
       ELSE IF ( CMD(1:3).EQ.'AMA') THEN
 	 CALL FLTRD('AMA: ',AMA)
+      ELSE IF ( CMD(1:4).EQ.'AST') THEN
+         CALL INTRD ('Enter I: ',IE)
+         CALL FLTRD('ASFT(I): ',ASFT(IE))
       ELSE
 C--
 C  Help for BASES inputs.
@@ -204,6 +210,9 @@ C--
       PRINT *,' AM2=',AM2
       PRINT *,' TNB=',TANB
       PRINT *,' AMA=',AMA
+      DO 95 I = 1, 3
+         PRINT *,' ASFT(',I,') = ', ASFT(I)
+95    CONTINUE
       PRINT *,' '
 C--
 C  That's it.

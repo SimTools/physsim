@@ -186,6 +186,7 @@ XCXCBases::XCXCBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("SFSFBases.At","0."),"%lg",&fAsoft[1]);
   sscanf(gJSF->Env()->GetValue("SFSFBases.Ab","0."),"%lg",&fAsoft[2]);
   sscanf(gJSF->Env()->GetValue("XCXCBases.WidthChic1","-1."),"%lg",&fWidthChic1);
+  if (fmA == -9999.) fmA = TMath::Sqrt(fm0*fm0+fmu*fmu);
 }
 
 

@@ -77,11 +77,18 @@ BASES
 @!  AM2   65.   ! M_2
 @!  TNB -1.5.   ! tan(beta)
 @!
-  AM0  200.   ! m_0
-  AMU  263.   ! mu
-  AM2   83.7  ! M_2
-  TNB   -2.   ! tan(beta)
+@!  AM0  200.   ! m_0
+@!  AMU  263.   ! mu
+@!  AM2   83.7  ! M_2
+@!  TNB   -2.   ! tan(beta)
 @!  AMA  407.   ! m_A set to sqrt(AM0**2+AMU**2) if unspecified
+@!
+  AM0   70.   ! m_0
+  AMU  400.   ! mu
+  AM2  250.   ! M_2
+  TNB    3.   ! tan(beta)
+@!  AMA  407.   ! m_A set to sqrt(AM0**2+AMU**2) if unspecified
+@!
 EXIT                                        
 @!                                                                      
 @!*************************************************                     
