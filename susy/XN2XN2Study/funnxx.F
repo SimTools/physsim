@@ -253,7 +253,7 @@ C--
 C--
       BRZ2 = BRVDK(IMD,2) - BRVDK(IMD-1,2)
       IMD2 = IMD
-      WAT  = WAT*(BRVDK(IMD1MX,2)-BRVDK(IMD1MN-1,2))/BRZ2
+      WAT  = WAT*(BRVDK(IMD2MX,2)-BRVDK(IMD2MN-1,2))/BRZ2
 C--
 C  Select helicity combination.
 C--

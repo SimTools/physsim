@@ -1,0 +1,102 @@
+##############################################################################
+## (Description)
+##    Imake file for XX generator.
+##	exe       : to make an executable.
+##	clean     : to clean the directory.
+##	distclean : to remove everything reproducible.
+## (Update Record) 
+##    95/03/13  K.Fujii 	Original version for HELAS V204.
+##    95/06/07  K.Fujii 	Use 95a.
+##    97/07/26  K.Fujii		Use pro for LCLIB and new private libraries
+##				collected in work/lib.
+##
+##############################################################################
+
+#include "../../../config/kflib.tmpl"
+
+INCPATH	= -I. -I$(KFLIBDIR)/../dgen_lib/sm/include -I$(KFLIBDIR)/../dgen_lib/ss/include
+
+#--
+#  Define the name of the executable. 
+#--
+PROGRAM = plot
+COMMAND = prod/$(PROGRAM).exe
+#--
+#  Routines to complie.
+#--
+OBJS = ampnxx.o \
+		blkdat.o \
+		dsgnxx.o \
+		pltdsg.o \
+		fulnxx.o
+#--
+#  Directories containing library routines.
+#--
+GENLIBDIR	= $(KFLIBDIR)/../dgen_lib
+
+LDDIRFLAG = -L
+EXTRALIBS =
+
+ANALLIB	= $(LDDIRFLAG)$(LCLIBDIR) -lDHELASV204 -lFORTLIB
+
+KFLIB	= $(LDDIRFLAG)$(KFLIBDIR) -lDGENLIBSS -lDGENLIBHG -lDGENLIBSM  \
+	 -lDGENLIBKN -lDGENLIBBM -lDFORTLIB -lANLLIB
+#--
+#  Make options.
+#--
+all::	exe
+
+exe:	$(COMMAND)
+
+
+#--
+#  Link procedure
+#--
+$(COMMAND): $(OBJS) $(ALL_EXTER_LIBS)
+	$(FF) -o $(COMMAND) $(LDFLAGS) $(OBJS) $(KFLIB) $(ANALLIB)
+				 
+#
+# Other options.
+#
+distclean::                                                     
+	rm -f *.o; rm -f *.a; rm -f *~; rm -f $(COMMAND)
+clean::
+	rm -f *.o; rm -f *~
+help:
+	@echo " ##############################################################"
+	@echo "  This is a Makefile for BM."
+	@echo "  Following options are available."
+	@echo "      make exe         ; create an executable module "
+	@echo "      make run         ; run the executable "
+	@echo "      make clean       ; clean up the directory "
+	@echo "      make distclean   ; remove everything reproducible "
+	@echo "      make             ; get this help "
+	@echo " ######################################### 95/03/15 K.Fujii ###"
+
+blkdat.o: blkdat.F
+
+SMPTAB	= $(GENLIBDIR)/sm/include/SMPTAB.inc
+SSPTAB	= $(GENLIBDIR)/ss/include/SSPTAB.inc
+BEMCNS	= $(GENLIBDIR)/bm/include/BEMCNS.inc
+USMPRM	= $(GENLIBDIR)/sm/include/USMPRM.inc
+
+blkdat.F: $(SMPTAB) $(SSPTAB) $(BEMCNS) $(USMPRM)
+	rm -f blkdat.F
+	echo "      block data blkdat" > blkdat.F
+	echo "C--" >> blkdat.F
+	echo "C  THIS FILE IS AUTOMATICALLY GENERAGED FROM" >> blkdat.F
+	echo "C     sm/include/SMPTAB.inc" >> blkdat.F
+	echo "C               /SSPTAB.inc" >> blkdat.F
+	echo "C               /BEMCNS.inc" >> blkdat.F
+	echo "C               /USMPRM.inc" >> blkdat.F
+	echo "C  DO NOT EDIT. EDIT C= COMMENTS IN THESE INCLUDE FILES" >> blkdat.F
+	echo "C--" >> blkdat.F
+	sed -e 's/^C=/  /' $(SMPTAB) >> blkdat.F
+	sed -e 's/^C=/  /' $(SSPTAB) >> blkdat.F
+	sed -e 's/^C=/  /' $(BEMCNS) >> blkdat.F
+	sed -e 's/^C=/  /' $(USMPRM) >> blkdat.F
+	echo "      end" >> blkdat.F
+
+
+
+

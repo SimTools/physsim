@@ -13,8 +13,8 @@ C*          (2,i) : (I*4) : T3 + 1.5.
 C*          (3,i) : (I*4) : l/q flag; (1,2) = (l,q).
 C*       IHEL( i) : (I*4) : helicity combination.
 C*                        : i = (1,2,3,4,5,6)
-C*                        :   = (e-,e+,tau-,tau+,X0,tau-,tau+,X0)
-C*                        :            <-- X0i ---> <-- X0j --->
+C*                        :   = (e-,e+,f,fbar,X0,  f',fbar',X0)
+C*                        :            <-- X0i --> <-- X0j --->
 C*       AM(i)    : (R*8) : mass of i.
 C*       IPV(1,1) : (I*4) : a from X0i
 C*          (2,1) : (I*4) : b
