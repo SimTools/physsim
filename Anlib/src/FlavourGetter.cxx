@@ -20,6 +20,7 @@
 //*    2001/07/31  K.Ikematsu   Supported to search generator particles
 //*                             contributing to the EM cluster (gamma)
 //*    2001/08/02  K.Ikematsu   Added fPIDOffVT and fSNOffVT members
+//*    2001/10/23  K.Ikematsu   Moved TObjNum class to ANLTrack class
 //*
 //* $Id$
 //*************************************************************************
@@ -57,14 +58,6 @@ void FlavourGetter::SetDataArray(const ANLJet &jet) {
   fSNOffVT.SetOwner();
 }
 
-#ifdef __DEBUG__
-void FlavourGetter::SetDebug(Bool_t flag) {
-  if ( flag != fDEBUG ) {
-    fDEBUG = flag;
-  }
-}
-#endif
-
 //_____________________________________________________________________
 //*--
 //*  Getters
@@ -90,7 +83,7 @@ Int_t FlavourGetter::operator()(const ANLJet &jet) {
     //              the HDC cluster from neutral combined tracks.
     Int_t prihadpid = TMath::Abs(prihadpidp->GetNum());
 #ifdef __DEBUG__
-    if (fDEBUG) cerr << "FlavourGetter::operator() : PID(pri had) = " << prihadpid << endl;
+    cerr << "FlavourGetter::operator() : PID(pri had) = " << prihadpid << endl;
 #endif
     ntrkinjet++;
   }
@@ -103,7 +96,7 @@ Int_t FlavourGetter::operator()(const ANLJet &jet) {
   while ((offvtrkpidp = (TObjNum *)nextoffvtrkpid())) {
     Int_t offvtrkpid = TMath::Abs(offvtrkpidp->GetNum());
 #ifdef __DEBUG__
-    if (fDEBUG) cerr << "FlavourGetter::operator() : PID(offv trk) = " << offvtrkpid << endl;
+    cerr << "FlavourGetter::operator() : PID(offv trk) = " << offvtrkpid << endl;
 #endif
     noffvtrkinjet++;
 
@@ -122,10 +115,10 @@ Int_t FlavourGetter::operator()(const ANLJet &jet) {
   Double_t chadratio = (Double_t)noffvtrkfromchad/noffvtrkinjet;
 
 #ifdef __DEBUG__
-  if (fDEBUG) cerr << "R(OffVTrk,FromB,FromC) = ("
-		   << offvratio << ","
-		   << bhadratio << ","
-		   << chadratio << ")" << endl;
+  cerr << "R(OffVTrk,FromB,FromC) = ("
+       << offvratio << ","
+       << bhadratio << ","
+       << chadratio << ")" << endl;
 #endif
 
   if ( offvratio >= kOffVRatioCut ) {
@@ -155,29 +148,10 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
   JSFLTKCLTrack *ctp = t.GetLTKCLTrack();
 
 #ifdef __DEBUG__
-  if (fDEBUG) {
-    if ( ctp->GetType() == 1 ) {
-      cerr << "Combined track type : pure gamma" << endl;
-    } else if ( ctp->GetType() == 2 ) {
-      cerr << "Combined track type : gamma in mixed EMC cluster" << endl;
-    } else if ( ctp->GetType() == 3 ) {
-      cerr << "Combined track type : pure nutral hadron" << endl;
-    } else if ( ctp->GetType() == 4 ) {
-      cerr << "Combined track type : hadron in mixed HDC cluster" << endl;
-    } else if ( ctp->GetType() == 5 ) {
-      cerr << "Combined track type : pure charged hadron" << endl;
-    } else if ( ctp->GetType() == 11 ) {
-      cerr << "Combined track type : electron candidate" << endl;
-    } else if ( ctp->GetType() == 13 ) {
-      cerr << "Combined track type : muon candidate" << endl;
-    } else if ( ctp->GetType() == 6 ) {
-      cerr << "Combined track type : unmatched track" << endl;
-    } else {
-      cerr << "illegal track type !!!" << endl;
-    }
-    cerr << "  CDCEntries   = " << ctp->GetCDCEntries() << endl;
-    cerr << "  EMGenEntries = " << ctp->GetEMGenEntries() << endl;
-  }
+  cerr << "  Track type : " << ctp->GetType()
+       << " , " << ctp->GetTypeName() << endl
+       << "  CDCEntries   = " << ctp->GetCDCEntries() << endl
+       << "  EMGenEntries = " << ctp->GetEMGenEntries() << endl;
 #endif
 
   // Should be weighted in charged tracks in cheating !!!
@@ -188,7 +162,7 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
   // Don't use CDCTrack pointer because of subtracted track-information !!
   if ( ncdctrk > 0 && ctp->GetCharge() != 0 ) {
 #ifdef __DEBUG__
-    if (fDEBUG) cerr << "# of charged tracks = " << ncdctrk << endl;
+    cerr << "# of charged tracks = " << ncdctrk << endl;
 #endif
     for (Int_t i = 0; i < ncdctrk; i++ ) {
       ScanThroughDecayChain(kECDC, ctp, i);
@@ -200,7 +174,7 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
   Int_t nemgen = ctp->GetEMGenEntries();
   if ( nemgen > 0 ) {
 #ifdef __DEBUG__
-    if (fDEBUG) cerr << "# of neutral tracks in EMC = " << nemgen << endl;
+    cerr << "# of neutral tracks in EMC = " << nemgen << endl;
 #endif
     for (Int_t i = 0; i < nemgen; i++ ) {
       ScanThroughDecayChain(kEEMC, ctp, i);
@@ -214,7 +188,7 @@ void FlavourGetter::ScanThroughDecayChain(EFlavourGetterDetectorID id,
 					  JSFLTKCLTrack *ctp, Int_t i) {
 
 #ifdef __DEBUG__
-  if (fDEBUG) cerr << "i = " << i << endl;
+  cerr << "i = " << i << endl;
 #endif
   Int_t gpid = 0;
   Int_t gsn  = 0;
@@ -236,27 +210,27 @@ void FlavourGetter::ScanThroughDecayChain(EFlavourGetterDetectorID id,
     gdln = g->GetDecayLength();
 
 #ifdef __DEBUG__
-    if (fDEBUG) cerr << "(PID, S.N, M.S.N, DLength) = ("
-		     << gpid << ","
-		     << gsn  << ","
-		     << gmsn << ","
-		     << gdln << ")" << endl;
+    cerr << "(PID, S.N, M.S.N, DLength) = ("
+	 << gpid << ","
+	 << gsn  << ","
+	 << gmsn << ","
+	 << gdln << ")" << endl;
 #endif
 
     if ( gdln > 0 ) {
 #ifdef __DEBUG__
-      if (fDEBUG) cerr << "This generator particle has a finite decay length." << endl;
+      cerr << "This generator particle has a finite decay length." << endl;
 #endif
       gpidoffvt = gpid;
       gsnoffvt  = gsn;
     }
   }
 #ifdef __DEBUG__
-  if (fDEBUG) cerr << "-- Search ended --" << endl;
+  cerr << "-- Search ended --" << endl;
   if (TMath::Abs(gpidoffvt) == 310  || TMath::Abs(gpidoffvt) == 3122 ||
       TMath::Abs(gpidoffvt) == 3112 || TMath::Abs(gpidoffvt) == 3222 ||
       TMath::Abs(gpidoffvt) == 3322 || TMath::Abs(gpidoffvt) == 3334)
-    if (fDEBUG) cerr << "This off-vertex generator particle is weak decaying hadron." << endl;
+    cerr << "This off-vertex generator particle is weak decaying hadron." << endl;
 #endif
 
   if ( TMath::Abs(gpidoffvt) > 0 &&
@@ -308,7 +282,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
     //              the HDC cluster from neutral combined tracks.
     Int_t partonid = TMath::Abs(ptnidp->GetNum());
 #ifdef __DEBUG__
-    if (fDEBUG) cerr << "TTL4JFlavourGetter::operator() : MSN = " << partonid << endl;
+    cerr << "TTL4JFlavourGetter::operator() : MSN = " << partonid << endl;
 #endif
     ntrkinjet++;
 
@@ -321,7 +295,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
   while ((offvtrkpidp = (TObjNum *)nextoffvtrkpid())) {
     Int_t offvtrkpid = TMath::Abs(offvtrkpidp->GetNum());
 #ifdef __DEBUG__
-    if (fDEBUG) cerr << "FlavourGetter::operator() : PID(offv trk) = " << offvtrkpid << endl;
+    cerr << "FlavourGetter::operator() : PID(offv trk) = " << offvtrkpid << endl;
 #endif
     noffvtrkinjet++;
 
@@ -335,10 +309,9 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
   }
 
 #ifdef __DEBUG__
-  if (fDEBUG)
-    cerr << "R(Fromb,FromW,FromD) = (" << (Double_t)ntrkfromb/ntrkinjet << ","
-	 << (Double_t)ntrkfromw/ntrkinjet << ","
-	 << (Double_t)noffvtrkfromchad/noffvtrkinjet << ")" << endl;
+  cerr << "R(Fromb,FromW,FromD) = (" << (Double_t)ntrkfromb/ntrkinjet << ","
+       << (Double_t)ntrkfromw/ntrkinjet << ","
+       << (Double_t)noffvtrkfromchad/noffvtrkinjet << ")" << endl;
 #endif
 
   JSFSpringParton *spbbar  = (JSFSpringParton *)fSpgen->UncheckedAt(2);
@@ -364,21 +337,19 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 
 #ifdef __DEBUG__
   if ( spdn->GetID() == 11 || spdn->GetID() == 13 ||  spdn->GetID() == 15 ) {
-    if (fDEBUG)
-      cerr << "W- decayed leptonically" << endl
-	   << "Th(bbar_j,b_j,up_j,dnbar_j) = ("
-	   << thetaspbbarj  << ","
-	   << thetaspbj     << ","
-	   << thetaspupj    << ","
-	   << thetaspdnbarj << ")" << endl;
+    cerr << "W- decayed leptonically" << endl
+	 << "Th(bbar_j,b_j,up_j,dnbar_j) = ("
+	 << thetaspbbarj  << ","
+	 << thetaspbj     << ","
+	 << thetaspupj    << ","
+	 << thetaspdnbarj << ")" << endl;
   } else {
-    if (fDEBUG)
-      cerr << "W+ decayed leptonically" << endl
-	   << "Th(bbar_j,b_j,upbar_j,dn_j) = ("
-	   << thetaspbbarj  << ","
-	   << thetaspbj     << ","
-	   << thetaspupbarj << ","
-	   << thetaspdnj    << ")" << endl;
+    cerr << "W+ decayed leptonically" << endl
+	 << "Th(bbar_j,b_j,upbar_j,dn_j) = ("
+	 << thetaspbbarj  << ","
+	 << thetaspbj     << ","
+	 << thetaspupbarj << ","
+	 << thetaspdnj    << ")" << endl;
   }
 #endif
 
@@ -388,8 +359,8 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
       else return 3;
     } else {
 #ifdef __DEBUG__
-      if (fDEBUG) cerr << "Th(bottom_j) = "
-		       << TMath::Min(thetaspbbarj,thetaspbj) << endl;
+      cerr << "Th(bottom_j) = "
+	   << TMath::Min(thetaspbbarj,thetaspbj) << endl;
 #endif
       return 0;
     }
@@ -400,7 +371,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 	else if ( thetaspdnbarj < kThetaCut ) return -1;
 	else {
 #ifdef __DEBUG__
-	  if (fDEBUG) cerr << "Th(charm_j) = " << thetaspupj << endl;
+	  cerr << "Th(charm_j) = " << thetaspupj << endl;
 #endif
 	  return 0;
 	}
@@ -410,8 +381,8 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 	  else return -1;
 	} else {
 #ifdef __DEBUG__
-	  if (fDEBUG) cerr << "Th(light_j) = "
-			   << TMath::Min(thetaspupj,thetaspdnbarj) << endl;
+	  cerr << "Th(light_j) = "
+	       << TMath::Min(thetaspupj,thetaspdnbarj) << endl;
 #endif
 	  return 0;
 	}
@@ -422,7 +393,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 	else if ( thetaspdnj < kThetaCut ) return 1;
 	else {
 #ifdef __DEBUG__
-	  if (fDEBUG) cerr << "Th(charm_j) = " << thetaspupbarj << endl;
+	  cerr << "Th(charm_j) = " << thetaspupbarj << endl;
 #endif
 	  return 0;
 	}
@@ -432,8 +403,8 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 	  else return 1;
 	} else {
 #ifdef __DEBUG__
-	  if (fDEBUG) cerr << "Th(light_j) = "
-			   << TMath::Min(thetaspupbarj,thetaspdnj) << endl;
+	  cerr << "Th(light_j) = "
+	       << TMath::Min(thetaspupbarj,thetaspdnj) << endl;
 #endif
 	  return 0;
 	}
