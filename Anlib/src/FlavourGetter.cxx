@@ -21,6 +21,7 @@
 //*                             contributing to the EM cluster (gamma)
 //*    2001/08/02  K.Ikematsu   Added fPIDOffVT and fSNOffVT members
 //*    2001/10/23  K.Ikematsu   Moved TObjNum class to ANLTrack class
+//*    2001/12/18  K.Ikematsu   Added SetThetaCut method
 //*
 //* $Id$
 //*************************************************************************
@@ -260,11 +261,20 @@ ClassImp(TTL4JFlavourGetter)
 
 //_____________________________________________________________________
 //*--
+//*  Setters
+//*--
+void TTL4JFlavourGetter::SetThetaCut(Double_t theta) {
+  if ( theta != fThetaCut ) {
+    fThetaCut = theta;
+  }
+}
+
+//_____________________________________________________________________
+//*--
 //*  Getters
 //*--
 Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 
-  static const Double_t kThetaCut = 12.0;
   static const Double_t kCHadRatioCut = 0.8;
 
   Int_t ntrkinjet = 0;
@@ -354,7 +364,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 #endif
 
   if ( (Double_t)ntrkfromb/ntrkinjet >= (Double_t)ntrkfromw/ntrkinjet ) {
-    if ( TMath::Min(thetaspbbarj,thetaspbj) < kThetaCut ) {
+    if ( TMath::Min(thetaspbbarj,thetaspbj) < fThetaCut ) {
       if ( thetaspbbarj < thetaspbj ) return -3;
       else return 3;
     } else {
@@ -367,8 +377,8 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
   } else {
     if ( spdn->GetID() == 11 || spdn->GetID() == 13 ||  spdn->GetID() == 15 ) {
       if ( (Double_t)noffvtrkfromchad/noffvtrkinjet >= kCHadRatioCut ) {
-	if ( thetaspupj < kThetaCut ) return 2;
-	else if ( thetaspdnbarj < kThetaCut ) return -1;
+	if ( thetaspupj < fThetaCut ) return 2;
+	else if ( thetaspdnbarj < fThetaCut ) return -1;
 	else {
 #ifdef __DEBUG__
 	  cerr << "Th(charm_j) = " << thetaspupj << endl;
@@ -376,7 +386,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 	  return 0;
 	}
       } else {
-	if ( TMath::Min(thetaspupj,thetaspdnbarj) < kThetaCut ) {
+	if ( TMath::Min(thetaspupj,thetaspdnbarj) < fThetaCut ) {
 	  if ( thetaspupj < thetaspdnbarj ) return 1;
 	  else return -1;
 	} else {
@@ -389,8 +399,8 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
       }
     } else {
       if ( (Double_t)noffvtrkfromchad/noffvtrkinjet >= kCHadRatioCut ) {
-	if ( thetaspupbarj < kThetaCut ) return -2;
-	else if ( thetaspdnj < kThetaCut ) return 1;
+	if ( thetaspupbarj < fThetaCut ) return -2;
+	else if ( thetaspdnj < fThetaCut ) return 1;
 	else {
 #ifdef __DEBUG__
 	  cerr << "Th(charm_j) = " << thetaspupbarj << endl;
@@ -398,7 +408,7 @@ Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet) {
 	  return 0;
 	}
       } else {
-	if ( TMath::Min(thetaspupbarj,thetaspdnj) < kThetaCut ) {
+	if ( TMath::Min(thetaspupbarj,thetaspdnj) < fThetaCut ) {
 	  if ( thetaspupbarj < thetaspdnj ) return -1;
 	  else return 1;
 	} else {

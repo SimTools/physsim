@@ -23,6 +23,7 @@
 //*                             contributing to the EM cluster (gamma)
 //*    2001/08/02  K.Ikematsu   Added fPIDOffVT and fSNOffVT members
 //*    2001/10/23  K.Ikematsu   Moved TObjNum class to ANLTrack class
+//*    2001/12/18  K.Ikematsu   Added SetThetaCut method
 //*
 //* $Id$
 //*************************************************************************
@@ -90,15 +91,18 @@ private:
 //
 class TTL4JFlavourGetter : public FlavourGetter {
 public:
-  TTL4JFlavourGetter(JSFSpring &sp) {
+  TTL4JFlavourGetter(JSFSpring &sp, Double_t theta=10.)
+                   : fThetaCut(theta) {
     JSFSpringBuf  *spptn   = (JSFSpringBuf *)sp.EventBuf();
     fSpgen = spptn->GetPartons();
   }                                                // default constructor
 
   Int_t    operator()(const ANLJet &jet);
+  void     SetThetaCut(Double_t theta);
 
 private:
   TClonesArray     *fSpgen;       //! Pointer to SpringParton
+  Double_t          fThetaCut;    //  ThetaCut value
 
   ClassDef(TTL4JFlavourGetter, 2) //  TTL4JFlavourGetter class
 };
