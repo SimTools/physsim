@@ -40,16 +40,25 @@ void FlavourGetter::SetData(const ANLJet &jet) {
   fPIDGen.Clear();
   fSNGen.Clear();
   fMSNGen.Clear();
+  fPIDOffVT.Clear();
+  fSNOffVT.Clear();
+  fMSNOffVT.Clear();
 
   TIter next(&jet.GetParticlesInJet());
   ANLTrack *tp;
   while ((tp = (ANLTrack *)next())) {
+#if 0
     SearchPrimaryHadron(*tp);
+#endif
+    SearchOffVertexHadron(*tp);
   }
 
   fPIDGen.SetOwner();  // SetOwner() method only enabled
   fSNGen.SetOwner();   // after adding contents
   fMSNGen.SetOwner();
+  fPIDOffVT.SetOwner();
+  fSNOffVT.SetOwner();
+  fMSNOffVT.SetOwner();
 }
 
 void FlavourGetter::SetDebug(Bool_t flag) {
@@ -213,6 +222,125 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t) {
     }
   }
 }
+
+//_____________________________________________________________________
+void FlavourGetter::SearchOffVertexHadron(const ANLTrack &t) {
+
+  JSFLTKCLTrack *ctp = t.GetLTKCLTrack();
+
+  Int_t nemgen = ctp->GetEMGenEntries();
+  if ( nemgen > 0 ) {
+    if (fDEBUG) cerr << "# of neutral tracks in EMC = " << nemgen << endl;
+    for (Int_t i = 0; i < nemgen; i++ ) {
+      if (fDEBUG) cerr << "i = " << i << endl;
+      Int_t    gpid = 0;
+      Int_t    gsn  = 0;
+      Int_t    gmsn = ctp->GetEMGenAt(i)->GetSerial();
+      Double_t gdln = 0;
+      Int_t gpidoffvt = 0;
+      Int_t gsnoffvt = 0;
+      Int_t gmsnoffvt = 0;
+      while ( gmsn >= 0 ) {
+        JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
+        gpid = g->GetID();
+        gsn  = g->GetSerial();
+        gmsn = g->GetMother();
+	gdln = g->GetDecayLength();
+
+        if (fDEBUG) cerr << "(PID, S.N, M.S.N, DLength) = ("
+                         << gpid << ","
+                         << gsn  << ","
+                         << gmsn << ","
+                         << gdln << ")" << endl;
+
+	if ( gdln > 0 ) {
+	  if (fDEBUG) cerr << "This generator particle has a finite decay length." << endl;
+	  gpidoffvt = gpid;
+	  gsnoffvt  = gsn;
+	  gmsnoffvt = gmsn;
+	}
+      }
+      if (fDEBUG) cerr << "-- Search ended --" << endl;
+
+      if (TMath::Abs(gpidoffvt) == 310  || TMath::Abs(gpidoffvt) == 3122 ||
+	  TMath::Abs(gpidoffvt) == 3112 || TMath::Abs(gpidoffvt) == 3222)
+	if (fDEBUG) cerr << "This off-vertex generator particle is weak decaying hadron." << endl;
+
+      if ( gpidoffvt > 0 &&
+	   TMath::Abs(gpidoffvt) != 310  && TMath::Abs(gpidoffvt) != 3122 &&
+	   TMath::Abs(gpidoffvt) != 3112 && TMath::Abs(gpidoffvt) != 3222 ) {
+	TObjNum *gpidoffvtp = new TObjNum(gpidoffvt);
+	TObjNum *gsnoffvtp  = new TObjNum(gsnoffvt);
+	TObjNum *gmsnoffvtp = new TObjNum(gmsnoffvt);
+	fPIDOffVT.Add(gpidoffvtp);  // *gpidoffvtp, *gsnoffvtp and *gmsnoffvtp stays
+	fSNOffVT.Add(gsnoffvtp);    // but (TObjArray *)obj->SetOwner() deletes
+	fMSNOffVT.Add(gmsnoffvtp);  // its elements.
+      }
+    }
+  }
+
+  Int_t ncdctrk = ctp->GetCDCEntries();
+  if ( ncdctrk > 0 ) {
+    if (fDEBUG) cerr << "# of charged tracks = " << ncdctrk << endl;
+    if ( (ctp->GetType()==2||ctp->GetType()==4) && ctp->GetCharge() == 0 ) {
+      if (fDEBUG) cerr << "Charge of this track in mixed CAL cluster = "
+                       << ctp->GetCharge() << endl
+                       << "Don't use these CDCTrack pointer !" << endl;
+      return;
+    }
+#if 0
+    for (Int_t i = 0; i < ncdctrk; i++ ) {
+#else // temporary treatment
+    for (Int_t i = 0; i < 1; i++ ) {
+#endif
+      if (fDEBUG) cerr << "i = " << i << endl;
+      Int_t    gpid = 0;
+      Int_t    gsn  = 0;
+      Int_t    gmsn = ctp->GetCDCTrackAt(i)->GetGenID();
+      Double_t gdln = 0;
+      Int_t gpidoffvt = 0;
+      Int_t gsnoffvt = 0;
+      Int_t gmsnoffvt = 0;
+      while ( gmsn >= 0 ) {
+        JSFGeneratorParticle *g = (JSFGeneratorParticle *)fGen->UncheckedAt(gmsn-1);
+        gpid = g->GetID();
+        gsn  = g->GetSerial();
+        gmsn = g->GetMother();
+	gdln = g->GetDecayLength();
+
+        if (fDEBUG) cerr << "(PID, S.N, M.S.N, DLength) = ("
+                         << gpid << ","
+                         << gsn  << ","
+                         << gmsn << ","
+                         << gdln << ")" << endl;
+
+	if ( gdln > 0 ) {
+	  if (fDEBUG) cerr << "This generator particle has a finite decay length." << endl;
+	  gpidoffvt = gpid;
+	  gsnoffvt  = gsn;
+	  gmsnoffvt = gmsn;
+	}
+      }
+      if (fDEBUG) cerr << "-- Search ended --" << endl;
+
+      if (TMath::Abs(gpidoffvt) == 310  || TMath::Abs(gpidoffvt) == 3122 ||
+	  TMath::Abs(gpidoffvt) == 3112 || TMath::Abs(gpidoffvt) == 3222)
+	if (fDEBUG) cerr << "This off-vertex generator particle is weak decaying hadron." << endl;
+
+      if ( gpidoffvt > 0 &&
+	   TMath::Abs(gpidoffvt) != 310  && TMath::Abs(gpidoffvt) != 3122 &&
+	   TMath::Abs(gpidoffvt) != 3112 && TMath::Abs(gpidoffvt) != 3222 ) {
+	TObjNum *gpidoffvtp = new TObjNum(gpidoffvt);
+	TObjNum *gsnoffvtp  = new TObjNum(gsnoffvt);
+	TObjNum *gmsnoffvtp = new TObjNum(gmsnoffvt);
+	fPIDOffVT.Add(gpidoffvtp);  // *gpidoffvtp, *gsnoffvtp and *gmsnoffvtp stays
+	fSNOffVT.Add(gsnoffvtp);    // but (TObjArray *)obj->SetOwner() deletes
+	fMSNOffVT.Add(gmsnoffvtp);  // its elements.
+      }
+    }
+  }
+}
+
 
 //_____________________________________________________________________
 //  ------------------------
