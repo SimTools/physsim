@@ -1,6 +1,6 @@
 {
   gROOT->Reset();
-  TFile file("xcxcsim.root","RECREATE");  // Output file
+  TFile file("xn1xn2sim.root","RECREATE");  // Output file
 
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();

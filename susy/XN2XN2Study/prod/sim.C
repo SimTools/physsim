@@ -1,6 +1,6 @@
 {
   gROOT->Reset();
-  TFile file("xcxcsim.root","RECREATE");  // Output file
+  TFile file("xn2xn2sim.root","RECREATE");  // Output file
 
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
@@ -17,7 +17,8 @@
 //  hdr->SetMakeBranch(kFALSE);    // suppress output of EventBuf 
 //  sim->SetMakeBranch(kFALSE);    // suppress output of EventBuf
 
-  Int_t maxevt=200;      // Number of events.
+  //Int_t maxevt=200;      // Number of events.
+  Int_t maxevt=14793;      // Number of events.
   jsf->Initialize();
 
   jsf->BeginRun(30);      // Set run number to 30.

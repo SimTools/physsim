@@ -3,7 +3,7 @@ TFile *file;
 void nsim()
 {
   gROOT->Reset();
-  file = new TFile("xcxcsim.run2.root","RECREATE");  // Output file
+  file = new TFile("xn2xn2sim.run2.root","RECREATE");  // Output file
 
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
@@ -16,7 +16,7 @@ void nsim()
 
   //  Get seeds of prevous run from a file, jsf.root.
   //  This part must be executed prior to the begin run.
-  TFile *flast = new TFile("xcxcsim.root","READ");
+  TFile *flast = new TFile("xn2xn2sim.root","READ");
   jsf->GetLastRunInfo(flast);       // Get seeds of last run. 
   flast->Close(); 
 
