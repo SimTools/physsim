@@ -31,34 +31,58 @@ ClassImp(FlavourGetter)
 
 //_____________________________________________________________________
 //*--
+//*  Setters
+//*--
+void FlavourGetter::SetDebug(Bool_t flag) {
+  if ( flag != fDEBUG ) {
+    fDEBUG = flag;
+  }
+}
+
+//_____________________________________________________________________
+//*--
 //*  Getters
 //*--
-Int_t   FlavourGetter::operator()(const ANLJet &jet){
+Int_t FlavourGetter::operator()(const ANLJet &jet){
 
-  Int_t nbhad = 0;
-  Int_t nchad = 0;
-  Int_t nhad = 0;
+  static const Double_t kBHadRatioCut   = 0.3;
+  static const Double_t kCHadRatioCut   = 0.2;
+  static const Double_t kPriHadRatioCut = 0.9;
+
+  Int_t ntrkinjet = 0;
+  Int_t ntrkfrombhad = 0;
+  Int_t ntrkfromchad = 0;
 
   TIter next(&jet.GetParticlesInJet());
   ANLTrack *tp;
   while ((tp = (ANLTrack *)next())) {
     Int_t hadpid = TMath::Abs(GetPrimaryHadronPID(*tp));
-    if ( hadpid != 0 ) ++nhad;
-    Int_t partonid = 0;
+    if ( hadpid != 0 ) ntrkinjet++;
+
+    Int_t flavour = 0;
     if ( hadpid/1000 > 0 && hadpid/10000 == 0 ) { // Meson-Baryon branch
-      partonid = hadpid/1000;
+      flavour = hadpid/1000;
     } else {
-      partonid = (hadpid/100)%10;
+      flavour = (hadpid/100)%10;
     }
-    if ( partonid == 5 ) ++nbhad;
-    if ( partonid == 4 ) ++nchad;
+    if ( flavour == 5 ) ntrkfrombhad++;
+    if ( flavour == 4 ) ntrkfromchad++;
   }
 
-  Double_t blike = (Double_t)nbhad/(Double_t)nhad;
-  Double_t clike = (Double_t)nchad/(Double_t)nhad;
-  if ( blike >= 0.2 && blike >= clike ) return 3;
-  else if ( clike >= 0.2 && clike > blike ) return 2;
-  else return 1;
+  Double_t bratio   = (Double_t)ntrkfrombhad/(Double_t)ntrkinjet;
+  Double_t cratio   = (Double_t)ntrkfromchad/(Double_t)ntrkinjet;
+  Double_t priratio = (Double_t)(ntrkinjet-ntrkfrombhad-ntrkfromchad)
+                      /(Double_t)ntrkinjet;
+
+  if (fDEBUG) cerr << "R(Frombhad,Fromchad,Fromprihad) = ("
+		   << bratio << ","
+		   << cratio << ","
+		   << priratio << ")" << endl;
+
+  if ( bratio >= kBHadRatioCut && cratio < kCHadRatioCut ) return 3;
+  else if ( bratio < kBHadRatioCut && cratio >= kCHadRatioCut ) return 2;
+  else if ( priratio >= kPriHadRatioCut ) return 1;
+  else return 0;
 }
 
 //_____________________________________________________________________
@@ -97,12 +121,11 @@ void FlavourGetter::SearchPrimaryHadron(const ANLTrack &t){
     fGpid = g->GetID();
     fGmsn = g->GetMother();
 
-    /*
-    cerr << "(PID, S.N, M.S.N) = ("
-         << fGpid << ","
-         << fGsn  << ","
-         << fGmsn << ")" << endl;
-    */
+    if (fDEBUG) cerr << "(PID, S.N, M.S.N) = ("
+		     << fGpid << ","
+		     << fGsn  << ","
+		     << fGmsn << ")" << endl;
+
     fGsn = fGmsn;
   }
   //cerr << "-- Search ended --" << endl;
@@ -117,12 +140,24 @@ ClassImp(TTL4JFlavourGetter)
 
 //_____________________________________________________________________
 //*--
+//*  Setters
+//*--
+void TTL4JFlavourGetter::SetDebug(Bool_t flag) {
+  if ( flag != fDEBUG ) {
+    fDEBUG = flag;
+  }
+}
+
+//_____________________________________________________________________
+//*--
 //*  Getters
 //*--
-Int_t   TTL4JFlavourGetter::operator()(const ANLJet &jet){
+Int_t TTL4JFlavourGetter::operator()(const ANLJet &jet){
 
   static const Double_t kThetaCut = 10.0;
-  static const Double_t kCHadRatioCut = 0.2;
+  //static const Double_t kCHadRatioCut = 0.25;
+  //temporary treatment
+  static const Double_t kCHadRatioCut = 0.1;
 
   Int_t ntrkinjet = 0;
   Int_t ntrkfromb = 0;
@@ -134,10 +169,6 @@ Int_t   TTL4JFlavourGetter::operator()(const ANLJet &jet){
   while ((tp = (ANLTrack *)next())) {
     Int_t hadpid   = TMath::Abs(GetPrimaryHadronPID(*tp));
     Int_t partonid = TMath::Abs(GetPartonID(*tp));
-    /*
-    cerr << "(HadPID,PartonID) = (" << hadpid << ","
-	 << partonid << ")" << endl;
-    */
     if ( hadpid != 0 ) ntrkinjet++;
 
     Int_t flavour = 0;
@@ -147,17 +178,15 @@ Int_t   TTL4JFlavourGetter::operator()(const ANLJet &jet){
       flavour = (hadpid/100)%10;
     }
 
-    if ( partonid == 3 ) {
-      ntrkfromb++;
-    } else if ( partonid == 7 || partonid == 9 ) {
-      ntrkfromw++;
-    }
+    if ( partonid == 3 ) ntrkfromb++;
+    else if ( partonid == 7 || partonid == 9 ) ntrkfromw++;
     if ( flavour == 4 ) ntrkfromchad++;
   }
 
-  cerr << "R(Fromb,FromW,FromD) = (" << (Double_t)ntrkfromb/ntrkinjet << ","
-       << (Double_t)ntrkfromw/ntrkinjet << ","
-       << (Double_t)ntrkfromchad/ntrkinjet << ")" << endl;
+  if (fDEBUG)
+    cerr << "R(Fromb,FromW,FromD) = (" << (Double_t)ntrkfromb/ntrkinjet << ","
+	 << (Double_t)ntrkfromw/ntrkinjet << ","
+	 << (Double_t)ntrkfromchad/ntrkinjet << ")" << endl;
 
   JSFSpringParton *spbbar  = (JSFSpringParton *)fSpgen->UncheckedAt(2);
   JSFSpringParton *spb     = (JSFSpringParton *)fSpgen->UncheckedAt(4);
@@ -181,46 +210,67 @@ Int_t   TTL4JFlavourGetter::operator()(const ANLJet &jet){
   Double_t thetaspdnbarj = qspdnbar.GetTheta(jet);
 
   if ( spdn->GetID() == 11 || spdn->GetID() == 13 ||  spdn->GetID() == 15 ) {
-  cerr << "Th(bbar_j,b_j,up_j,dnbar_j) = ("
-       << thetaspbbarj  << ","
-       << thetaspbj     << ","
-       << thetaspupj    << ","
-       << thetaspdnbarj << ")" << endl;
+    if (fDEBUG)
+      cerr << "W- decayed leptonically" << endl
+	   << "Th(bbar_j,b_j,up_j,dnbar_j) = ("
+	   << thetaspbbarj  << ","
+	   << thetaspbj     << ","
+	   << thetaspupj    << ","
+	   << thetaspdnbarj << ")" << endl;
   } else {
-  cerr << "Th(bbar_j,b_j,upbar_j,dn_j) = ("
-       << thetaspbbarj  << ","
-       << thetaspbj     << ","
-       << thetaspupbarj << ","
-       << thetaspdnj    << ")" << endl;
+    if (fDEBUG)
+      cerr << "W+ decayed leptonically" << endl
+	   << "Th(bbar_j,b_j,upbar_j,dn_j) = ("
+	   << thetaspbbarj  << ","
+	   << thetaspbj     << ","
+	   << thetaspupbarj << ","
+	   << thetaspdnj    << ")" << endl;
   }
 
-  if ( (Double_t)ntrkfromb/ntrkinjet > (Double_t)ntrkfromw/ntrkinjet ) {
+  if ( (Double_t)ntrkfromb/ntrkinjet > (Double_t)ntrkfromw/ntrkinjet &&
+       (Double_t)ntrkfromchad/ntrkinjet < kCHadRatioCut ) {
     if ( TMath::Min(thetaspbbarj,thetaspbj) < kThetaCut ) {
       if ( thetaspbbarj < thetaspbj ) return -3;
       else return 3;
-    } else return TMath::Min(thetaspbbarj,thetaspbj);
+    } else {
+      if (fDEBUG) cerr << "Th(bottom_j) = "
+		       << TMath::Min(thetaspbbarj,thetaspbj) << endl;
+      return 0;
+    }
   } else {
     if ( spdn->GetID() == 11 || spdn->GetID() == 13 ||  spdn->GetID() == 15 ) {
-      //cerr << "W- decayed leptonically" << endl;
-      if ( (Double_t)ntrkfromchad/ntrkinjet > kCHadRatioCut ) {
+      if ( (Double_t)ntrkfromchad/ntrkinjet >= kCHadRatioCut ) {
 	if ( thetaspupj < kThetaCut ) return 2;
-	else return thetaspupj;
+	else {
+	  if (fDEBUG) cerr << "Th(charm_j) = " << thetaspupj << endl;
+	  return 0;
+	}
       } else {
 	if ( TMath::Min(thetaspupj,thetaspdnbarj) < kThetaCut ) {
 	  if ( thetaspupj < thetaspdnbarj ) return 1;
 	  else return -1;
-	} else return TMath::Min(thetaspupj,thetaspdnbarj);
+	} else {
+	  if (fDEBUG) cerr << "Th(light_j) = "
+			   << TMath::Min(thetaspupj,thetaspdnbarj) << endl;
+	  return 0;
+	}
       }
     } else {
-      //cerr << "W+ decayed leptonically" << endl;
       if ( (Double_t)ntrkfromchad/ntrkinjet > kCHadRatioCut ) {
 	if ( thetaspupbarj < kThetaCut ) return -2;
-	else return thetaspupbarj;
+	else {
+	  if (fDEBUG) cerr << "Th(charm_j) = " << thetaspupbarj << endl;
+	  return 0;
+	}
       } else {
 	if ( TMath::Min(thetaspupbarj,thetaspdnj) < kThetaCut ) {
 	  if ( thetaspupbarj < thetaspdnj ) return -1;
 	  else return 1;
-	} else return TMath::Min(thetaspupbarj,thetaspdnj);
+	} else {
+	  if (fDEBUG) cerr << "Th(light_j) = "
+			   << TMath::Min(thetaspupbarj,thetaspdnj) << endl;
+	  return 0;
+	}
       }
     }
   }
