@@ -19,7 +19,9 @@
 //*    2000/03/23  K.Ikematsu	Added GetTheta method.
 //*    2000/03/28  K.Ikematsu	Added Acol method.
 //*    2001/02/16  K.Ikematsu	Added GetTrans and GetLong method.
+//*    2001/12/25  K.Ikematsu	Added Long2 and Long method.
 //*
+//* $Id$
 //*************************************************************************
 //
 #include <iostream.h>
@@ -33,7 +35,7 @@
 //
 class ANL3DVector : public TVector3, public Lockable {
 public:
-   ANL3DVector(Double_t px=0., Double_t py=0., Double_t pz=0.) 
+   ANL3DVector(Double_t px=0., Double_t py=0., Double_t pz=0.)
    			               : TVector3(px,py,pz) {}
    ANL3DVector(Float_t px, Float_t py=0., Float_t pz=0.) {
      TVector3::operator[](0) = px;
@@ -87,19 +89,18 @@ public:
      return ( q1(1)*q2(1) + q1(2)*q2(2) + q1(3)*q2(3) );
    }
 
-
    inline friend ANL3DVector operator^ (const ANL3DVector &q1,
 				        const ANL3DVector &q2) {
      ANL3DVector ans( q1.Cross(q2) );
      return ans;
    }
 
-   inline Double_t GetPt2()   const { return ( operator()(1)*operator()(1) 
+   inline Double_t GetPt2()   const { return ( operator()(1)*operator()(1)
                                        + operator()(2)*operator()(2) ); }
-   inline Double_t GetMag2()  const { return ( GetPt2() 
+   inline Double_t GetMag2()  const { return ( GetPt2()
                                        + operator()(3)*operator()(3) ); }
-   inline Double_t GetPt()    const { return TMath::Sqrt( GetPt2() );       }
-   inline Double_t GetMag()   const { return TMath::Sqrt( GetMag2() );      }
+   inline Double_t GetPt()    const { return TMath::Sqrt( GetPt2() );   }
+   inline Double_t GetMag()   const { return TMath::Sqrt( GetMag2() );  }
    inline Double_t GetTheta() const { return (180.*(TMath::ACos(CosTheta()))/TMath::Pi()); }
    inline Double_t GetTheta(const ANL3DVector &q) const {
      return (180.*(TMath::ACos(CosTheta(q)))/TMath::Pi());
@@ -118,6 +119,18 @@ public:
    inline Double_t GetLong() const {
      return operator()(3);
    }
+   inline Double_t GetLong2(const ANL3DVector &q) const {
+     return Mag2() - Perp2(q);
+   }
+   inline Double_t GetLong(const ANL3DVector &q) const {
+     return TMath::Sqrt(Long2(q));
+   }
+   inline Double_t Long2(const ANL3DVector &q) const {
+     return GetLong2(q);
+   }
+   inline Double_t Long(const ANL3DVector &q) const {
+     return GetLong(q);
+   }
 
    inline Double_t Acol(const ANL3DVector &q) const {
      return (180.*(TMath::Pi()-TMath::ACos(CosTheta(q)))/TMath::Pi());
@@ -134,7 +147,7 @@ public:
                   /(GetMag()*q.GetMag());
    }
 
-   inline virtual void DebugPrint(const Char_t *opt = "Brief") const { 
+   inline virtual void DebugPrint(const Char_t *opt = "Brief") const {
      cerr << "p    = " << operator()(1) << " "
                        << operator()(2) << " " << operator()(3) << endl;
      if (opt == "Detailed") {
