@@ -15,7 +15,9 @@
 Int_t maxnevt = 2000;
 Int_t freq = 10;
 
+Char_t *utils_so = "libS4Utils.so";
 Char_t *anlib_so = "libAnlib.so";
+Char_t *jsfanlib_so = "libJSFAnlib.so";
 Char_t *zhspr_so = "../../../../../higgs/ZHStudy/prod/ZHSpring.so";
 Char_t *procanl_so = "libZH4JAnalysis.so";
 
@@ -25,7 +27,9 @@ Char_t *inputfile = "../../../../../higgs/ZHStudy/prod/zhsim.root";	// Input sim
 
 int anlzh4j()
 {
+  gSystem->Load(utils_so);
   gSystem->Load(anlib_so);
+  gSystem->Load(jsfanlib_so);
   gSystem->Load(zhspr_so);
   gSystem->Load(procanl_so);
 

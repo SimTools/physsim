@@ -1,0 +1,123 @@
+XCOMM ############################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for XNXN generator.
+XCOMM ##	exe      : to make an executable.
+XCOMM ##	run      : to run the executalbe.
+XCOMM ##	clean    : to clean the directory.
+XCOMM ##	cleanall : to remove everything reproducible.
+XCOMM ## (Update Record) 
+XCOMM ##    04/11/23  K.Fujii   Modified for JSF
+XCOMM ############################################################################
+
+/*
+ * Template Files
+ *
+ */
+#define CXXPACKAGE 
+#include "config/kflib.tmpl"
+
+/*
+ * Headers
+ *
+ */
+
+INCPATH	= -I. -I$(KFLIBROOT)/dgen_lib/sm/include \
+	-I$(KFLIBROOT)/dgen_lib/ss/include \
+	-I$(KFLIBROOT)/dgen_lib/hg/include \
+	-I$(KFLIBROOT)/dgen_lib/bm/include \
+	-I$(KFLIBROOT)/gen_lib/bs/include \
+	-I$(LCDIR)/simjlc/src -I$(LCDIR)/util/fortlib/src 
+/*
+ * Libraries
+ *
+ */
+
+HELASV204 = DHELASV204
+
+KFLIB     = $(LDDIRFLAG)$(KFLIBDIR) -lDGENLIBSS -lDGENLIBHG -lDGENLIBSM \
+            -lDGENLIBKN -lDGENLIBBM -lDFORTLIB -lANLLIB
+
+
+/*
+ * Fortran Objects
+ *
+ */
+
+FOBJS = ampnxx.o \
+		fulnxx.o \
+		funnxx.o \
+		getxph.o \
+		setgsz.o \
+		sgnxxf.o \
+		spevnt.o \
+		userin.o
+
+PACKAGENAME   = XN2XN2Spring
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+
+FSRCS         = $(strip $(subst .o,.F,$(FOBJS)))
+
+OBJS          = $(PACKAGENAME).$(ObjSuf) \
+		$(PACKAGENAME)Dict.$(ObjSuf)
+
+SRCS          = $(PACKAGENAME).$(SrcSuf) 
+
+HDRS	      = $(PACKAGENAME).h
+
+DICTNAME      = $(PACKAGENAME)Dict
+
+SONAME	      = $(PACKAGENAME).$(DllSuf)
+
+JSFSOLIB      = prod/$(SONAME)
+
+JSFPROGRAM    = prod/jsf
+
+/*
+ * Make Targets
+ *
+ */
+
+#if defined(hitachiArchitecture)
+all::  $(JSFPROGRAM)
+#else
+all::  $(JSFSOLIB)
+#endif
+
+$(JSFPROGRAM): $(OBJS) jsfmain.o $(FOBJS)
+	$(LD) -o $(JSFPROGRAM) jsfmain.o $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS)
+
+prod/$(SONAME): $(OBJS) $(FOBJS)
+	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS)
+
+clean:: 
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
+
+depend:: $(SRCS) $(HDRS) $(FSRCS)
+	for i in $(SRCS) $(FSRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
+
+distclean:: clean
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~
+	@rm -f $(JSFPROGRAM) $(JSFSOLIB) *.root Makefile
+	@(cd prod; rm -f *.root *.tdr *.out *~ core)
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I$(JSFROOT)/include $(HDRS) LinkDef.h
+
+/*
+ * Suffix Rules
+ *
+ */
+
+.SUFFIXES: .$(SrcSuf)
+
+.$(SrcSuf).$(ObjSuf):
+	$(CXX) $(CXXFLAGS) -c $<
