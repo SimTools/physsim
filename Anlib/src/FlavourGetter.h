@@ -104,7 +104,9 @@ public:
   TTL4JFlavourGetter(JSFSpring &sp) {
     JSFSpringBuf  *spptn   = (JSFSpringBuf *)sp.EventBuf();
     fSpgen = spptn->GetPartons();
+#ifdef __DEBUG__
     fDEBUG = kFALSE;
+#endif
   }                                                // default constructor
 
   Int_t    operator()(const ANLJet &jet);
