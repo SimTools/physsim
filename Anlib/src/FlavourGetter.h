@@ -42,10 +42,12 @@ public:
     JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
     fGen   = evt->GetGeneratorParticles();
     fGpid  = 0; fGsn = 0; fGmsn = 0;
+    fDEBUG = kFALSE;
   }                                                // default constructor
 
   virtual ~FlavourGetter() {}                      // default destructor
-  Int_t operator()(const ANLJet &jet);
+  Int_t    operator()(const ANLJet &jet);
+  virtual void SetDebug(Bool_t flag);              // sets debug flag
 
   //private:
   Int_t GetPrimaryHadronPID(const ANLTrack &t);
@@ -60,6 +62,7 @@ private:
   Int_t             fGpid;        //  PID of GeneratorParticle
   Int_t             fGsn;         //  S.N of GeneratorParticle
   Int_t             fGmsn;        //  Mother S.N of GeneratorParticle
+  Bool_t            fDEBUG;       //  Debug flag
 
   ClassDef(FlavourGetter, 1)      //  FlavourGetter class
 };
@@ -74,12 +77,15 @@ public:
   TTL4JFlavourGetter(JSFSpring &sp) {
     JSFSpringBuf  *spptn   = (JSFSpringBuf *)sp.EventBuf();
     fSpgen = spptn->GetPartons();
+    fDEBUG = kFALSE;
   }                                                // default constructor
 
-  Int_t operator()(const ANLJet &jet);
+  Int_t    operator()(const ANLJet &jet);
+  void     SetDebug(Bool_t flag);                  // sets debug flag
 
 private:
   TClonesArray     *fSpgen;       //! Pointer to SpringParton
+  Bool_t            fDEBUG;       //  Debug flag
 
   ClassDef(TTL4JFlavourGetter, 1)    //  TTFlavourGetter class
 };
