@@ -22,6 +22,8 @@
 //*    2001/10/21  K.Ikematsu   Added SetColorSingletID method and
 //*                             fColorSingletID member.
 //*    2001/10/22  K.Ikematsu   Added TObjNum class from FlavourGetter class.
+//*    2002/02/08  K.Fujii      fMSNPriHad is now a pointer.
+//*                             Added operator=.
 //*
 //* $Id$
 //*************************************************************************
@@ -38,17 +40,17 @@ ClassImp(ANLTrack)
 //*  Constructors
 //*--
 ANLTrack::ANLTrack() : ANL4DVector(0.), fTrackPtr(0), fGen(0),
-		       fColorSingletID(9999) {}
+		       fMSNPriHad(0), fColorSingletID(9999) {}
 ANLTrack::ANLTrack(const TObject *track) :
   ANL4DVector(((JSFLTKCLTrack *)track)->GetPV()),
-  fTrackPtr(track), fColorSingletID(9999) {
+  fTrackPtr(track), fMSNPriHad(0), fColorSingletID(9999) {
   JSFSIMDST     *sds = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
   JSFSIMDSTBuf  *evt = (JSFSIMDSTBuf*)sds->EventBuf();
   fGen   = evt->GetGeneratorParticles();
-  fMSNPriHad.Delete();
 }
 ANLTrack::ANLTrack(const TVector &pv, const TObject *ptr) :
-  ANL4DVector(pv), fTrackPtr(ptr), fGen(0), fColorSingletID(9999) {}
+  ANL4DVector(pv), fTrackPtr(ptr), fGen(0), fMSNPriHad(0), 
+  fColorSingletID(9999) {}
 
 //*--
 //*  Destructor
@@ -96,7 +98,8 @@ Int_t ANLTrack::GetColorSingletID() const {
 //*--
 void ANLTrack::SetColorSingletID() {
 
-  fMSNPriHad.Clear();
+  if (!fMSNPriHad) fMSNPriHad = new TObjArray();
+  else		   fMSNPriHad->Clear();
 
   JSFLTKCLTrack *ctp = GetLTKCLTrack();
 
@@ -124,7 +127,7 @@ void ANLTrack::SetColorSingletID() {
       egen = GetEGeneratorParticle(kECDC, ctp, i);
     }
 
-    TIter nextid(&fMSNPriHad);
+    TIter nextid(fMSNPriHad);
     TObjNum *idp;
     while ((idp = (TObjNum *)nextid())) {
       fColorSingletID = idp->GetNum();
@@ -140,15 +143,28 @@ void ANLTrack::SetColorSingletID() {
       egen = GetEGeneratorParticle(kEEMC, ctp, i);
     }
 
-    TIter nextid(&fMSNPriHad);
+    TIter nextid(fMSNPriHad);
     TObjNum *idp;
     while ((idp = (TObjNum *)nextid())) {
       fColorSingletID = idp->GetNum();
     }
   }
 
-  fMSNPriHad.SetOwner();  // SetOwner() method only enabled
-                          // after adding contents
+  fMSNPriHad->SetOwner();  // SetOwner() method only enabled
+                           // after adding contents
+}
+
+const ANLTrack & ANLTrack::operator=(const ANLTrack & track) {
+	*(ANL4DVector *)this = (ANL4DVector)track;
+	fTrackPtr 	= track.fTrackPtr;
+	fGen	  	= track.fGen;
+	if (fMSNPriHad) {
+		delete fMSNPriHad;
+		fMSNPriHad = 0;
+	}
+	if (track.fMSNPriHad) fMSNPriHad = new TObjArray(*track.fMSNPriHad);
+	fColorSingletID = track.fColorSingletID;
+	return *this;
 }
 
 //_____________________________________________________________________
@@ -221,7 +237,7 @@ void ANLTrack::ScanThroughDecayChain(EFlavourGetterDetectorID id,
   TObjNum *gmsnp = new TObjNum(gmsn);
   ////fPIDPriHad.Add(gpidp);  // *gpidp, *gsnp and *gmsnp stays
   ////fSNPriHad.Add(gsnp);    // but (TObjArray *)obj->SetOwner() deletes
-  fMSNPriHad.Add(gmsnp);  // its elements.
+  fMSNPriHad->Add(gmsnp);  // its elements.
 }
 
 //_____________________________________________________________________

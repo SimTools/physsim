@@ -202,8 +202,8 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   TT2L2JAnalysisBuf *ua    = (TT2L2JAnalysisBuf *)fEventBuf;
   TT2L2JAnalysisBuf &a     = *ua;
 
-  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks
-  TClonesArray  *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
+  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
 
   // Select good tracks and store them in "TObjArray tracks".
 

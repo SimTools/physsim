@@ -191,7 +191,7 @@ Bool_t XCXC4JAnalysis::Process(Int_t ev)
   XCXC4JAnalysisBuf &a   = *ua;
 
   Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
-  TClonesArray  *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
 
   // Select good tracks
 

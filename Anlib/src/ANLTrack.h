@@ -24,6 +24,8 @@
 //*    2001/10/21  K.Ikematsu   Added SetColorSingletID method and
 //*                             fColorSingletID member.
 //*    2001/10/22  K.Ikematsu   Added TObjNum class from FlavourGetter class.
+//*    2002/02/08  K.Fujii      fMSNPriHad is now a pointer.
+//*				Added operator=.
 //*
 //* $Id$
 //*************************************************************************
@@ -58,6 +60,8 @@ public:
   Int_t     GetColorSingletID() const;
   void      SetColorSingletID();
 
+  virtual   const ANLTrack & operator=(const ANLTrack & track);
+
 private:
   void      ScanThroughDecayChain(EFlavourGetterDetectorID id,
 				  JSFLTKCLTrack *ctp, Int_t i);
@@ -67,7 +71,7 @@ private:
 private:
   const TObject *fTrackPtr;       //  Pointer to JSFLTKCLTrack
   TClonesArray  *fGen;            //! Pointer to GeneratorParticles Array
-  TObjArray     fMSNPriHad;       //  Array of primary hadron's Mother S.N
+  TObjArray     *fMSNPriHad;      //  Pointer to Array of primary hadron's Mother S.N
                                   //  (corresponding to PartonID)
   Int_t         fColorSingletID;  // ColorSinglet ID
 

@@ -207,7 +207,7 @@ Bool_t WW4JAnalysis::Process(Int_t ev)
   WW4JAnalysisBuf &a     = *ua;
 
   Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
-  TClonesArray  *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
 
   // Select good tracks and store them in "TObjArray tracks".
 

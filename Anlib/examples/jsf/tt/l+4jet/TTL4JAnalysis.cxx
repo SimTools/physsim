@@ -223,8 +223,8 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   TTL4JAnalysisBuf *ua    = (TTL4JAnalysisBuf *)fEventBuf;
   TTL4JAnalysisBuf &a     = *ua;
 
-  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks
-  TClonesArray  *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
+  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
 
   // Select good tracks and store them in "TObjArray tracks".
 

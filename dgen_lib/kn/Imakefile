@@ -56,6 +56,6 @@ blkdat.F: include/SMPTAB.inc include/BEMCNS.inc
 	sed -e 's/^C=/  /' include/BEMCNS.inc >> blkdat.F
 	echo "      end" >> blkdat.F
 
-distclean: clean
+distclean:: clean
 	rm -f Makefile
 

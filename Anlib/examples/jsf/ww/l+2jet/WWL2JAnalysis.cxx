@@ -202,7 +202,7 @@ Bool_t WWL2JAnalysis::Process(Int_t ev)
   WWL2JAnalysisBuf &a     = *ua;
 
   Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
-  TClonesArray  *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
 
   // Select good tracks and store them in "TObjArray tracks".
 

@@ -200,7 +200,7 @@ Bool_t ZH4JAnalysis::Process(Int_t ev)
   ZH4JAnalysisBuf &a	= *ua;
 
   Int_t		ntrks	= evt->GetNLTKCLTracks();	// No. of tracks
-  TClonesArray	*trks	= evt->GetLTKCLTracks();	// Combined tracks
+  TObjArray	*trks	= evt->GetLTKCLTracks();	// Combined tracks
 
   // Select good tracks
   ANL4DVector qsum;

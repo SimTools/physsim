@@ -203,8 +203,8 @@ Bool_t TT6JAnalysis::Process(Int_t ev)
   TT6JAnalysisBuf *ua    = (TT6JAnalysisBuf *)fEventBuf;
   TT6JAnalysisBuf &a     = *ua;
 
-  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks
-  TClonesArray  *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
+  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
 
   // Select good tracks and store them in "TObjArray tracks".
 
