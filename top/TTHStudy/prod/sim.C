@@ -5,15 +5,6 @@
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
  
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("TTHSpring.sl");
-    }
-    else {
-      gSystem->Load("TTHSpring.so");
-   }
-  }
- 
   spring = new TTHSpring();
   spring->ReadBases("bases.root");
  

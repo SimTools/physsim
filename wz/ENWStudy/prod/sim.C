@@ -5,15 +5,6 @@
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
  
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("ENWSpring.sl");
-    }
-    else {
-      gSystem->Load("ENWSpring.so");
-   }
-  }
- 
   spring = new ENWSpring();
   spring->ReadBases("bases.root");
  

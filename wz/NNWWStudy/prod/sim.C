@@ -5,15 +5,6 @@
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
  
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("NNWWSpring.sl");
-    }
-    else {
-      gSystem->Load("NNWWSpring.so");
-   }
-  }
- 
   spring = new NNWWSpring();
   spring->ReadBases("bases.root");
  

@@ -2,15 +2,6 @@
   gROOT->Reset();
   TFile file("sfsfsim.root","RECREATE");  // Output file
  
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("SFSFSpring.sl");
-    }
-    else {
-      gSystem->Load("SFSFSpring.so");
-   }
-  }
- 
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
  

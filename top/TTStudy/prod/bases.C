@@ -6,16 +6,7 @@
 
   jsf = new JSFSteer();    // required to read parameter from jsf.conf
   
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("TTSpring.sl");
-    }
-    else {
-      gSystem->Load("TTSpring.so");
-   }
-  }
   bases = new TTBases();
-
 
 //  bases->SetNoOfSample(10000);
 //  bases->SetIteration1( 0.2, 10);

@@ -5,15 +5,6 @@ void nsim()
   gROOT->Reset();
   file = new TFile("xcxcsim.run2.root","RECREATE");  // Output file
 
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("XCXCSpring.sl");
-    }
-    else {
-      gSystem->Load("XCXCSpring.so");
-   }
-  }
- 
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
   spring = new XCXCSpring();

@@ -5,15 +5,6 @@
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
  
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("EEZSpring.sl");
-    }
-    else {
-      gSystem->Load("EEZSpring.so");
-   }
-  }
- 
   spring = new EEZSpring();
   spring->ReadBases("bases.root");
  

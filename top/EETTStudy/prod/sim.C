@@ -5,15 +5,6 @@
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
  
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("EETTSpring.sl");
-    }
-    else {
-      gSystem->Load("EETTSpring.so");
-   }
-  }
- 
   spring = new EETTSpring();
   spring->ReadBases("bases.root");
  

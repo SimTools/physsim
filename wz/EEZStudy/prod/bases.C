@@ -6,14 +6,6 @@
 
   jsf = new JSFSteer();    // required to read parameter from jsf.conf
   
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("EEZSpring.sl");
-    }
-    else {
-      gSystem->Load("EEZSpring.so");
-   }
-  }
   bases = new EEZBases();
 
 

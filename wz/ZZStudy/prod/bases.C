@@ -6,14 +6,6 @@
 
   jsf = new JSFSteer();    // required to read parameter from jsf.conf
   
-  if( strncmp(gSystem->HostName(),"ccjlc",5)  != 0 ) {
-    if( strncmp(gSystem->Getenv("OSTYPE"),"hpux",4) ==0 ) {
-      gSystem->Load("ZZSpring.sl");
-    }
-    else {
-      gSystem->Load("ZZSpring.so");
-   }
-  }
   bases = new ZZBases();
 
 
