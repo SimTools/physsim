@@ -135,12 +135,23 @@ C--
 C--
 C  Then select final states.
 C--
+#if 1
+C tt
       IDPTCL(1, 3) = 3
       IDPTCL(2, 3) = 1
       IDPTCL(3, 3) = 2
       IDPTCL(1, 4) = 3
       IDPTCL(2, 4) = 1
       IDPTCL(3, 4) = 2
+#else
+C bb
+      IDPTCL(1, 3) = 3
+      IDPTCL(2, 3) = 2
+      IDPTCL(3, 3) = 2
+      IDPTCL(1, 4) = 3
+      IDPTCL(2, 4) = 2
+      IDPTCL(3, 4) = 2
+#endif
 C--
 C  Select electron helicity.
 C--

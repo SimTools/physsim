@@ -53,7 +53,7 @@ C--
          NCALL  = 1
          SPIN   = 2
          NB     = 2
-         FACT   = xGV2PB*x2PI/(x4PI**(3*NB))/SPIN
+         FACT   = xGV2FB*x2PI/(x4PI**(3*NB))/SPIN
          AME    = AMF(1,2,1)
          CALL UVZERO(9,EC)
          EC(1,1) = 1
@@ -104,9 +104,15 @@ C--
 C--
 C  Differenctial cross section.
 C--
-      SG  = AMP2(0)*WAT
-CHOFFT       SG = AMP2(1)*WAT
-CHOFFZ       SG = AMP2(2)*WAT
+#if 1
+C all
+      SG = AMP2(0)*WAT
+#else
+C H off t
+      SG = AMP2(1)*WAT
+C H off Z
+C     SG = AMP2(2)*WAT
+#endif
 C--
 C  That's it.
 C--

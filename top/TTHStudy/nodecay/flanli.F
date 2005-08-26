@@ -43,13 +43,13 @@ CDBGEN       CALL DSDBGB
 C                     Define BASES generator.
       CALL DSBS51
 C                     Define Lund Hadronizer.
-      CALL DSLHAD
+C     CALL DSLHAD
 C                     List Generator:Particle_List bank
 CGELS       CALL DSGELS
 C                     Define Swimmer  routine.
-      CALL DSCSWM
+C     CALL DSCSWM
 C                     Define Smearing routine.
-      CALL DSCSMR
+C     CALL DSCSMR
 C                     Define recover routine
 CRCV         CALL DSRCOV
 C                     Define User routine.
