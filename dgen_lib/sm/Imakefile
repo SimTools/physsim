@@ -38,7 +38,11 @@ blkdat.o: blkdat.F
 
 blkdat.F: include/SMPTAB.inc Imakefile
 	rm -f blkdat.F
-	echo "      block data blkdat" > blkdat.F
+	if [ x$(FC) != xgfortran ]; then \
+	echo "      block data blkdat" > blkdat.F; \
+	else \
+	echo "      subroutine blkdat" > blkdat.F; \
+	fi
 	echo "C--" >> blkdat.F
 	echo "C  THIS FILE IS AUTOMATICALLY GENERAGED FROM" >> blkdat.F
 	echo "C     include/SMPTAB.inc" >> blkdat.F
@@ -49,5 +53,5 @@ blkdat.F: include/SMPTAB.inc Imakefile
 	echo "      end" >> blkdat.F
 
 distclean:: clean
-	rm -f Makefile
+	rm -f Makefile blkdat.F
 

@@ -2,7 +2,7 @@ C* 95/03/28  K.Fujii    FUNC for e+ e- --> t t_bar H full amplitudes.
 C* 95/06/07  K.Fujii	Use ISRBM switch.
 C*
 
-      REAL FUNCTION FUNC*8(ZZ)
+      REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)

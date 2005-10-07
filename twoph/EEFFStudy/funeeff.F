@@ -29,6 +29,7 @@ C--
 #include "BSHUFL.inc"
 C--
       DIMENSION OMEGAX(2), AKX(2)
+      integer*4 dum
 #ifdef MACHTEN_PPC
       REAL*8   QEXTD
       REAL*8   TMP

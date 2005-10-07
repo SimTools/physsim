@@ -37,7 +37,9 @@ ROOTLIBS     += -lEGPythia6 -lEG -Wl,-u,pytest_ $(CERNLIBS)
 /* Analysis Related Fortran Libraries */
 
 #if defined(MacOSXArchitecture) || defined(DarwinArchitecture)
-LDFLAGS       = $(ANALLIB) -L/usr/local/lib -lg2c
+/* LIBG2C = -lg2c */
+LIBG2C        = -lgfortran -lgfortranbegin
+LDFLAGS       = $(ANALLIB) -L/usr/local/lib $(LIBG2C)
 ANALLIB	      = $(LDDIRFLAG)$(LCLIBDIR) -lFORTLIB -l$(HELASV204) $(EXTRALIBS)
 #else
 ANALLIB       = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \

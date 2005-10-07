@@ -170,6 +170,7 @@ KKhhBases::KKhhBases(const char *name, const char *title)
 
   cout << "Init kkbases " << endl;
   
+  using namespace std;
   stringstream ins(gJSF->Env()->GetValue("KKhhBases.CosthRange","-1.0 1.0"));
   ins >> fXL[0] >> fXU[0];
 

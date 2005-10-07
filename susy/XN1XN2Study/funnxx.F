@@ -322,7 +322,7 @@ C--
       PT4   = MAX(SQRT( PV(1,4)**2 + PV(2,4)**2 ),.1D0)
       PT5   = MAX(SQRT( PV(1,5)**2 + PV(2,5)**2 ),.1D0)
       ACOP  = ( PV(1,4)*PV(1,5) + PV(2,4)*QV(2,5) )/PT4/PT5
-      IF ( ABS(ACOP).GE.1.0D0 ) ACOP = SIGN(1.0,ACOP)
+      IF ( ABS(ACOP).GE.1.0D0 ) ACOP = SIGN(1.0D0, ACOP)
       ACOP  = xPI - ACOS(ACOP)
       COST  = XPHASE(2,1)
       PHIT  = XPHASE(3,1)

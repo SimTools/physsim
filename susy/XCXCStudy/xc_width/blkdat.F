@@ -1,4 +1,4 @@
-      block data blkdat
+      subroutine blkdat
 C--
 C  THIS FILE IS AUTOMATICALLY GENERAGED FROM
 C     include/SMPTAB.inc

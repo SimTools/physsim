@@ -34,6 +34,9 @@ C--
 C
 C===========< Entry Point >=============================================
 C
+#if defined(__GFORTRAN__)
+      call grqblk
+#endif
 C--
 C  Set up constants.
 C     MODE = 0 : 1-st call.

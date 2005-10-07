@@ -1,7 +1,7 @@
 C* (Update Record)
 C*   05/03/06  K.Fujii	FUNC for e+ e- --> e+ e- Z0 Z0 full amplitudes.
 C*
-      REAL FUNCTION FUNC*8(ZZ)
+      REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*8 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)

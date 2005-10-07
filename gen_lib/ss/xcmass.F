@@ -74,7 +74,7 @@ C--
 C--
 C  Decide EPSR.
 C--
-      EPSR = SIGN(1.,AM2*AMU-AMW*AMW*SN2B)
+      EPSR = SIGN(1.D0,AM2*AMU-AMW*AMW*SN2B)
 C--
 C  That's it.
 C--

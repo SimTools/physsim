@@ -10,6 +10,9 @@
 C
 C========< Entry Point >================================================
 C
+#if defined(__GFORTRAN__)
+      call blkdat
+#endif
 C--
 C  Initialize numerical constants.
 C--

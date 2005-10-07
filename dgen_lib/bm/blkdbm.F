@@ -1,4 +1,4 @@
-      block data blkdbm
+      subroutine blkdbm
 C--
 C  THIS FILE IS AUTOMATICALLY GENERAGED FROM
 C      include/BEMCNS.inc

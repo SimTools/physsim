@@ -1,7 +1,7 @@
 C* (Update Record)
 C*   95/05/10  K.Fujii	Original version for X+ --> X0 fu + fdbar.
 C*
-      REAL FUNCTION FUNC*8(ZZ)
+      REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)

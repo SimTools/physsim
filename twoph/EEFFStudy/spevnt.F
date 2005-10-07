@@ -26,6 +26,7 @@ C--
       DATA NEVENT     / 0 /
 C--
       REAL*8	      DRN      
+      integer*4       dumm
 C
 C========< Entry Point >================================================
 C

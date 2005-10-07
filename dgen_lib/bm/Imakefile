@@ -33,7 +33,11 @@ blkdbm.o: blkdbm.F
 
 blkdbm.F: include/BEMCNS.inc
 	rm -f blkdbm.F
-	echo "      block data blkdbm" > blkdbm.F
+	if [ x$(FC) != xgfortran ]; then \
+	echo "      block data blkdbm" > blkdbm.F; \
+	else \
+	echo "      subroutine blkdbm" > blkdbm.F; \
+	fi
 	echo "C--" >> blkdbm.F
 	echo "C  THIS FILE IS AUTOMATICALLY GENERAGED FROM" >> blkdbm.F
 	echo "C      include/BEMCNS.inc" >> blkdbm.F
@@ -43,5 +47,5 @@ blkdbm.F: include/BEMCNS.inc
 	echo "      end" >> blkdbm.F
 
 distclean:: clean
-	rm -f Makefile
+	rm -f Makefile blkdbm.F
 

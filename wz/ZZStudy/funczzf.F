@@ -4,7 +4,7 @@ C*				To avoid problems related to kinematic
 C*				boundaries, we introduced a tiny offset
 C*				EPSL. Now use INSMCN instead of CONINT.
 
-      REAL FUNCTION FUNC*8(ZZ)
+      REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)

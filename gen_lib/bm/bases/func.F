@@ -1,6 +1,6 @@
 C*  95/06/23  K.Fujii		Original version for BASES 5.1.
 C*
-      REAL FUNCTION FUNC*8(ZZ)
+      REAL*8 FUNCTION FUNC(ZZ)
 
       IMPLICIT REAL*8 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)

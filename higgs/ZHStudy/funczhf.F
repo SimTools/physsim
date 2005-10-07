@@ -7,7 +7,7 @@ C*                      included.
 C*			Use INSMCN instead of CONINT.
 C*  00/06/24  K.Fujii	Modified for Bases++.
 C*
-      REAL FUNCTION FUNC*8(ZZ)
+      REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)

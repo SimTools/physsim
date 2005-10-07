@@ -18,6 +18,9 @@ C
 C--
 C  Initialize Higgs masses and mixing angles.
 C--
+#if defined(__GFORTRAN__)
+      call blkdat
+#endif
 C--
 C  Local R*4 parameters.
 C--

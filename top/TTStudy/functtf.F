@@ -7,7 +7,7 @@ C*                      included.
 C* 95/06/07  K.Fujii	Now use INSMCN instead of CONINT.
 C*			Use ISRBM switch.
 C*
-      REAL FUNCTION FUNC*8(ZZ)
+      REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)

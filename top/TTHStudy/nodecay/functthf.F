@@ -1,7 +1,7 @@
 C* 95/06/08  K.Fujii    FUNC for e+ e- --> t t_bar H w/o decays.
 C*
 
-      REAL FUNCTION FUNC*8(ZZ)
+      REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)
