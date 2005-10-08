@@ -11,6 +11,7 @@ int anlL2J()
   Char_t *inputfile="../../../../../wz/WWStudy/prod/wwsim.root"; 
   // Char_t *inputfile="wwsim.root";	// Input simulator file.
 
+      gSystem->Load("libS4Utils.so");
       gSystem->Load("libAnlib.so");
       gSystem->Load("libJSFAnlib.so");
       gSystem->Load("../../../../../wz/WWStudy/prod/WWSpring.so");
