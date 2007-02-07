@@ -6,8 +6,8 @@ int anlzx()
   TFile *fin;
 
   Char_t *ofilen = "jsf.root";  // A file to output histograms
-  //Char_t *ifilen = "../../../../../../xd/RSZXStudy/prod/zxsim.root"; 
-  Char_t *ifilen = "../../../../../../xd/RSZXStudy/prod/zhsim.root"; 
+  Char_t *ifilen = "../../../../../../xd/RSZXStudy/prod/zxsim.root"; 
+  //Char_t *ifilen = "../../../../../../xd/RSZXStudy/prod/zhsim.root"; 
 
   gSystem->Load("libJSFGenerator.so");
   gSystem->Load("libBasesSpring.so");
@@ -16,7 +16,7 @@ int anlzx()
   gSystem->Load("libS4Utils.so");
   gSystem->Load("libAnlib.so");
   gSystem->Load("libJSFAnlib.so");
-  gSystem->Load("RSZXSpring.so");
+  gSystem->Load("../../../../../../xd/RSZXStudy/prod/RSZXSpring.so");
   gSystem->Load("libZX2A2JAnalysis.so");
 
   JSFSteer *jsf  = new JSFSteer();			// Create JSF object
