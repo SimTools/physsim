@@ -1,0 +1,459 @@
+//***************************************************************************
+//*  ====================
+//*  AXAnalysis Classes
+//*  ====================
+//*
+//*  (Description)
+//*	A user analysis class for JLC analyses.
+//*	This reads and analyzes MC e+e- -> AX data.
+//*  (Requires)
+//*	library Anlib (in physsim-99a-1 if K.Fujii)
+//*	library AXStudy (also in physsim)
+//*  (Provides)
+//*	class AXAnalysis
+//*  (Usage)
+//*	...
+//*  (Update Record)
+//*     2007/01/27  K.Fujii	Original version.
+//***************************************************************************
+
+#include "AXAnalysis.h"
+#include "JSFGeneratorParticle.h"
+#include "TNtupleD.h"
+
+#include <sstream>
+//#define __USEGENERATORINFO__
+
+static const Double_t kMassX   = 120.0; // X mass
+static const Double_t kMassZ   = 91.19;	// Z mass
+static const Double_t kEcm     = 500.;  // Ecm
+static const Double_t kEa      = (kEcm/2.)*(1.-kMassX/kEcm)*(1.+kMassX/kEcm);
+static const Double_t kSigmaMx =   2.0;	// X mass resolution
+static const Double_t kSigmaEa =   3.3;	// gamma energy resolution
+
+Int_t  AXAnalysis::Ngoods = 0;
+Bool_t gDEBUG = kFALSE;
+
+// -------------------------------------------------------------------------
+//  ------------------
+//  AXAnalysis Class
+//  ------------------
+
+ClassImp(AXAnalysis)
+
+// Constructor
+AXAnalysis::AXAnalysis(const Char_t *name, const Char_t *title)
+            : JSFModule(name, title), hStat(0)
+{
+}
+
+// Destructor
+AXAnalysis::~AXAnalysis()
+{
+}
+
+// -------------------------------------------------------------------------
+void AXAnalysis::CleanUp(TObjArray *objs)
+{
+  TIter next(objs);
+  TObject *obj;
+  while ( (obj = next()) ) {
+    objs->Remove(obj);
+    delete obj;
+  }
+}
+
+// -------------------------------------------------------------------------
+Bool_t AXAnalysis::Initialize()
+{
+  hStat = new TH1D("hStat", "", 20, 0., 20.);
+
+  xEtrack   =   0.10;	// track energy
+  xEvis     = 100.00;	// Minimum visible energy
+  xPt       = 999.00;	// Pt maximum
+  xPl       = 999.00;	// Pl maximum
+  xYcut     =  0.004;	// y_cut to force the event to 4 jets
+  xNjets    =      3;	// No. of Jets
+  xEjet     =   1.00;	// E_jet minimum
+  xCosjet   =   0.99;	// |cos(theta_j)| maximum
+  xCosrsax  =   0.99;	// |cos(theta_Z)| and |cos(theta_H)| maximum
+  xM2j      =   9.00;	// |m_jj-m_S| maximum , S = Z,H
+
+  return 0;
+}
+
+// -------------------------------------------------------------------------
+Bool_t AXAnalysis::Process(Int_t ev)
+{
+  // Local copies of AXAnalysisBuf data members.
+
+  Int_t		fNtracks;	// track multiplicity
+  Double_t	fEvis;		// visible energy
+  Double_t	fPt;		// Pt
+  Double_t	fPl;		// Pl
+  Double_t	fYcut;		// y_cut to force the event to 4 jets
+  Int_t		fNjets;		// jet multiplicity
+
+  // Remember the previous directory.
+  
+  TDirectory *last = gDirectory;
+  gFile->cd("/");
+
+  Char_t msg[60];
+
+  // Analysis starts here.
+
+  Float_t selid = -0.5;
+  hStat->Fill(++selid);
+  if (Ngoods == 0) strcpy(&cutName[(Int_t)selid][0],"No Cut");
+
+  // Get event buffer and make combined tracks accessible.
+
+  JSFSIMDST     *sds	= (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
+  JSFSIMDSTBuf	*evt	= (JSFSIMDSTBuf*)sds->EventBuf();
+
+  // Select good tracks
+
+  ANL4DVector qsum;
+  TObjArray tracks(1000);
+  fNtracks = 0;
+#ifndef __USEGENERATORINFO__
+  Int_t		ntrks	= evt->GetNLTKCLTracks();	// No. of tracks
+  TObjArray	*trks	= evt->GetLTKCLTracks();	// Combined tracks
+  for (Int_t i = 0; i < ntrks; i++) {
+    JSFLTKCLTrack *t = (JSFLTKCLTrack*)trks->UncheckedAt(i);
+    if ( t->GetE() > xEtrack ) {
+      ANLTrack *qt = new ANLTrack(t);
+      tracks.Add(qt);		// track 4-momentum
+      qsum += *qt;		// total 4-mometum
+      fNtracks++;		// *qt stays.
+    }
+  }
+#else
+  Int_t         ntrks = evt->GetNGeneratorParticles();
+  TClonesArray *trks   = evt->GetGeneratorParticles();
+  for (Int_t i = 0; i < ntrks; i++) {
+    JSFGeneratorParticle *t = (JSFGeneratorParticle *)trks->UncheckedAt(i);
+    if ( t->GetE() > xEtrack ) {
+      ANL4DVector *qt = new ANL4DVector(t->GetPV());
+      tracks.Add(qt);		// track 4-momentum
+      qsum += *qt;		// total 4-mometum
+      fNtracks++;		// *qt stays.
+    }
+  }
+#endif
+  if (gDEBUG) cerr << "Ntracks = " << fNtracks << endl;
+
+  // Cut on No. of tracks.
+  
+  if ( fNtracks < xNtracks ) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg,"N_tracks > %i",xNtracks);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+  
+  fEvis = qsum(0);	// E_vis
+  fPt	= qsum.GetPt(); // P_t
+  fPl	= qsum(3);	// P_l
+
+  if (gDEBUG) cerr << "Evis = " << fEvis << " Pt = "
+	<< fPt << " Pl = " << fPl << endl;
+
+  // Cut on Evis.
+
+  if (fEvis < xEvis) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0)  {
+    sprintf(msg,"Evis > %g",xEvis);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+
+  // Cut on Pt.
+  
+  if (fPt > xPt) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg," Pt <= %g",xPt);
+    strcpy(&cutName[(Int_t)selid][0], msg);
+  }
+
+  // Cut on Pl.
+  
+  if (TMath::Abs(fPl) > xPl) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg,"|Pl| <= %g",xPl);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+
+  // Find jets.
+
+  fYcut = xYcut;
+  ANLJadeEJetFinder jclust(fYcut);
+  jclust.Initialize(tracks);
+  jclust.FindJets();
+  fYcut  = jclust.GetYcut();
+  fNjets = jclust.GetNjets();
+  
+  if (gDEBUG) cerr << "Ycut = " << fYcut << " Njets = " << fNjets << endl;
+
+  // Cut on No. of jets.
+
+  if (fNjets < xNjets) { CleanUp(&tracks); return kFALSE;}
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+
+  // Now force the event to be xNjets.
+
+  jclust.ForceNJets(xNjets);
+  fNjets = jclust.GetNjets();
+  fYcut  = jclust.GetYcut();
+
+  if(gDEBUG) cerr << "Ycut = " << fYcut << " Njets = " << fNjets << endl;
+
+  // Make sure the No. of Jets is xNjets.
+  
+  if (fNjets != xNjets) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg,"Njets = %i",xNjets);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+
+  TObjArray &jets = jclust.GetJets();
+  TIter nextjet(&jets);
+  ANLJet *jetp;
+  Double_t ejetmin = 999999.;
+  Double_t cosjmax = 0.;
+  while ((jetp = (ANLJet*)nextjet())) {
+    ANLJet &jet = *jetp;
+    if (gDEBUG) jet.DebugPrint();
+    Double_t ejet = jet()(0);
+    if (ejet < ejetmin) ejetmin = ejet;
+    Double_t cosj = jet.CosTheta();
+    if (TMath::Abs(cosj) > TMath::Abs(cosjmax)) cosjmax = cosj;
+  }
+
+  // Cut on Ejet_min.
+
+  if (ejetmin < xEjet) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg,"Ejet > %g",xEjet);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+
+  // Cut on |cos(theta_j)|_max.
+
+  if (TMath::Abs(cosjmax) > xCosjet ) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg,"|cos(theta_j)| <= %g", xCosjet);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+
+  // Find AX candidates in given mass window.
+  
+  TObjArray        solutions(10);
+  ANLPairCombiner  xcandidates(jets,jets);
+  ANLPair         *xp;
+  while ((xp = (ANLPair *)xcandidates())) {
+    ANLPair &x = *xp;
+    Double_t xmass = x().GetMass();
+    if (TMath::Abs(xmass - kMassX) > xM2j) continue;
+    x.LockChildren();
+    TIter acandidates(&jets);
+    ANLJet *ap;
+    while ( (ap = (ANLJet*)acandidates()) ) {
+      ANLJet &a = *ap;
+      if (a.IsLocked()) continue;
+      if (gDEBUG) {
+        cerr << " M_X = " << xmass << endl;
+      }
+      Double_t chi2 = TMath::Power((xmass - kMassX)/kSigmaMx,2.)
+                      + TMath::Power((a.E() - kEa)/kSigmaEa,2);
+      solutions.Add(new ANLPair(xp,ap,chi2));
+    }
+    x.UnlockChildren();
+  }
+
+  // Cut on number of solutions.
+ 
+  if (!solutions.GetEntries()) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg,"|m_jj - m_X| <= %g",xM2j);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+
+  // Cut on cos(theta_AX).
+
+  TIter nextsol(&solutions);
+  ANLPair *sol;
+  while ((sol = (ANLPair*)nextsol())) {
+    ANLPair    &x = *(ANLPair *)(*sol)[0];
+    ANLJet     &a = *(ANLJet  *)(*sol)[1];
+    Double_t cosx = x.CosTheta();
+    Double_t cosa = a.CosTheta();
+    if (TMath::Abs(cosx) > xCosrsax || TMath::Abs(cosa) > xCosrsax) {
+      solutions.Remove(sol);
+      delete sol;
+    }
+  }
+  if (!solutions.GetEntries()) { CleanUp(&tracks); return kFALSE; }
+  hStat->Fill(++selid);
+  if (Ngoods == 0) {
+    sprintf(msg,"|cos(theta_x)| and |cos(theta_a)| <= %g", xCosrsax);
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+
+  // End of event selection
+  
+  if (Ngoods == 0) {
+    selid++;
+    sprintf(msg,"END");
+    strcpy(&cutName[(Int_t)selid][0],msg);
+  }
+  Ngoods++;
+
+  cerr << "------------------------------------------" << endl
+       << "Event " << gJSF->GetEventNumber()
+       << ": Number of solutions = " << solutions.GetEntries() << endl
+       << "------------------------------------------" << endl;
+  
+  // Sort the solutions in the ascending order of chi2 values.
+
+  solutions.Sort();
+
+  // Hists and plots for selected events.
+
+  if (gDEBUG) {
+    Int_t nj = 0;
+    nextjet.Reset();
+    while ( (jetp = (ANLJet*)nextjet()) ) {
+      cerr << "------" << endl
+           << "Jet " << ++nj << endl
+           << "------" << endl;
+      jetp->DebugPrint();
+    }
+  }
+
+  //--
+  // Save the best solution.
+  //--
+  static TNtupleD *hEvt = 0;
+  if (!hEvt) {
+    stringstream sout;
+    sout << "chi2:evis:pt:pl:cosx:phix:cosa:phia:mx:ex"            << ":"
+         << "ea1:pa1x:pa1y:pa1z:ea2:pa2x:pa2y:pa2z:ea:pax:pay:paz" << ":"
+         << "cosa1h:phia1h:cosa2h:phia2h"                          << ends;
+    hEvt = new TNtupleD("hEvt","",sout.str().data());
+  }
+  nextsol.Reset();
+  Int_t nsols = 0;
+  while ((sol = (ANLPair*)nextsol())) {
+    if ( nsols++ ) break;
+    ANLPair &x = *(ANLPair *)(*sol)[0];
+    ANLJet  &a = *(ANLJet  *)(*sol)[1];
+    Double_t chi2  = sol->GetQuality();
+    //--
+    // Calculate helicity angles.
+    //--
+    TVector3    ez    = TVector3(0., 0., 1.);
+    TVector3    exz   = x.Vect().Unit();
+    TVector3    exx   = exz.Cross(ez).Unit();
+    TVector3    exy   = exz.Cross(exx).Unit();
+  
+    const ANL4DVector &gam1 = *(ANL4DVector *)x[0];
+    TVector3    bstx  = TVector3(0., 0., x.Vect().Mag()/x.E());
+    ANL4DVector k1h   = ANL4DVector(gam1.E(), gam1.Vect()*exx,
+                                              gam1.Vect()*exy,
+                                              gam1.Vect()*exz);
+    k1h.Boost(-bstx);
+    Double_t    csa1h = k1h.CosTheta();
+    Double_t    fia1h = k1h.Phi();
+  
+    const ANL4DVector &gam2 = *(ANL4DVector *)x[1];
+    ANL4DVector k2h   = ANL4DVector(gam2.E(), gam2.Vect()*exx,
+                                              gam2.Vect()*exy,
+                                              gam2.Vect()*exz);
+    k2h.Boost(-bstx);
+    Double_t    csa2h = k2h.CosTheta();
+    Double_t    fia2h = k2h.Phi();
+#if 0
+    cerr << " k1h = (" << k1h.E () << ", "
+                       << k1h.Px() << ", "
+                       << k1h.Py() << ", "
+                       << k1h.Pz() << ") " << endl;
+    cerr << " k2h = (" << k2h.E () << ", "
+                       << k2h.Px() << ", "
+                       << k2h.Py() << ", "
+                       << k2h.Pz() << ") " << endl;
+#endif
+    //--
+    // Save them to the Ntuple.
+    //--
+    Double_t data[100];
+    data[ 0] = chi2;
+    data[ 1] = fEvis;
+    data[ 2] = fPt;
+    data[ 3] = fPl;
+    data[ 4] = x.CosTheta();
+    data[ 5] = x.Phi();
+    data[ 6] = a.CosTheta();
+    data[ 7] = a.Phi();
+    data[ 8] = x.GetMass();
+    data[ 9] = x.E();
+    data[10] = gam1.E();
+    data[11] = gam1.Px();
+    data[12] = gam1.Py();
+    data[13] = gam1.Pz();
+    data[14] = gam2.E();
+    data[15] = gam2.Px();
+    data[16] = gam2.Py();
+    data[17] = gam2.Pz();
+    data[18] = a.E();
+    data[19] = a.Px();
+    data[20] = a.Py();
+    data[21] = a.Pz();
+    data[22] = csa1h;
+    data[23] = fia1h;
+    data[24] = csa2h;
+    data[25] = fia2h;
+    hEvt->Fill(data);
+  }
+
+  // Clean up
+
+  CleanUp(&solutions);
+  CleanUp(&tracks);
+
+  last->cd();
+  return kTRUE;
+}
+
+
+// *****Terminate()***** //
+Bool_t AXAnalysis::Terminate()
+{
+  // This function is called at the end of job.
+  cout << endl;
+  cout << "  =============" << endl;
+  cout << "   Cut Summary " << endl;
+  cout << "  =============" << endl;
+  cout << endl;
+  cout << "  ---------------------------------------------------------" <<endl;   
+  cout << "  ID   No.Events     Cut Description" << endl;
+  cout << "  ---------------------------------------------------------" <<endl;
+  Int_t i;
+  for (i = 0; strncmp(&cutName[i][0],"END",4) && i < MAXCUT ; i++) {
+    printf("  %3d  %10d  : %s\n",i,(int)hStat->GetBinContent(i+1),&cutName[i][0]);
+  } 
+  cout << "  ---------------------------------------------------------";
+  return 0;
+}
+// *****End of Terminate()***** //
