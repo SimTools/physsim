@@ -130,8 +130,8 @@ int anlkkhh()
 
   // Adjust Cut.
 
-  myanl->SetEvisCut(600.);	// minimum Evis
-  myanl->SetPtCut(50.);		// minimum Pt
+  myanl->SetEvisCut(0.);	// minimum Evis
+  myanl->SetPtCut(9999.);		// minimum Pt
   myanl->SetPlCut(9999.);	// maximum Pl
   //  myanl->SetCosjetCut(0.9);	
   myanl->SetCosjetCut(1.05);	

@@ -275,21 +275,6 @@ KKhhBases::KKhhBases(const char *name, const char *title)
     DefineVariable(fR_ISR_side, 0., 1., 0, 1);
   }
 
-#if 0
-  fID    = gJSF->Env()->GetValue("KKhhBases.ID",25);
-  
-  Double_t uq  = 2.0/3.0;  
-  Double_t dq  = -1.0/3.0;
-  Double_t zr  = 0.0; 
-  Double_t one =-1.0;
-  Double_t cdata[20]={ dq,uq,dq,uq,dq,    uq,dq,uq,zr,zr,
-		       one,zr,one,zr,one,   zr,one,zr,zr,zr};
-  if (fID < 1 || fID > 20) {
-    Error("KKhhBases","Particle ID(%d) is outof range",fID);
-  }
-  fCharge=cdata[fID-1];
-#endif
-
   // --------------------------------------------
   //  Set Bases integration parameters
   // --------------------------------------------
@@ -334,8 +319,13 @@ Double_t KKhhBases::Func()
                               fR_BS_m, fR_BS_p,
                               eminus, eplus);
     
+#if 0
     eplus   *= fBM->GetNominalEnergy();
     eminus  *= fBM->GetNominalEnergy();
+#else
+    eplus   *= 0.5*fEcmInit;
+    eminus  *= 0.5*fEcmInit;
+#endif
     fEcmIP   = 2.*TMath::Sqrt(eplus*eminus);     // ignore electron mass 
   } else {
     fEcmIP   = fEcmInit;      
