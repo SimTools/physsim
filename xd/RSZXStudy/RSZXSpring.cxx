@@ -624,6 +624,7 @@ Double_t RSZXBases::DSigmaDX(GENBranch &cmbranch)
   GENPhase2 phaseCM(qcm, q2x, q2z, cmframe, cosx, phix, 0);
   ANL4DVector px = phaseCM.GetFourMomentum(0);
   ANL4DVector pz = phaseCM.GetFourMomentum(1);
+  Double_t betax = phaseCM.GetBetaBar();
 
   GENBranch &xbranch = * cmbranch.GetBranchPtr(0);
   Double_t cosa = xbranch.GetCosTheta();
@@ -658,7 +659,6 @@ Double_t RSZXBases::DSigmaDX(GENBranch &cmbranch)
   // --------------------------------------------
   //  Calcuate differential cross section
   // --------------------------------------------
-  Double_t betax  = phaseX.GetBetaBar();
   Double_t s      = rs * rs;
 
   // -------------------
