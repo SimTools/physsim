@@ -427,7 +427,7 @@ RSZXBases::RSZXBases(const char *name, const char *title)
   //--
   fXL[1] = fXL[1]*TMath::Pi();
   fXU[1] = fXU[1]*TMath::Pi();
-  fXL[3] = fXL[2]*TMath::Pi();
+  fXL[3] = fXL[3]*TMath::Pi();
   fXU[3] = fXU[3]*TMath::Pi();
   fXL[5] = fXL[5]*TMath::Pi();
   fXU[5] = fXU[5]*TMath::Pi();
