@@ -4,8 +4,7 @@
 //* =====================
 //*  
 //* (Description)
-//*    Kaluza-Klein  ee -> hh generator
-//*    Based on example/FFbarSpring directory.
+//*    RS+SUSY e+e- --> AX generator
 //*
 //* (Update Record)
 //*    2007/01/27  K.Fujii	Original version.
@@ -16,12 +15,22 @@
 #include "RSAXSpring.h"
 
 #include <sstream>
+#include <iomanip>
+//#define __DEBUG__
+//#define __PHASESPACE__
+#ifdef __PHASESPACE__
+#define __NODECAY__
+#endif
+
+//*----------------------------------------------------------------------
+//*     Numerical and Natural Constants
+//*----------------------------------------------------------------------
+#include "GENNumCon.h"
 
 ClassImp(RSAXSpring)
 ClassImp(RSAXSpringBuf)
 ClassImp(RSAXBases)
-ClassImp(GENFrame)
-ClassImp(GENPhase2)
+ClassImp(RSXBoson)
 
 //-----------------------------------------------------------------------------
 // ==============================
@@ -71,84 +80,111 @@ Bool_t RSAXSpringBuf::SetPartons()
   // ----------------------------------------------
   //  Set 4-momenta of final state particles in CM
   // ----------------------------------------------
-  TLorentzVector p2 = bases->fPA;
-  TLorentzVector p3 = bases->fP1;
-  TLorentzVector p4 = bases->fP2;
-  TLorentzVector p1 = p3 + p4;
-#if 0
-  cerr << " -------- " << endl;
-  cerr << " px = (" << p1.E () << ", " << p1.Px() << ", " << p1.Py() << ", " << p1.Pz() << ") " << endl;
-  cerr << " pa = (" << p2.E () << ", " << p2.Px() << ", " << p2.Py() << ", " << p2.Pz() << ") " << endl;
-  cerr << " p1 = (" << p3.E () << ", " << p3.Px() << ", " << p3.Py() << ", " << p3.Pz() << ") " << endl;
-  cerr << " p2 = (" << p4.E () << ", " << p4.Px() << ", " << p4.Py() << ", " << p4.Pz() << ") " << endl;
-#endif
+  const Int_t kNparton = 4;
+  ANL4DVector pv[kNparton];
+  pv[2] = bases->fP[0];
+  pv[3] = bases->fP[1];
+  pv[1] = bases->fP[2];
+  pv[0] = pv[2] + pv[3];
 
   // ----------------------------------------------
   //  Boost them to lab. frame
   // ----------------------------------------------
 
-  fEcmIP        = bases->GetEcmIP();
   fZBoost       = bases->GetZBoost();
+  fEcmIP        = bases->GetEcmIP();
+  fQ2AX         = fEcmIP*fEcmIP;
   fCosTheta     = bases->GetCosTheta();
   fPhi          = bases->GetPhi();
+  fQ2X          = bases->GetQ2X();
   fCosThetaA    = bases->GetCosThetaA();
   fPhiA         = bases->GetPhiA();
   Double_t elab = TMath::Sqrt(fEcmIP*fEcmIP + fZBoost*fZBoost);
-  p1.Boost(0.,0.,fZBoost/elab);
-  p2.Boost(0.,0.,fZBoost/elab);
-  p3.Boost(0.,0.,fZBoost/elab);
-  p4.Boost(0.,0.,fZBoost/elab);
+  TVector3 boostv(0.,0.,fZBoost/elab);
+  for (Int_t i=0; i<kNparton; i++) pv[i].Boost(boostv);
 
   // ----------------------------------------------
   //  Set final state parton infomation
   // ----------------------------------------------
 
-  TVector q1(4);
-  TVector q2(4);
-  TVector q3(4);
-  TVector q4(4);
+  fNparton = kNparton;
 
-  fNparton = 4;
+  static TVector **qp = 0;
+  if (!qp) {
+    qp = new TVector* [kNparton];
+    for (Int_t i=0; i<kNparton; i++) qp[i] = new TVector(4);
+  }
+  for (Int_t i=0; i<kNparton; i++) {
+    TVector &q = *qp[i];
+    q(0) = pv[i].E ();
+    q(1) = pv[i].Px();
+    q(2) = pv[i].Py();
+    q(3) = pv[i].Pz();
+  }
+  Int_t    idx     = bases->fXBosonPtr->GetPID(); // PDG code for X??
+  Int_t    ida     = 22;                          // PDG code for gamma
+  Int_t    id1     = bases->f1Ptr->GetPID();      // PDG code for 1st daughter
+  Int_t    id2     = bases->f2Ptr->GetPID();      // PDG code for 1st daughter
+  Double_t m1      = bases->f1Ptr->GetMass();     // 1st daughter mass
+  Double_t m2      = bases->f2Ptr->GetMass();     // 1st daughter mass
+  Double_t color   = bases->f1Ptr->GetColor();    // color factor
+  Double_t chg1    = bases->f1Ptr->GetCharge();   // 1st daughter charge
+  Double_t chg2    = bases->f2Ptr->GetCharge();   // 2nd daughter charge
+  Int_t    islev   = color > 1. ? 101 : 0;        // shower level
+  Int_t    icf     = 1;                           // color flux id
 
-  q1(0) = p1.E ();
-  q1(1) = p1.Px();
-  q1(2) = p1.Py();
-  q1(3) = p1.Pz();
-
-  q2(0) = p2.E ();
-  q2(1) = p2.Px();
-  q2(2) = p2.Py();
-  q2(3) = p2.Pz();
-
-  q3(0) = p3.E ();
-  q3(1) = p3.Px();
-  q3(2) = p3.Py();
-  q3(3) = p3.Pz();
-
-  q4(0) = p4.E ();
-  q4(1) = p4.Px();
-  q4(2) = p4.Py();
-  q4(3) = p4.Pz();
-
-#if 0
-  Int_t    idx     = 25; 	// PDG code for higgs
-#else
-  Int_t    idx     = 20000000; 	// PDG code for higgs
-#endif
-  Int_t    ida     = 22; 	// PDG code for higgs
-  Double_t charge  = 0;  	// X charge
-  Int_t    islev   = 0;  	// shower level
-  Int_t    icf     = 0;  	// color flux id
   Double_t mass    = bases->GetMass();
+#if 0
+//#ifdef __DEBUG__
+  cerr << " -------------------------- " << endl;
+  cerr << " 1 pid=" << idx << " m=" << mass  << " Q=" << 0.
+       << " pv=(" << (*qp[0])(0) << ", "
+                  << (*qp[0])(1) << ", "
+                  << (*qp[0])(2) << ", "
+                  << (*qp[0])(3) << ") " << endl;
+  cerr << " 2 pid=" << idz << " m=" << rq2z << " Q=" << 0.
+       << " pv=(" << (*qp[1])(0) << ", "
+                  << (*qp[1])(1) << ", "
+                  << (*qp[1])(2) << ", "
+                  << (*qp[1])(3) << ") " << endl;
+  cerr << " 3 pid=" << ida << " m=" << 0. << " Q=" << 0.
+       << " pv=(" << (*qp[2])(0) << ", "
+                  << (*qp[2])(1) << ", "
+                  << (*qp[2])(2) << ", "
+                  << (*qp[2])(3) << ") " << endl;
+  cerr << " 4 pid=" << ida << " m=" << 0. << " Q=" << 0.
+       << " pv=(" << (*qp[3])(0) << ", "
+                  << (*qp[3])(1) << ", "
+                  << (*qp[3])(2) << ", "
+                  << (*qp[3])(3) << ") " << endl;
+  cerr << " 5 pid=" << idf << " m=" << m3 << " Q=" << chrg
+       << " pv=(" << (*qp[4])(0) << ", "
+                  << (*qp[4])(1) << ", "
+                  << (*qp[4])(2) << ", "
+                  << (*qp[4])(3) << ") " << endl;
+  TVector qcm(4), qx(4), qa(4);
+  qx  = *qp[2] + *qp[3];
+  qa  = *qp[1];
+  qcm = qx +qa;
+  cerr << " px=(" << qx[0] << ", "
+                  << qx[1] << ", "
+                  << qx[2] << ", "
+                  << qx[3] << ") " << endl;
+  cerr << " pa=(" << qa[0] << ", "
+                  << qa[1] << ", "
+                  << qa[2] << ", "
+                  << qa[3] << ") " << endl;
+  cerr << " pcm=(" << qcm[0] << ", "
+                   << qcm[1] << ", "
+                   << qcm[2] << ", "
+                   << qcm[3] << ") " << endl;
+#endif
 
-  new (partons[0]) JSFSpringParton(1,  idx, mass,  charge, q1,
-                                   2, 3, 0, 0, icf, islev);
-  new (partons[1]) JSFSpringParton(2,  ida, 0., -charge, q2,
-                                   0, 0, 0, 0, icf, islev);
-  new (partons[2]) JSFSpringParton(3,  ida, 0.,  charge, q3,
-                                   0, 0, 1, 0, icf, islev);
-  new (partons[3]) JSFSpringParton(4,  ida, 0., -charge, q4,
-                                   0, 0, 1, 0, icf, islev);
+  //                              No. PID  Mass  Charge   pv   Nd 1st Mom hel col shower
+  new (partons[0]) JSFSpringParton(1, idx, mass,    0., *qp[0], 2, 3,  0, 0,   0,     0);
+  new (partons[1]) JSFSpringParton(2, ida,   0.,    0., *qp[1], 0, 0,  0, 0,   0,     0);
+  new (partons[2]) JSFSpringParton(3, id1,   m1,  chg1, *qp[2], 0, 0,  1, 0, icf, islev);
+  new (partons[3]) JSFSpringParton(4, id2,   m2,  chg2, *qp[3], 0, 0,  1, 0, icf, islev);
   return kTRUE ;
 }
 
@@ -167,16 +203,28 @@ RSAXBases::RSAXBases(const char *name, const char *title)
            fC1        (1.),
            fC2        (1.),
            fC3        (1.),
+           fC4        (1.),
            fMass      ( 120.),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
+           fPole      (0.),
+           fXBosonPtr ( 0),
+           fWBosonPtr ( 0),
+           fZBosonPtr ( 0),
+           fPhotonPtr ( 0),
+           fGluonPtr  ( 0),
+           fZBoost    (0.),
+           fEcmIP     (fEcmInit),
+           fQ2AX      (0.),
+           fQ2X       (0.),
+           fXModePtr  (0),
+           f1Ptr      (0),
+           f2Ptr      (0),
            fCosTheta  (0.),
            fPhi       (0.),
            fCosThetaA (0.),
            fPhiA      (0.),
-           fZBoost    (0.),
-           fEcmIP     (fEcmInit),
            fR_BW_m    (0),
            fR_BW_p    (0),
            fR_BS_m    (0),
@@ -190,7 +238,7 @@ RSAXBases::RSAXBases(const char *name, const char *title)
   //  Get parameters from jsf.conf, if specified
   // --------------------------------------------
 
-  cout << "Init rsaxbases " << endl;
+  cout << "Init rszxbases " << endl;
   
   using namespace std;
   stringstream ins(gJSF->Env()->GetValue("RSAXBases.CosthRange","-1.0 1.0"));
@@ -229,6 +277,10 @@ RSAXBases::RSAXBases(const char *name, const char *title)
   ins >> fC3;
 
   ins.clear();
+  ins.str(gJSF->Env()->GetValue("RSAXBases.C4","1.")); 		 // C_4
+  ins >> fC4;
+
+  ins.clear();
   ins.str(gJSF->Env()->GetValue("RSAXBases.MassX","120.")); 	 // M_x [GeV]
   ins >> fMass;
 
@@ -244,6 +296,10 @@ RSAXBases::RSAXBases(const char *name, const char *title)
   ins.str(gJSF->Env()->GetValue("RSAXBases.Bremstrahlung","1")); // ISR (on)
   ins >> fISR;
 
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("RSAXBases.Pole","0."));         // electron polarization
+  ins >> fPole;
+
   // --------------------------------------------
   //  Open beamstrahlung data
   // --------------------------------------------
@@ -252,7 +308,8 @@ RSAXBases::RSAXBases(const char *name, const char *title)
 
   if (fBeamStr) {
     ins.clear();
-    ins.str(gJSF->Env()->GetValue("RSAXBases.BeamstrahlungFilepath","/proj/soft/jsf/pro/data/bsdata/"));
+    ins.str(gJSF->Env()->GetValue("RSAXBases.BeamstrahlungFilepath",
+                                  "/proj/soft/jsf/pro/data/bsdata/"));
     ins >> bsfiledir;
 
     ins.clear();
@@ -290,6 +347,13 @@ RSAXBases::RSAXBases(const char *name, const char *title)
   //  Registor random numbers
   // --------------------------------------------
   //--
+  //  Initial state helicity combination
+  //--
+  DefineVariable(fHelCombInitial, 0., 1., 0, 1);
+  DefineVariable(fHelCombFinal  , 0., 1., 0, 1);
+
+  DefineVariable(fXDecayMode    , 0., 1., 0, 1);
+  //--
   //  cos(theta) and phi
   //--
   fXL[1] = fXL[1]*TMath::Pi();
@@ -305,7 +369,6 @@ RSAXBases::RSAXBases(const char *name, const char *title)
   //--
   //  Beamstrahlung and natural Ebeam spread
   //--
-
   if (fBeamStr == 1) {
     DefineVariable(fR_BW_m, 0., 1., 0, 1);
     DefineVariable(fR_BW_p, 0., 1., 0, 1);
@@ -324,26 +387,23 @@ RSAXBases::RSAXBases(const char *name, const char *title)
   // --------------------------------------------
   //  Set Bases integration parameters
   // --------------------------------------------
-  SetNoOfSample(2000);
+  SetNoOfSample(20000);
 
   SetTuneValue (1.5);
-  SetIteration1(0.05, 100);
-  SetIteration2(0.05, 100);
+  SetIteration1(0.05, 20);
+  SetIteration2(0.05, 50);
 
-  // --------------------------------------------
-  //  Define some plots
-  // --------------------------------------------
-  Xh_init(1, fXL[0], fXU[0],       50, "Costh" );
-  Xh_init(2, fXL[1], fXU[1],       50, "Phi"   );
-  Xh_init(3, fXL[2], fXU[2],       50, "CosthA");
-  Xh_init(4, fXL[3], fXU[3],       50, "PhiA"  );
-  Xh_init(5,     0., fEcmInit*1.1, 50, "Ecm"   );
 }
 // --------------------------
 //  D-tor
 // --------------------------
 RSAXBases::~RSAXBases()
 {
+  delete fXBosonPtr;
+  delete fWBosonPtr;
+  delete fZBosonPtr;
+  delete fPhotonPtr;
+  delete fGluonPtr;
 }
 
 //_____________________________________________________________________________
@@ -378,7 +438,6 @@ Double_t RSAXBases::Func()
     fEcmIP   = fEcmInit;      
     eplus    = fEcmInit/2.;
     eminus   = eplus;
-    bsWeight = 1.;
   }
    
   // --------------------------------------------
@@ -401,87 +460,283 @@ Double_t RSAXBases::Func()
   } // if Bremstrahlung
 
 
-  // --------------------------------------------
-  //  Check if reduced Ecm enough for pair prod.
-  // --------------------------------------------
+  fZBoost = eminus - eplus; // P_z of the cm system after ISR and beamstrahlung
 
-  if (fEcmIP < fMass) {
-    bsWeight = 0.;
+  // --------------------------------------------
+  //  Select final state
+  // --------------------------------------------
+  Double_t weight = 1;
+  fXModePtr = fXBosonPtr->PickMode(fXDecayMode, weight, fXMode);
+  bsWeight *= weight;
+  f1Ptr = static_cast<GENPDTEntry *>(fXModePtr->At(0));
+  f2Ptr = static_cast<GENPDTEntry *>(fXModePtr->At(1));
+  Double_t m1   = f1Ptr->GetMass();
+  Double_t m2   = f2Ptr->GetMass();
+  Double_t m3   = 0.;
+
+  // --------------------------------------------
+  //  Check if reduced Ecm enough for prod.
+  // --------------------------------------------
+  if (fEcmIP < fMass + m3) {
     return 0.;
   }
 
-  fZBoost = eminus - eplus; // P_z of the cm system after ISR and beamstrahlung
+  // --------------------------------------------
+  //  Select helicity combination
+  // --------------------------------------------
+  //  Notice that spin average for e- is taken
+  //  care of here
+  SelectHelicities(weight);
+  bsWeight *= weight;
+
+  // --------------------------------------------
+  //  Decide Q^2 of internal lines
+  // --------------------------------------------
+  fQ2AX = fEcmIP*fEcmIP;
+  fQ2X  = fMass*fMass; // narrow width approx. for X
 
   // --------------------------------------------
   //  Calcuate differential cross section
   // --------------------------------------------
 
-  Double_t betax  = (1. - fMass/fEcmIP)*(1. + fMass/fEcmIP);
-  Double_t beta_e = 1.;  // ignore electron mass
-  Double_t rs     = fEcmIP;
-  Double_t s      = rs * rs;
+  GENBranch xbranch (fQ2X , fCosThetaA, fPhiA, m1, m2);
+  GENBranch cmbranch(fQ2AX, fCosTheta , fPhi , &xbranch, m3);
 
-  // -------------------
-  //  Amplitude squared
-  // -------------------
-
-  Double_t a1     = fC1*kCos2W + fC2*kSin2W;
-  Double_t a2     = (fC1 - fC2) * kSinCosW;
-  Double_t betax2 = betax * betax;
-
-
-  Double_t part1  = ((k4Pi*kAlpha)*a1*a1/(4.*fLambda*fLambda)) * s
-                    * betax2 * (1. + fCosTheta*fCosTheta);
-  Double_t part2  = ((k4Pi*kAlpha/(4.*kSinCosW*kSinCosW)) *a2*a2 * (1. - 4.*kSin2W + 8.*kSin2W*kSin2W) /(8.*fLambda*fLambda)) * s
-                    * TMath::Power(s/((rs - kM_z)*(rs + kM_z)), 2)
-                    * betax2 * (1. + fCosTheta*fCosTheta);
-  Double_t part3  = ((k4Pi*kAlpha/(2.*kSinCosW)) *a1*a2* (1. - 4.*kSin2W) /(4.*fLambda*fLambda)) * s
-                    * s/((rs - kM_z)*(rs + kM_z))
-                    * betax2 * (1. + fCosTheta*fCosTheta);
-
-  Double_t amp2   = part1 + part2 - part3; // amplitude squared
-
-  Double_t & beta_bar = betax;
-
-  static const Double_t k8Pi = 8. * TMath::Pi();
-
-  Double_t identp = 1.;                           // identical particle factor
-  Double_t dPhase = (beta_bar/k8Pi) / k4Pi;       // 2-body phase space factor
-  Double_t flux   = 1./(2.*fEcmIP*fEcmIP*beta_e); // beam flux factor
-  Double_t spin   = 1./4.;                        // spin average
-
-  Double_t sigma  = identp * flux * spin * amp2 * dPhase; // in [1/GeV^2]
-           sigma *= kGeV2fb;                              // now in [fb]
-
-  // --------------------------------------------
-  //  Phase space
-  // --------------------------------------------
-
-  TLorentzVector qcm(0., 0., 0., rs);
-  GENFrame       cmframe;
-
-  GENPhase2 phaseCM(qcm, fMass*fMass, 0., cmframe, fCosTheta, fPhi, 0);
-  GENFrame       xframe = phaseCM.GetFrame();
-  TLorentzVector px     = phaseCM.GetFourMomentum(0);
-                 fPA    = phaseCM.GetFourMomentum(1);
-
-  GENPhase2 phaseX(px, 0., 0., cmframe, fCosThetaA, fPhiA, 1);
-  fP1 = phaseX.GetFourMomentum(0);
-  fP2 = phaseX.GetFourMomentum(1);
-
-  bsWeight *= 1./k4Pi;
+  Double_t sigma = DSigmaDX(cmbranch);
 
   // --------------------------------------------
   //  Fill plots
   // --------------------------------------------
 
-  Xh_fill(1, fCosTheta , (bsWeight*sigma));
-  Xh_fill(2, fPhi      , (bsWeight*sigma));
-  Xh_fill(3, fCosThetaA, (bsWeight*sigma));
-  Xh_fill(4, fPhiA     , (bsWeight*sigma));
-  Xh_fill(5, fEcmIP    , (bsWeight*sigma));
+  Xh_fill( 1, fEcmIP           , (bsWeight*sigma));
+  Xh_fill( 2, fCosTheta        , (bsWeight*sigma));
+  Xh_fill( 3, fPhi             , (bsWeight*sigma));
+  Xh_fill( 4, TMath::Sqrt(fQ2X), (bsWeight*sigma));
+  Xh_fill( 5, fCosThetaA       , (bsWeight*sigma));
+  Xh_fill( 6, fPhiA            , (bsWeight*sigma));
+  Xh_fill( 7, (Double_t)fJCombI, (bsWeight*sigma));
+  Xh_fill( 8, (Double_t)fJCombF, (bsWeight*sigma));
+  Xh_fill( 9, (Double_t)fXMode , (bsWeight*sigma));
 
-  return (bsWeight * sigma) ;
+  return (bsWeight * sigma);
+}
+
+//_____________________________________________________________________________
+// --------------------------
+//  DSigmaDX
+// --------------------------
+Double_t RSAXBases::DSigmaDX(GENBranch &cmbranch)
+{
+  // --------------------------------------------
+  //  Phase space
+  // --------------------------------------------
+  Double_t rs = TMath::Sqrt(cmbranch.GetQ2());
+  ANL4DVector qcm(rs, 0., 0., 0.);
+  GENFrame    cmframe;
+
+  Double_t q2x  = cmbranch.GetM12();
+  Double_t q2z  = cmbranch.GetM22();
+  Double_t cosx = cmbranch.GetCosTheta();
+  Double_t phix = cmbranch.GetPhi     ();
+  GENPhase2 phaseCM(qcm, q2x, q2z, cmframe, cosx, phix, 0);
+  ANL4DVector px = phaseCM.GetFourMomentum(0);
+           fP[2] = phaseCM.GetFourMomentum(1);
+  Double_t betax = phaseCM.GetBetaBar();
+  if (betax <= 0.) return 0.;
+
+  GENBranch &xbranch = * cmbranch.GetBranchPtr(0);
+  Double_t cosa = xbranch.GetCosTheta();
+  Double_t phia = xbranch.GetPhi     ();
+  Double_t m12  = xbranch.GetM12();
+  Double_t m22  = xbranch.GetM22();
+  GENPhase2 phaseX(px, m12, m22, cmframe, cosa, phia, 1);
+  fP[0] = phaseX.GetFourMomentum(0);
+  fP[1] = phaseX.GetFourMomentum(1);
+  fM[0] = TMath::Sqrt(m12);
+  fM[1] = TMath::Sqrt(m22);
+  Double_t betaa = phaseX.GetBetaBar();
+  if (betaa <= 0.) return 0.;
+
+  Double_t eb     = rs/2.;
+  Double_t pb     = TMath::Sqrt((eb-kM_e)*(eb+kM_e));
+  Double_t beta_e = pb/eb;
+  fK[0].SetXYZT(0., 0., pb, eb);
+  fK[1].SetXYZT(0., 0.,-pb, eb);
+
+  // --------------------------------------------
+  //  Calcuate differential cross section
+  // --------------------------------------------
+  Double_t s      = rs * rs;
+
+  // -------------------
+  //  Amplitude squared
+  // -------------------
+  Double_t amp2 = AmpSquared(cmbranch);
+
+  // -------------------
+  //  Put them together
+  // -------------------
+  static const Int_t    kNbr  = 2;
+  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr));
+
+  Double_t identp = 1.;                            // identical particle factor
+  Double_t dPhase = kFact * betax * betaa;         // phase space factor
+  Double_t flux   = 1./(2.* s * beta_e);           // beam flux factor
+  Double_t spin   = 1./2.;                         // spin average for e+
+
+  Double_t sigma  = identp * flux * spin * amp2 * dPhase; // in [1/GeV^2]
+           sigma *= kGeV2fb;                              // now in [fb]
+
+  return sigma;
+}
+
+//_____________________________________________________________________________
+// --------------------------
+//  AmpSquared()
+// --------------------------
+Double_t RSAXBases::AmpSquared(GENBranch &cmbranch)
+{
+  Complex_t amp   = FullAmplitude();
+  Double_t  amp2  = TMath::Power(abs(amp),2);
+#if 1
+  amp2 *= k2Pi * k8Pi; // branch factor correction: no phase space for X
+  amp2 *= fXModePtr->GetBR();
+#endif
+
+  return amp2;
+}
+
+//_____________________________________________________________________________
+// --------------------------
+//  FullAmplitude()
+// --------------------------
+Complex_t RSAXBases::FullAmplitude()
+{
+   static const Bool_t kIsIncoming = kTRUE;
+   static const Bool_t kIsOutgoing = kFALSE;
+
+   HELFermion em(fK[0], kM_e, fHelInitial[0], +1, kIsIncoming);
+   HELFermion ep(fK[1], kM_e, fHelInitial[1], -1, kIsOutgoing);
+
+   HELScalar  xf(fP[0]+fP[1], kFALSE);
+   HELVector  af(fP[2], 0., fHelFinal[2], +1);
+
+   Complex_t amp = AmpEEtoAX(em, ep, xf, af);
+
+   return amp;
+}
+
+//_____________________________________________________________________________
+// --------------------------
+//  AmpEEtoAX()
+// --------------------------
+Complex_t RSAXBases::AmpEEtoAX(const HELFermion &em,
+                               const HELFermion &ep,
+                               const HELScalar  &xf,
+                               const HELVector  &af)
+{
+   //-------------------
+   // Coupling consts.
+   //-------------------
+   Double_t  a1    = fC1*kCos2W + fC2*kSin2W;
+   Double_t  a2    = (fC1 - fC2) * kSinCosW;
+   Double_t  a3    = fC1*kSin2W + fC2*kCos2W;
+   Double_t  gaax  = a1*kSqh/fLambda;
+   Double_t  gazx  = a2*kSqh/fLambda;
+   Double_t  gzzx  = a3*kSqh/fLambda;
+
+   Double_t  qe    = -1.;
+   Double_t  ge    = -qe*kGe;
+   Double_t  glae  = ge;
+   Double_t  grae  = ge;
+
+   Double_t  t3e   = -1./2.;
+   Double_t  glze  = -kGz*(t3e - qe*kSin2W);
+   Double_t  grze  = -kGz*(    - qe*kSin2W);
+
+   Double_t  gamz  = fZBosonPtr->GetWidth();
+
+   //--------------------------------------------------
+   // Calculate Amplitudes
+   //--------------------------------------------------
+#ifdef __PHASESPACE__
+   //---------------------------
+   // Just Phase Space
+   //---------------------------
+   Complex_t amp = 1;
+#else
+   //---------------------------
+   // AX Production Amplitude
+   //---------------------------
+   //--
+   // S-channel Z
+   //--
+   HELVector zs(em, ep, glze, grze, kM_z, gamz); // s-channel   Z: backward-going
+   ANL4DVector k1   = zs.GetFourMomentum();      // s-channel   Z: backward-going
+   ANL4DVector k2   = af.GetFourMomentum();      // final state A: forward-going 
+
+   Double_t    k1k2 = k1*k2;
+   Complex_t   k1af = k1(0)*af[0] - k1(1)*af[1] - k1(2)*af[2] - k1(3)*af[3];
+   Complex_t   zsaf = zs[0]*af[0] - zs[1]*af[1] - zs[2]*af[2] - zs[3]*af[3];
+   Complex_t   k2zs = zs[0]*k2(0) - zs[1]*k2(1) - zs[2]*k2(2) - zs[3]*k2(3);
+   Complex_t   ampzax = gazx * (k1k2*zsaf - k1af*k2zs);
+
+   //--
+   // S-channel A
+   //--
+   HELVector as(em, ep, glae, grae,   0.,   0.); // s-channel gamma
+
+   Complex_t   asaf = as[0]*af[0] - as[1]*af[1] - as[2]*af[2] - as[3]*af[3];
+   Complex_t   k2as = as[0]*k2(0) - as[1]*k2(1) - as[2]*k2(2) - as[3]*k2(3);
+   Complex_t   ampaax = gaax * (k1k2*asaf - k1af*k2as);
+
+   //--
+   // Sum of the two
+   //--
+   Complex_t amp = ampzax + ampaax;
+#endif /* end __PHASESPACE__ */
+
+   return amp;
+}
+
+//_____________________________________________________________________________
+// --------------------------
+//  Userin
+// --------------------------
+void RSAXBases::Userin()
+{
+  // --------------------------------------------
+  //  Initialize Z decay table
+  // --------------------------------------------
+   if (!fXBosonPtr) fXBosonPtr = new RSXBoson(fMass, 
+                                              fLambda,
+                                              fC0,
+                                              fC1,
+                                              fC2,
+                                              fC3,
+                                              fC4);
+   fXBosonPtr->DebugPrint();
+   if (!fWBosonPtr) fWBosonPtr = new GENPDTWBoson();
+   fWBosonPtr->DebugPrint();
+   if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
+   fZBosonPtr->DebugPrint();
+   if (!fPhotonPtr) fPhotonPtr = new GENPDTPhoton();
+   fPhotonPtr->DebugPrint();
+   if (!fGluonPtr)  fGluonPtr  = new GENPDTGluon();
+   fGluonPtr->DebugPrint();
+
+  // --------------------------------------------
+  //  Define some plots
+  // --------------------------------------------
+  Xh_init( 1,     0., fEcmInit*1.1, 50, "Ecm"   );
+  Xh_init( 2, fXL[0], fXU[0],       50, "Costh" );
+  Xh_init( 3, fXL[1], fXU[1],       50, "Phi"   );
+  Xh_init( 4,   100.,   140.,       50, "Mx"    );
+  Xh_init( 5, fXL[2], fXU[2],       50, "CosthA");
+  Xh_init( 6, fXL[3], fXU[3],       50, "PhiA"  );
+  Xh_init( 7,     0.,     2.,        2, "Helin ");
+  Xh_init( 8,     0.,     2.,        2, "Helot ");
+  Xh_init( 9,     0.,     2.,        2, "X mode");
 }
 
 //_____________________________________________________________________________
@@ -493,186 +748,152 @@ void RSAXBases::Userout()
   cout << "End of RSAXBases----------------------------------- "  << endl
        << "Ecm                  = " << fEcmInit << " [GeV]   "    << endl
        << "Beamstrahlung        = " << (fBeamStr ? "on" : "off")  << endl
-       << "Brehmstrahlung       = " << (fISR     ? "on" : "off")  << endl
+       << "Bremstrahlung        = " << (fISR     ? "on" : "off")  << endl
        << "Total Cross section  = " << GetEstimate()  << " +/- "
                                     << GetError()     << " [fb]"  << endl
        << "Number of iterations = " << GetNoOfIterate()           << endl;
 }
 
+//_____________________________________________________________________________
+// --------------------------
+//  SelectHelicities
+// --------------------------
+void RSAXBases::SelectHelicities(Double_t &weight)
+{
+   static const Int_t kNi = 2;
+   static const Int_t kIHelComb[kNi][2] = {{-1, +1},
+                                           {+1, -1}};
+   static const Int_t kNf = 2;
+   static const Int_t kFHelComb[kNf][3] = {{0, 0, +1},
+                                           {0, 0, -1}};
+   Double_t helm = (1. - fPole)/2.;
+   if (fHelCombInitial < helm) {
+      fJCombI = 0;
+   } else {
+      fJCombI = 1;
+   }
+   fHelInitial[0] = kIHelComb[fJCombI][0];
+   fHelInitial[1] = kIHelComb[fJCombI][1];
+   fJCombF = (Int_t)(fHelCombFinal*kNf);
+   fJCombF = TMath::Min(fJCombF, kNf-1);
+   fHelFinal  [0] = kFHelComb[fJCombF][0];
+   fHelFinal  [1] = kFHelComb[fJCombF][1];
+   fHelFinal  [2] = kFHelComb[fJCombF][2];
+   weight = kNf;
+}
+
 //-----------------------------------------------------------------------------
 // ==============================
-//  class GENFrame
+//  class RSXBoson
 // ==============================
 //_____________________________________________________________________________
 // --------------------------
 //  C-tor
 // --------------------------
-GENFrame::GENFrame()
+RSXBoson::RSXBoson(Double_t m,
+                   Double_t lambda,
+                   Double_t c0,
+                   Double_t c1,
+                   Double_t c2,
+                   Double_t c3,
+                   Double_t c4)
+        : fLambda(lambda),
+          fC0(c0),
+          fC1(c1),
+          fC2(c2),
+          fC3(c3),
+          fC4(c4)
 {
-   fEV[0].SetXYZ(1., 0., 0.);
-   fEV[1].SetXYZ(0., 1., 0.);
-   fEV[2].SetXYZ(0., 0., 1.);
+   fName    = TString("X");
+   fPID     = 200000000;
+   fCharge  = 0.;
+   fSpin    = 0.;
+   fMass    = m;
+   fGen     = 0;
+   fIsoSpin = 0.;
+   fColor   = 1.;
+
+   Initialize();
 }
 
-GENFrame::GENFrame(const TLorentzVector &q, const GENFrame &eb)
+//_____________________________________________________________________________
+// --------------------------
+//  Initialize
+// --------------------------
+void RSXBoson::Initialize()
 {
-   fEV[2] = q.Vect().Unit();
-   fEV[1] = eb.fEV[2].Cross(fEV[2]);
-   Double_t ae2  = fEV[1].Mag();
-   static const Double_t kXmin = 1.e-12;
-   if (ae2 < kXmin) {
-      fEV[0] = eb.fEV[0]; fEV[1] = eb.fEV[1]; fEV[2] = eb.fEV[2];
-      Double_t csth = fEV[2] * eb.fEV[2];
-      if (csth <= 0.) {
-         fEV[2] = -eb.fEV[2];
-      }
-      return;
-   } else {
-      fEV[1] = fEV[1].Unit();
+   //--
+   // X --> gluon gluon
+   //--
+   GENDecayMode *dmp;
+   GENPDTEntry  *d1p, *d2p;
+   d1p = new GENPDTGluon();
+   d2p = new GENPDTGluon();
+   Double_t cf    = 8.;
+   Double_t m1    = 0.;
+   Double_t m2    = 0.;
+   Double_t ident = 2.;
+   Double_t gam = GamToVV(m1, m2, fC4, cf)/ident;
+   if (gam > 0.) {
+      dmp = new GENDecayMode(gam);
+      dmp->Add(d1p);
+      dmp->Add(d2p);
+      Add(dmp);
    }
-   fEV[0] = fEV[1].Cross(fEV[2]).Unit();
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  Transform
-// --------------------------
-TLorentzVector GENFrame::Transform(const TLorentzVector &pb)
-{
-   return TLorentzVector(pb.X()*fEV[0]+pb.Y()*fEV[1]+pb.Z()*fEV[2], pb.E());
-}
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class GENPhase2
-// ==============================
-//_____________________________________________________________________________
-// --------------------------
-//  C-tor
-// --------------------------
-GENPhase2::GENPhase2(const TLorentzVector &q,
-                           Double_t       m12,
-                           Double_t       m22,
-                     const GENFrame      &eb,
-                           Double_t       costh,
-                           Double_t       phi,
-                           Int_t          mode)
-         : fQ(q), fM12(m12), fM22(m22), 
-           fEb(eb), fEa(eb), 
-           fCosTheta(costh), fPhi(phi),
-           fBetaBar(0.), 
-           fMode(mode),
-           fDone(kFALSE)
-{
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  GetFourMomentum
-// --------------------------
-TLorentzVector GENPhase2::GetFourMomentum(Int_t i)
-{
-   if (!fDone) Update(); return i ? fP2 : fP1;
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  GetFrame
-// --------------------------
-GENFrame GENPhase2::GetFrame(Int_t i)
-{
-   if (!fDone) Update(); return i ? fEa : fEb;
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  GetBetaBar
-// --------------------------
-Double_t GENPhase2::GetBetaBar()
-{
-   if (!fDone) Update(); return fBetaBar;
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  Beta2
-// --------------------------
-Double_t GENPhase2::Beta2(Double_t x1, Double_t x2)
-{
-   return 1. - 2*(x1+x2) + (x1-x2)*(x1-x2);
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  Update
-// --------------------------
-void GENPhase2::Update()
-{
-   // -------------------------
-   //  Check if update needed
-   // -------------------------
-   if (fDone) return;
-   fDone = kTRUE;
-
-   // -------------------------
-   //  Calculate Beta_bar
-   // -------------------------
-   Double_t amq2 = fQ.Mag2();
-   if (amq2 <= 0.) {
-      cerr << " >>>>> Error in GENPhase2::GENPhase2() >>>>>>>> " << endl
-           << " q = ("  << fQ.E() << ", " 
-                        << fQ.X() << ", " 
-                        << fQ.Y() << ", "
-                        << fQ.Z() << ")" << endl
-           << " q2  = " << amq2   
-           << " m12 = " << fM12
-           << " m22 = " << fM22 << endl;
-      fBetaBar = 0.;
-      return;
+   //--
+   // X --> gamma gamma 
+   //--
+   d1p = new GENPDTPhoton();
+   d2p = new GENPDTPhoton();
+   cf    = 1.;
+   m1    = 0.;
+   m2    = 0.;
+   ident = 2.;
+   gam = GamToVV(m1, m2, fC1, cf)/ident;
+   if (gam > 0.) {
+      dmp = new GENDecayMode(gam);
+      dmp->Add(d1p);
+      dmp->Add(d2p);
+      Add(dmp);
    }
-
-   Double_t amq = TMath::Sqrt(amq2);
-   fBetaBar = Beta2(fM12/amq2, fM22/amq2);   
-   if (fBetaBar < 0.) {
-      fBetaBar = 0.;
-      return;
+   //--
+   // X --> Z gamma 
+   //--
+   d1p = new GENPDTZBoson();
+   d2p = new GENPDTPhoton();
+   cf    = 1.;
+   m1    = 0.;
+   m2    = 0.;
+   ident = 2.;
+   gam = GamToVV(m1, m2, fC1, cf)/ident;
+   if (gam > 0.) {
+      dmp = new GENDecayMode(gam);
+      dmp->Add(d1p);
+      dmp->Add(d2p);
+      Add(dmp);
    }
-   fBetaBar = TMath::Sqrt(fBetaBar);
+}
 
-   // -------------------------
-   //  Daughter momenta
-   // -------------------------
-   Double_t ap1  = (amq/2) * fBetaBar;
-   Double_t snth = TMath::Sqrt((1.-fCosTheta)*(1.+fCosTheta));
-   fP1.SetXYZT(ap1*snth*TMath::Cos(fPhi),
-               ap1*snth*TMath::Sin(fPhi),
-               ap1*fCosTheta,
-               TMath::Sqrt(ap1*ap1+fM12));
-   fP2.SetXYZT(-fP1.X(), -fP1.Y(), -fP1.Z(), amq - fP1.E());
+//_____________________________________________________________________________
+// --------------------------
+//  GamToVV
+// --------------------------
+Double_t RSXBoson::GamToVV(Double_t m1, // 1st daughter mass
+                           Double_t m2, // 2nd daughter mass
+                           Double_t a,  // coupling
+                           Double_t cf) // color factor
+{
+   Double_t x1   = TMath::Power(m1/fMass,2);
+   Double_t x2   = TMath::Power(m2/fMass,2);
+   Double_t beta = 1. - 2.*(x1+x2) + TMath::Power((x1-x2),2);
 
-   // -------------------------
-   //  Boost them to lab. frame
-   // -------------------------
-   if (!fMode) {
-      fEa = fEb;
-   } else {
-      fEa = GENFrame(fQ, fEb);
-      fP1 = fEa.Transform(fP1);
-      fP2 = fEa.Transform(fP2);
-      TVector3 boostv = fQ.BoostVector();
-      fP1.Boost(boostv);
-      fP2.Boost(boostv);
-   }
+   if (beta <= 0.) return 0.;
+   beta = TMath::Sqrt(beta);
 
-   // -------------------------
-   //  Fix round-off errors
-   // -------------------------
-   if (fP1.E() <= 0. || fP2.E() <= 0.) {
-      fBetaBar = 0;
-   } else {
-      Double_t ap = fP1.Vect().Mag();
-      if (fP1.E() < ap) fP1.SetE(TMath::Sqrt(ap*ap+fM12));
-               ap = fP2.Vect().Mag();
-      if (fP2.E() < ap) fP2.SetE(TMath::Sqrt(ap*ap+fM22));
-   }
+   Double_t tta = a*a*fMass*TMath::Power(fMass/fLambda,2)
+	          * (3. + 2.*TMath::Power(beta,2) + 3.*TMath::Power(beta,4))/8.;
+   Double_t fac = 1./(64.*kPi);
+   Double_t gam = fac*tta*beta*cf;
+
+   return gam;
 }

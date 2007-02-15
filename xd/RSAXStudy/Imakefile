@@ -6,6 +6,8 @@
 #define CXXPACKAGE
 #include "config/kflib.tmpl"
 
+CXXFLAGS += -I$(LEDAROOT)/include
+
 PACKAGENAME   = RSAXSpring
 
 /*
@@ -15,6 +17,8 @@ PACKAGENAME   = RSAXSpring
 
 
 OBJS          = $(PACKAGENAME).$(ObjSuf) \
+                HELLib.$(ObjSuf) \
+                GENLib.$(ObjSuf) \
 		$(PACKAGENAME)Dict.$(ObjSuf)
 
 SRCS          = $(PACKAGENAME).$(SrcSuf) 
@@ -35,8 +39,7 @@ JSFSOLIB      = prod/$(SONAME)
 all::  $(JSFSOLIB)
 
 prod/$(SONAME): $(OBJS) $(FOBJS)
-	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS) \
-	$(KFLIB) $(LDFLAGS)
+	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS)
 
 clean:: 
 	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
@@ -53,4 +56,4 @@ distclean:: clean
 $(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
 	@echo "Generating dictionary ..."
 	rootcint -f $(DICTNAME).$(SrcSuf) \
- 		-c -I$(JSFROOT)/include $(HDRS) LinkDef.h
+ 		-c -I$(LEDAROOT)/include -I$(JSFROOT)/include $(HDRS) LinkDef.h

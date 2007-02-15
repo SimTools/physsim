@@ -16,7 +16,7 @@ Int_t sim()
 {
   gROOT->Reset();
 
-  file=new TFile("axsim.root","RECREATE");  // Output file
+  file=new TFile("sim.root","RECREATE");  // Output file
 
   // Define modules.  JSFLCFULL must be declared to use JSFHadronizer and 
   // JSFQuickSim, which uses LCLIB libraries.  Each modules are executed
@@ -27,8 +27,8 @@ Int_t sim()
   pythia = new JSFHadronizer();
   sim    = new JSFQuickSim();
 
-  Int_t maxevt=10000;      // Number of event 
-  //Int_t maxevt=100;     // Number of event is 10.
+  //Int_t maxevt=10000;      // Number of event 
+  Int_t maxevt=100;     // Number of event is 10.
   jsf->Initialize();
 
   //spring->GetBases()->Bases();
