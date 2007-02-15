@@ -721,9 +721,9 @@ void RSAXBases::Userin()
    if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
    fZBosonPtr->DebugPrint();
    if (!fPhotonPtr) fPhotonPtr = new GENPDTPhoton();
-   fPhotonPtr->DebugPrint();
+   //fPhotonPtr->DebugPrint();
    if (!fGluonPtr)  fGluonPtr  = new GENPDTGluon();
-   fGluonPtr->DebugPrint();
+   //fGluonPtr->DebugPrint();
 
   // --------------------------------------------
   //  Define some plots
@@ -823,6 +823,12 @@ RSXBoson::RSXBoson(Double_t m,
 void RSXBoson::Initialize()
 {
    //--
+   // Couplings
+   //--
+   Double_t  a1    = fC1*kCos2W + fC2*kSin2W;
+   Double_t  a2    = (fC1 - fC2) * kSinCosW;
+   Double_t  a3    = fC1*kSin2W + fC2*kCos2W;
+   //--
    // X --> gluon gluon
    //--
    GENDecayMode *dmp;
@@ -849,7 +855,7 @@ void RSXBoson::Initialize()
    m1    = 0.;
    m2    = 0.;
    ident = 2.;
-   gam = GamToVV(m1, m2, fC1, cf)/ident;
+   gam = GamToVV(m1, m2, a1, cf)/ident;
    if (gam > 0.) {
       dmp = new GENDecayMode(gam);
       dmp->Add(d1p);
@@ -862,10 +868,10 @@ void RSXBoson::Initialize()
    d1p = new GENPDTZBoson();
    d2p = new GENPDTPhoton();
    cf    = 1.;
-   m1    = 0.;
-   m2    = 0.;
-   ident = 2.;
-   gam = GamToVV(m1, m2, fC1, cf)/ident;
+   m1    = d1p->GetMass();
+   m2    = d2p->GetMass();
+   ident = 1.;
+   gam = GamToVV(m1, m2, a2, cf)/ident;
    if (gam > 0.) {
       dmp = new GENDecayMode(gam);
       dmp->Add(d1p);
