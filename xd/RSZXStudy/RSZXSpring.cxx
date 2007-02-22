@@ -362,7 +362,7 @@ RSZXBases::RSZXBases(const char *name, const char *title)
   ins >> fBeamStr;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("RSZXBases.Bremstrahlung","1")); // ISR (on)
+  ins.str(gJSF->Env()->GetValue("RSZXBases.Bremsstrahlung","1"));// ISR (on)
   ins >> fISR;
 
   ins.clear();
@@ -527,7 +527,7 @@ Double_t RSZXBases::Func()
     } else {
       eminus *= 1. - xisr;
     }
-  } // if Bremstrahlung
+  } // if Bremsstrahlung
 
 
   fZBoost = eminus - eplus; // P_z of the cm system after ISR and beamstrahlung
@@ -894,7 +894,7 @@ void RSZXBases::Userout()
   cout << "End of RSZXBases----------------------------------- "  << endl
        << "Ecm                  = " << fEcmInit << " [GeV]   "    << endl
        << "Beamstrahlung        = " << (fBeamStr ? "on" : "off")  << endl
-       << "Bremstrahlung        = " << (fISR     ? "on" : "off")  << endl
+       << "Bremsstrahlung       = " << (fISR     ? "on" : "off")  << endl
        << "Total Cross section  = " << GetEstimate()  << " +/- "
                                     << GetError()     << " [fb]"  << endl
        << "Number of iterations = " << GetNoOfIterate()           << endl;
