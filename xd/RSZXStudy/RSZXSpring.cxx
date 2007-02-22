@@ -27,61 +27,12 @@
 //*----------------------------------------------------------------------
 //*     Numerical and Natural Constants
 //*----------------------------------------------------------------------
-const Double_t   kSqh     = TMath::Sqrt(0.5); // sqrt(1/2)
-const Double_t   kPi      = TMath::Pi();      // Pi
-const Double_t   k2Pi     = 2*TMath::Pi();    // 2*Pi
-const Double_t   k4Pi     = 4*TMath::Pi();    // 4*Pi
-const Double_t   k8Pi     = 8*TMath::Pi();    // 8*Pi
-const Double_t   kGeV2fb  = 0.389379292e12;   // GeV to fb
-const Double_t   kAlpha   = 1./128.;          // alpha(mz)  = 1/128.
-const Double_t   kAlpha0  = 1./137.0359895;   // alpha(q=0) = 1/137.
-const Double_t   kAlphaS  = 0.12;             // alphaS(mz) = 0.12
-const Double_t   kM_e     = 0.510998902e-3;   // electron mass [GeV]
-const Double_t   kM_z     = 91.188;           // Z mass [GeV]
-const Double_t   kSin2W   = 0.23;                     // sin^2(theta_W)
-const Double_t   kSinW    = TMath::Sqrt(kSin2W);      // sin(theta_W)
-const Double_t   kCos2W   = (1. - kSinW)*(1. + kSinW);// cos^2(theta_W)
-const Double_t   kCosW    = TMath::Sqrt(kCos2W);      // cos(theta_W)
-const Double_t   kSinCosW = kSinW*kCosW;              // sin(2theta_W)/2
-const Double_t   kGe      = TMath::Sqrt(k4Pi*kAlpha);  // e
-const Double_t   kGw      = kGe/kSinW;                 // gw
-const Double_t   kGz      = kGw/kCosW;                 // gz
-  
-const Char_t   *kName[2][2][3] = {{{"nu_e", "nu_mu"  , "nu_tau"},
-                                   {"e"   , "mu"     , "tau"   }},
-                                  {{"up"  , "charm"  , "top"   },
-                                   {"down", "strange", "bottom"}}};
-const Int_t     kPID [2][2][3] = {{{    12,        14,       16},
-                                   {    11,        13,       15}},
-                                  {{     2,         4,        6},
-                                   {     1,         3,        5}}};
-const Double_t  kChrg[2][2][3] = {{{    0.,        0.,       0.},
-                                   {   -1.,       -1.,      -1.}},
-                                  {{  2/3.,      2/3.,     2/3.},
-                                   { -1/3.,     -1/3.,    -1/3.}}};
-
-const Double_t  kMass[2][2][3] = {{{0.000000, 0.00000,   0.0000},
-                                   {0.511e-3, 0.10566,   1.7770}},
-                                  {{0.04    , 1.5    , 175.    },
-                                   {0.04    , 0.1    ,   4.7   }}};
-
-ClassImp(TVectorC)
+#include "GENNumCon.h"
 
 ClassImp(RSZXSpring)
 ClassImp(RSZXSpringBuf)
 ClassImp(RSZXBases)
-
-ClassImp(HELFermion)
-ClassImp(HELVector)
-ClassImp(HELScalar)
-
-ClassImp(GENBranch)
-ClassImp(GENFrame)
-ClassImp(GENPhase2)
-ClassImp(GENDecayMode)
-ClassImp(GENModePicker)
-ClassImp(GENPDTEntry)
-ClassImp(GENPDTZBoson)
+ClassImp(RSXBoson)
 
 //-----------------------------------------------------------------------------
 // ==============================
@@ -177,20 +128,25 @@ Bool_t RSZXSpringBuf::SetPartons()
     q(2) = pv[i].Py();
     q(3) = pv[i].Pz();
   }
-#if 0
-  Int_t    idx     = 25; 	// PDG code for higgs
-#else
-  Int_t    idx     = 20000000; 	// PDG code for X??
-#endif
-  Int_t    ida     = 22; 	// PDG code for gamma
-  Int_t    idz     = 23; 	// PDG code for Z
-  Int_t    idf     = bases->f3Ptr->GetPID   (); // PDG code for f
-  Double_t chrg    = bases->f3Ptr->GetCharge(); // F charge
-  Double_t m3      = bases->f3Ptr->GetMass  (); // F mass
-  Double_t m4      = m3;                        // F mass
-  Double_t color   = bases->f3Ptr->GetColor();  // color factor
-  Int_t    islev   = color > 1. ? 101 : 0;  	// shower level
-  Int_t    icf     = 1;  	// color flux id
+  Int_t    idx     = bases->fXBosonPtr->GetPID(); // PDG code for X??
+  Int_t    id1     = bases->f1Ptr->GetPID();      // PDG code for 1st daughter
+  Int_t    id2     = bases->f2Ptr->GetPID();      // PDG code for 1st daughter
+  Double_t m1      = bases->f1Ptr->GetMass();     // 1st daughter mass
+  Double_t m2      = bases->f2Ptr->GetMass();     // 1st daughter mass
+  Double_t colorx  = bases->f1Ptr->GetColor();    // color factor
+  Double_t chg1    = bases->f1Ptr->GetCharge();   // 1st daughter charge
+  Double_t chg2    = bases->f2Ptr->GetCharge();   // 2nd daughter charge
+  Int_t    islevx  = colorx > 1. ? 101 : 0;       // shower level
+  Int_t    icfx    = 1;                           // color flux id
+
+  Int_t    idz     = 23;                          // PDG code for Z
+  Int_t    idf     = bases->f3Ptr->GetPID   ();   // PDG code for f
+  Double_t chrg    = bases->f3Ptr->GetCharge();   // F charge
+  Double_t m3      = bases->f3Ptr->GetMass  ();   // F mass
+  Double_t m4      = m3;                          // F mass
+  Double_t color   = bases->f3Ptr->GetColor();    // color factor
+  Int_t    islev   = color > 1. ? 201 : 0;  	  // shower level
+  Int_t    icf     = 2;                           // color flux id
   Double_t rq2z    = pv[1].Mag();
 
   Double_t mass    = bases->GetMass();
@@ -248,8 +204,8 @@ Bool_t RSZXSpringBuf::SetPartons()
   //                              No. PID  Mass  Charge   pv   Nd 1st Mom hel col shower
   new (partons[0]) JSFSpringParton(1, idx, mass,    0., *qp[0], 2, 3,  0, 0,   0,     0);
   new (partons[1]) JSFSpringParton(2, idz, rq2z,    0., *qp[1], 2, 5,  0, 0,   0,     0);
-  new (partons[2]) JSFSpringParton(3, ida,   0.,    0., *qp[2], 0, 0,  1, 0,   0,     0);
-  new (partons[3]) JSFSpringParton(4, ida,   0.,    0., *qp[3], 0, 0,  1, 0,   0,     0);
+  new (partons[2]) JSFSpringParton(3, id1,   m1,  chg1, *qp[2], 0, 0,  1, 0,icfx,islevx);
+  new (partons[3]) JSFSpringParton(4, id2,   m2,  chg2, *qp[3], 0, 0,  1, 0,icfx,islevx);
   new (partons[4]) JSFSpringParton(5, idf,   m3,  chrg, *qp[4], 0, 0,  2, 0, icf, islev);
   new (partons[5]) JSFSpringParton(6,-idf,   m4, -chrg, *qp[5], 0, 0,  2, 0, icf, islev);
   return kTRUE ;
@@ -270,17 +226,26 @@ RSZXBases::RSZXBases(const char *name, const char *title)
            fC1        (1.),
            fC2        (1.),
            fC3        (1.),
+           fC4        (1.),
            fMass      ( 120.),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
            fPole      (0.),
+           fXBosonPtr ( 0),
+           fWBosonPtr ( 0),
            fZBosonPtr ( 0),
+           fPhotonPtr ( 0),
+           fGluonPtr  ( 0),
            fZBoost    (0.),
            fEcmIP     (fEcmInit),
            fQ2ZX      (0.),
            fQ2X       (0.),
+           fXModePtr  (0),
+           f1Ptr      (0),
+           f2Ptr      (0),
            fQ2Z       (0.),
+           fZModePtr  (0),
            f3Ptr      (0),
            f4Ptr      (0),
            fCosTheta  (0.),
@@ -348,6 +313,10 @@ RSZXBases::RSZXBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("RSZXBases.C3","1.")); 		 // C_3
   ins >> fC3;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("RSAXBases.C4","1."));           // C_4
+  ins >> fC4;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("RSZXBases.MassX","120.")); 	 // M_x [GeV]
@@ -420,6 +389,7 @@ RSZXBases::RSZXBases(const char *name, const char *title)
   //--
   DefineVariable(fHelCombInitial, 0., 1., 0, 1);
   DefineVariable(fHelCombFinal  , 0., 1., 0, 1);
+  DefineVariable(fXDecayMode    , 0., 1., 0, 1);
   DefineVariable(fZDecayMode    , 0., 1., 0, 1);
   DefineVariable(fXQ2Z          , 0., 1., 0, 1);
   //--
@@ -472,7 +442,11 @@ RSZXBases::RSZXBases(const char *name, const char *title)
 // --------------------------
 RSZXBases::~RSZXBases()
 {
+  delete fXBosonPtr;
+  delete fWBosonPtr;
   delete fZBosonPtr;
+  delete fPhotonPtr;
+  delete fGluonPtr;
 }
 
 //_____________________________________________________________________________
@@ -507,7 +481,6 @@ Double_t RSZXBases::Func()
     fEcmIP   = fEcmInit;      
     eplus    = fEcmInit/2.;
     eminus   = eplus;
-    bsWeight = 1.;
   }
    
   // --------------------------------------------
@@ -536,13 +509,18 @@ Double_t RSZXBases::Func()
   //  Select final state
   // --------------------------------------------
   Double_t weight = 1;
-  GENDecayMode *zdkmode = fZBosonPtr->PickMode(fZDecayMode, weight, fZMode);
-  bsWeight *= weight;
 
-  f3Ptr = static_cast<GENPDTEntry *>(zdkmode->At(0));
-  f4Ptr = static_cast<GENPDTEntry *>(zdkmode->At(1));
-  Double_t m1   = 0.;
-  Double_t m2   = 0.;
+  fXModePtr = fXBosonPtr->PickMode(fXDecayMode, weight, fXMode);
+  bsWeight *= weight;
+  f1Ptr = static_cast<GENPDTEntry *>(fXModePtr->At(0));
+  f2Ptr = static_cast<GENPDTEntry *>(fXModePtr->At(1));
+  Double_t m1   = f1Ptr->GetMass();
+  Double_t m2   = f2Ptr->GetMass();
+
+  GENDecayMode *fZModePtr = fZBosonPtr->PickMode(fZDecayMode, weight, fZMode);
+  bsWeight *= weight;
+  f3Ptr = static_cast<GENPDTEntry *>(fZModePtr->At(0));
+  f4Ptr = static_cast<GENPDTEntry *>(fZModePtr->At(1));
   Double_t m3   = f3Ptr->GetMass();
   Double_t m4   = f4Ptr->GetMass();
 
@@ -550,7 +528,6 @@ Double_t RSZXBases::Func()
   //  Check if reduced Ecm enough for prod.
   // --------------------------------------------
   if (fEcmIP < fMass + m3 + m4) {
-    bsWeight = 0.;
     return 0.;
   }
 
@@ -599,7 +576,8 @@ Double_t RSZXBases::Func()
   Xh_fill( 9, fPhiF            , (bsWeight*sigma));
   Xh_fill(10, (Double_t)fJCombI, (bsWeight*sigma));
   Xh_fill(11, (Double_t)fJCombF, (bsWeight*sigma));
-  Xh_fill(12, (Double_t)fZMode , (bsWeight*sigma));
+  Xh_fill(12, (Double_t)fXMode , (bsWeight*sigma));
+  Xh_fill(13, (Double_t)fZMode , (bsWeight*sigma));
 
   return (bsWeight * sigma);
 }
@@ -625,6 +603,7 @@ Double_t RSZXBases::DSigmaDX(GENBranch &cmbranch)
   ANL4DVector px = phaseCM.GetFourMomentum(0);
   ANL4DVector pz = phaseCM.GetFourMomentum(1);
   Double_t betax = phaseCM.GetBetaBar();
+  if (betax <= 0.) return 0.;
 
   GENBranch &xbranch = * cmbranch.GetBranchPtr(0);
   Double_t cosa = xbranch.GetCosTheta();
@@ -637,6 +616,7 @@ Double_t RSZXBases::DSigmaDX(GENBranch &cmbranch)
   fM[0] = TMath::Sqrt(m12);
   fM[1] = TMath::Sqrt(m22);
   Double_t betaa = phaseX.GetBetaBar();
+  if (betaa <= 0.) return 0.;
 
   GENBranch &zbranch = * cmbranch.GetBranchPtr(1);
   Double_t cosf = zbranch.GetCosTheta();
@@ -649,6 +629,7 @@ Double_t RSZXBases::DSigmaDX(GENBranch &cmbranch)
   fM[2] = TMath::Sqrt(m32);
   fM[3] = TMath::Sqrt(m42);
   Double_t betaf = phaseZ.GetBetaBar();
+  if (betaf <= 0.) return 0.;
 
   Double_t eb     = rs/2.;
   Double_t pb     = TMath::Sqrt((eb-kM_e)*(eb+kM_e));
@@ -670,7 +651,7 @@ Double_t RSZXBases::DSigmaDX(GENBranch &cmbranch)
   //  Put them together
   // -------------------
   static const Int_t    kNbr  = 3;
-  static const Double_t kFact = k2Pi/(TMath::Power(k8Pi*k4Pi*k2Pi,kNbr));
+  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr));
 
   Double_t identp = 1.;                            // identical particle factor
   Double_t dPhase = kFact * betax * betaa * betaf; // phase space factor
@@ -694,6 +675,7 @@ Double_t RSZXBases::AmpSquared(GENBranch &cmbranch)
   Double_t  amp2  = TMath::Power(abs(amp),2) * color;
 #if 1
   amp2 *= k2Pi * k8Pi; // branch factor correction: no phase space for X
+  amp2 *= fXModePtr->GetBR();
 #endif
 
 #ifdef __NODECAY__
@@ -713,7 +695,7 @@ Double_t RSZXBases::AmpSquared(GENBranch &cmbranch)
 // --------------------------
 Complex_t RSZXBases::FullAmplitude()
 {
-   Double_t   gamz    = fZBosonPtr->GetWidth();
+   Double_t gamz   = fZBosonPtr->GetWidth();
 
    Double_t qf     = f3Ptr->GetCharge();
    Double_t t3f    = f3Ptr->GetISpin();
@@ -755,6 +737,17 @@ Complex_t RSZXBases::AmpEEtoZX(const HELFermion &em,
    Double_t  gaax  = a1*kSqh/fLambda;
    Double_t  gazx  = a2*kSqh/fLambda;
    Double_t  gzzx  = a3*kSqh/fLambda;
+#if 1
+   static Int_t ncall = 0;
+   if (!ncall) {
+      ncall = 1;
+      cerr << " a1 = " << a1
+           << " a2 = " << a2
+           << " a3 = " << a3 << endl;
+      cerr << " kSqh = "    << kSqh 
+           << " fLambda = " << fLambda << endl;
+   }
+#endif
 
    Double_t  qe    = -1.;
    Double_t  ge    = -qe*kGe;
@@ -782,8 +775,7 @@ Complex_t RSZXBases::AmpEEtoZX(const HELFermion &em,
    //---------------------------
    HELVector zs(em, ep, glze, grze, kM_z, gamz);
    Double_t gzzh  = kGz*kM_z;
-   Complex_t amp  = zs[0]*zf[0] - zs[1]*zf[1] - zs[2]*zf[2] - zs[3]*zf[3];
-             amp *= gzzh;
+   Complex_t amp = HELVertex(zs, zf, xf, gzzh);
 #else
    //---------------------------
    // ZX Production Amplitude
@@ -865,8 +857,22 @@ void RSZXBases::Userin()
   // --------------------------------------------
   //  Initialize Z decay table
   // --------------------------------------------
+   if (!fXBosonPtr) fXBosonPtr = new RSXBoson(fMass,
+                                              fLambda,
+                                              fC0,
+                                              fC1,
+                                              fC2,
+                                              fC3,
+                                              fC4);
+   fXBosonPtr->DebugPrint();
+   if (!fWBosonPtr) fWBosonPtr = new GENPDTWBoson();
+   fWBosonPtr->DebugPrint();
    if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
    fZBosonPtr->DebugPrint();
+   if (!fPhotonPtr) fPhotonPtr = new GENPDTPhoton();
+   //fPhotonPtr->DebugPrint();
+   if (!fGluonPtr)  fGluonPtr  = new GENPDTGluon();
+   //fGluonPtr->DebugPrint();
 
   // --------------------------------------------
   //  Define some plots
@@ -882,7 +888,8 @@ void RSZXBases::Userin()
   Xh_init( 9, fXL[5], fXU[5],       50, "PhiF"  );
   Xh_init(10,     0.,     2.,        2, "Helin ");
   Xh_init(11,     0.,     2.,        2, "Helot ");
-  Xh_init(12,     0.,    12.,       12, "Zdecay");
+  Xh_init(12,     0.,     2.,        2, "X mode");
+  Xh_init(13,     0.,    12.,       12, "Z mode");
 }
 
 //_____________________________________________________________________________
@@ -921,7 +928,7 @@ void RSZXBases::SelectHelicities(Double_t &weight)
    fHelInitial[0] = kIHelComb[fJCombI][0];
    fHelInitial[1] = kIHelComb[fJCombI][1];
    fJCombF = (Int_t)(fHelCombFinal*kNf);
-   fJCombF = TMath::Min(fJCombF, 1);
+   fJCombF = TMath::Min(fJCombF, kNf-1);
    fHelFinal  [0] = 0;
    fHelFinal  [1] = 0;
    fHelFinal  [2] = kFHelComb[fJCombF][0];
@@ -929,713 +936,124 @@ void RSZXBases::SelectHelicities(Double_t &weight)
    weight = kNf;
 }
 
-
 //-----------------------------------------------------------------------------
 // ==============================
-//  class HELFermion
-// ==============================
-//_____________________________________________________________________________
-//_____________________________________________________________________________
-// --------------------------
-//  C-tor
-// --------------------------
-//----------------------
-// IXXXXX() and OXXXXX()
-//----------------------
-HELFermion::HELFermion(const ANL4DVector &p,
-                             Double_t     m,
-                             Int_t        hel,
-                             Int_t        nsf,
-                             Bool_t       isincom)
-          : TVectorC(4),
-            fP(nsf*p.E(), nsf*p.Px(), nsf*p.Py(), nsf*p.Pz()),
-	    fM(m),
-            fHel(hel),
-            fNSF(nsf),
-            fIsIncoming(isincom)
-{
-   Double_t  sf[2], sfomeg[2], omega[2], pp, pp3, sqpop3, sqm;
-   Complex_t chi[2];
-   Int_t nh = hel*nsf;
-   Int_t in = isincom ? 1 : -1;
-   if (m == 0.) {
-      sqpop3 = nsf*TMath::Sqrt(TMath::Max(p(0)+p(3), 0.));
-      chi[0] = sqpop3;
-      if (sqpop3 == 0.) chi[1] = -hel * TMath::Sqrt(2.*p(0));
-      else              chi[1] = Complex_t(nh*p(1), in*p(2))/sqpop3;
-      Int_t iu = (1-in)/2;
-      Int_t id = (1+in)/2;
-      if (nh == 1*in) {
-         (*this)[0] = 0.;
-         (*this)[1] = 0.;
-         (*this)[2] = chi[iu];
-         (*this)[3] = chi[id];
-      } else {
-         (*this)[0] = chi[id];
-         (*this)[1] = chi[iu];
-         (*this)[2] = 0.;
-         (*this)[3] = 0.;
-      }
-   } else {
-      pp = TMath::Min(p(0), p.Vect().Mag());
-      if (pp == 0.) {
-         sqm = TMath::Sqrt(m);
-         Int_t ip =    (1+in*nh)/2;
-         Int_t im = in*(1-in*nh)/2;
-         (*this)[0] = ip       * sqm;
-         (*this)[1] = im * nsf * sqm;
-         (*this)[2] = ip * nsf * sqm;
-         (*this)[3] = im       * sqm;
-      } else {
-         sf[0] = (1+nsf+(1-nsf)*nh)*0.5;
-         sf[1] = (1+nsf-(1-nsf)*nh)*0.5;
-         omega[0] = TMath::Sqrt(p(0)+pp);
-         omega[1] = m/omega[0];
-         Int_t ip = (1+nh)/2;
-         Int_t im = (1-nh)/2;
-         sfomeg[0] = sf[0] * omega[ip];
-         sfomeg[1] = sf[1] * omega[im];
-         pp3    = TMath::Max(pp+p(3), 0.);
-         chi[0] = TMath::Sqrt(pp3*0.5/pp);
-         if (pp3 == 0.) chi[1] = -nh;
-         else           chi[1] = Complex_t(nh*p(1), in*p(2))/TMath::Sqrt(2.*pp*pp3);
-         Int_t iu = (1-in)/2;
-         Int_t id = (1+in)/2;
-         (*this)[0] = sfomeg[iu] * chi[im];
-         (*this)[1] = sfomeg[iu] * chi[ip];
-         (*this)[2] = sfomeg[id] * chi[im];
-         (*this)[3] = sfomeg[id] * chi[ip];
-      }
-   }
-#ifdef __DEBUG__ 
-	   cerr << (isincom ? "fin" : "fot")
-		<<  " =(" << (*this)[0] << ", "
-                          << (*this)[1] << ", "
-                          << (*this)[2] << ", "
-                          << (*this)[3] << ") " << endl;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class HELVector
-// ==============================
-//_____________________________________________________________________________
-//_____________________________________________________________________________
-// --------------------------
-//  C-tor
-// --------------------------
-//----------
-// VXXXXX()
-//----------
-HELVector::HELVector(const ANL4DVector &p,
-                           Double_t     m,
-                           Int_t        hel,
-                           Int_t        nsv)
-          : TVectorC(4),
-            fP(nsv*p.E(), nsv*p.Px(), nsv*p.Py(), nsv*p.Pz()),
-	    fM(m),
-            fHel(hel),
-            fNSV(nsv)
-{
-   Double_t  hel0, pt, pt2, pp, pzpt, emp;
-   Int_t     nsvahl;
-   nsvahl = nsv*TMath::Abs(hel);
-   pt2 = p.GetPt2();
-   pp  = TMath::Min(p(0), p.Vect().Mag());
-   pt  = TMath::Min(pp, TMath::Sqrt(pt2));
-   if (m == 0.) {
-      pp = p(0);
-      pt = p.GetPt();
-      (*this)[0] = 0.;
-      (*this)[3] = hel*pt/pp*kSqh;
-      if (pt != 0.) {
-         pzpt = p(3)/(pp*pt)*kSqh*hel;
-         (*this)[1] = Complex_t(-p(1)*pzpt, -nsvahl*p(2)/pt*kSqh);
-         (*this)[2] = Complex_t(-p(2)*pzpt,  nsvahl*p(1)/pt*kSqh);
-      } else {
-         (*this)[1] = -hel*kSqh;
-         (*this)[2] = Complex_t(0., nsvahl*TMath::Sign(kSqh,p(3)));
-      }
-   } else {
-      hel0 = 1. - TMath::Abs(hel);
-      if (pp == 0.) {
-         (*this)[0] = 0.;
-         (*this)[1] = -hel*kSqh;
-         (*this)[2] = Complex_t(0., nsvahl*kSqh);
-         (*this)[3] = hel0;
-      } else {
-         emp = p(0)/(m*pp);
-	 (*this)[0] = hel0*pp/m;
-         (*this)[3] = hel0*p(3)*emp + hel*pt/pp*kSqh;
-	 if (pt != 0.) {
-            pzpt = p(3)/(pp*pt)*kSqh*hel;
-	    (*this)[1] = Complex_t(hel0*p(1)*emp - p(1)*pzpt, -nsvahl*p(2)/pt*kSqh);
-	    (*this)[2] = Complex_t(hel0*p(2)*emp - p(2)*pzpt,  nsvahl*p(1)/pt*kSqh);
-	 } else {
-	    (*this)[1] = -hel*kSqh;
-	    (*this)[2] = Complex_t(0., nsvahl*TMath::Sign(kSqh,p(3)));
-	 }
-      }
-   }
-}
-
-//----------
-// JIOXXX()
-//----------
-HELVector::HELVector(const HELFermion &fin,
-                     const HELFermion &fout,
-                           Double_t    glv,
-                           Double_t    grv,
-                           Double_t    mv,
-                           Double_t    gamv)
-          : TVectorC(4),
-            fP(fout.fP - fin.fP),
-	    fM(mv)
-{
-   Complex_t c0, c1, c2, c3, cs, d;
-   Double_t  q2, vm2, dd;
-   q2  = fP.Mag2();
-   vm2 = mv*mv;
-   if (mv == 0.) {
-      dd = 1./q2;
-      if (grv == 0.) { // purely left-handed
-         dd *= glv;
-	 (*this)[0] = ( fout[2]*fin[0] + fout[3]*fin[1]) * dd;
-	 (*this)[1] = (-fout[2]*fin[1] - fout[3]*fin[0]) * dd;
-	 (*this)[2] = ( fout[2]*fin[1] - fout[3]*fin[0]) * Complex_t(0., dd);
-	 (*this)[3] = (-fout[2]*fin[0] + fout[3]*fin[1]) * dd;
-      } else {
-         (*this)[0] = (  glv * ( fout[2]*fin[0] + fout[3]*fin[1])
-                       + grv * ( fout[0]*fin[2] + fout[1]*fin[3])) * dd;
-         (*this)[1] = (- glv * ( fout[2]*fin[1] + fout[3]*fin[0])
-                       + grv * ( fout[0]*fin[3] + fout[1]*fin[2])) * dd;
-         (*this)[2] = (  glv * ( fout[2]*fin[1] - fout[3]*fin[0])
-                       + grv * (-fout[0]*fin[3] + fout[1]*fin[2])) * Complex_t(0., dd);
-         (*this)[3] = (  glv * (-fout[2]*fin[0] + fout[3]*fin[1])
-                       + grv * ( fout[0]*fin[2] - fout[1]*fin[3])) * dd;
-      }
-   } else {
-      d = 1./Complex_t(q2 - vm2, TMath::Max(TMath::Sign(mv*gamv, q2), 0.));
-      if (grv == 0.) { // purely left-handed
-         d *= glv;
-	 c0 =  fout[2]*fin[0] + fout[3]*fin[1];
-	 c1 = -fout[2]*fin[1] - fout[3]*fin[0];
-	 c2 = (fout[2]*fin[1] - fout[3]*fin[0]) * Complex_t(0., 1.);
-	 c3 = -fout[2]*fin[0] + fout[3]*fin[1];
-      } else {
-         c0 =   glv * ( fout[2]*fin[0] + fout[3]*fin[1])
-              + grv * ( fout[0]*fin[2] + fout[1]*fin[3]);
-         c1 = - glv * ( fout[2]*fin[1] + fout[3]*fin[0])
-              + grv * ( fout[0]*fin[3] + fout[1]*fin[2]);
-         c2 =  (glv * ( fout[2]*fin[1] - fout[3]*fin[0])
-              + grv * (-fout[0]*fin[3] + fout[1]*fin[2])) * Complex_t(0., 1.);
-         c3 =   glv * (-fout[2]*fin[0] + fout[3]*fin[1])
-              + grv * ( fout[0]*fin[2] - fout[1]*fin[3]);
-      }
-      cs = (fP(0)*c0 - fP(1)*c1 - fP(2)*c2 - fP(3)*c3)/vm2;
-      (*this)[0] = (c0 - cs*fP(0))*d;
-      (*this)[1] = (c1 - cs*fP(1))*d;
-      (*this)[2] = (c2 - cs*fP(2))*d;
-      (*this)[3] = (c3 - cs*fP(3))*d;
-   }
-#ifdef __DEBUG__ 
-	   cerr << " jio =(" << (*this)[0] << ", "
-                             << (*this)[1] << ", "
-                             << (*this)[2] << ", "
-                             << (*this)[3] << ") " << endl;
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class HELScalar
-// ==============================
-//_____________________________________________________________________________
-//_____________________________________________________________________________
-// --------------------------
-//  C-tor
-// --------------------------
-//----------
-// SXXXXX()
-//----------
-HELScalar::HELScalar(const ANL4DVector &p,
-                           Int_t        nss)
-          : Complex_t(1.,0.),
-            fP(nss*p.E(), nss*p.Px(), nss*p.Py(), nss*p.Pz()),
-            fNSS(nss)
-{
-}
-
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class GENDecayMode
-// ==============================
-//_____________________________________________________________________________
-//_____________________________________________________________________________
-// --------------------------
-//  DebugPrint
-// --------------------------
-void GENDecayMode::DebugPrint(const Option_t *)
-{
-   using namespace std;
-   cerr << " Gamma = " << setw(6) << setprecision(4) 
-                       << setiosflags(ios::fixed)
-                       << setiosflags(ios::showpoint)
-        << GetGamma() 
-        << " BR = "    << setw(6) << setprecision(4)
-                       << setiosflags(ios::fixed)
-                       << setiosflags(ios::showpoint)
-        << GetBR()     <<  " : --> ";
-   TIter next(this);
-   GENPDTEntry *ep;
-   while ((ep = static_cast<GENPDTEntry *>(next()))) {
-      cerr <<  ep->GetName() << (ep->GetPID() > 0 ? " " : "bar ");
-   }
-   cerr << endl;
-}
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class GENModePicker
-// ==============================
-//_____________________________________________________________________________
-// --------------------------
-//  Add
-// --------------------------
-void GENModePicker::Add(GENDecayMode *mp)
-{
-   TObjArray::Add(mp);
-   fDone = kFALSE;
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  PickMode
-// --------------------------
-GENDecayMode *GENModePicker::PickMode(Double_t x,
-                                      Double_t &weight,
-                                      Int_t    &mode)
-{
-   if (!fDone) Update();
-   mode = 0;
-   TIter next(this);
-   GENDecayMode *mp;
-   while ((mp = static_cast<GENDecayMode *>(next()))) {
-      if (x <= mp->fCumBR) {
-         weight = 1./mp->fBR; 
-         break;
-      }
-      mode++;
-   }
-   return static_cast<GENDecayMode *>(mp);
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  Update
-// --------------------------
-void GENModePicker::Update()
-{
-   if (fDone) return;
-   fDone = kTRUE;
-
-   fGamma = 0.;
-   TIter next(this);
-   GENDecayMode *mp;
-   while ((mp = static_cast<GENDecayMode *>(next()))) {
-      fGamma += mp->fGamma;
-   }
-
-   Double_t cum = 0.;
-   next.Reset();
-   while ((mp = static_cast<GENDecayMode *>(next()))) {
-      mp->fBR = mp->fGamma/fGamma;
-      cum    += mp->fBR;
-      mp->fCumBR = cum;
-   }
-}
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class GENPDTEntry
+//  class RSXBoson
 // ==============================
 //_____________________________________________________________________________
 // --------------------------
 //  C-tor
 // --------------------------
-GENPDTEntry::GENPDTEntry(const Char_t     *name,
-                               Int_t       pid,
-                               Double_t    charge,
-                               Double_t    spin,
-                               Double_t    mass,
-                               Int_t       gen,
-                               Double_t    ispin,
-                               Double_t    color)
-           : fName(name),
-             fPID(pid),
-             fCharge(charge),
-             fSpin(spin),
-             fMass(mass),
-             fGen(gen),
-             fIsoSpin(ispin),
-             fColor(color)
+RSXBoson::RSXBoson(Double_t m,
+                   Double_t lambda,
+                   Double_t c0,
+                   Double_t c1,
+                   Double_t c2,
+                   Double_t c3,
+                   Double_t c4)
+        : fLambda(lambda),
+          fC0(c0),
+          fC1(c1),
+          fC2(c2),
+          fC3(c3),
+          fC4(c4)
 {
-}
+   fName    = TString("X");
+   fPID     = 200000000;
+   fCharge  = 0.;
+   fSpin    = 0.;
+   fMass    = m;
+   fGen     = 0;
+   fIsoSpin = 0.;
+   fColor   = 1.;
 
-//_____________________________________________________________________________
-// --------------------------
-//  GetQ2BW
-// --------------------------
-Double_t GENPDTEntry::GetQ2BW(Double_t    qmin,   // Q_min
-                              Double_t    qmax,   // Q_max
-                              Double_t       x,   // integration variable
-                              Double_t &weight)   // Jacobian weight
-{
-   Double_t m    = GetMass ();
-   Double_t gm   = GetWidth();
-   Double_t mgm  = m*gm;
-   Double_t m2   = m*fMass;
-   Double_t mgm2 = mgm*mgm;
-
-   Double_t thmin = TMath::ATan((qmin-m)*(qmin+m)/mgm);
-   Double_t thmax = TMath::ATan((qmax-m)*(qmax+m)/mgm);
-   Double_t theta = thmin + (thmax - thmin)*x;
-   Double_t q2    = mgm * TMath::Tan(theta) + m2;
-
-   weight = (thmax - thmin)*(TMath::Power(q2-m2,2) + mgm2)/mgm;
-
-   return q2;
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  DebugPrint
-// --------------------------
-void GENPDTEntry::DebugPrint(const Option_t *opt)
-{
-   using namespace std;
-   cerr << " ---------------------------------------------------- " << endl;
-   Update();
-   TIter next(this);
-   GENDecayMode *mp;
-   while ((mp = static_cast<GENDecayMode *>(next()))) {
-      mp->DebugPrint(opt);
-   }
-   cerr << " ---------------------------------------------------- " << endl
-        << " Gamma_tot = " << GetWidth() << " [GeV]"                << endl;
-}
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class GENPDTZBoson
-// ==============================
-//_____________________________________________________________________________
-// --------------------------
-//  C-tor
-// --------------------------
-GENPDTZBoson::GENPDTZBoson()
-{
    Initialize();
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  D-tor
-// --------------------------
-GENPDTZBoson::~GENPDTZBoson()
-{
-   TIter next(this);
-   GENDecayMode *dmp;
-   while ((dmp = static_cast<GENDecayMode *>(next()))) {
-      dmp->Delete();
-   }
-   Delete();
 }
 
 //_____________________________________________________________________________
 // --------------------------
 //  Initialize
 // --------------------------
-void GENPDTZBoson::Initialize()
+void RSXBoson::Initialize()
 {
-   fName   = TString("Z");
-   fPID    = 23;
-   fCharge = 0.;
-   fSpin   = 1.;
-   fMass   = kM_z;
    //--
-   //  Set decay modes
+   // Couplings
    //--
-   for (Int_t ic=0; ic<2; ic++) {
-      for (Int_t ig=0; ig<3; ig++) {
-         for (Int_t it=0; it<2; it++) { 
-            const Char_t   *name = kName[ic][it][ig];
-                  Int_t     pid  = kPID [ic][it][ig];  
-                  Double_t  t3   = (1 - 2*it)/2.;
-                  Double_t  qf   = kChrg[ic][it][ig];
-                  Double_t  spin = 0.5;
-                  Double_t  cf   = 2*ic + 1;
-                  Double_t  mass = kMass[ic][it][ig];
-            GENDecayMode *dmp;
-            GENPDTEntry  *d1p, *d2p;
-            if (ic) cf  *= 1 + kAlphaS/kPi;
-            d1p  = new GENPDTEntry(name, pid, qf, spin, mass, ig+1, t3, cf);
-            d2p  = new GENPDTEntry(name,-pid,-qf, spin, mass, ig+1, t3, cf);
-            Double_t gam  = GamToFF(t3, qf, cf, mass);
-            if (gam == 0.) continue;
-            dmp = new GENDecayMode(gam);
-            dmp->Add(d1p);
-            dmp->Add(d2p);
-            Add(dmp); 
-         }
-      }
+   Double_t  a1    = fC1*kCos2W + fC2*kSin2W;
+   Double_t  a2    = (fC1 - fC2) * kSinCosW;
+   Double_t  a3    = fC1*kSin2W + fC2*kCos2W;
+   //--
+   // X --> gluon gluon
+   //--
+   GENDecayMode *dmp;
+   GENPDTEntry  *d1p, *d2p;
+   d1p = new GENPDTGluon();
+   d2p = new GENPDTGluon();
+   Double_t cf    = 8.;
+   Double_t m1    = 0.;
+   Double_t m2    = 0.;
+   Double_t ident = 2.;
+   Double_t gam = GamToVV(m1, m2, fC4, cf)/ident;
+   if (gam > 0.) {
+      dmp = new GENDecayMode(gam);
+      dmp->Add(d1p);
+      dmp->Add(d2p);
+      Add(dmp);
+   }
+   //--
+   // X --> gamma gamma 
+   //--
+   d1p = new GENPDTPhoton();
+   d2p = new GENPDTPhoton();
+   cf    = 1.;
+   m1    = 0.;
+   m2    = 0.;
+   ident = 2.;
+   gam = GamToVV(m1, m2, a1, cf)/ident;
+   if (gam > 0.) {
+      dmp = new GENDecayMode(gam);
+      dmp->Add(d1p);
+      dmp->Add(d2p);
+      Add(dmp);
+   }
+   //--
+   // X --> Z gamma 
+   //--
+   d1p = new GENPDTZBoson();
+   d2p = new GENPDTPhoton();
+   cf    = 1.;
+   m1    = d1p->GetMass();
+   m2    = d2p->GetMass();
+   ident = 1.;
+   gam = GamToVV(m1, m2, a2, cf)/ident;
+   if (gam > 0.) {
+      dmp = new GENDecayMode(gam);
+      dmp->Add(d1p);
+      dmp->Add(d2p);
+      Add(dmp);
    }
 }
 
 //_____________________________________________________________________________
 // --------------------------
-//  GamToFF
+//  GamToVV
 // --------------------------
-Double_t GENPDTZBoson::GamToFF(Double_t t3, // weak isospin
-                               Double_t qf, // charge
-                               Double_t cf, // color factor
-                               Double_t m)  // mass
+Double_t RSXBoson::GamToVV(Double_t m1, // 1st daughter mass
+                           Double_t m2, // 2nd daughter mass
+                           Double_t a,  // coupling
+                           Double_t cf) // color factor
 {
-   Double_t mz2 = fMass*fMass;
-   Double_t p1  = mz2/4 - m*m;
+   Double_t x1   = TMath::Power(m1/fMass,2);
+   Double_t x2   = TMath::Power(m2/fMass,2);
+   Double_t beta = 1. - 2.*(x1+x2) + TMath::Power((x1-x2),2);
 
-   if (p1 <= 0.) return 0.;
+   if (beta <= 0.) return 0.;
+   beta = TMath::Sqrt(beta);
 
-   p1 = TMath::Sqrt(p1);
-   Double_t gv  =  t3/2 - kSin2W*qf;
-   Double_t ga  = -t3/2;
-   Double_t tta = 2*((gv*gv + ga*ga)*(mz2 - 4*p1*p1/3) - 4*ga*ga*m*m); 
-   Double_t fac = (kAlpha/kSin2W/kCos2W)/2;
-   Double_t gam = fac*tta*cf*p1/mz2;
+   Double_t tta = a*a*fMass*TMath::Power(fMass/fLambda,2)
+                  * (3. + 2.*TMath::Power(beta,2) + 3.*TMath::Power(beta,4))/8.;
+   Double_t fac = 1./(64.*kPi);
+   Double_t gam = fac*tta*beta*cf;
 
    return gam;
-}
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class GENBranch
-// ==============================
-//_____________________________________________________________________________
-// --------------------------
-//  C-tor
-// --------------------------
-GENBranch::GENBranch(Double_t q2,
-                     Double_t costh,
-                     Double_t phi,
-                     Double_t m12,
-                     Double_t m22)
-         : fQ2(q2),
-           fCosTheta(costh),
-           fPhi(phi), 
-           fM12(m12),
-           fM22(m22),
-           fBR1Ptr(0),
-           fBR2Ptr(0)
-{
-   Double_t x1 = fM12/fQ2;
-   Double_t x2 = fM22/fQ2;
-   fBetaBar    = TMath::Sqrt(1. - 2*(x1+x2) + TMath::Power(x1-x2,2));
-}
-
-GENBranch::GENBranch(Double_t   q2,
-                     Double_t   costh,
-                     Double_t   phi,
-                     GENBranch *br1p,
-                     GENBranch *br2p)
-         : fQ2(q2),
-           fCosTheta(costh),
-           fPhi(phi), 
-           fM12(br1p->GetQ2()),
-           fM22(br2p->GetQ2()),
-           fBR1Ptr(br1p),
-           fBR2Ptr(br2p)
-{
-   Double_t x1 = fM12/fQ2;
-   Double_t x2 = fM22/fQ2;
-   fBetaBar    = TMath::Sqrt(1. - 2*(x1+x2) + TMath::Power(x1-x2,2));
-}
-
-// ==============================
-//  class GENFrame
-// ==============================
-//_____________________________________________________________________________
-// --------------------------
-//  C-tor
-// --------------------------
-GENFrame::GENFrame()
-{
-   fEV[0].SetXYZ(1., 0., 0.);
-   fEV[1].SetXYZ(0., 1., 0.);
-   fEV[2].SetXYZ(0., 0., 1.);
-}
-
-GENFrame::GENFrame(const ANL4DVector &q, const GENFrame &eb)
-{
-   fEV[2] = q.Vect().Unit();
-   fEV[1] = eb.fEV[2].Cross(fEV[2]);
-   Double_t ae2  = fEV[1].Mag();
-   static const Double_t kXmin = 1.e-12;
-   if (ae2 < kXmin) {
-      fEV[0] = eb.fEV[0]; fEV[1] = eb.fEV[1]; fEV[2] = eb.fEV[2];
-      Double_t csth = fEV[2] * eb.fEV[2];
-      if (csth <= 0.) {
-         fEV[2] = -eb.fEV[2];
-      }
-      return;
-   } else {
-      fEV[1] = fEV[1].Unit();
-   }
-   fEV[0] = fEV[1].Cross(fEV[2]).Unit();
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  Transform
-// --------------------------
-ANL4DVector GENFrame::Transform(const ANL4DVector &pb)
-{
-   TVector3 pb3v = pb.X()*fEV[0] + pb.Y()*fEV[1] + pb.Z()*fEV[2];
-   return ANL4DVector(pb.E(),pb3v.Px(), pb3v.Py(), pb3v.Pz());
-}
-
-//-----------------------------------------------------------------------------
-// ==============================
-//  class GENPhase2
-// ==============================
-//_____________________________________________________________________________
-// --------------------------
-//  C-tor
-// --------------------------
-GENPhase2::GENPhase2(const ANL4DVector &q,
-                           Double_t       m12,
-                           Double_t       m22,
-                     const GENFrame      &eb,
-                           Double_t       costh,
-                           Double_t       phi,
-                           Int_t          mode)
-         : fQ(q), fM12(m12), fM22(m22), 
-           fEb(eb), fEa(eb), 
-           fCosTheta(costh), fPhi(phi),
-           fBetaBar(0.), 
-           fMode(mode),
-           fDone(kFALSE)
-{
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  GetFourMomentum
-// --------------------------
-ANL4DVector GENPhase2::GetFourMomentum(Int_t i)
-{
-   if (!fDone) Update(); return i ? fP2 : fP1;
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  GetFrame
-// --------------------------
-GENFrame GENPhase2::GetFrame(Int_t i)
-{
-   if (!fDone) Update(); return i ? fEa : fEb;
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  GetBetaBar
-// --------------------------
-Double_t GENPhase2::GetBetaBar()
-{
-   if (!fDone) Update(); return fBetaBar;
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  Beta2
-// --------------------------
-Double_t GENPhase2::Beta2(Double_t x1, Double_t x2)
-{
-   return 1. - 2*(x1+x2) + (x1-x2)*(x1-x2);
-}
-
-//_____________________________________________________________________________
-// --------------------------
-//  Update
-// --------------------------
-void GENPhase2::Update()
-{
-   // -------------------------
-   //  Check if update needed
-   // -------------------------
-   if (fDone) return;
-   fDone = kTRUE;
-
-   // -------------------------
-   //  Calculate Beta_bar
-   // -------------------------
-   Double_t amq2 = fQ.Mag2();
-   if (amq2 <= 0.) {
-      cerr << " >>>>> Error in GENPhase2::GENPhase2() >>>>>>>> " << endl
-           << " q = ("  << fQ.E() << ", " 
-                        << fQ.X() << ", " 
-                        << fQ.Y() << ", "
-                        << fQ.Z() << ")" << endl
-           << " q2  = " << amq2   
-           << " m12 = " << fM12
-           << " m22 = " << fM22 << endl;
-      fBetaBar = 0.;
-      return;
-   }
-
-   Double_t amq = TMath::Sqrt(amq2);
-   fBetaBar = Beta2(fM12/amq2, fM22/amq2);   
-   if (fBetaBar < 0.) {
-      fBetaBar = 0.;
-      return;
-   }
-   fBetaBar = TMath::Sqrt(fBetaBar);
-
-   // -------------------------
-   //  Daughter momenta
-   // -------------------------
-   Double_t ap1  = (amq/2) * fBetaBar;
-   Double_t snth = TMath::Sqrt((1.-fCosTheta)*(1.+fCosTheta));
-   fP1.SetXYZT(ap1*snth*TMath::Cos(fPhi),
-               ap1*snth*TMath::Sin(fPhi),
-               ap1*fCosTheta,
-               TMath::Sqrt(ap1*ap1+fM12));
-   fP2.SetXYZT(-fP1.X(), -fP1.Y(), -fP1.Z(), amq - fP1.E());
-
-   // -------------------------
-   //  Boost them to lab. frame
-   // -------------------------
-   if (!fMode) {
-      fEa = fEb;
-   } else {
-      fEa = GENFrame(fQ, fEb);
-      fP1 = fEa.Transform(fP1);
-      fP2 = fEa.Transform(fP2);
-      TVector3 boostv = fQ.BoostVector();
-      fP1.Boost(boostv);
-      fP2.Boost(boostv);
-   }
-
-   // -------------------------
-   //  Fix round-off errors
-   // -------------------------
-   if (fP1.E() <= 0. || fP2.E() <= 0.) {
-      fBetaBar = 0;
-   } else {
-      Double_t ap = fP1.Vect().Mag();
-      if (fP1.E() < ap) fP1.SetE(TMath::Sqrt(ap*ap+fM12));
-               ap = fP2.Vect().Mag();
-      if (fP2.E() < ap) fP2.SetE(TMath::Sqrt(ap*ap+fM22));
-   }
 }

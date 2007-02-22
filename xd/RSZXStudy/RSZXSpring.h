@@ -15,22 +15,15 @@
 //*****************************************************************************
 
 #include "TNamed.h"
-
-#include "ANL4DVector.h"
 #include "JSFModule.h"
 #include "JSFBases.h"
 #include "JSFSpring.h"
 #include "JSFBeamGeneration.h"
 
-#include <complex>
-typedef std::complex<Double_t>  Complex_t;
+#include "HELLib.h"
+#include "GENLib.h"
 
-class GENPDTEntry;
-class GENPDTZBoson;
-class GENBranch;
-class HELFermion;
-class HELScalar;
-class HELVector;
+class RSXBoson;
 
 //_______________________________________________________________________
 // =====================
@@ -108,6 +101,7 @@ private:
   Double_t fC1;             // C_1
   Double_t fC2;             // C_2
   Double_t fC3;             // C_3
+  Double_t fC4;             // C_4
 
   Double_t fMass;           // m_x    : mass  of X
 
@@ -119,7 +113,11 @@ private:
   // ----------------
   //  Particle Data
   // ----------------
+  RSXBoson     *fXBosonPtr;       //! PD table entry of "X"
+  GENPDTWBoson *fWBosonPtr;       //! PD table entry of "W"
   GENPDTZBoson *fZBosonPtr;       //! PD table entry of "Z"
+  GENPDTPhoton *fPhotonPtr;       //! PD table entry of "Gamma"
+  GENPDTGluon  *fGluonPtr;        //! PD table entry of "Gluon"
 
   // ----------------
   //  Event info
@@ -128,13 +126,18 @@ private:
   Double_t       fEcmIP;          // Ecm after B-strahlung
   Double_t       fQ2ZX;           // q^2 of ZX system
   Double_t       fQ2X;            // q^2 of final state X
+  GENDecayMode  *fXModePtr;       // pointer to X decay mode
+  GENPDTEntry   *f1Ptr;           // point to 1st X daughter
+  GENPDTEntry   *f2Ptr;           // point to 2nd X daughter
   Double_t       fQ2Z;            // q^2 of final state Z
+  GENDecayMode  *fZModePtr;       // pointer to Z decay mode
   GENPDTEntry   *f3Ptr;           // point to 1st Z daughter
   GENPDTEntry   *f4Ptr;           // point to 2nd Z daughter
   Int_t          fHelInitial[2];  // initial state helicities
   Int_t          fHelFinal  [4];  // final   state helicities
   Int_t          fJCombI;         // intial helicity combination
   Int_t          fJCombF;         // final  helicity combination
+  Int_t          fXMode;          // X decay mode
   Int_t          fZMode;          // Z decay mode
   ANL4DVector    fK[2];           // [0,1] = [e-, e+]
   ANL4DVector    fP[4];           // [0,1,2,3] = [ax1, ax2, fz1, fz2]
@@ -145,6 +148,7 @@ private:
   // ----------------
   Double_t       fHelCombInitial; // initial state helicity combination
   Double_t       fHelCombFinal;   // final   state helicity combination
+  Double_t       fXDecayMode;     // decay mode selector for X
   Double_t       fZDecayMode;     // decay mode selector for Z
   Double_t       fCosTheta;       // cos(theta_x) in cm  frame
   Double_t       fPhi;            // phi_x        in cm  frame
@@ -255,359 +259,35 @@ public:
    ClassDef(RSZXSpring, 1)  // RSZXSpring class
 };
 
-
 //_______________________________________________________________________
 // =====================
-//  class TVectorC
+//  class RSXBoson
 // =====================
 //-----------------------------------------------------------------------
-class TVectorC : public TObject {
-public:
-#if 0
-  TVectorC(Int_t n = 4) : fData(n) {}
-#else
-  TVectorC(Int_t n = 4) { fData[0]=0.; fData[1]=0.; fData[2]=0.; fData[3]=0.; }
-#endif
-  TVectorC(const TVectorC &src) : fData(src.fData) {}
 
-  Complex_t  operator[](Int_t i) const { return fData[i]; }
-  Complex_t &operator[](Int_t i)       { return fData[i]; }
+class RSXBoson: public GENPDTEntry {
+public:
+   RSXBoson(Double_t m      = 120.,
+            Double_t lambda = 1000.,
+            Double_t c0     = 0.,
+            Double_t c1     = 1.,
+            Double_t c2     = 1.,
+            Double_t c3     = 1.,
+            Double_t c4     = 1.);
+  virtual ~RSXBoson() {}
 
 private:
-#if 0
-  std::vector<Complex_t> fData; // data
-#else
-  Complex_t   fData[4]; // data
-#endif
-
-  ClassDef(TVectorC, 1) 	// Complex vector class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class HELFermion
-// =====================
-//-----------------------------------------------------------------------
-class HELFermion : public TVectorC {
-friend class HELVector;
-friend class HELScalar;
-public:
-#if 0
-   HELFermion() : TVectorC(4) {}
-#else
-   HELFermion() {}
-#endif
-   HELFermion(const ANL4DVector &p,
-                    Double_t     m,
-                    Int_t        hel,
-                    Int_t        nsf = 1,
-		    Bool_t       isincom = kFALSE);
-   virtual ~HELFermion() {}
-
-   inline const ANL4DVector &GetFourMomentum() const  { return fP;   }
-   inline       Double_t     GetMass        () const  { return fM;   }
-   inline       Int_t        GetHelicity    () const  { return fHel; }
-   inline       Int_t        GetNSF         () const  { return fNSF; }
-   
-private:
-   ANL4DVector fP;                // 4-momentum * fNSF
-   Double_t    fM;                // mass
-   Int_t       fHel;              // (-1,+1) = (-1/2,+1/2)
-   Int_t       fNSF;              // (-1,+1) = (antiparticle, particle)
-   Bool_t      fIsIncoming;       // true if incoming
-
-   ClassDef(HELFermion, 1)  // Incoming fermion class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class HELVector
-// =====================
-//-----------------------------------------------------------------------
-class HELVector: public TVectorC {
-friend class HELFermion;
-friend class HELScalar;
-public:
-#if 0
-   HELVector() : TVectorC(4) {}
-#else
-   HELVector() {}
-#endif
-   HELVector(const ANL4DVector &p,
-                   Double_t     m,
-	           Int_t        hel,
-		   Int_t        nsv = 1);
-   HELVector(const HELFermion &fin, 
-             const HELFermion &fout,
-	           Double_t    gl,
-		   Double_t    gr,
-		   Double_t    m,
-		   Double_t    gm);
-   virtual ~HELVector() {}
-
-   inline const ANL4DVector &GetFourMomentum() const  { return fP;   }
-   inline       Double_t     GetMass        () const  { return fM;   }
-   inline       Int_t        GetHelicity    () const  { return fHel; }
-   inline       Int_t        GetNSV         () const  { return fNSV; }
-   
-private:
-   ANL4DVector fP;                // 4-momentum * fNSV
-   Double_t    fM;                // mass
-   Int_t       fHel;              // helicity
-   Int_t       fNSV;              // (-1,1) = (initial, final)
-
-   ClassDef(HELVector, 1)  // Vector boson class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class HELScalar
-// =====================
-//-----------------------------------------------------------------------
-class HELScalar: public Complex_t {
-friend class HELFermion;
-friend class HELVector;
-public:
-   HELScalar() {}
-   HELScalar(const ANL4DVector &p,
-		   Int_t        nss = 1);
-   virtual ~HELScalar() {}
-
-   inline const ANL4DVector &GetFourMomentum() const  { return fP;   }
-   inline       Int_t        GetNSS         () const  { return fNSS; }
-   
-private:
-   ANL4DVector fP;                // 4-momentum * fNSS
-   Int_t       fNSS;              // (-1,1) = (initial, final)
-
-   ClassDef(HELScalar, 1)  // Scalar boson class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class GENDecayMode
-// =====================
-//-----------------------------------------------------------------------
-class GENDecayMode : public TObjArray {
-friend class GENModePicker;
-public:
-   GENDecayMode(Double_t gm = 0.) : fGamma(gm), fBR(0.), fCumBR(0.) {}
-   virtual ~GENDecayMode() {}
-
-   Double_t GetGamma()             { return fGamma; }
-   Double_t GetBR   ()             { return fBR;    }
-   void     SetGamma(Double_t gm ) { fGamma = gm;   }
-   void     SetBR   (Double_t br ) { fBR    = br;   }
-
-   void     DebugPrint(const Option_t *opt ="");
+   void     Initialize();
+   Double_t GamToVV(Double_t m1, Double_t m2, Double_t a, Double_t color);
 
 private:
-   Double_t fGamma;		// partial width
-   Double_t fBR;		// branching fraction
-   Double_t fCumBR;		// cumulative branching fraction
+   Double_t fLambda;
+   Double_t fC0;
+   Double_t fC1;
+   Double_t fC2;
+   Double_t fC3;
+   Double_t fC4;
 
-   ClassDef(GENDecayMode, 1) 	// Decay mode class
+   ClassDef(RSXBoson, 1)  // X boson class
 };
-
-//_______________________________________________________________________
-// =====================
-//  class GENModePicker
-// =====================
-//-----------------------------------------------------------------------
-class GENModePicker : public TObjArray {
-public:
-   GENModePicker() : fGamma(0.), fDone(kFALSE) {}
-   virtual ~GENModePicker() {}
-
-   using TObjArray::Add;
-   virtual void     Add          (GENDecayMode *mp);
-           GENDecayMode *PickMode(Double_t x, 
-			          Double_t &weight,
-				  Int_t &mode);
-
-           Double_t GetWidth  () { if(!fDone) Update(); return fGamma; }
-
-protected:
-   virtual void     Update();
-
-private:
-   Double_t fGamma;		// total width [GeV]
-   Bool_t   fDone;		// true if updated
-
-   ClassDef(GENModePicker, 1) 	// Decay mode picker class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class GENPDTEntry
-// =====================
-//-----------------------------------------------------------------------
-class GENPDTEntry: public GENModePicker {
-public:
-   GENPDTEntry() {}
-   GENPDTEntry(const Char_t     *name,
-                     Int_t       pid,
-                     Double_t    charge,
-                     Double_t    spin,
-                     Double_t    mass,
-                     Int_t       gen   = 0,
-                     Double_t    ispin = 0.,
-                     Double_t    color = 1.);
-   virtual ~GENPDTEntry() {}
-
-   TString & GetName  () { return fName;    }
-   Int_t     GetPID   () { return fPID;     }
-   Double_t  GetCharge() { return fCharge;  }
-   Double_t  GetMass  () { return fMass;    }
-   Int_t     GetGenNo () { return fGen;     }
-   Double_t  GetISpin () { return fIsoSpin; }
-   Double_t  GetColor () { return fColor;   }
-
-   Double_t  GetQ2BW  (Double_t    qmin,   // Q_min
-                       Double_t    qmax,   // Q_max
-                       Double_t       x,   // integration variable
-                       Double_t &weight);  // Jacobian weight
-
-   void      DebugPrint(const Option_t *opt = "");
-
-protected:
-   TString       fName;		//  name
-   Int_t         fPID;		//  PDG ID code
-   Double_t      fCharge;	//  charge
-   Double_t      fSpin;		//  spin
-   Double_t      fMass;		//  mass  [GeV]
-   Int_t         fGen;		//  generation
-   Double_t      fIsoSpin;	//  (0, 1, 2) = (0, up, down)
-   Double_t      fColor;	//  color factor
-
-   ClassDef(GENPDTEntry, 1) 	// PD table entry class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class GENPDTZBoson
-// =====================
-//-----------------------------------------------------------------------
-class GENPDTZBoson: public GENPDTEntry {
-public:
-   GENPDTZBoson();
-   ~GENPDTZBoson();
-
-private:
-   void     Initialize();   
-   Double_t GamToFF(Double_t t3, Double_t qf, Double_t cf, Double_t m);
-
-   ClassDef(GENPDTZBoson, 1)  // Reference frame class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class GENBranch
-// =====================
-//-----------------------------------------------------------------------
-class GENBranch {
-public:
-   GENBranch(Double_t q2    = 0.,
-             Double_t costh = 0.,
-             Double_t phi   = 0.,
-             Double_t m12   = 0.,
-	     Double_t m22   = 0.);
-
-   GENBranch(Double_t   q2,
-             Double_t   costh,
-             Double_t   phi,
-             GENBranch *br1p,
-             GENBranch *br2p);
-
-   virtual ~GENBranch() {}
-
-   inline Double_t GetQ2      ()            { return fQ2;       }
-   inline Double_t GetCosTheta()            { return fCosTheta; }
-   inline Double_t GetPhi     ()            { return fPhi;      }
-   inline Double_t GetM12     ()            { return fM12;      }
-   inline Double_t GetM22     ()            { return fM22;      }
-   inline Double_t GetBetaBar ()            { return fBetaBar;  }
-
-   inline void     SetQ2      (Double_t q2) { fQ2       = q2;   }
-   inline void     SetCosTheta(Double_t cs) { fCosTheta = cs;   }
-   inline void     SetPhi     (Double_t fi) { fPhi      = fi;   }
-
-   inline GENBranch * GetBranchPtr(Int_t i) { return i ? fBR2Ptr
-                                                       : fBR1Ptr; }
-
-private:
-   Double_t   fQ2;        // q^2
-   Double_t   fCosTheta;  // cos(theta)
-   Double_t   fPhi;       // phi
-   Double_t   fM12;       // m1*m1
-   Double_t   fM22;       // m2*m2
-   GENBranch *fBR1Ptr;    // 1st daughter branch if any
-   GENBranch *fBR2Ptr;    // 2nd daughter branch if any
-   Double_t   fBetaBar;   // beta_bar
-
-   ClassDef(GENBranch, 1)  // Branch class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class GENFrame
-// =====================
-//-----------------------------------------------------------------------
-class GENFrame {
-public:
-   GENFrame();
-   GENFrame(const ANL4DVector &q, const GENFrame &eb);
-   virtual ~GENFrame() {}
-
-   ANL4DVector Transform(const ANL4DVector &pb);
-
-private:
-   TVector3 fEV[3];	// axis vectors
-
-   ClassDef(GENFrame, 1)  // Reference frame class
-};
-
-//_______________________________________________________________________
-// =====================
-//  class GENPhase2
-// =====================
-//-----------------------------------------------------------------------
-class GENPhase2 {
-public:
-   GENPhase2() {}
-   GENPhase2(const ANL4DVector &q,
-                   Double_t     m12,
-                   Double_t     m22,
-             const GENFrame    &eb,
-                   Double_t     costh,
-                   Double_t     phi,
-                   Int_t        mode = 0);
-   virtual ~GENPhase2() {}
-
-   ANL4DVector GetFourMomentum(Int_t i);
-   GENFrame    GetFrame(Int_t i = 1);
-   Double_t    GetBetaBar();
-
-private:
-   Double_t       Beta2(Double_t x1, Double_t x2);
-   void           Update();
-
-private:
-   ANL4DVector  fQ;		// parent 4-momentum
-   Double_t     fM12;		// 1st dauter mass^2
-   Double_t     fM22;		// 2nd dauter mass^2
-   GENFrame     fEb;		// Eb: original frame
-   GENFrame     fEa;		// Ea: parent's helicity frame
-   Double_t     fCosTheta;   	// cos(theta_1) in Ea
-   Double_t     fPhi;        	// phi_1        in Ea
-   ANL4DVector  fP1;		// 1st daughter 4-momentum in Eb
-   ANL4DVector  fP2;		// 2nd daughter 4-momentum in Eb
-   Double_t     fBetaBar;	// beta_bar
-   Int_t        fMode;		// (0,1)=(no transf, transf)
-   Bool_t       fDone;		// true if updated
-
-   ClassDef(GENPhase2, 1)  // 2-body phase space class
-};
-
-
 #endif
