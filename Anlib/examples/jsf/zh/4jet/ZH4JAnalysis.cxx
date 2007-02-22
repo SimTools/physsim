@@ -346,6 +346,7 @@ Bool_t ZH4JAnalysis::Process(Int_t ev)
     if (TMath::Abs(zmass - kMassZ) > xM2j) continue;
     z.LockChildren();
     ANLPairCombiner hcandidates(zcandidates);
+    hcandidates.Reset();
     while ( (hp = (ANLPair*)hcandidates()) ) {
       ANLPair &h = *hp;
       if (h.IsLocked()) continue;
