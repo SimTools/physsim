@@ -18,7 +18,7 @@
 #include <sstream>
 #include <iomanip>
 //#define __DEBUG__
-//#define __HIGGS__
+#define __HIGGS__
 //#define __ZEROWIDTH__
 //#define __PHASESPACE__
 #ifdef __PHASESPACE__
@@ -227,7 +227,6 @@ RSZXBases::RSZXBases(const char *name, const char *title)
            fC1        (1.),
            fC2        (1.),
            fC3        (1.),
-           fC4        (1.),
            fMass      ( 120.),
            fEcmInit   (1000.),
            fISR       ( 1),
@@ -314,10 +313,6 @@ RSZXBases::RSZXBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("RSZXBases.C3","1.")); 		 // C_3
   ins >> fC3;
-
-  ins.clear();
-  ins.str(gJSF->Env()->GetValue("RSZXBases.C4","1."));           // C_4
-  ins >> fC4;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("RSZXBases.MassX","120.")); 	 // M_x [GeV]
@@ -868,8 +863,7 @@ void RSZXBases::Userin()
                                               fC0,
                                               fC1,
                                               fC2,
-                                              fC3,
-                                              fC4);
+                                              fC3);
    fXBosonPtr->DebugPrint();
    if (!fWBosonPtr) fWBosonPtr = new GENPDTWBoson();
    fWBosonPtr->DebugPrint();
@@ -955,14 +949,12 @@ RSXBoson::RSXBoson(Double_t m,
                    Double_t c0,
                    Double_t c1,
                    Double_t c2,
-                   Double_t c3,
-                   Double_t c4)
+                   Double_t c3)
         : fLambda(lambda),
           fC0(c0),
           fC1(c1),
           fC2(c2),
-          fC3(c3),
-          fC4(c4)
+          fC3(c3)
 {
    fName    = TString("X");
    fPID     = 200000000;
@@ -999,7 +991,7 @@ void RSXBoson::Initialize()
    Double_t m1    = 0.;
    Double_t m2    = 0.;
    Double_t ident = 2.;
-   Double_t gam = GamToVV(m1, m2, fC4, cf)/ident;
+   Double_t gam = GamToVV(m1, m2, fC3, cf)/ident;
    if (gam > 0.) {
       dmp = new GENDecayMode(gam);
       dmp->Add(d1p);

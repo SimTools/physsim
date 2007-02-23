@@ -98,7 +98,6 @@ private:
   Double_t fC1;             // C_1
   Double_t fC2;             // C_2
   Double_t fC3;             // C_3
-  Double_t fC4;             // C_4
 
   Double_t fMass;           // m_x    : mass  of X
 
@@ -253,8 +252,7 @@ public:
 	    Double_t c0     = 0.,
 	    Double_t c1     = 1.,
 	    Double_t c2     = 1.,
-	    Double_t c3     = 1.,
-	    Double_t c4     = 1.);
+	    Double_t c3     = 1.);
    virtual ~RSXBoson() {}
 
 private:
@@ -267,7 +265,6 @@ private:
    Double_t fC1;
    Double_t fC2;
    Double_t fC3;
-   Double_t fC4;
 
    ClassDef(RSXBoson, 1)  // X boson class
 };
