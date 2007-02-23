@@ -315,7 +315,7 @@ RSZXBases::RSZXBases(const char *name, const char *title)
   ins >> fC3;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("RSAXBases.C4","1."));           // C_4
+  ins.str(gJSF->Env()->GetValue("RSZXBases.C4","1."));           // C_4
   ins >> fC4;
 
   ins.clear();
