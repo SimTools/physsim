@@ -19,6 +19,7 @@
 #include <iomanip>
 //#define __DEBUG__
 //#define __HIGGS__
+//#define __ZEROWIDTH__
 //#define __PHASESPACE__
 #ifdef __PHASESPACE__
 #define __NODECAY__
@@ -548,7 +549,12 @@ Double_t RSZXBases::Func()
   Double_t rs   = fEcmIP;
   Double_t qmin = m3 + m4;
   Double_t qmax = rs - fMass;
+#ifndef __ZEROWIDTH__
   fQ2Z = fZBosonPtr->GetQ2BW(qmin, qmax, fXQ2Z, weight);
+#else
+  fQ2Z = TMath::Power(fZBosonPtr->GetMass(),2);
+  weight = kPi*fZBosonPtr->GetMass()*fZBosonPtr->GetWidth();
+#endif
   bsWeight *= weight;
 
   // --------------------------------------------
