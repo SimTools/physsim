@@ -18,7 +18,7 @@
 #include <sstream>
 #include <iomanip>
 //#define __DEBUG__
-#define __HIGGS__
+//#define __HIGGS__
 //#define __ZEROWIDTH__
 //#define __PHASESPACE__
 #ifdef __PHASESPACE__
