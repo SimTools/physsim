@@ -14,6 +14,9 @@
 //*****************************************************************************
 
 #include "ANL4DVector.h"
+#if 1
+#include "TObjArray.h"
+#endif
 
 class GENPDTEntry;
 class GENPDTWBoson;
