@@ -556,8 +556,8 @@ Double_t RSZXBases::Func()
   //  Calcuate differential cross section
   // --------------------------------------------
 
-  GENBranch xbranch (fQ2X , fCosThetaA, fPhiA, m1, m2);
-  GENBranch zbranch (fQ2Z , fCosThetaF, fPhiF, m3, m4);
+  GENBranch xbranch (fQ2X , fCosThetaA, fPhiA, m1*m1, m2*m2);
+  GENBranch zbranch (fQ2Z , fCosThetaF, fPhiF, m3*m3, m4*m4);
   GENBranch cmbranch(fQ2ZX, fCosTheta , fPhi , &xbranch, &zbranch);
 
   Double_t sigma = DSigmaDX(cmbranch);
