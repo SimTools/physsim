@@ -12,17 +12,19 @@
 //	22 Nov 1999	A.L.C. Sanchez	*Modified for testing ZH4JAnalysis
 //***************************************************************************
 
-Int_t maxnevt = 2000;
+Int_t maxnevt = 200000;
 Int_t freq = 10;
 
 Char_t *utils_so = "libS4Utils.so";
 Char_t *anlib_so = "libAnlib.so";
 Char_t *jsfanlib_so = "libJSFAnlib.so";
-Char_t *zhspr_so = "../../../../../higgs/ZHStudy/prod/ZHSpring.so";
+Char_t *zhspr_so = "../../../../../higgs/ZHStudy++/prod/ZHSpring.so";
+//Char_t *zhspr_so = "../../../../../higgs/ZHStudy/prod/ZHSpring.so";
 Char_t *procanl_so = "libZH4JAnalysis.so";
 
 Char_t *outputfile = "jsf.root";	// A file to output histograms
-Char_t *inputfile = "../../../../../higgs/ZHStudy/prod/zhsim.root";	// Input simulator file
+Char_t *inputfile = "../../../../../higgs/ZHStudy++/prod/zhsim.root";	// Input simulator file
+//Char_t *inputfile = "../../../../../higgs/ZHStudy/prod/zhsim.root";	// Input simulator file
 
 
 int anlzh4j()
@@ -59,11 +61,11 @@ int anlzh4j()
   // Adjust Cut.
 
   myanl->SetEvisCut(0.);	// minimum Evis
-  myanl->SetPtCut(0.);		// minimum Pt
+  myanl->SetPtCut(999.);	// minimum Pt
   myanl->SetPlCut(999.);	// maximum Pl
-  myanl->SetCosjetCut(0.8);	
+  myanl->SetCosjetCut(0.99);	
   myanl->SetMinYcut(0.004);
-  myanl->SetM2jCut(15.);
+  myanl->SetM2jCut(24.);
   myanl->SetAcopCut(180.);
 
   jsf->BeginRun(1);				// Set run number to 1.

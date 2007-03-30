@@ -22,6 +22,9 @@
 //***************************************************************************
 
 #include "ZH4JAnalysis.h"
+#include "ANLVTXTagger.h"
+#include "TNtupleD.h"
+#include <sstream>
 
 static const Double_t kMassH   = 120.0; // H mass
 static const Double_t kMassZ   = 91.19;	// Z mass
@@ -118,16 +121,16 @@ Bool_t ZH4JAnalysis::Initialize()
   hMassz      = new TH1F("hMassz","M_Z Distribution",  50,   0.0,  300.0);
 
   xNtracks  =     25;	// No. of Tracks
-  xEtrack   =   0.10;	// track energy
+  xEtrack   =   0.05;	// track energy
   xEvis     = 100.00;	// Minimum visible energy
-  xPt       =  10.00;	// Pt minimum
+  xPt       = 999.00;	// Pt maximum
   xPl       = 999.00;	// Pl maximum
   xYcut     =  0.004;	// y_cut to force the event to 4 jets
   xNjets    =      4;	// No. of Jets
   xEjet     =   5.00;	// E_jet minimum
   xCosjet   =   0.99;	// |cos(theta_j)| maximum
   xCoszh    =   0.99;	// |cos(theta_Z)| and |cos(theta_H)| maximum
-  xM2j      =  18.00;	// |m_jj-m_S| maximum , S = Z,H
+  xM2j      =  36.00;	// |m_jj-m_S| maximum , S = Z,H
   xAcop     =  30.00;	// Acoplanarity maximum
 
   last->cd();
@@ -247,7 +250,7 @@ Bool_t ZH4JAnalysis::Process(Int_t ev)
   // Cut on Pt.
   
   hPt->Fill(fPt);
-  if ( fPt < xPt ) { CleanUp(&tracks); return kFALSE; }
+  if ( fPt > xPt ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg," Pt <= %g",xPt);
@@ -336,6 +339,8 @@ Bool_t ZH4JAnalysis::Process(Int_t ev)
   }
 
   // Find ZH candidates in given mass window.
+
+  ANLVTXTagger btag(3,3);
   
   TObjArray solutions(10);
   ANLPairCombiner zcandidates(jets,jets);
@@ -350,6 +355,7 @@ Bool_t ZH4JAnalysis::Process(Int_t ev)
     while ( (hp = (ANLPair*)hcandidates()) ) {
       ANLPair &h = *hp;
       if (h.IsLocked()) continue;
+      if (!btag(*(ANLJet *)h[0]) || !btag(*(ANLJet *)h[1])) continue;
       Double_t hmass = h().GetMass();
       if (TMath::Abs(hmass - kMassH) > xM2j) continue;
       if (gDEBUG) {
@@ -465,18 +471,118 @@ Bool_t ZH4JAnalysis::Process(Int_t ev)
   hNsols->Fill(solutions.GetEntries());
   hEvisPl->Fill(fEvis,fPl,1.);
 
+  static TNtupleD *tupp = 0;
+  if (!tupp) {
+    stringstream tupstr;
+    tupstr << "ntracks:evis:pt:pl:ycut:chi2"                            << ":"
+           << "npb1:eb1:pb1x:pb1y:pb1z:npb2:eb2:pb2x:pb2y:pb2z"         << ":"
+           << "npj1:ej1:pj1x:pj1y:pj1z:npj2:ej2:pj2x:pj2y:pj2z"         << ":"
+           << "zmass:hmass:acop"                                        << ":"
+           << "cosb1h:phib1h:cosb2h:phib2h:cosj1h:phij1h:cosj2h:phij2h" << ends;
+
+    tupp = new TNtupleD("hEvt","ZHAnalysis",tupstr.str().data());
+  }
+  Double_t data[100];
+ 
   nextsol.Reset();
   Int_t nsols = 0;
   while ( (sol = (ANLPair*)nextsol()) ) {
     if ( nsols++ ) break;
-    ANLPair &z = *(ANLPair*)(*sol)[0];
-    ANLPair &h = *(ANLPair*)(*sol)[1];
+    ANLPair &z  = *(ANLPair*)(*sol)[0];
+    ANLJet  &j1 = *static_cast<ANLJet  *>(z[0]);
+    ANLJet  &j2 = *static_cast<ANLJet  *>(z[1]);
+    ANLPair &h  = *(ANLPair*)(*sol)[1];
+    ANLJet  &b1 = *static_cast<ANLJet  *>(h[0]);
+    ANLJet  &b2 = *static_cast<ANLJet  *>(h[1]);
+
     Double_t chi2   = sol->GetQuality();
     Double_t zmass = z.GetMass();
     hMassz->Fill(zmass);
     Double_t hmass = h.GetMass();
     hMassh->Fill(hmass);
     hChi2->Fill(chi2);
+    //--
+    // Calculate helicity angles.
+    //--
+    TVector3    ez    = TVector3(0., 0., 1.);
+    TVector3    ehz   = h.Vect().Unit();
+    TVector3    ehx   = ehz.Cross(ez).Unit();
+    TVector3    ehy   = ehz.Cross(ehx);
+
+    TVector3    bsth  = TVector3(0., 0., h.Vect().Mag()/h.E());
+    ANL4DVector k1h   = ANL4DVector(b1.E(), b1.Vect()*ehx,
+                                            b1.Vect()*ehy,
+                                            b1.Vect()*ehz);
+    k1h.Boost(-bsth);
+    Double_t    csb1h = k1h.CosTheta();
+    Double_t    fib1h = k1h.Phi();
+
+    ANL4DVector k2h   = ANL4DVector(b2.E(), b2.Vect()*ehx,
+                                            b2.Vect()*ehy,
+                                            b2.Vect()*ehz);
+    k2h.Boost(-bsth);
+    Double_t    csb2h = k2h.CosTheta();
+    Double_t    fib2h = k2h.Phi();
+
+    TVector3    ezz   = z.Vect().Unit();
+    TVector3    ezx   = ezz.Cross(ez).Unit();
+    TVector3    ezy   = ezz.Cross(ezx);
+    TVector3    bstz  = TVector3(0., 0., z.Vect().Mag()/z.E());
+    ANL4DVector p1h   = ANL4DVector(j1.E(), j1.Vect()*ezx,
+                                            j1.Vect()*ezy,
+                                            j1.Vect()*ezz);
+    p1h.Boost(-bstz);
+    Double_t    csj1h = p1h.CosTheta();
+    Double_t    fij1h = p1h.Phi();
+
+    ANL4DVector p2h   = ANL4DVector(j2.E(), j2.Vect()*ezx,
+                                            j2.Vect()*ezy,
+                                            j2.Vect()*ezz);
+    p2h.Boost(-bstz);
+    Double_t    csj2h = p2h.CosTheta();
+    Double_t    fij2h = p2h.Phi();
+
+    //--
+    // Fill up Ntuple.
+    //--
+    data[ 0] = fNtracks;
+    data[ 1] = fEvis;
+    data[ 2] = fPt;
+    data[ 3] = fPl;
+    data[ 4] = fYcut;
+    data[ 5] = sol->GetQuality();
+    data[ 6] = b1.GetNparticles();
+    data[ 7] = b1()(0);
+    data[ 8] = b1()(1);
+    data[ 9] = b1()(2);
+    data[10] = b1()(3);
+    data[11] = b2.GetNparticles();
+    data[12] = b2()(0);
+    data[13] = b2()(1);
+    data[14] = b2()(2);
+    data[15] = b2()(3);
+    data[16] = j1.GetNparticles();
+    data[17] = j1()(0);
+    data[18] = j1()(1);
+    data[19] = j1()(2);
+    data[20] = j1()(3);
+    data[21] = j2.GetNparticles();
+    data[22] = j2()(0);
+    data[23] = j2()(1);
+    data[24] = j2()(2);
+    data[25] = j2()(3);
+    data[26] = z().GetMass();
+    data[27] = h().GetMass();
+    data[28] = z.Acop(h);
+    data[29] = csb1h;
+    data[30] = fib1h;
+    data[31] = csb2h;
+    data[32] = fib2h;
+    data[33] = csj1h;
+    data[34] = fij1h;
+    data[35] = csj2h;
+    data[36] = fij2h;
+    tupp->Fill(data);
   }
 
   // Clean up
