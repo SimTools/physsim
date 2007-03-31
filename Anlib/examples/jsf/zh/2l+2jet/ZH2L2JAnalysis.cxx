@@ -102,7 +102,7 @@ Bool_t ZH2L2JAnalysis::Initialize()
   hNtracks    = new TH1F("hNtracks","No. of Tracks" ,  50,   0.0,  100.0);
   hEvis       = new TH1F("hEvis","Visible Energy"   ,  50,   0.0,  500.0);
   hPt         = new TH1F("hPt","Missing Pt"         ,  50,   0.0,  250.0);
-  hNlptracks    = new TH1F("hNlptracks","No.lp trks", 10,   0.0,  10.0);
+  hNlptracks  = new TH1F("hNlptracks","No.lp trks"  ,  10,   0.0,   10.0);
   hNjets      = new TH1F("hNjets","No. of Jets"     ,  20,   0.0,   20.0);
   hEjet       = new TH1F("hEjet","Jet Energy"       ,  50,   0.0,  200.0);
   hCosjet     = new TH1F("hCosjet","cos(theta_j)"   ,  50,  -1.0,   +1.0);
@@ -119,13 +119,13 @@ Bool_t ZH2L2JAnalysis::Initialize()
   hMassz      = new TH1F("hMassz","M_Z Distribution", 240,  60.0,  120.0);
 
   xNtracks  =     25;	// No. of Tracks
-  xEtrack   =   0.10;	// track energy
-  xEvis     = 100.00;	// Minimum visible energy
-  xPt       =  10.00;	// Pt minimum
+  xEtrack   =   0.05;	// track energy
+  xEvis     =  50.00;	// Minimum visible energy
+  xPt       = 999.00;	// Pt maximum
   xPl       = 999.00;	// Pl maximum
   xElepton  =  10.00;   // Elepton mimimum
   xCosCone  =   0.94;   // cos(theta_cone)
-  xEcone    =  10.00;   // Ecome maximum
+  xEcone    =   2.00;   // Ecome maximum
   xYcut     =  0.004;	// y_cut to force the event to 4 jets
   xNjets    =      2;	// No. of Jets
   xEjet     =   5.00;	// E_jet minimum
@@ -252,7 +252,7 @@ Bool_t ZH2L2JAnalysis::Process(Int_t ev)
   // Cut on Pt.
   
   hPt->Fill(fPt);
-  if ( fPt < xPt ) { CleanUp(&tracks); return kFALSE; }
+  if ( fPt > xPt ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if ( Ngoods == 0 ) {
     sprintf(msg," Pt <= %g",xPt);
@@ -379,13 +379,13 @@ Bool_t ZH2L2JAnalysis::Process(Int_t ev)
   // Find ZH candidates in given mass window.
   
   TObjArray solutions(10);
-  ANLPairCombiner zcandidates(jets,jets);
+  ANLPairCombiner zcandidates(lptracks,lptracks);
   ANLPair *hp, *zp;
   while ( (zp = (ANLPair*)zcandidates()) ) {
     ANLPair &z = *zp;
     Double_t zmass = z().GetMass();
     if (TMath::Abs(zmass - kMassZ) > xM2j) continue;
-    ANLPairCombiner hcandidates(lptracks,lptracks);
+    ANLPairCombiner hcandidates(jets,jets);
     while ( (hp = (ANLPair*)hcandidates()) ) {
       ANLPair &h = *hp;
       if (h.IsLocked()) continue;

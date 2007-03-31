@@ -60,7 +60,7 @@ int anlzh4jbg()
 
   myanl->SetNtrackCut(3);
   myanl->SetEvisCut(0.);	// minimum Evis
-  myanl->SetPtCut(0.);		// minimum Pt
+  myanl->SetPtCut(999.);	// minimum Pt
   myanl->SetPlCut(999.);	// maximum Pl
   myanl->SetCosjetCut(0.99);	
   myanl->SetMinYcut(0.004);
