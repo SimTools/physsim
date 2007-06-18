@@ -44,6 +44,7 @@ public:
   //  Getters and Setters
   // ----------------------
   Double_t GetMass     ()           const { return fMass;      }
+  Double_t GetMassA    ()           const { return fMassA;     }
   Double_t GetEcmInit  ()           const { return fEcmInit;   }
 
   Double_t GetQ2ZH     ()           const { return fQ2ZH;      }
@@ -56,10 +57,13 @@ public:
   Double_t GetEcmIP    ()           const { return fEcmIP;     }
 
   void     SetMass     (Double_t m      ) { fMass    = m;      }
+  void     SetMassA    (Double_t m      ) { fMassA   = m;      }
   void     SetEcmInit  (Double_t ecm    ) { fEcmInit = ecm;    }
   void     SetISR      (Bool_t b = kTRUE) { fISR     = b;      }
   void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr = b;      }
   void     SetPole     (Double_t p      ) { fPole    = p;      }
+
+  static void EnableHtoAA(Bool_t b = kTRUE) { fgEnableHtoAA = b; }
 
   // ----------------------
   //   Base class methods
@@ -91,6 +95,7 @@ private:
   //  Job parameters
   // ----------------
   Double_t fMass;           // m_h    : mass  of H
+  Double_t fMassA;          // m_A    : mass  of A
 
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?
@@ -146,6 +151,8 @@ private:
 
   TFile   *fBeamFile;         //! Beamstrahlung data file
   JSFBeamGenerationCain *fBM; //! Beamstrahlung data
+
+  static Bool_t  fgEnableHtoAA;    //! H --> AA decay
 
   ClassDef(ZHBases, 1) // Bases for e+e- -> XX process
 };

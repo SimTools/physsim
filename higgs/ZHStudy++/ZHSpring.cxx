@@ -14,6 +14,8 @@
 #include "JSFSteer.h"
 #include "ZHSpring.h"
 
+#include "TRandom.h"
+
 #include <sstream>
 #include <iomanip>
 //#define __DEBUG__
@@ -31,6 +33,8 @@
 ClassImp(ZHSpring)
 ClassImp(ZHSpringBuf)
 ClassImp(ZHBases)
+
+Bool_t ZHBases::fgEnableHtoAA = kFALSE;
 
 //-----------------------------------------------------------------------------
 // ==============================
@@ -80,12 +84,44 @@ Bool_t ZHSpringBuf::SetPartons()
   // ----------------------------------------------
   //  Set 4-momenta of final state particles in CM
   // ----------------------------------------------
-  const Int_t kNparton = 4;
-  ANL4DVector pv[kNparton];
+  if (!ZHBases::fgEnableHtoAA) {
+    fNparton = 4;
+  } else {
+    fNparton = 10;
+  }
+
+  static ANL4DVector *pv = 0;
+  if (!pv) {
+    pv = new ANL4DVector [fNparton];
+  }
   pv[0] = bases->fP[0];
   pv[2] = bases->fP[1];
   pv[3] = bases->fP[2];
   pv[1] = pv[2] + pv[3];
+
+  if (ZHBases::fgEnableHtoAA) {
+    GENFrame    cmframe;
+    Double_t cosp = gRandom->Uniform(-1.,+1.);
+    Double_t phip = gRandom->Uniform(0.,2.*TMath::Pi());
+    Double_t mp   = bases->GetMassA();
+    Double_t m52  = mp*mp;
+    Double_t m62  = m52;
+    GENPhase2 phaseH(pv[0], m52, m62, cmframe, cosp, phip, 1);
+    pv[4] = phaseH.GetFourMomentum(0);
+    pv[5] = phaseH.GetFourMomentum(1);
+
+    Double_t cosa = gRandom->Uniform(-1.,+1.);
+    Double_t phia = gRandom->Uniform(0.,2.*TMath::Pi());
+    GENPhase2 phaseP1(pv[4], 0., 0., phaseH.GetFrame(), cosa, phia, 1);
+    pv[6] = phaseP1.GetFourMomentum(0);
+    pv[7] = phaseP1.GetFourMomentum(1);
+
+    cosa = gRandom->Uniform(-1.,+1.);
+    phia = gRandom->Uniform(0.,2.*TMath::Pi());
+    GENPhase2 phaseP2(pv[5], 0., 0., phaseH.GetFrame(), cosa, phia, 1);
+    pv[8] = phaseP2.GetFourMomentum(0);
+    pv[9] = phaseP2.GetFourMomentum(1);
+  }
 
   // ----------------------------------------------
   //  Boost them to lab. frame
@@ -101,20 +137,20 @@ Bool_t ZHSpringBuf::SetPartons()
   fPhiF         = bases->GetPhiF();
   Double_t elab = TMath::Sqrt(fEcmIP*fEcmIP + fZBoost*fZBoost);
   TVector3 boostv(0.,0.,fZBoost/elab);
-  for (Int_t i=0; i<kNparton; i++) pv[i].Boost(boostv);
+
+  for (Int_t i=0; i<fNparton; i++) pv[i].Boost(boostv);
 
   // ----------------------------------------------
   //  Set final state parton infomation
   // ----------------------------------------------
 
-  fNparton = kNparton;
 
   static TVector **qp = 0;
   if (!qp) {
-    qp = new TVector* [kNparton];
-    for (Int_t i=0; i<kNparton; i++) qp[i] = new TVector(4);
+    qp = new TVector* [fNparton];
+    for (Int_t i=0; i<fNparton; i++) qp[i] = new TVector(4);
   }
-  for (Int_t i=0; i<kNparton; i++) {
+  for (Int_t i=0; i<fNparton; i++) {
     TVector &q = *qp[i];
     q(0) = pv[i].E ();
     q(1) = pv[i].Px();
@@ -123,6 +159,8 @@ Bool_t ZHSpringBuf::SetPartons()
   }
   Int_t    idh     = 25;                          // PDG code for H
   Int_t    idz     = 23;                          // PDG code for Z
+  Int_t    idp     = 36;                          // PDG code for A
+  Int_t    ida     = 22;                          // PDG code for photon
   Int_t    idf     = bases->f3Ptr->GetPID   ();   // PDG code for f
   Double_t chrg    = bases->f3Ptr->GetCharge();   // F charge
   Double_t m3      = bases->f3Ptr->GetMass  ();   // F mass
@@ -133,6 +171,7 @@ Bool_t ZHSpringBuf::SetPartons()
   Double_t rq2z    = pv[1].Mag();
 
   Double_t mass    = bases->GetMass();
+  Double_t pmass   = bases->GetMassA();
 #if 0
 //#ifdef __DEBUG__
   cerr << " -------------------------- " << endl;
@@ -146,12 +185,12 @@ Bool_t ZHSpringBuf::SetPartons()
                   << (*qp[1])(1) << ", "
                   << (*qp[1])(2) << ", "
                   << (*qp[1])(3) << ") " << endl;
-  cerr << " 3 pid=" << ida << " m=" << 0. << " Q=" << 0.
+  cerr << " 3 pid=" << idf << " m=" << m3 << " Q=" << 0.
        << " pv=(" << (*qp[2])(0) << ", "
                   << (*qp[2])(1) << ", "
                   << (*qp[2])(2) << ", "
                   << (*qp[2])(3) << ") " << endl;
-  cerr << " 4 pid=" << ida << " m=" << 0. << " Q=" << 0.
+  cerr << " 4 pid=" << idf << " m=" << m4 << " Q=" << 0.
        << " pv=(" << (*qp[3])(0) << ", "
                   << (*qp[3])(1) << ", "
                   << (*qp[3])(2) << ", "
@@ -174,11 +213,25 @@ Bool_t ZHSpringBuf::SetPartons()
                    << qcm[3] << ") " << endl;
 #endif
 
-  //                              No. PID  Mass  Charge   pv   Nd 1st Mom hel col shower
-  new (partons[0]) JSFSpringParton(1, idh, mass,    0., *qp[0], 0, 0,  0, 0,   0,     0);
-  new (partons[1]) JSFSpringParton(2, idz, rq2z,    0., *qp[1], 2, 3,  0, 0,   0,     0);
-  new (partons[2]) JSFSpringParton(3, idf,   m3,  chrg, *qp[2], 0, 0,  2, 0, icf, islev);
-  new (partons[3]) JSFSpringParton(4,-idf,   m4, -chrg, *qp[3], 0, 0,  2, 0, icf, islev);
+  if (!ZHBases::fgEnableHtoAA) {
+  //                                No. PID  Mass  Charge   pv   Nd 1st Mom hel col shower
+    new (partons[0]) JSFSpringParton(1, idh, mass,    0., *qp[0], 0, 0,  0, 0,   0,     0);
+    new (partons[1]) JSFSpringParton(2, idz, rq2z,    0., *qp[1], 2, 3,  0, 0,   0,     0);
+    new (partons[2]) JSFSpringParton(3, idf,   m3,  chrg, *qp[2], 0, 0,  2, 0, icf, islev);
+    new (partons[3]) JSFSpringParton(4,-idf,   m4, -chrg, *qp[3], 0, 0,  2, 0, icf, islev);
+  } else {
+  //                                 No. PID  Mass  Charge   pv   Nd 1st Mom hel col shower
+    new (partons[0]) JSFSpringParton( 1, idh, mass,    0., *qp[0], 2, 5,  0, 0,   0,     0);
+    new (partons[1]) JSFSpringParton( 2, idz, rq2z,    0., *qp[1], 2, 3,  0, 0,   0,     0);
+    new (partons[2]) JSFSpringParton( 3, idf,   m3,  chrg, *qp[2], 0, 0,  2, 0, icf, islev);
+    new (partons[3]) JSFSpringParton( 4,-idf,   m4, -chrg, *qp[3], 0, 0,  2, 0, icf, islev);
+    new (partons[4]) JSFSpringParton( 5, idp,pmass,    0., *qp[4], 2, 7,  1, 0,   0,     0);
+    new (partons[5]) JSFSpringParton( 6, idp,pmass,    0., *qp[5], 2, 9,  1, 0,   0,     0);
+    new (partons[6]) JSFSpringParton( 7, ida,   0.,    0., *qp[6], 0, 0,  5, 0,   0,     0);
+    new (partons[7]) JSFSpringParton( 8, ida,   0.,    0., *qp[7], 0, 0,  5, 0,   0,     0);
+    new (partons[8]) JSFSpringParton( 9, ida,   0.,    0., *qp[8], 0, 0,  6, 0,   0,     0);
+    new (partons[9]) JSFSpringParton(10, ida,   0.,    0., *qp[9], 0, 0,  6, 0,   0,     0);
+  }
   return kTRUE ;
 }
 
@@ -244,6 +297,16 @@ ZHBases::ZHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHBases.MassH","120.")); 	 // M_x [GeV]
   ins >> fMass;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHBases.MassA","0.2")); 	 // M_A [GeV]
+  ins >> fMassA;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHBases.EnableHtoAA","0")); 	 // H --> AA
+  Int_t HtoAA;
+  ins >> HtoAA;
+  if (HtoAA) fgEnableHtoAA = kTRUE;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHBases.Ecm","1000."));       // E_cm (1TeV)
