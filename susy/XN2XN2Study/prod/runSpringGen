@@ -1,0 +1,8 @@
+#!/bin/bash
+# Run Spring and Hadronizer 
+# 
+
+jsf -b -q -conf=jsf.conf --maxevt=100000 \
+   --OutputFile=xn2xn2Spring500GeV_100k.root \
+   gui.C 
+

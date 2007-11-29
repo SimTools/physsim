@@ -2,9 +2,9 @@
 // Macro example for bases calculation.
 
   gROOT->Reset();
-  TFile file("bases.root","RECREATE");
 
   jsf = new JSFSteer();    // required to read parameter from jsf.conf
+  TFile file(jsf->Env()->GetValue("JSFGUI.Spring.BasesFile","bases.root"),"RECREATE");
 
   bases = new XN2XN2Bases();
 

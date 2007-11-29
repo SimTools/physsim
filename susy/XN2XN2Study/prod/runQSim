@@ -1,0 +1,12 @@
+#!/bin/bash
+# Run Spring and Hadronizer 
+# 
+
+jsf -b -q -conf=jsf.conf --maxevt=100 \
+   --simtype=1 \
+   --runmode=0 \
+   --macro=QSimUserAnalysis.C \
+   --InputFile=xn2xn2Spring500GeV_100k.root \
+   --OutputFile=jsf.root \
+   gui.C 
+
