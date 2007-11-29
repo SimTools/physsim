@@ -1,0 +1,10 @@
+#!/bin/bash
+
+. ~/soft/MyRelease/071123/setup.bash
+
+which $JSFROOT
+pwd
+
+jsf -b -q bases.C
+
+
