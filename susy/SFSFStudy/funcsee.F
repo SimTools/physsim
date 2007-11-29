@@ -129,8 +129,12 @@ C  First decide e- and e+ energy.
 C--
       IF ( ISRBM.EQ.3 ) THEN
          EBM = ROOTS/2
-         CALL PROBEB(REAL(Z(13)),REAL(Z(1)),EBM,EMBM,EMBM0,PEM)
-         CALL PROBEB(REAL(Z(14)),REAL(Z(2)),EBM,EPBM,EPBM0,PEP)
+cc         CALL PROBEB(REAL(Z(13)),REAL(Z(1)),EBM,EMBM,EMBM0,PEM)
+cc         CALL PROBEB(REAL(Z(14)),REAL(Z(2)),EBM,EPBM,EPBM0,PEP)
+
+         call jsfbeamgenr(z(13), z(14), z(1), z(2), ebm, 
+     >      embm, epbm, embm0, epbm0, dpdebm)
+
          RS  = 2*SQRT(EMBM*EPBM)
          IF ( RS.LT.5. ) THEN
             FUNC = 0
@@ -141,7 +145,7 @@ C--
          BMENGY(2) = EPBM0
          BMENGY(3) = EMBM
          BMENGY(4) = EPBM
-         DPDEBM    = PEM*PEP
+c         DPDEBM    = PEM*PEP
       ENDIF
 C--
 C  Then decide reduced sqrt(s) after bremsstrahlung.
