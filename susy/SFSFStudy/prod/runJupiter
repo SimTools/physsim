@@ -1,0 +1,13 @@
+#!/bin/bash
+# Run Jupiter
+# 
+
+jsf -b -q -conf=jsf.conf --maxevt=50 \
+   --simtype=3 \
+   --runmode=0 \
+   --macro=J4UserAnalysis.C \
+   --1stevt=5500 \
+   --InputFile=smuonSpring500GeV_100k.root \
+   --OutputFile=jsfj4.root \
+   gui.C 
+

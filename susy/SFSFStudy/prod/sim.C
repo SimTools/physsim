@@ -18,7 +18,8 @@
 //  sim->SetMakeBranch(kFALSE);    // suppress output of EventBuf
 
 //  Int_t maxevt=132000;      // Number of events.
-  Int_t maxevt=10;      // Number of events.
+//  Int_t maxevt=10;      // Number of events.
+  Int_t maxevt=10000;      // Number of events.
   jsf->Initialize();
 
   jsf->BeginRun(30);      // Set run number to 30.
