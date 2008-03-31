@@ -85,7 +85,7 @@ C      ( 4) : e- helicity
 C      ( 5) : helicity combination for final states.
 C      ( 6) : m(t-bar)**2
 C      ( 7) : m(t)**2
-C      ( 8) : m(J)**2
+C      ( 8) : m(H)**2
 C      ( 9) : m(t-t_bar)**2
 C      (10) : m(W-)**2
 C      (11) : m(W+)**2
@@ -288,9 +288,13 @@ C-- t.
       Q4    = SQRT(Q42)
       WAT   = WAT*(TH4MX-TH4MN)*( (Q42-AMT2)**2 + AMGT2 )/AMGT
 #ifdef DEBUG
-       print *, '--Z'
+       print *, '--H'
 #endif
 C-- H.
+#ifdef NO_H_DECAY
+      Q52   = AMH2
+      WAT   = WAT*(8*xPI)
+#else
       Q5MN  = AM9 + AM10 + EPSL
       Q5MX  = MAX( RS - (Q3+Q4) - EPSL, Q5MN )
       TH5MN = ATAN((Q5MN-AMH)*(Q5MN+AMH)/AMGH)
@@ -299,6 +303,7 @@ C-- H.
       Q52   = AMGH*TAN(TH5) + AMH2
       Q5    = SQRT(Q52)
       WAT   = WAT*(TH5MX-TH5MN)*( (Q52-AMH2)**2 + AMGH2 )/AMGH
+#endif
 #ifdef DEBUG
        print *, '--ttbar'
 #endif
@@ -347,7 +352,7 @@ C--
      .            *(xPI*AMT*GMT)**2
      .            *(xPI*AMW*GMW)**2
      .            *(xPI*AMH*GMH)
-#endif ZEROWIDTH
+#endif
 C--
       XPHASE(1,1) = RS*RS
       XPHASE(1,2) = Q62

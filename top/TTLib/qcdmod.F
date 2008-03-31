@@ -26,6 +26,9 @@ C*                            in the range 2*mt-12 to 2*mt+5,
 C*                            though parameters are not allowed to
 C*                            change in the job.
 C*   92/10/27  K.Fujii        QCD hard gluon correction added.
+C*   07/11/08  A.Ishikawa     Allowed sqrt(s) is changed to 
+C*                            2*mt-20 to 2*mt+40GeV for ttH.
+C*                            Set FQCD=1 for sqrt(s)>2*mt+40GeV.
 C*
 CC**********************************************************************
  
@@ -35,11 +38,11 @@ CC**********************************************************************
       REAL*4      ALFS, AMT, GMT, AMH, BTH, RS, Q12, Q22
       COMPLEX*8   FQCD
 C--
-      PARAMETER    ( NE = 100, NQ = 500 )
+      PARAMETER    ( NE = 200, NQ = 500 )
       INTEGER*4    NBN(3)
-      DATA NBN     /   5, 35, 50 /
+      DATA NBN     /   13, 35, 200 /
       REAL   *8    ERGN(0:3), DERGN(3), DQRGN(0:NE,3)
-      DATA ERGN    / -12.D0, -7.D0, 0.D0, 10.D0 /
+      DATA ERGN    / -20.D0, -7.D0, 0.D0, 40.D0 /
       COMPLEX*16   GQ, GQL, GQH, GQDAT(0:NQ,0:NE,3)
       DATA NCALL   /0/
 C--
@@ -117,9 +120,13 @@ C--
          FQCD = 0
          RETURN
       ELSE IF ( E.GT.ERGN(3) ) THEN
-         PRINT *, '>>>>> Error in QCDMOD >>>>>>>>'
-         PRINT *, '   RS = ', RS, ' is too large!'
-         STOP
+C         PRINT *, '>>>>> Error in QCDMOD >>>>>>>>'
+C         PRINT *, '   RS = ', RS, ' is too large!'
+C         STOP
+
+C     no QCD correction for large E
+         FQCD = 1
+         RETURN
       ELSE IF ( E.LE.ERGN(1) ) THEN
          IRGN = 1
       ELSE IF ( E.LE.ERGN(2) ) THEN

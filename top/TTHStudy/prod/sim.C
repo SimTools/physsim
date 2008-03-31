@@ -6,7 +6,8 @@
   full   = new JSFLCFULL();
  
   spring = new TTHSpring();
-  spring->ReadBases("bases.root");
+  char *bsfile = jsf->Env()->GetValue("JSFGUI.Spring.BasesFile","bases.root");
+  spring->ReadBases(bsfile);
  
   printf(" Roots is %g\n",((TTHBases*)spring->GetBases())->GetRoots());
 
@@ -17,7 +18,8 @@
 //  hdr->SetMakeBranch(kFALSE);    // suppress output of EventBuf 
 //  sim->SetMakeBranch(kFALSE);    // suppress output of EventBuf
 
-  Int_t maxevt=2000;      // Number of events.
+//  Int_t maxevt=2000;      // Number of events.
+  Int_t maxevt=200;      // Number of events.
   jsf->Initialize();
 
   jsf->BeginRun(30);      // Set run number to 30.

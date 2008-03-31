@@ -33,8 +33,35 @@ void UserAnalysis()
   // Any data processing of the event can be performed in this function.
   // 
 
-  JSFSIMDSTBuf *sdb=(JSFSIMDSTBuf*)simdst->EventBuf();
+#if 1
+  JSFSpring    *sp =(JSFSpring*)jsf->FindModule("TTHSpring");
+  JSFSpringBuf *spb=(JSFSpringBuf*)sp->EventBuf();
+  Int_t nsps = spb->GetNpartons();
+  cerr << " --- Npartons = " << nsps << " -------- " << endl;
+  ANL4DVector pcm;
+  TClonesArray *partons = spb->GetPartons();
+  TIter next(partons);
+  JSFSpringParton *parton;
+  while ((parton = (JSFSpringParton *)next())) {
+    cerr << parton->GetSerial() << " "
+         << " PID=" << parton->GetID()
+         << " Q="   << parton->GetCharge()
+         << " M="   << parton->GetMass()
+         << " M="   << parton->GetColorID()
+         << " M="   << parton->GetShowerInfo()
+	 << " p=("  << parton->GetE() << ","
+	            << parton->GetPx() << ","
+	            << parton->GetPy() << ","
+	            << parton->GetPz() << ")" << endl;
+    if (parton->GetNDaughter()) continue;
+    pcm += ANL4DVector(parton->GetPV());
+  }
+  cerr << " SpringParton : ";
+  pcm.DebugPrint();
+#endif
 
+
+  JSFSIMDSTBuf *sdb=(JSFSIMDSTBuf*)simdst->EventBuf();
   //  Accumulate information in the histogram
   hNCDC->Fill((Float_t)sdb->GetNCDCTracks());
   hNVTX->Fill((Float_t)sdb->GetNVTXHits());
@@ -43,17 +70,29 @@ void UserAnalysis()
   /*
   **  If these comments are removed, generator particle information
   **  are printed.
+  */
+  ANL4DVector qcm;
+#if 1
   printf(" # Generator Particle is %d\n",sdb->GetNGeneratorParticles());
   TClonesArray *gen=sdb->GetGeneratorParticles();
   for(Int_t i=0;i<sdb->GetNGeneratorParticles();i++){
     JSFGeneratorParticle *g=gen->UncheckedAt(i);
     Int_t ndau=g->GetNDaughter();
-    if( ndau != 0 ) continue;
-    // printf(" ndau=%d\n",ndau);
+#if 1
     g->ls();
+#endif
+    if( ndau != 0 ) continue;
+    Int_t da1 = g->GetFirstDaughter();
+    //if (da1) continue;
+    // printf(" ndau=%d\n",ndau);
+    qcm += ANL4DVector(g->GetPV());
+#if 0
+    g->ls();
+#endif
   }
-  */
-
+  cerr << " GeneratorParticle : ";
+  qcm.DebugPrint();
+#endif
 }
 
 //_________________________________________________________

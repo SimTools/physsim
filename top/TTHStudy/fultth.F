@@ -31,6 +31,8 @@ C* (Relation)
 C*    Invokes AMPTTH and subroutines in HELAS.LOAD.
 C* (Update Record)
 C*    95/03/28  K.Fujii         Original version.
+C*    07/11/07  K.Fujii         Allow no Higgs decay
+C*    07/11/08  A.Ishikawa      Allow ttbar threshold enhancement
 C*				
 CC**********************************************************************
  
@@ -46,7 +48,9 @@ C--
       REAL   *4  GZH
       COMPLEX*8  GTH(2), GFH(2)
 C--     
-      COMPLEX*8  SPINOR(6,12), WVCT(6,2), HIGG(3), AMP(0:2)
+      REAL   *4  QV(0:3,3)
+      REAL   *4  QVH(0:3)
+      COMPLEX*8  SPINOR(6,12), WVCT(6,2), HIGG(3), AMP(0:2), FQCD, PQCD
       INTEGER*4  NF(10,2)
       DATA  NF  / +1, -1,   -1, -1, +1,   +1, +1, -1,   -1, +1,
      .            +1, -1,   +1, +1, -1,   -1, -1, +1,   +1, -1 /
@@ -101,12 +105,45 @@ C--
 C--
 C  Prepare wave function for H_SM.
 C--
+#ifdef NO_H_DECAY
+      CALL PSUMXX(PV(0,9),PV(0,10),QVH)
+      CALL SXXXXX(QVH,1,HIGG)
+#else
       CALL HIOXXX(SPINOR(1,9),SPINOR(1,10),GFH,AMSH,GAMH,HIGG)
+#endif
 C--
 C  Prepare spinors for t-bar and t.
 C--
       CALL FVIXXX(SPINOR(1,3),WVCT(1,1),GWF,AMST,GAMT,SPINOR(1,11))
       CALL FVOXXX(SPINOR(1,6),WVCT(1,2),GWF,AMST,GAMT,SPINOR(1,12))
+C--
+C  Calculate QCD correction.
+C--
+#ifdef TT_THRESHOLD
+C      WRITE(*,*)'correction'
+      CALL PSUMxx(PV(0,4),PV(0, 5),QV(0,1))
+      CALL PSUMxx(QV(0,1),PV(0, 3),QV(0,1))
+      CALL PSUMxx(PV(0,7),PV(0, 8),QV(0,2))
+      CALL PSUMxx(QV(0,2),PV(0, 6),QV(0,2))
+      CALL PSUMxx(QV(0,1),QV(0, 2),QV(0,3))
+      CALL RDOTxx(QV(0,1),QV(0,1),S1)
+      CALL RDOTxx(QV(0,2),QV(0,2),S2)
+      CALL RDOTxx(QV(0,3),QV(0,3),SH)
+      RSH = SQRT(SH)
+      CALL QCDMOD(xALFS,AMST,GAMT,AMSH,BETAH,RSH,S1,S2,FQCD)
+C--
+C
+C   no P-wave correction 
+C
+C--
+      PQCD = 1
+C     CALL QCDMOD_P(xALFS,AMST,GAMT,AMSH,BETAH,RSH,S1,S2,PQCD)
+#else
+C      WRITE(*,*)'no correction'      
+      FQCD = 1
+      PQCD = 1
+C         WRITE(*,*)'no correction'
+#endif
 C--
 C  Calculate amplitude**2.
 C--
@@ -122,8 +159,8 @@ C--
      .          * VKM( IDP(1,4), IDP(1,5), IDP(3,4) )**2
      .          * VKM(        3, IDP(1,6), IDP(3,6) )**2
      .          * VKM( IDP(1,7), IDP(1,8), IDP(3,7) )**2
-      AMP2(0) = FACT*ABS(AMP(0))**2
-      AMP2(1) = FACT*ABS(AMP(1))**2
+      AMP2(0) = FACT*ABS(FQCD*AMP(1)+AMP(2))**2
+      AMP2(1) = FACT*ABS(FQCD*AMP(1))**2
       AMP2(2) = FACT*ABS(AMP(2))**2
 C--
 C  That's it.

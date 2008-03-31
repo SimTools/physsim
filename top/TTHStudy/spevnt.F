@@ -195,8 +195,13 @@ C--
       RBUF( 6) =   QV(2,5)
       RBUF( 7) =   QV(3,5)
       RBUF( 8) =   QV(0,5)
+#ifdef NO_H_DECAY
+      RBUF(12) =   0
+      RBUF(13) =   0
+#else
       RBUF(12) =   2
       RBUF(13) =  12
+#endif
       RBUF(14) =   0
       RBUF(18) =   5
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
@@ -370,6 +375,7 @@ C--
 C--
 C  Fermions from H.
 C--
+#ifndef NO_H_DECAY
       NF =  1
       DO 400 IPT = 9, 10
          CALL IDK2PD(IDPTCL(1,IPT),IDPDG)
@@ -398,6 +404,7 @@ C--
             CALL SLPRNT(NEVENT,NPT,RBUF(1))
          ENDIF
 400   CONTINUE
+#endif
 C--
 C  That's it.
 C--
