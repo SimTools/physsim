@@ -123,6 +123,19 @@ Bool_t TTHSpring::Initialize()
 
   JSFHadronizer *had=(JSFHadronizer*)gJSF->FindModule("JSFHadronizer");
   if(had) had->SetCopySpringClassDataToBank(kFALSE);
+
+  if (fFile->IsWritable()) {
+    TTHBases *bs = (TTHBases *)GetBases();
+    TDirectory *last = gDirectory;
+    fFile->cd("/conf");
+    TList *dlist = gDirectory->GetListOfKeys();
+    if (!dlist->FindObject("init")) gDirectory->mkdir("init");
+    fFile->cd("/conf/init");
+    bs->Write();
+    last->cd(); 
+    cerr << ">>>>>> TTHBases written to file" << endl;
+  }
+
   return kTRUE;
 }
 
