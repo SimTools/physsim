@@ -78,7 +78,7 @@ void UserAnalysis()
   for(Int_t i=0;i<sdb->GetNGeneratorParticles();i++){
     JSFGeneratorParticle *g=gen->UncheckedAt(i);
     Int_t ndau=g->GetNDaughter();
-#if 1
+#if 0
     g->ls();
 #endif
     if( ndau != 0 ) continue;
