@@ -65,7 +65,6 @@ int anl8J()
   myanl->SetM2jCut(16.);
   myanl->SetM3jCut(30.);
   myanl->SetThrustCut(0.8);
-#endif
 
   jsf->BeginRun(1);      			// Set run number to 1.
   Int_t nok = 0;
