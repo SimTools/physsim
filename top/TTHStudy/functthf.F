@@ -124,8 +124,13 @@ C--
       DPDEBM    = 1
 C--      
       IF ( ISRBM.EQ.3 ) THEN
+#if 0
          CALL PROBEB(REAL(Z(1)),REAL(Z(27)),EBM,EMBM,EMBM0,PEM)
          CALL PROBEB(REAL(Z(2)),REAL(Z(28)),EBM,EPBM,EPBM0,PEP)
+#else
+         call jsfbeamgenr(z(1), z(2), z(27), z(28), ebm,
+     >        embm, epbm, embm0, epbm0, dpdebm )
+#endif
          RS  = 2*SQRT(EMBM*EPBM)
          IF ( RS.LT.5. ) THEN
             FUNC = 0
@@ -136,7 +141,9 @@ C--
          BMENGY(2) = EPBM0
          BMENGY(3) = EMBM
          BMENGY(4) = EPBM
+#if 0
          DPDEBM    = PEM*PEP
+#endif
       ENDIF
 C--
 C  Then decide reduced sqrt(s) after ISR.
