@@ -22,6 +22,7 @@ XCOMM ##########################################################################
 
 INCPATH	= -I. -I../../../../src \
 	  -I$(JSFROOT)/include -I$(LEDAROOT)/include
+INCPATH += -I../../../../../top/TTHStudy
 EXTRACXXOPT = $(INCPATH)
 
 /*

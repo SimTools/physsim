@@ -20,6 +20,7 @@
 //*************************************************************************
 //
 #include "TTHL6JAnalysis.h"
+#include "TTHSpring.h"
 
 static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
@@ -143,6 +144,17 @@ Bool_t TTHL6JAnalysis::Initialize()
   for (Int_t i = 0; i < MAXCUT; i++) {
     strcpy(&cutName[i][0],"     ");
   }
+
+  //--
+  //  Read in Generator info.
+  //--
+  gJSF->GetInput()->cd("/conf/init");
+  TTHBases *bsp = (TTHBases *)gROOT->FindObject("TTHBases");
+  cerr << "------------------------------------" << endl
+       << " Ecm = " << bsp->GetRoots() << " GeV" << endl
+       << "------------------------------------" << endl;
+  TTHL6JAnalysisBuf *bufp = (TTHL6JAnalysisBuf *)EventBuf();
+  bufp->SetEcm(bsp->GetRoots());
 
   last->cd();
   return 0;
