@@ -7,7 +7,7 @@
 #include "../ss/include/SSCUPL.inc"
 #include "../ss/include/SSMIX.inc"
       REAL*8   ALF, ALFS, WM, ZM, AM0, AMU, AM2, TANB, AMA
-      REAL*8   FM(3), FM3P(3),FM3(3), ASFT(3), xSFM3(7), xSFM(3)
+      REAL*8   FM(3), FM3P(3),FM3(3), ASFT(3), xSFM3(7), xSFM(7)
 C
 C========< Entry Point >================================================
 C version without using user defined sfermion masses.
