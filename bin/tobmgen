@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+#-------------------------------------------------------------------------------
+# ---------
+# tobmgen
+# ---------
+# (Function)
+#    Convert old beam spetrum to new one.
+# (Usage)
+#    Just type
+#    	./tobmgen XXStudy
+#    then you get "tmp/" that contains converted source files.
+# (Update Record)
+#   2008/04/07	K.Fujii		Original version
+#-------------------------------------------------------------------------------
+#--
+#  Open input directory.
+#--
+$indir = $ARGV[0];
+print "Processing $indir \n";
+opendir(INDIR,$indir);
+
+#--
+#  Prepare output directory.
+#--
+$outdir = "tmp";
+umask(0000);
+mkdir($outdir,0755);
+
+#--
+#  Process files.
+#--
+chdir($indir);
+@flist = readdir(INDIR);
+foreach $i (@flist) {
+   if (-f $i) {
+#--
+#  XXSpring.cxx
+#--
+      if ($i =~ /.*Spring\.cxx/) {
+         xxspring_cxx($i);
+#--
+#  funcxx.F
+#--
+      } elsif ($i =~ /fun.*\.F/) {
+         funcxx_f($i);
+#--
+#  Others don't need modifications.
+#--
+      } else {
+         print "Copying      $i\n";
+	 # system "cp -a $i ../$outdir/.";
+	 system "cp -p $i ../$outdir/."; # Mac
+      }
+   } elsif (-d $i) {
+#--
+#  prod directory.
+#--
+      if ($i =~ /prod/) {
+         print "Processing $i\n"; 
+	 # system "cp -ar $i ../$outdir/.";
+         system "cp -RPp $i ../$outdir/.";
+#--
+#  jsf.conf
+#--
+	 jsf_conf();
+#--
+#  CVS and other directories.
+#--
+      } elsif ($i =~ /^\.$/ || $i =~ /^\.\.$/) {
+      } else {
+         print "Copying    $i\n"; 
+	 # system "cp -ar $i ../$outdir/.";
+         system "cp -RPp $i ../$outdir/.";
+      }
+   }
+}
+
+#--
+#  Close directories.
+#--
+closedir(INDIR);
+#--
+#  That's it, folks!
+#--
+exit 0;
+
+#------------------------------------------------------------------------------
+#  XXSpring.cxx Processor
+#------------------------------------------------------------------------------
+sub xxspring_cxx {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   open(OUTFILE,">../$outdir/$i");
+   $spinit  = 0;
+   while (<INFILE>) {
+      if (/Bool_t\s+.*Spring::Initialize\(/) {
+         $spinit = 1;
+	 $xx = $_;
+	 $xx =~ s/.*\s+(\w+)Spring.*/$1/;
+	 chomp $xx;
+	 print "xx = $xx\n";
+         print OUTFILE $_;
+      } elsif (/return\s+kTRUE;/ && $spinit == 1) {
+         print OUTFILE <<END_MARK1
+
+  if (fFile->IsWritable()) {
+    ${xx}Bases *bs = (${xx}Bases *)GetBases();
+    TDirectory *last = gDirectory;
+    fFile->cd("/conf");
+    TList *dlist = gDirectory->GetListOfKeys();
+    if (!dlist->FindObject("init")) gDirectory->mkdir("init");
+    fFile->cd("/conf/init");
+    bs->Write();
+    last->cd();
+    cerr << ">>>>>> ${xx}Bases written to file" << endl;
+  }
+
+END_MARK1
+;
+         print OUTFILE $_;
+      } else {
+         print OUTFILE $_;
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
+
+#------------------------------------------------------------------------------
+#  funcxx.F Processor
+#------------------------------------------------------------------------------
+sub funcxx_f {
+   my($i) = $_[0];
+   print "Processing   $i\n"; 
+   open(INFILE,"<$i");
+   open(OUTFILE,">../$outdir/$i");
+   $probeb  = 0;
+   while (<INFILE>) {
+       if (/ *CALL *PROBEB/ && $probeb == 0) {
+          $probeb = 1;
+	  $blank = $_;
+	  $blank =~ s/      (\s*)\w+.*/$1/;
+	  chomp $blank;
+          $z1 = $_;
+	  $z1 =~ s/.*\((\w+\([0-9]+\)).*\w+\([1-9]+\).*/$1/;
+	  chomp $z1;
+          $zn1 = $_;
+	  $zn1 =~ s/.*\(\w+\([1-9]+\).*(\w+\([1-9]+\)).*/$1/;
+	  chomp $zn1;
+       } elsif (/\s*CALL\s+PROBEB/ && $probeb == 1) {
+          $probeb = 0;
+          $z2 = $_;
+	  $z2 =~ s/.*\((\w+\([0-9]+\)).*\w+\([1-9]+\).*/$1/;
+	  chomp $z2;
+          $zn2 = $_;
+	  $zn2 =~ s/.*\(\w+\([1-9]+\).*(\w+\([1-9]+\)).*/$1/;
+	  chomp $zn2;
+          print OUTFILE <<END_MARK2
+      ${blank}call jsfbeamgenr($z1, $z2, $zn1, $zn2, ebm,
+     >${blank}                 embm, epbm, embm0, epbm0, dpdebm )
+END_MARK2
+;
+      } elsif (/\s*DPDEBM\s*=\s*PEM\s*\*\s*PEP/) {
+      } else {
+         print OUTFILE $_;
+      }
+   }
+   close(INFILE);
+   close(OUTFILE);
+}
+
+#------------------------------------------------------------------------------
+#  jsf.conf Processor
+#------------------------------------------------------------------------------
+sub jsf_conf {
+   my($i);
+   $i = "jsf.conf";
+   print "Processing   $i\n"; 
+   open(INFILE,"<prod/$i");
+   open(OUTFILE,">../$outdir/prod/$i");
+   while (<INFILE>) {
+      if (/JSF\.SharedLibraries:/) {
+         s/(JSF\.SharedLibraries:\s*)(\w*Spring\.so:.*)/$1 libJSFBeamGeneration.so:$2/;
+         print OUTFILE $_;
+      } else {
+         print OUTFILE $_;
+      }
+   }
+   print OUTFILE <<END_MARK3
+
+#JSFBeamGeneration.FileName:/proj/soft/data5/samples/gen/bsdata/500_nominal.root
+JSFBeamGeneration.FileName:/proj/soft/jsf/share/bsdata/500_nominal.root
+JSFBeamGeneration.ParName:500_nominal
+JSFBeamGeneration.Width:0.0005
+
+END_MARK3
+;
+   close(INFILE);
+   close(OUTFILE);
+}
