@@ -32,6 +32,7 @@ OBJS = couplsub.o \
 		inomix3.o \
 		inmass.o \
 		insscn.o \
+		insscnp.o \
 		insusy.o \
 		modgam.o \
 		sf2br.o \

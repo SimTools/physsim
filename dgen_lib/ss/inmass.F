@@ -20,6 +20,10 @@ C     parameters (sfermion masses
 C     and AM1 AM2 AM3) taken from input.  
 C     If IS=1, only third generation mass is the one taken 
 C     from input
+c 2008/04/28
+c     If is=3, only gaugino mass parameters am1, am2, am3
+c     are taken from the inputs.
+c
       IMPLICIT    REAL*8 ( A-H, O-Z )
 #include "../ss/include/SSMIX.inc"
       REAL*8   OL(2,2), OR(2,2)
@@ -55,9 +59,14 @@ C--
       IF(IS.NE.2) THEN 
 C GUT RELATION TO GAUGINO MASS 
        M2=AM2
-       M1=S2W/(1.D0-S2W)*M2/0.6D0
-       AM1 = M1
-       M3=ALFS*S2W/ALF*M2
+       if (is.eq.3) then
+        m1=am1
+        m3=am3
+       else
+        M1=S2W/(1.D0-S2W)*M2/0.6D0
+        AM1 = M1
+        M3=ALFS*S2W/ALF*M2
+       endif
       ENDIF
       FM(1) = 0
       FM(2) = 0
