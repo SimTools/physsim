@@ -176,7 +176,11 @@ XN1XN2Bases::XN1XN2Bases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("XN1XN2Bases.MassTop","170."),"%lg",&fMassTop);  
   sscanf(gJSF->Env()->GetValue("XN1XN2Bases.m0","70."),"%lg",&fm0);
   sscanf(gJSF->Env()->GetValue("XN1XN2Bases.mu","400."),"%lg",&fmu);
+  sscanf(gJSF->Env()->GetValue("XN1XN2Bases.GUT","1"),"%d",&fGUT);
   sscanf(gJSF->Env()->GetValue("XN1XN2Bases.M2","250."),"%lg",&fM2);
+  if (fGUT != 1) {
+     sscanf(gJSF->Env()->GetValue("XN1XN2Bases.M1","125."),"%lg",&fM1);
+  }
   sscanf(gJSF->Env()->GetValue("XN1XN2Bases.tanb","+2."),"%lg",&ftanb);
   sscanf(gJSF->Env()->GetValue("XN1XN2Bases.mA","-9999."),"%lg",&fmA);
   sscanf(gJSF->Env()->GetValue("SFSFBases.Atau","0."),"%lg",&fAsoft[0]);
@@ -247,14 +251,20 @@ void XN1XN2Bases::Userin()
   usmprm_.amst = fMassTop;
 
   // Copy class data member into common /usmprm/
-  ussprm_.am0  = fm0;
-  ussprm_.amu  = fmu;
-  ussprm_.am2  = fM2;
-  ussprm_.tanb = ftanb;
-  ussprm_.ama  = fmA;
-  ussprm_.asft[0] = fAsoft[0];
-  ussprm_.asft[1] = fAsoft[1];
-  ussprm_.asft[2] = fAsoft[2];
+  ussprmp_.am0  = fm0;
+  ussprmp_.amu  = fmu;
+  ussprmp_.am2  = fM2;
+  ussprmp_.isgut = fGUT;
+  if (fGUT != 1) {
+     ussprmp_.am1  = fM1;
+     Double_t s2w = (1-fMassW/fMassZ)*(1+fMassW/fMassZ);
+     ussprmp_.am3  = fAlphas*s2w*fAlphai*fM2;
+  }
+  ussprmp_.tanb = ftanb;
+  ussprmp_.ama  = fmA;
+  ussprmp_.asft[0] = fAsoft[0];
+  ussprmp_.asft[1] = fAsoft[1];
+  ussprmp_.asft[2] = fAsoft[2];
 
   // Copy class data member into common /usrprm/
   usrprm_.sqrts  = fRoots;

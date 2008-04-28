@@ -10,7 +10,7 @@ C*
 C--
 #include "XCXCCN.inc"
 #include "USRPRM.inc"
-#include "USSPRM.inc"
+#include "USSPRMP.inc"
 #include "USMPRM.inc"
 #include "BEMCNS.inc"
 #include "BSHUFL.inc"
@@ -19,6 +19,7 @@ C--
 C  Local R*4 variables used in subroutine calls.
 C--
       REAL*4        ALF
+      integer*4     is
 C
 C========< Entry Point >================================================
 C
@@ -27,7 +28,14 @@ C  Initialize numerical constants and particle table.
 C--
       ALF   = 1/ALFI
       CALL INSMCN(ALF,ALFS,AMSW,AMSZ,AMSH,AMST)
-      CALL INSSCN(ALF,ALFS,AMSW,AMSZ,AM0,AMU,AM2,TANB,AMA,ASFT)
+c      CALL INSSCN(ALF,ALFS,AMSW,AMSZ,AM0,AMU,AM2,TANB,AMA,ASFT)
+      if (isgut.eq.1) then
+         is = 0
+      else
+         is = 3
+      endif
+      CALL INSSCNP(is,ALF,ALFS,AMSW,AMSZ,AM0,AMU,
+     .                am1,AM2,am3,TANB,AMA,ASFT)
 C--
       IF ( GAMSW1.GT.0.0 ) THEN
          CALL MODGAM('SW',1,GAMSW1)

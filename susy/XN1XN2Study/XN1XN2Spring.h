@@ -46,13 +46,15 @@ typedef struct {
 extern COMMON_USMPRM usmprm_;
 
 // =====================================================================
-//  COMMONs for SS parameters, see USSPRM.inc for more details.
+//  COMMONs for SS parameters, see USSPRMP.inc for more details.
 // =====================================================================
 typedef struct {
   Float_t  am0, amu, am2, tanb, ama, asft[3];
-} COMMON_USSPRM;             //  Common /USSPRM/
+  Float_t  am1, am3;
+  Int_t    isgut;
+} COMMON_USSPRMP;             //  Common /USSPRMP/
 
-extern COMMON_USSPRM ussprm_;
+extern COMMON_USSPRMP ussprmp_;
 
 // =====================================================================
 //  COMMONs for XN1XN2 calculation, see USRPRM.inc for more details.
@@ -81,6 +83,7 @@ protected:
   Int_t    fZ1ModesHi;          // lst Z1 decay mode ID.
   Int_t    fZ2ModesLo;          // 1st Z2 decay mode ID.
   Int_t    fZ2ModesHi;          // lst Z2 decay mode ID.
+  Int_t    fGUT;                // (0,1)=(No GUT, GUT)
   Double_t fAlphai;		// 1/alpha(m_Z)
   Double_t fAlphas;		// alpha_s(m_Z)
   Double_t fMassW;		// m_W
@@ -89,6 +92,7 @@ protected:
   Double_t fMassTop;		// m_t
   Double_t fm0;			// m0 (GeV)
   Double_t fmu;			// mu (GeV)
+  Double_t fM1;			// M1 (GeV)
   Double_t fM2;			// M2 (GeV)
   Double_t ftanb;		// tan(beta)
   Double_t fmA;			// mA (GeV)
@@ -148,6 +152,12 @@ public:
    
   void SetMu(Double_t m){ fmu = m; }
   Double_t GetMu(){ return fmu;}
+
+  void SetGUT(Double_t m){ fGUT = m; }
+  Int_t GetGUT(){ return fGUT;}
+
+  void SetM1(Double_t m){ fM1 = m; }
+  Double_t GetM1(){ return fM1;}
     
   void SetM2(Double_t m){ fM2 = m; }
   Double_t GetM2(){ return fM2;}
