@@ -93,8 +93,13 @@ C--
       IF(IS.NE.2) THEN
         CALL GTSFMS(AM0,AM2,AMU,TANB,ALF,S2W,ZM,SFM)
       ENDIF
+      if (is.ne.3) then
         CALL GTSFMS3(AMU,TANB,ALF,S2W,ZM,FM3,ASFT,SFM,
      &            SFM3,SFM3M,SPHI,IS)
+      else
+        CALL GTSFMS3(AMU,TANB,ALF,S2W,ZM,FM3,ASFT,SFM,
+     &            SFM3,SFM3M,SPHI,0)
+      endif
       CALL INOMIX3(AM,WM,S2W,ALF,AMU,M1,M2,TANB,SWM,SZM,
      .  OL,OR,ER,PHIL,PHIR,ON,UN,ETA,IFLG)
 C      ENDIF
