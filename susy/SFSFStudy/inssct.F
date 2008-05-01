@@ -1,4 +1,5 @@
-      SUBROUTINE INSSCT(ALF,ALFS,WM,ZM,AM0,AMU,AM2,TANB,AMA,ASFT,ITAU)
+      SUBROUTINE INSSCT(is,ALF,ALFS,WM,ZM,AM0,AMU,am1,AM2,am3,TANB,
+     .                     AMA,ASFT,ITAU)
  
       IMPLICIT    REAL*4 ( A-H, O-Z )
 #include "SSCONS.inc"
@@ -6,13 +7,16 @@
 #include "SSCUPL.inc"
       INTEGER*4   ITAU
       REAL   *4   ALF, ALFS, WM, ZM, AM0, AMU, AM2, TANB, AMA
+      integer*4   is
+      real   *4   am1, am3
 C
 C========< Entry Point >================================================
 C
 C--
 C  Initialize SUSY parameters.
 C--
-      CALL INSSCN(ALF,ALFS,WM,ZM,AM0,AMU,AM2,TANB,AMA,ASFT)
+      CALL INSSCNP(is,ALF,ALFS,WM,ZM,AM0,AMU,
+     .                am1,AM2,am3,TANB,AMA,ASFT)
 C--
 C  When ITAU is nonzero, reset sfermion and LSP masses.
 C--
