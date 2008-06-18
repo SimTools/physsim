@@ -295,7 +295,8 @@ void SFSFBases::Userin()
 
       Double_t qmx  = fRoots/2.;
       Double_t ptmx = 150.;
-      Double_t elmx = 60.; // fRoots/2.;
+      //      Double_t elmx = 60.; // fRoots/2.;
+      Double_t elmx = fRoots/2.;
       Xhinit("h01", -1.0, 1.0, 50,"cos(theta_X-)      ");
       Xhinit("h02",  0.0,360., 50,"phi_X-             ");
       Xhinit("h03", -1.0, 1.0, 50,"cos(theta_l-)      ");
