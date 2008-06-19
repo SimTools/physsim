@@ -113,8 +113,8 @@ C--
       DPDEBM    = 1
 C--      
       IF ( ISRBM.EQ.3 ) THEN
-         CALL PROBEB(REAL(Z(1)),REAL(Z(20)),EBM,EMBM,EMBM0,PEM)
-         CALL PROBEB(REAL(Z(2)),REAL(Z(21)),EBM,EPBM,EPBM0,PEP)
+         call jsfbeamgenr(Z(1), Z(2), Z(20), Z(21), ebm,
+     >                    embm, epbm, embm0, epbm0, dpdebm )
          RS  = 2*SQRT(EMBM*EPBM)
          IF ( RS.LT.5. ) THEN
             FUNC = 0
@@ -125,7 +125,6 @@ C--
          BMENGY(2) = EPBM0
          BMENGY(3) = EMBM
          BMENGY(4) = EPBM
-         DPDEBM    = PEM*PEP
       ENDIF
 C--
 C  Then decide reduced sqrt(s) after bremsstrahlung.

@@ -454,6 +454,7 @@ C--
       CALL XHFILL( 'h10', DBLE(Q5)          ,FUNC )
       CALL XHFILL( 'h11', DBLE(QMWM)        ,FUNC )
       CALL XHFILL( 'h12', DBLE(QMWP)        ,FUNC )
+      CALL XHFILL( 'h13', DBLE(RS/ROOTS)    ,FUNC )
       CALL DHFILL( 'hd21', DBLE(EZ/EBM), DBLE(COSZ)    , FUNC )
       CALL DHFILL( 'hd22', DBLE(ET/EBM), DBLE(ETB/EBM) , FUNC )
 #ifdef DEBUG

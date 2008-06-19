@@ -297,6 +297,7 @@ void TTHBases::Userin()
   Xhinit("h10", 50.0,150., 50,"m_H          ");
   Xhinit("h11", 40.0,120., 50,"m_W-         ");
   Xhinit("h12", 40.0,120., 50,"m_W+         ");
+  Xhinit("h13",  0.0, 1.0, 50,"rsh/roots    ");
   Dhinit("hd21",0.,1.,50,-1.,1.,50,"E_H/E_bm-cos(th_H)");
   Dhinit("hd22",0.,1.,50, 0.,1.,50,"E_t/E_bm-E_tb/E_bm");
 }
