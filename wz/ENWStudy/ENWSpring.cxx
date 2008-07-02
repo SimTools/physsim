@@ -108,6 +108,19 @@ Bool_t ENWSpring::Initialize()
 
   JSFHadronizer *had=(JSFHadronizer*)gJSF->FindModule("JSFHadronizer");
   if(had) had->SetCopySpringClassDataToBank(kFALSE);
+
+  if (fFile->IsWritable()) {
+    ENWBases *bs = (ENWBases *)GetBases();
+    TDirectory *last = gDirectory;
+    fFile->cd("/conf");
+    TList *dlist = gDirectory->GetListOfKeys();
+    if (!dlist->FindObject("init")) gDirectory->mkdir("init");
+    fFile->cd("/conf/init");
+    bs->Write();
+    last->cd();
+    cerr << ">>>>>> ENWBases written to file" << endl;
+  }
+
   return kTRUE;
 }
 

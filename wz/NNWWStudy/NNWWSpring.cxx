@@ -108,6 +108,19 @@ Bool_t NNWWSpring::Initialize()
 
   JSFHadronizer *had=(JSFHadronizer*)gJSF->FindModule("JSFHadronizer");
   if(had) had->SetCopySpringClassDataToBank(kFALSE);
+
+  if (fFile->IsWritable()) {
+    NNWWBases *bs = (NNWWBases *)GetBases();
+    TDirectory *last = gDirectory;
+    fFile->cd("/conf");
+    TList *dlist = gDirectory->GetListOfKeys();
+    if (!dlist->FindObject("init")) gDirectory->mkdir("init");
+    fFile->cd("/conf/init");
+    bs->Write();
+    last->cd();
+    cerr << ">>>>>> NNWWBases written to file" << endl;
+  }
+
   return kTRUE;
 }
 

@@ -113,8 +113,8 @@ C--
 C  First decide e- and e+ energy.
 C--
       IF ( ISRBM.EQ.3 ) THEN
-         CALL PROBEB(REAL(Z(1)),REAL(Z(2)),EBM,EMBM,EMBM0,PEM)
-         CALL PROBEB(REAL(Z(3)),REAL(Z(4)),EBM,EPBM,EPBM0,PEP)
+         call jsfbeamgenr(Z(1), Z(3), Z(2), Z(4), ebm,
+     >                    embm, epbm, embm0, epbm0, dpdebm )
          RS  = 2*SQRT(EMBM*EPBM)
          IF ( RS.LT.5. ) THEN
             FUNC = 0
