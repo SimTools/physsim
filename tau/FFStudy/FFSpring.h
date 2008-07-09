@@ -108,7 +108,7 @@ private:
   Int_t          fJCombI;         // intial helicity combination
   Int_t          fJCombF;         // final  helicity combination
   ANL4DVector    fK[2];           // [0,1] = [e-, e+]
-  ANL4DVector    fP[2];           // [0,1,2] = [f, fbar]
+  ANL4DVector    fP[2];           // [0,1] = [f, fbar]
 
   // ----------------
   //  Integ. vars

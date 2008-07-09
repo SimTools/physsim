@@ -273,11 +273,11 @@ FFBases::FFBases(const char *name, const char *title)
   // --------------------------------------------
   //  Set Bases integration parameters
   // --------------------------------------------
-  SetNoOfSample(20000);
+  SetNoOfSample(2000);
 
   SetTuneValue (1.5);
-  SetIteration1(0.05, 20);
-  SetIteration2(0.05, 50);
+  SetIteration1(0.05, 5);
+  SetIteration2(0.05, 10);
 
 }
 // --------------------------
@@ -376,11 +376,11 @@ Double_t FFBases::Func()
   //  Fill plots
   // --------------------------------------------
 
-  Xh_fill( 1, fEcmIP           , (bsWeight*sigma));
-  Xh_fill( 2, fCosTheta        , (bsWeight*sigma));
-  Xh_fill( 3, fPhi             , (bsWeight*sigma));
-  Xh_fill( 4, (Double_t)fJCombI, (bsWeight*sigma));
-  Xh_fill( 5, (Double_t)fJCombF, (bsWeight*sigma));
+  H1Fill( "h01", fEcmIP           , (bsWeight*sigma));
+  H1Fill( "h02", fCosTheta        , (bsWeight*sigma));
+  H1Fill( "h03", fPhi             , (bsWeight*sigma));
+  H1Fill( "h04", (Double_t)fJCombI, (bsWeight*sigma));
+  H1Fill( "h05", (Double_t)fJCombF, (bsWeight*sigma));
 
   return (bsWeight * sigma);
 }
@@ -574,11 +574,11 @@ void FFBases::Userin()
   // --------------------------------------------
   //  Define some plots
   // --------------------------------------------
-  Xh_init( 1,     0., fEcmInit*1.1, 50, "Ecm"   );
-  Xh_init( 2, fXL[0], fXU[0],       50, "Costh" );
-  Xh_init( 3, fXL[1], fXU[1],       50, "Phi"   );
-  Xh_init( 4,     0.,     2.,        2, "Helin ");
-  Xh_init( 5,     0.,     2.,        2, "Helot ");
+  H1Init( "h01", "Ecm"   , 50,     0., fEcmInit*1.1 );
+  H1Init( "h02", "Costh" , 50, fXL[0],        fXU[0]);
+  H1Init( "h03", "Phi"   , 50, fXL[1],        fXU[1]);
+  H1Init( "h04", "Helin" ,  2,     0.,            2.);
+  H1Init( "h05", "Helot" ,  2,     0.,            2.);
 }
 
 //_____________________________________________________________________________
