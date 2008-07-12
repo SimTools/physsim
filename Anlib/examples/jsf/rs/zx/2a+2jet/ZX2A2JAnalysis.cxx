@@ -26,6 +26,7 @@
 #include "Anlib.h"
 #include "ANLTrack.h"
 #include <sstream>
+#include <iomanip>
 
 static const Double_t kMassX   = 120.0; // H mass
 static const Double_t kMassZ   = 91.19;	// Z mass
@@ -39,7 +40,7 @@ static const Double_t kSigmaMz =   4.0;	// Z mass resolution
 #endif
       Int_t  gNgoods  = 0;
 const Int_t  kMaxCuts = 100;
-      Char_t gCutName[kMaxCuts][100];
+      stringstream gCutName[kMaxCuts];   
       TH1D  *hStat = 0;
 
 //___________________________________________________________________________
@@ -93,7 +94,6 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
   TDirectory *last = gDirectory;
   gFile->cd("/");
   if (!hStat) hStat = new TH1D("hStat","Cut Statistics", 20, 0., 20.);
-  Char_t msg[60];
 
   static TNtupleD *hEvt = 0;
   if (!hEvt) {
@@ -114,8 +114,7 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
   Double_t selid = -0.5;
   hStat->Fill(++selid);
   if (gNgoods == 0) {
-    sprintf(msg,"No Cuts");
-    strcpy(&gCutName[(Int_t)selid][0],msg);
+    gCutName[(Int_t)selid] << "No Cuts" << ends;
   }
 
   //--
@@ -150,8 +149,7 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
   if ( ntracks < 4 ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
-    sprintf(msg,"Ntracks < 4");
-    strcpy(&gCutName[(Int_t)selid][0],msg);
+    gCutName[(Int_t)selid] << "Ntracks < 4" << ends;
   }
   
   Double_t evis  = qsum(0);	 // E_vis
@@ -191,8 +189,7 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
   if (ngams < 2) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
-    sprintf(msg,"Ngammas >= 2");
-    strcpy(&gCutName[(Int_t)selid][0],msg);
+    gCutName[(Int_t)selid] << "Ngammas >= 2" << ends;
   }
 
   //--
@@ -217,8 +214,7 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
   if (solutions.GetEntries() < 1) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
-    sprintf(msg,"Solutions > 0");
-    strcpy(&gCutName[(Int_t)selid][0],msg);
+    gCutName[(Int_t)selid] << "Solutions > 0" << ends;
   }
 
   solutions.Sort();  
@@ -244,8 +240,7 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
   if (njets < 2) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
-    sprintf(msg,"Njets >= 2 for Ycut = %g",fYcutCut);
-    strcpy(&gCutName[(Int_t)selid][0],msg);
+    gCutName[(Int_t)selid] << "Njets >= 2 for Ycut = " << fYcutCut << ends;
   }
 
   //--
@@ -263,8 +258,7 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
   if (njets != 2) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
-    sprintf(msg,"Njets = 2");
-    strcpy(&gCutName[(Int_t)selid][0],msg);
+    gCutName[(Int_t)selid] << "Njets = 2" << ends;
   }
 
   //--
@@ -389,11 +383,6 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
   //--
   // End of event selection
   //--
-  if (gNgoods == 0) {
-    selid++;
-    sprintf(msg,"END");
-    strcpy(&gCutName[(Int_t)selid][0],msg);
-  }
   gNgoods++;
 
   cerr << "------------------------------------------" << endl
@@ -413,18 +402,25 @@ Bool_t ZX2A2JAnalysis::Process(Int_t ev)
 Bool_t ZX2A2JAnalysis::Terminate()
 {
   // This function is called at the end of job.
-  cout << endl;
-  cout << "  =============" << endl;
-  cout << "   Cut Summary " << endl;
-  cout << "  =============" << endl;
-  cout << endl;
-  cout << "  ---------------------------------------------------------" << endl;   
-  cout << "  ID   No.Events     Cut Description"                        << endl;
-  cout << "  ---------------------------------------------------------" << endl;
-  Int_t i;
-  for ( i = 0; strncmp(&gCutName[i][0],"END",4) && i < kMaxCuts ; i++ ) {
-    printf("  %3d  %10d  : %s\n",i,(int)hStat->GetBinContent(i+1),&gCutName[i][0]);
-  } 
-  cout << "  ---------------------------------------------------------";
+  //--
+  // Print out cut statistics
+  //--
+  cerr << endl
+       << "  =============" << endl
+       << "   Cut Summary " << endl
+       << "  =============" << endl
+       << endl
+       << "  -----------------------------------------------------------" << endl
+       << "   ID   No.Events    Cut Description                         " << endl
+       << "  -----------------------------------------------------------" << endl;
+  for (int id=0; id<kMaxCuts && gCutName[id].str().data()[0]; id++) {
+     cerr << "  " << setw( 3) << id 
+          << "  " << setw(10) << static_cast<int>(hStat->GetBinContent(id+1))
+          << "  : " << gCutName[id].str().data() << endl;
+  }
+  cerr << "  -----------------------------------------------------------" << endl;
+  //--
+  // That's it!
+  //--
   return 0;
 }

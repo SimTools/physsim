@@ -1,5 +1,5 @@
-#ifndef __AXANALYSIS__
-#define __AXANALYSIS__
+#ifndef AXANALYSIS_H
+#define AXANALYSIS_H
 
 //**********************************************************************
 //* ======================

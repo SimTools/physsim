@@ -1,5 +1,5 @@
-#ifndef __ZX2A2JANALYSIS__
-#define __ZX2A2JANALYSIS__
+#ifndef ZX2A2JANALYSIS_H
+#define ZX2A2JANALYSIS_H
 
 //**********************************************************************
 //* ========================

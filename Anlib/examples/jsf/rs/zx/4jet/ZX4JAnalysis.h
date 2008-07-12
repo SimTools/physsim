@@ -1,5 +1,5 @@
-#ifndef __ZX4JANALYSIS__
-#define __ZX4JANALYSIS__
+#ifndef ZX4JANALYSIS_H
+#define ZX4JANALYSIS_H
 
 //**********************************************************************
 //* ========================
