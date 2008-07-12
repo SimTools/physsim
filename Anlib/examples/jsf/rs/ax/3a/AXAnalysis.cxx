@@ -22,6 +22,7 @@
 #include "TNtupleD.h"
 
 #include <sstream>
+#include <iomanip>
 //#define __USEGENERATORINFO__
 
 static const Double_t kMassX   = 120.0; // X mass
@@ -31,8 +32,12 @@ static const Double_t kEa      = (kEcm/2.)*(1.-kMassX/kEcm)*(1.+kMassX/kEcm);
 static const Double_t kSigmaMx =   2.0;	// X mass resolution
 static const Double_t kSigmaEa =   3.3;	// gamma energy resolution
 
-Int_t  AXAnalysis::Ngoods = 0;
 Bool_t gDEBUG = kFALSE;
+
+      Int_t  gNgoods  = 0;
+const Int_t  kMaxCuts = 100;
+      stringstream gCutName[kMaxCuts];   
+      TH1D  *hStat = 0;
 
 // -------------------------------------------------------------------------
 //  ------------------
@@ -43,7 +48,7 @@ ClassImp(AXAnalysis)
 
 // Constructor
 AXAnalysis::AXAnalysis(const Char_t *name, const Char_t *title)
-            : JSFModule(name, title), hStat(0)
+            : JSFModule(name, title)
 {
 }
 
@@ -66,7 +71,6 @@ void AXAnalysis::CleanUp(TObjArray *objs)
 // -------------------------------------------------------------------------
 Bool_t AXAnalysis::Initialize()
 {
-  hStat = new TH1D("hStat", "", 20, 0., 20.);
 
   xEtrack   =   0.10;	// track energy
   xEvis     = 100.00;	// Minimum visible energy
@@ -99,13 +103,14 @@ Bool_t AXAnalysis::Process(Int_t ev)
   TDirectory *last = gDirectory;
   gFile->cd("/");
 
-  Char_t msg[60];
-
   // Analysis starts here.
 
   Float_t selid = -0.5;
+  if (!hStat) hStat = new TH1D("hStat", "", 20, 0., 20.);
   hStat->Fill(++selid);
-  if (Ngoods == 0) strcpy(&cutName[(Int_t)selid][0],"No Cut");
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "No Cuts" << ends;
+  }
 
   // Get event buffer and make combined tracks accessible.
 
@@ -148,9 +153,8 @@ Bool_t AXAnalysis::Process(Int_t ev)
   
   if ( fNtracks < xNtracks ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg,"N_tracks > %i",xNtracks);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Ntracks >= " << xNtracks << ends;
   }
   
   fEvis = qsum(0);	// E_vis
@@ -164,27 +168,24 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   if (fEvis < xEvis) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0)  {
-    sprintf(msg,"Evis > %g",xEvis);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0)  {
+    gCutName[(Int_t)selid] << "Evis >= " << xEvis << ends;
   }
 
   // Cut on Pt.
   
   if (fPt > xPt) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg," Pt <= %g",xPt);
-    strcpy(&cutName[(Int_t)selid][0], msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Pt <= " << xPt << ends;
   }
 
   // Cut on Pl.
   
   if (TMath::Abs(fPl) > xPl) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg,"|Pl| <= %g",xPl);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|Pl| <= " << xPl << ends;
   }
 
   // Find jets.
@@ -202,9 +203,8 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   if (fNjets < xNjets) { CleanUp(&tracks); return kFALSE;}
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Njets >= " << xNjets << " for Ycut = " << xYcut << ends;
   }
 
   // Now force the event to be xNjets.
@@ -219,9 +219,8 @@ Bool_t AXAnalysis::Process(Int_t ev)
   
   if (fNjets != xNjets) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg,"Njets = %i",xNjets);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Njets = " << xNjets << ends;
   }
 
   TObjArray &jets = jclust.GetJets();
@@ -242,18 +241,16 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   if (ejetmin < xEjet) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg,"Ejet > %g",xEjet);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Ejet > " << xEjet << ends;
   }
 
   // Cut on |cos(theta_j)|_max.
 
   if (TMath::Abs(cosjmax) > xCosjet ) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg,"|cos(theta_j)| <= %g", xCosjet);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|cos(theta_j)| <= " << xCosjet << ends;
   }
 
   // Find AX candidates in given mass window.
@@ -285,9 +282,8 @@ Bool_t AXAnalysis::Process(Int_t ev)
  
   if (!solutions.GetEntries()) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg,"|m_jj - m_X| <= %g",xM2j);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|m_jj - m_X| <= " << xM2j << ends;
   }
 
   // Cut on cos(theta_AX).
@@ -306,19 +302,13 @@ Bool_t AXAnalysis::Process(Int_t ev)
   }
   if (!solutions.GetEntries()) { CleanUp(&tracks); return kFALSE; }
   hStat->Fill(++selid);
-  if (Ngoods == 0) {
-    sprintf(msg,"|cos(theta_x)| and |cos(theta_a)| <= %g", xCosrsax);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|cos(theta_x)| and |cos(theta_a)| <= " << xCosrsax << ends;
   }
 
   // End of event selection
   
-  if (Ngoods == 0) {
-    selid++;
-    sprintf(msg,"END");
-    strcpy(&cutName[(Int_t)selid][0],msg);
-  }
-  Ngoods++;
+  gNgoods++;
 
   cerr << "------------------------------------------" << endl
        << "Event " << gJSF->GetEventNumber()
@@ -441,19 +431,26 @@ Bool_t AXAnalysis::Process(Int_t ev)
 Bool_t AXAnalysis::Terminate()
 {
   // This function is called at the end of job.
-  cout << endl;
-  cout << "  =============" << endl;
-  cout << "   Cut Summary " << endl;
-  cout << "  =============" << endl;
-  cout << endl;
-  cout << "  ---------------------------------------------------------" <<endl;   
-  cout << "  ID   No.Events     Cut Description" << endl;
-  cout << "  ---------------------------------------------------------" <<endl;
-  Int_t i;
-  for (i = 0; strncmp(&cutName[i][0],"END",4) && i < MAXCUT ; i++) {
-    printf("  %3d  %10d  : %s\n",i,(int)hStat->GetBinContent(i+1),&cutName[i][0]);
-  } 
-  cout << "  ---------------------------------------------------------";
+  //--
+  // Print out cut statistics
+  //--
+  cerr << endl
+       << "  =============" << endl
+       << "   Cut Summary " << endl
+       << "  =============" << endl
+       << endl
+       << "  -----------------------------------------------------------" << endl
+       << "   ID   No.Events    Cut Description                         " << endl
+       << "  -----------------------------------------------------------" << endl;
+  for (int id=0; id<kMaxCuts && gCutName[id].str().data()[0]; id++) {
+     cerr << "  " << setw( 3) << id 
+          << "  " << setw(10) << static_cast<int>(hStat->GetBinContent(id+1))
+          << "  : " << gCutName[id].str().data() << endl;
+  }
+  cerr << "  -----------------------------------------------------------" << endl;
+  //--
+  // That's it!
+  //--
   return 0;
 }
 // *****End of Terminate()***** //

@@ -71,11 +71,6 @@ private:
   Double_t xCosrsax;	// |cos(theta_z)| and |cos(theta_h)| maximum
   Double_t xM2j;	// |m_jj - m_w| maximum
 
-  TH1D     *hStat;      // cut stat.
-
-  static Int_t   Ngoods;	       // Number of good events
-         Char_t  cutName[MAXCUT][100]; // Cut names
-
   ClassDef(AXAnalysis, 2)	// AXAnalysis Example
 };
 
