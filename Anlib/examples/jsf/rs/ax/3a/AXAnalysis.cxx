@@ -58,17 +58,6 @@ AXAnalysis::~AXAnalysis()
 }
 
 // -------------------------------------------------------------------------
-void AXAnalysis::CleanUp(TObjArray *objs)
-{
-  TIter next(objs);
-  TObject *obj;
-  while ( (obj = next()) ) {
-    objs->Remove(obj);
-    delete obj;
-  }
-}
-
-// -------------------------------------------------------------------------
 Bool_t AXAnalysis::Initialize()
 {
 
@@ -114,20 +103,21 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Get event buffer and make combined tracks accessible.
 
-  JSFSIMDST     *sds	= (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
-  JSFSIMDSTBuf	*evt	= (JSFSIMDSTBuf*)sds->EventBuf();
+  JSFSIMDST     *sds	= static_cast<JSFSIMDST*>(gJSF->FindModule("JSFSIMDST"));
+  JSFSIMDSTBuf	*evt	= static_cast<JSFSIMDSTBuf*>(sds->EventBuf());
 
   // Select good tracks
 
   ANL4DVector qsum;
   TObjArray tracks(1000);
+  tracks.SetOwner();
   fNtracks = 0;
 #ifndef __USEGENERATORINFO__
   Int_t		ntrks	= evt->GetNLTKCLTracks();	// No. of tracks
   TObjArray	*trks	= evt->GetLTKCLTracks();	// Combined tracks
   for (Int_t i = 0; i < ntrks; i++) {
-    JSFLTKCLTrack *t = (JSFLTKCLTrack*)trks->UncheckedAt(i);
-    if ( t->GetE() > xEtrack ) {
+    JSFLTKCLTrack *t = static_cast<JSFLTKCLTrack*>(trks->UncheckedAt(i));
+    if (t->GetE() > xEtrack) {
       ANLTrack *qt = new ANLTrack(t);
       tracks.Add(qt);		// track 4-momentum
       qsum += *qt;		// total 4-mometum
@@ -138,8 +128,8 @@ Bool_t AXAnalysis::Process(Int_t ev)
   Int_t         ntrks = evt->GetNGeneratorParticles();
   TClonesArray *trks   = evt->GetGeneratorParticles();
   for (Int_t i = 0; i < ntrks; i++) {
-    JSFGeneratorParticle *t = (JSFGeneratorParticle *)trks->UncheckedAt(i);
-    if ( t->GetE() > xEtrack ) {
+    JSFGeneratorParticle *t = static_cast<JSFGeneratorParticle *>(trks->UncheckedAt(i));
+    if (t->GetE() > xEtrack) {
       ANL4DVector *qt = new ANL4DVector(t->GetPV());
       tracks.Add(qt);		// track 4-momentum
       qsum += *qt;		// total 4-mometum
@@ -151,7 +141,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Cut on No. of tracks.
   
-  if ( fNtracks < xNtracks ) { CleanUp(&tracks); return kFALSE; }
+  if (fNtracks < xNtracks) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Ntracks >= " << xNtracks << ends;
@@ -166,7 +156,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Cut on Evis.
 
-  if (fEvis < xEvis) { CleanUp(&tracks); return kFALSE; }
+  if (fEvis < xEvis) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0)  {
     gCutName[(Int_t)selid] << "Evis >= " << xEvis << ends;
@@ -174,7 +164,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Cut on Pt.
   
-  if (fPt > xPt) { CleanUp(&tracks); return kFALSE; }
+  if (fPt > xPt) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Pt <= " << xPt << ends;
@@ -182,7 +172,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Cut on Pl.
   
-  if (TMath::Abs(fPl) > xPl) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(fPl) > xPl) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "|Pl| <= " << xPl << ends;
@@ -201,7 +191,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Cut on No. of jets.
 
-  if (fNjets < xNjets) { CleanUp(&tracks); return kFALSE;}
+  if (fNjets < xNjets) { return kFALSE;}
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Njets >= " << xNjets << " for Ycut = " << xYcut << ends;
@@ -217,7 +207,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Make sure the No. of Jets is xNjets.
   
-  if (fNjets != xNjets) { CleanUp(&tracks); return kFALSE; }
+  if (fNjets != xNjets) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Njets = " << xNjets << ends;
@@ -228,7 +218,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
   ANLJet *jetp;
   Double_t ejetmin = 999999.;
   Double_t cosjmax = 0.;
-  while ((jetp = (ANLJet*)nextjet())) {
+  while ((jetp = static_cast<ANLJet*>(nextjet()))) {
     ANLJet &jet = *jetp;
     if (gDEBUG) jet.DebugPrint();
     Double_t ejet = jet()(0);
@@ -239,7 +229,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Cut on Ejet_min.
 
-  if (ejetmin < xEjet) { CleanUp(&tracks); return kFALSE; }
+  if (ejetmin < xEjet) {  return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Ejet > " << xEjet << ends;
@@ -247,7 +237,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Cut on |cos(theta_j)|_max.
 
-  if (TMath::Abs(cosjmax) > xCosjet ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(cosjmax) > xCosjet ) {  return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "|cos(theta_j)| <= " << xCosjet << ends;
@@ -256,16 +246,17 @@ Bool_t AXAnalysis::Process(Int_t ev)
   // Find AX candidates in given mass window.
   
   TObjArray        solutions(10);
+  solutions.SetOwner();
   ANLPairCombiner  xcandidates(jets,jets);
   ANLPair         *xp;
-  while ((xp = (ANLPair *)xcandidates())) {
+  while ((xp = static_cast<ANLPair *>(xcandidates()))) {
     ANLPair &x = *xp;
     Double_t xmass = x().GetMass();
     if (TMath::Abs(xmass - kMassX) > xM2j) continue;
     x.LockChildren();
     TIter acandidates(&jets);
     ANLJet *ap;
-    while ( (ap = (ANLJet*)acandidates()) ) {
+    while ((ap = static_cast<ANLJet*>(acandidates()))) {
       ANLJet &a = *ap;
       if (a.IsLocked()) continue;
       if (gDEBUG) {
@@ -280,7 +271,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   // Cut on number of solutions.
  
-  if (!solutions.GetEntries()) { CleanUp(&tracks); return kFALSE; }
+  if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "|m_jj - m_X| <= " << xM2j << ends;
@@ -290,7 +281,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
 
   TIter nextsol(&solutions);
   ANLPair *sol;
-  while ((sol = (ANLPair*)nextsol())) {
+  while ((sol = static_cast<ANLPair*>(nextsol()))) {
     ANLPair    &x = *(ANLPair *)(*sol)[0];
     ANLJet     &a = *(ANLJet  *)(*sol)[1];
     Double_t cosx = x.CosTheta();
@@ -300,7 +291,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
       delete sol;
     }
   }
-  if (!solutions.GetEntries()) { CleanUp(&tracks); return kFALSE; }
+  if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "|cos(theta_x)| and |cos(theta_a)| <= " << xCosrsax << ends;
@@ -324,7 +315,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
   if (gDEBUG) {
     Int_t nj = 0;
     nextjet.Reset();
-    while ( (jetp = (ANLJet*)nextjet()) ) {
+    while ((jetp = static_cast<ANLJet*>(nextjet()))) {
       cerr << "------" << endl
            << "Jet " << ++nj << endl
            << "------" << endl;
@@ -345,10 +336,10 @@ Bool_t AXAnalysis::Process(Int_t ev)
   }
   nextsol.Reset();
   Int_t nsols = 0;
-  while ((sol = (ANLPair*)nextsol())) {
-    if ( nsols++ ) break;
-    ANLPair &x = *(ANLPair *)(*sol)[0];
-    ANLJet  &a = *(ANLJet  *)(*sol)[1];
+  while ((sol = static_cast<ANLPair*>(nextsol()))) {
+    if (nsols++) break;
+    ANLPair &x = *static_cast<ANLPair *>((*sol)[0]);
+    ANLJet  &a = *static_cast<ANLJet  *>((*sol)[1]);
     Double_t chi2  = sol->GetQuality();
     //--
     // Calculate helicity angles.
@@ -358,7 +349,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
     TVector3    exx   = exz.Cross(ez).Unit();
     TVector3    exy   = exz.Cross(exx).Unit();
   
-    const ANL4DVector &gam1 = *(ANL4DVector *)x[0];
+    const ANL4DVector &gam1 = *static_cast<ANL4DVector *>(x[0]);
     TVector3    bstx  = TVector3(0., 0., x.Vect().Mag()/x.E());
     ANL4DVector k1h   = ANL4DVector(gam1.E(), gam1.Vect()*exx,
                                               gam1.Vect()*exy,
@@ -367,7 +358,7 @@ Bool_t AXAnalysis::Process(Int_t ev)
     Double_t    csa1h = k1h.CosTheta();
     Double_t    fia1h = k1h.Phi();
   
-    const ANL4DVector &gam2 = *(ANL4DVector *)x[1];
+    const ANL4DVector &gam2 = *static_cast<ANL4DVector *>(x[1]);
     ANL4DVector k2h   = ANL4DVector(gam2.E(), gam2.Vect()*exx,
                                               gam2.Vect()*exy,
                                               gam2.Vect()*exz);
@@ -416,11 +407,6 @@ Bool_t AXAnalysis::Process(Int_t ev)
     data[25] = fia2h;
     hEvt->Fill(data);
   }
-
-  // Clean up
-
-  CleanUp(&solutions);
-  CleanUp(&tracks);
 
   last->cd();
   return kTRUE;

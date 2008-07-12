@@ -40,8 +40,6 @@ public:
   AXAnalysis(const Char_t *name, const Char_t *title);
   virtual ~AXAnalysis();
   
-  void CleanUp(TObjArray *objs);
-
   inline void SetNtrackCut (Int_t    x) { xNtracks = x; }
   inline void SetEtrackCut (Double_t x) { xEtrack = x;  }
   inline void SetEvisCut   (Double_t x) { xEvis = x;    }
