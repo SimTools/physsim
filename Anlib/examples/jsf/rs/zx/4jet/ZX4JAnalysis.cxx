@@ -58,29 +58,14 @@ ZX4JAnalysis::ZX4JAnalysis(const Char_t *name,
                 fYcutCut  (0.004),
                 fM2jCut   (12.000)
 {
-  SetBufferSize(2000);	// buffer size for event data
-  cout << "ZX4JAnalysis is created... fEventBuf is "
-       << (Int_t)fEventBuf << endl;
 }
 
 // Destructor
 ZX4JAnalysis::~ZX4JAnalysis()
 {
-  cout << "ZX4JAnalysisBuf will be deleted... fEventBuf is "
-       << (Int_t)fEventBuf << endl;
-  delete fEventBuf; fEventBuf = 0;
 }
 
 // Functions
-void ZX4JAnalysis::CleanUp(TObjArray *objs)
-{
-  TIter next(objs);
-  TObject *obj;
-  while ( (obj = next()) ) {
-    objs->Remove(obj);
-    delete obj;
-  }
-}
 
 Bool_t ZX4JAnalysis::Process(Int_t ev)
 {
@@ -129,8 +114,9 @@ Bool_t ZX4JAnalysis::Process(Int_t ev)
   Int_t    ntracks = 0;
   ANL4DVector qsum;
   TObjArray tracks(1000);
+  tracks.SetOwner();
   for (Int_t i=0; i<ntrks; i++) {
-    JSFLTKCLTrack *tp = (JSFLTKCLTrack*)trks->UncheckedAt(i);
+    JSFLTKCLTrack *tp = static_cast<JSFLTKCLTrack*>(trks->UncheckedAt(i));
     if (tp->GetE() > fEtrackCut) {
       ANLTrack *qtp = new ANLTrack(tp);
       tracks.Add(qtp);		// track 4-momentum
@@ -143,7 +129,7 @@ Bool_t ZX4JAnalysis::Process(Int_t ev)
   //--
   // Cut on No. of tracks.
   //--
-  if ( ntracks < 4 ) { CleanUp(&tracks); return kFALSE; }
+  if (ntracks < 4) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Ntracks >= 4" << ends;
@@ -169,7 +155,7 @@ Bool_t ZX4JAnalysis::Process(Int_t ev)
   //--
   // Cut on No. of jets.
   //--
-  if (njets < 4) { CleanUp(&tracks); return kFALSE; }
+  if (njets < 4) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Njets >= 4 for Ycut = " << fYcutCut << ends;
@@ -187,7 +173,7 @@ Bool_t ZX4JAnalysis::Process(Int_t ev)
   //--
   // Make sure the No. of Jets is 4.
   //--
-  if (njets != 4) { CleanUp(&tracks); return kFALSE; }
+  if (njets != 4) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Njets = 4" << ends;
@@ -198,17 +184,18 @@ Bool_t ZX4JAnalysis::Process(Int_t ev)
   //--
 
   TObjArray solutions(10);
+  solutions.SetOwner();
   TObjArray &jets = jclust.GetJets();
   ANLPairCombiner zcandidates(jets,jets);
   ANLPair *xp, *zp;
-  while ((zp = (ANLPair *)zcandidates())) {
+  while ((zp = static_cast<ANLPair *>(zcandidates()))) {
     ANLPair &z = *zp;
     Double_t zmass = z().GetMass();
     if (TMath::Abs(zmass - kMassZ) > fM2jCut) continue;
     z.LockChildren();
     ANLPairCombiner xcandidates(zcandidates);
     xcandidates.Reset();
-    while ((xp = (ANLPair *)xcandidates())) {
+    while ((xp = static_cast<ANLPair *>(xcandidates()))) {
       ANLPair &x = *xp;
       if (x.IsLocked()) continue;
       Double_t xmass = x().GetMass();
@@ -228,7 +215,7 @@ Bool_t ZX4JAnalysis::Process(Int_t ev)
   //--
   // Require at least one solution.
   //--
-  if (solutions.GetEntries() < 1) { CleanUp(&tracks); return kFALSE; }
+  if (solutions.GetEntries() < 1) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Solutions > 0" << ends;
@@ -340,12 +327,6 @@ Bool_t ZX4JAnalysis::Process(Int_t ev)
   cerr << "------------------------------------------" << endl
        << "Event " << gJSF->GetEventNumber()           << endl
        << "------------------------------------------" << endl;
-  
-  //--
-  // Clean up
-  //--
-  CleanUp(&tracks);
-  CleanUp(&solutions);
 
   last->cd();
   return kTRUE;

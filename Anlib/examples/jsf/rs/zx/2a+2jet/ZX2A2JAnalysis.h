@@ -34,8 +34,6 @@ public:
                  const Char_t *title);
   virtual ~ZX2A2JAnalysis();
   
-  void CleanUp(TObjArray *objs);
-
   Bool_t Process   (Int_t evt);
   Bool_t Terminate ();
 
