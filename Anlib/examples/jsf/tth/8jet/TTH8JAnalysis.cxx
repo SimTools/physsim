@@ -428,6 +428,8 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     Double_t cosbw1 = b1.CosTheta(w1);
     Double_t cosbw2 = b2.CosTheta(w2);
     if (cosbw1 > fCosbwCut || cosbw2 > fCosbwCut) {
+      ANLPair &tt = *static_cast<ANLPair *>(sol[0]);
+      tt.Delete();
       sol.Delete();
     }
   }
@@ -446,7 +448,11 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   Double_t thrust = eshape.GetThrust();
   if (thrust > fThrustCut) {
   	nextsol.Reset();
-  	while ((solp = static_cast<ANLPair *>(nextsol()))) solp->Delete();
+  	while ((solp = static_cast<ANLPair *>(nextsol()))) {
+          ANLPair *ttp = static_cast<ANLPair *>((*solp)[0]);
+          ttp ->Delete();
+          solp->Delete();
+        }
   	return kFALSE;
   }
   hStat->Fill(++selid);
@@ -544,7 +550,11 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   //--
 
   nextsol.Reset();
-  while ((solp = (ANLPair *)nextsol())) solp->Delete();
+  while ((solp = (ANLPair *)nextsol())) {
+    ANLPair *ttp = static_cast<ANLPair *>((*solp)[0]);
+    ttp ->Delete();
+    solp->Delete();
+  }
 
   last->cd();
 
