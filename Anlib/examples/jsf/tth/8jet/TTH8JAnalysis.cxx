@@ -11,15 +11,24 @@
 //* 	library TTHStudy
 //* (Provides)
 //* 	class TTH8JAnalysis
-//* 	class TTH8JAnalysisBuf
 //* (Usage)
 //*   Take a look at anl8J.C.
 //* (Update Recored)
 //*   2002/08/15  K.Fujii	Original version.
+//*   2008/07/13  K.Fujii	Clean up.
 //*************************************************************************
-//
+
 #include "TTH8JAnalysis.h"
 #include "TTHSpring.h"
+#include "TROOT.h"
+#include "TFile.h"
+#include "TNtupleD.h"
+#include "TH1D.h"
+#include "JSFSIMDST.h"
+#include "Anlib.h"
+
+#include <sstream>
+#include <iomanip>
 
 static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
@@ -29,384 +38,317 @@ static const Double_t kSigmaMw =   8.0; 	// W mass resolution
 static const Double_t kSigmaMz =   8.0; 	// Z mass resolution
 static const Double_t kSigmaMt =  15.0; 	// top mass resolution
 static const Double_t kSigmaMh =   8.0; 	// H mass resolution
-static const Int_t    kZoneX   = 4;		// No. X Zones in the Canvas
-static const Int_t    kZoneY   = 4;		// No. Y Zones in the Canvas
 
-Int_t TTH8JAnalysis::Ngoods = 0;
 Bool_t gDEBUG = kFALSE;
+Int_t  gNgoods  = 0;
+const Int_t  kMaxCuts = 100;
+      stringstream gCutName[kMaxCuts];
+      TH1D  *hStat = 0;
 
 //_____________________________________________________________________
-//  ----------------------
-//  TTH8JAnalysisBuf Class
-//  ----------------------
-//
-//
-ClassImp(TTH8JAnalysisBuf)
-
-//_________________________________________________________
-TTH8JAnalysisBuf::TTH8JAnalysisBuf(const Char_t *name, const Char_t *title,
-   TTH8JAnalysis *module) : JSFEventBuf(name, title, (JSFModule*)module) {}
-
-//_________________________________________________________
-TTH8JAnalysisBuf::TTH8JAnalysisBuf(TTH8JAnalysis *module, const Char_t *name,
-   const Char_t *title) : JSFEventBuf(name, title, (JSFModule*)module) {}
-
-
-//_____________________________________________________________________
-//  ------------------
+// ---------------------
 //  TTH8JAnalysis Class
-//  ------------------
-//
-//
+// ---------------------
 
 ClassImp(TTH8JAnalysis)
 
-TTH8JAnalysis::TTH8JAnalysis(const Char_t *name, const Char_t *title)
-  : JSFModule(name, title), cHist(0)
+TTH8JAnalysis::TTH8JAnalysis(const Char_t *name,
+		             const Char_t *title)
+              : JSFModule(name, title),
+                fNtracksCut(   25),   // No. of tracks
+                fEtrackCut (  0.1),   // track energy
+                fEvisCut   (500.0),   // Minimum visible energy
+                fPtCut     ( 50.0),   // Pt maximum
+                fPlCut     (999.0),   // Pl maximum
+                fYcutCut   (0.004),   // y_cut to force the event to 4 jets
+                fNjetsCut  (    8),   // No. of jets
+                fEjetCut   (  5.0),   // E_jet minimum
+                fCosjetCut ( 0.99),   // |cos(theta_j)| maximum
+                fCosbwCut  ( 1.00),   // cos(theta_bw) maximum
+                fM2jCut    ( 18.0),   // |m_jj-m_W| maximum
+                fM3jCut    ( 24.0),   // |m_3j-m_t| maximum
+                fThrustCut (  0.8)    // Thrust maximum
 {
-  fEventBuf = new TTH8JAnalysisBuf(this);
-  SetBufferSize(2000);  // buffer size for event data.
-  cout << "TTH8JAnalysisBuf is created...fEventBuf is "
-       << (Int_t)fEventBuf << endl;
 }
 
 //_____________________________________________________________________
 TTH8JAnalysis::~TTH8JAnalysis()
 {
-  cout << "TTH8JAnalysisBuf will be deleted...fEventBuf is "
-       << (Int_t)fEventBuf << endl;
-  delete fEventBuf; fEventBuf = 0;
-}
-
-//_____________________________________________________________________
-void TTH8JAnalysis::CleanUp(TObjArray *objs)
-{
-  objs->SetOwner();
 }
 
 //_____________________________________________________________________
 Bool_t TTH8JAnalysis::Initialize()
 {
-  TDirectory *last = gDirectory;
-  gFile->cd("/");
+  //--
+  //  Read in Generator info.
+  //--
+  gJSF->GetInput()->cd("/conf/init");
+  TTHBases *bsp = (TTHBases *)gROOT->FindObject("TTHBases");
+  cerr << "------------------------------------" << endl
+       << " Ecm = " << bsp->GetRoots() << " GeV" << endl
+       << "------------------------------------" << endl;
+  SetEcm(bsp->GetRoots()); 
 
-  hStat         = new TH1F("hStat","Cut Statistics",  20,   0.0,  20.0);
-  hNtracks      = new TH1F("hNtracks","No. tracks" ,  50,   0.0, 400.0);
-  hEvis         = new TH1F("hEvis","Visible energy",  80,   0.0, 800.0);
-  hPt           = new TH1F("hPt","Missing Pt"      ,  60,   0.0, 240.0);
-  hNjets        = new TH1F("hNjets","No. jets"     ,  20,   0.0,  20.0);
-  hEjet         = new TH1F("hEjet","Jet energy"    ,  50,   0.0, 200.0);
-  hCosjet       = new TH1F("hCosjet","cos(theta_j)",  50,  -1.0,  +1.0);
-  hNsols        = new TH1F("hNsols","No. solutions",  20,   0.0,  20.0);
-  hChi2         = new TH1F("hChi2","Chi2"          ,  50,   0.0,  50.0);
-  hEw1Ew2       = new TH2F("hEw1Ew2","(E_w1,E_w2)" ,
-  				    50,  0.0, 400.0,  50,   0.0, 400.0);
-  hCosbw1Cosbw2 = new TH2F("hCosbw1Cosbw2","(cos_bw1,cow_bw2)",
-				    50, -1.0,  +1.0,  50,  -1.0,  +1.0);
-  hMw1Mw2       = new TH2F("hMw1Mw2","(m_w1,m_w2)" ,
-  				    60, 50.0, 110.0,  60,  50.0, 110.0);
-  hEvisPl       = new TH2F("hEvisPl","(Evis,Pl)"   ,
-  				    80,  0.0, 800.0,  50,-200.0,+200.0);
-  hMt1Mt2       = new TH2F("hMt1Mt2","(m_t1,m_t2)" ,
-  				    50,120.0, 220.0,  50, 120.0, 220.0);
-  hMw2Mh        = new TH2F("hMw2MH","(m_w2,m_H)" ,
-  				    60, 50.0, 110.0,  50,  70.0, 170.0);
-  hThrust       = new TH1F("hThrust","Thrust"      ,  50,   0.0,   1.0);
-  hYcut         = new TH1F("hYcut","Ymax"          ,1000,   0.0,  0.02);
-
-  xNtracks  =     25;   // No. of tracks
-  xEtrack   =   0.10;   // track energy
-  xEvis     = 500.00;   // Minimum visible energy
-  xPt       =  50.00;   // Pt maximum
-  xPl       = 999.00;   // Pl maximum
-  xYcut     =  0.004;   // y_cut to force the event to 4 jets
-  xNjets    =      8;   // No. of jets
-  xEjet     =   5.00;	// E_jet minimum
-  xCosjet   =   0.99;	// |cos(theta_j)| maximum
-  xCosbw    =    1.0;	// cos(theta_bw) maximum
-  xM2j      =  18.00;	// |m_jj-m_W| maximum
-  xM3j      =  24.00;	// |m_3j-m_t| maximum
-  xThrust   =   0.80;   // Thrust maximum
-
-  for (Int_t i = 0; i < MAXCUT; i++) {
-    strcpy(&cutName[i][0],"     ");
-  }
-
-   //--
-   //  Read in Generator info.
-   //--
-   gJSF->GetInput()->cd("/conf/init");
-   TTHBases *bsp = (TTHBases *)gROOT->FindObject("TTHBases");
-   cerr << "------------------------------------" << endl
-        << " Ecm = " << bsp->GetRoots() << " GeV" << endl
-        << "------------------------------------" << endl;
-    TTH8JAnalysisBuf *bufp = (TTH8JAnalysisBuf *)EventBuf();
-    bufp->SetEcm(bsp->GetRoots()); 
-
-  last->cd();
-  return 0;
-}
-
-//_________________________________________________________
-void TTH8JAnalysis::DrawHist()
-{
-  TDirectory *last = gDirectory;
-  if (!cHist) {
-    cHist = new TCanvas("cHist","Canvas 1",10, 10, kZoneX*200, kZoneY*200);
-    cHist->Divide(kZoneX,kZoneY);
-  } else {
-    cHist->cd();
-  }
-
-  Int_t Ihist = 0;
-  cHist->cd(++Ihist);		hStat->Draw();
-  cHist->cd(++Ihist);		hNtracks->Draw();
-  cHist->cd(++Ihist);		hEvis->Draw();
-  cHist->cd(++Ihist);		hPt->Draw();
-  cHist->cd(++Ihist);		hNjets->Draw();
-  cHist->cd(++Ihist);		hEjet->Draw();
-  cHist->cd(++Ihist);		hCosjet->Draw();
-  cHist->cd(++Ihist);		hNsols->Draw();
-  cHist->cd(++Ihist);		hChi2->Draw();
-  cHist->cd(++Ihist);		hEw1Ew2->Draw();
-  cHist->cd(++Ihist);		hCosbw1Cosbw2->Draw();
-  cHist->cd(++Ihist);		hMw1Mw2->Draw();
-  cHist->cd(++Ihist);		hEvisPl->Draw();
-  cHist->cd(++Ihist);		hMt1Mt2->Draw();
-  cHist->cd(++Ihist);		hThrust->Draw();
-  cHist->cd(++Ihist);		hYcut->Draw();
-
-  cHist->Update();
-
-  last->cd();
+  return kTRUE;
 }
 
 //_________________________________________________________
 Bool_t TTH8JAnalysis::Process(Int_t ev)
 {
-  // Local copies of TTH8JAnalysisBuf data members.
+  using namespace std;
 
-  Int_t     	fNtracks;	// track multiplicity
-  Double_t  	fEvis;		// visible energy
-  Double_t  	fPt;		// Pt
-  Double_t  	fPl;		// Pl
-  Double_t  	fYcut;		// y_cut to force the event to 4 jets
-  Int_t        	fNjets;		// jet multiplicity
-  Double_t  	fThrust;	// thrust
-
+  //--
   // Remember the previous directory.
+  //--
 
   TDirectory *last = gDirectory;
   gFile->cd("/");
+  if (!hStat) hStat = new TH1D("hStat","Cut Statistics", 20, 0., 20.);
 
-  Char_t msg[60];
+  static TNtupleD *hEvt = 0;
+  if (!hEvt) {
+    stringstream tupstr;
+    tupstr << "nev:ecm:ntracks:evis:pt:pl:ycut:chi2"                    << ":"
+           << "nsols:ejmin:csjmax"                                      << ":"
+           << "csbw1:csbw2"                                             << ":"
+           << "mw1:mw2:mt1:mt2:mh:thrust"                               << ":"
+           << ends;
+
+    hEvt = new TNtupleD("hEvt", "", tupstr.str().data());
+  }
 
   // ---------------------
   // Analysis starts here.
   // ---------------------
 
-  Float_t selid = -0.5;
+  Double_t selid = -0.5;
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) strcpy(&cutName[(Int_t)selid][0],"No cut");
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "No Cuts" << ends;
+  }
 
+  //--
   // Get event buffer and make combined tracks accessible.
+  //--
 
-  JSFSIMDST     *sds     = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
-  JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
-  TTH8JAnalysisBuf *ua    = (TTH8JAnalysisBuf *)fEventBuf;
-  TTH8JAnalysisBuf &a     = *ua;
+  JSFSIMDST    *sdsp  = static_cast<JSFSIMDST *>(gJSF->FindModule("JSFSIMDST"));
+  JSFSIMDSTBuf *evtp  = static_cast<JSFSIMDSTBuf *>(sdsp->EventBuf());
 
-  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
-  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  Int_t         ntrks   = evtp->GetNLTKCLTracks(); 	// No. of tracks 
+  TObjArray    *trks    = evtp->GetLTKCLTracks(); 	// combined tracks
 
+  //--
   // Select good tracks and store them in "TObjArray tracks".
+  //--
 
   ANL4DVector qsum;
   TObjArray tracks(1000);
-  fNtracks = 0;
-  for ( Int_t i = 0; i < ntrks; i++ ) {
-    JSFLTKCLTrack *t = (JSFLTKCLTrack*)trks->UncheckedAt(i);
-    if ( t->GetE() > xEtrack ) {
-      ANLTrack *qt = new ANLTrack(t);
-      tracks.Add(qt); 		// track 4-momentum
-      qsum += *qt;		// total 4-momentum
-      fNtracks++;
-    }				// *qt stays.
+  tracks.SetOwner();       // the "tracks" array owns tracks in it
+  Int_t ntracks = 0;
+  for (Int_t i = 0; i < ntrks; i++) {
+    JSFLTKCLTrack *tp = static_cast<JSFLTKCLTrack*>(trks->UncheckedAt(i));
+    if (tp->GetE() > fEtrackCut) {
+      ANLTrack *qtp = new ANLTrack(tp);
+      tracks.Add(qtp); 		// track 4-momentum
+      qsum += *qtp;		// total 4-momentum
+      ntracks++;
+    }				// *qtp stays.
   }
-  if (gDEBUG) cerr << "Ntracks = " << fNtracks << endl;
+  if (gDEBUG) cerr << "Ntracks = " << ntracks << endl;
 
+  //--
   // Cut on No. of tracks.
+  //--
 
-  hNtracks->Fill(fNtracks);
-  if ( fNtracks < xNtracks ) { CleanUp(&tracks); return kFALSE; }
+  if (ntracks < fNtracksCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"N_tracks > %i",xNtracks);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Ntracks >= " << fNtracksCut << ends;
   }
 
-  fEvis = qsum(0);		// E_vis
-  fPt   = qsum.GetPt();		// P_t
-  fPl   = qsum(3);		// P_l
+  Double_t evis = qsum(0);      // E_vis
+  Double_t pt   = qsum.GetPt(); // P_t
+  Double_t pl   = qsum(3);      // P_l
 
-  if (gDEBUG) cerr << "Evis = " << fEvis << " Pt = "
-       << fPt << " Pl = " << fPl << endl;
+  if (gDEBUG) cerr << "Evis = " << evis << " Pt = " << pt << " Pl = " << pl << endl;
 
+  //--
   // Cut on Evis.
+  //--
 
-  hEvis->Fill(fEvis);
-  if ( fEvis < xEvis ) { CleanUp(&tracks); return kFALSE; }
+  if (evis < fEvisCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"E_vis > %g",xEvis);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Evis >= " << fEvisCut << ends;
   }
 
+  //--
   // Cut on Pt.
+  //--
 
-  hPt->Fill(fPt);
-  if ( fPt > xPt ) { CleanUp(&tracks); return kFALSE; }
+  if (pt > fPtCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Pt <= %g",xPt);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Pt <= " << fPtCut << ends;
   }
 
+  //--
   // Cut on Pl.
+  //--
 
-  if ( TMath::Abs(fPl) > xPl ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(pl) > fPlCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"|Pl| <= %g",xPl);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|Pl| <= " << fPlCut << ends;
   }
 
+  //--
   // Find jets.
+  //--
 
-  fYcut = xYcut;
-  ANLJadeEJetFinder jclust(fYcut);
+  ANLJadeEJetFinder jclust(fYcutCut);
   jclust.Initialize(tracks);
   jclust.FindJets();
-  fYcut  = jclust.GetYmax();
-  fNjets = jclust.GetNjets();
+  Double_t ycut  = jclust.GetYcut();
+  Int_t    njets = jclust.GetNjets();
 
-  if (gDEBUG) cerr << "Ycut = " << fYcut << " Njets = " << fNjets << endl;
+  if (gDEBUG) cerr << "Ycut = " << ycut << " Njets = " << njets << endl;
 
+  //--
   // Cut on No. of jets.
+  //--
 
-  hNjets->Fill(fNjets);
-  if ( fNjets < xNjets ) { CleanUp(&tracks); return kFALSE; }
+  if (njets < fNjetsCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Njets >= 4 for Ycut = " << fYcutCut << ends;
   }
 
-  // Now force the event to be xNjets.
+  //--
+  // Now force the event to be fNjetsCut.
+  //--
 
-  jclust.ForceNJets(xNjets);
-  fNjets = jclust.GetNjets();
-  fYcut  = jclust.GetYmax();
+  jclust.ForceNJets(fNjetsCut);
+  njets = jclust.GetNjets();
+  ycut  = jclust.GetYcut();
 
-  if (gDEBUG) cerr << "Ycut = " << fYcut << " Njets = " << fNjets << endl;
+  if (gDEBUG) cerr << "Ycut = " << ycut << " Njets = " << njets << endl;
 
-  // Make sure that No. of jets is xNjets.
+  //--
+  // Make sure that No. of jets is fNjetsCut.
+  //--
 
-  hYcut->Fill(fYcut);
-  if ( fNjets != xNjets ) { CleanUp(&tracks); return kFALSE; }
+  if (njets != fNjetsCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Njets = %i",xNjets);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Njets = " << fNjetsCut << ends;
   }
 
+  //--
   // Loop over jets and decide Ejet_min and |cos(theta_j)|_max.
+  //--
 
   TObjArray &jets = jclust.GetJets();
   TIter nextjet(&jets);
   ANLJet *jetp;
   Double_t ejetmin = 999999.;
   Double_t cosjmax = 0.;
-  while ((jetp = (ANLJet *)nextjet())) {
+  while ((jetp = static_cast<ANLJet *>(nextjet()))) {
     ANLJet &jet = *jetp;
     if (gDEBUG) jet.DebugPrint();
-    Double_t ejet = jet()(0);
+    Double_t ejet = jet.E();
     if (ejet < ejetmin) ejetmin = ejet;
-    hEjet->Fill(ejet);
     Double_t cosj = jet.CosTheta();
     if (TMath::Abs(cosj) > TMath::Abs(cosjmax)) cosjmax = cosj;
-    hCosjet->Fill(cosj);
   }
 
+  //--
   // Cut on Ejet_min.
+  //--
 
-  if ( ejetmin < xEjet ) { CleanUp(&tracks); return kFALSE; }
+  if (ejetmin < fEjetCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Ejet > %g",xEjet);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Ejet >= " << fEjetCut << ends;
   }
 
+  //--
   // Cut on |cos(theta_j)|_max.
+  //--
 
-  if ( TMath::Abs(cosjmax) > xCosjet ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(cosjmax) > fCosjetCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"|cos(theta_j)| <= %g",xCosjet);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|cos(theta_j)| <= " << fCosjetCut << ends;
   }
 
+  //--
   // Find W and top candidates in given mass windows.
+  //--
 
   TObjArray solutions(10);
+  solutions.SetOwner();    // The "solutions" array owns solutions in it.
   ANLPairCombiner w1candidates(jets,jets);
   if (gDEBUG) {
-    cerr << "------------------------------------------" << endl;
-    cerr << "- w1candidates:" << endl;
+    cerr << "------------------------------------------" << endl
+         << "- w1candidates:"                            << endl;
     w1candidates.DebugPrint();
   }
+
+#if 0
+  ANLVTXTagger btag(2.,2); // (sigma, n-offv tracks) b-tagger
+#else
+  ANLVTXTagger btag(1.,2); // (sigma, n-offv tracks) b-tagger
+#endif
+  
   ANLPair *w1p, *w2p, *bbp, *hp;
-  
-  ANLVTXTagger btag(2.,2);
-  
-  while ((w1p = (ANLPair *)w1candidates())) {
+  while ((w1p = static_cast<ANLPair *>(w1candidates()))) {
     ANLPair &w1 = *w1p;
-    Double_t w1mass = w1().GetMass();
-    if (TMath::Abs(w1mass - kMassW) > xM2j) continue;
+#if 0
+    if (btag(*static_cast<ANLJet *>(w1[0])) || 
+        btag(*static_cast<ANLJet *>(w1[1]))) continue;   // anti-b-tag for W daughters
+#endif
+    Double_t w1mass = w1.GetMass();
+    if (TMath::Abs(w1mass - kMassW) > fM2jCut) continue; // in the Mw window
     w1.LockChildren();
     ANLPairCombiner w2candidates(w1candidates);
     if (gDEBUG) {
       cerr << "-- w2candidates:" << endl;
       w2candidates.DebugPrint();
     }
-    while ((w2p = (ANLPair *)w2candidates())) {
+    while ((w2p = static_cast<ANLPair *>(w2candidates()))) {
       ANLPair &w2 = *w2p;
+#if 0
+      if (btag(*static_cast<ANLJet *>(w2[0])) || 
+          btag(*static_cast<ANLJet *>(w2[1]))) continue;   // anti-b-tag for W daughters
+#endif
       if (w2.IsLocked()) continue;
-      Double_t w2mass = w2().GetMass();
-      if (TMath::Abs(w2mass - kMassW) > xM2j) continue;
+      Double_t w2mass = w2.GetMass();
+      if (TMath::Abs(w2mass - kMassW) > fM2jCut) continue; // in the Mw window
       w2.LockChildren();
       ANLPairCombiner bbcandidates(w2candidates);
-      bbcandidates.Reset();
+      bbcandidates.Reset(); // rewind the pair combiner
       if (gDEBUG) {
         cerr << "---- bbcandidates:" << endl;
         bbcandidates.DebugPrint();
       }
-      while ((bbp = (ANLPair *)bbcandidates())) {
+      while ((bbp = static_cast<ANLPair *>(bbcandidates()))) {
         ANLPair &bb = *bbp;
         if (bb.IsLocked()) continue;
-        if (!btag(*(ANLJet *)bb[0]) || !btag(*(ANLJet *)bb[1])) continue;
+        if (!btag(*static_cast<ANLJet *>(bb[0])) || 
+            !btag(*static_cast<ANLJet *>(bb[1]))) continue;   // double b-tag for b's from t's
         bb.LockChildren();
         for (Int_t i = 0; i < 2; i++) {
-          ANL4DVector *b1p = (ANL4DVector *)bb[i];
-          ANL4DVector *b2p = (ANL4DVector *)bb[1-i];
+          ANL4DVector *b1p = static_cast<ANL4DVector *>(bb[i]);
+          ANL4DVector *b2p = static_cast<ANL4DVector *>(bb[1-i]);
           ANLPair *bw1p = new ANLPair(b1p,w1p);
           ANLPair *bw2p = new ANLPair(b2p,w2p);
           ANLPair &bw1  = *bw1p;
           ANLPair &bw2  = *bw2p;
-          Double_t t1mass = bw1().GetMass();
-          Double_t t2mass = bw2().GetMass();
-          if (TMath::Abs(t1mass - kMasst) > xM3j ||
-              TMath::Abs(t2mass - kMasst) > xM3j ) {
+          Double_t t1mass = bw1.GetMass();
+          Double_t t2mass = bw2.GetMass();
+          if (TMath::Abs(t1mass - kMasst) > fM3jCut ||
+              TMath::Abs(t2mass - kMasst) > fM3jCut) {
             delete bw1p;
             delete bw2p;
             continue;
@@ -425,14 +367,15 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
                  << " bb[1] = " << (void *)bb[1] << endl;
           }
           ANLPairCombiner hcandidates(bbcandidates);
-	  hcandidates.Reset();
+	  hcandidates.Reset(); // rewind the pair combiner
 	  Bool_t ok = kFALSE;
-	  while ((hp = (ANLPair *)hcandidates())) { 
+	  while ((hp = static_cast<ANLPair *>(hcandidates()))) { 
 	    ANLPair &h = *hp;
-	    Double_t hmass = h().GetMass();
+	    Double_t hmass = h.GetMass();
 	    if (h.IsLocked() ||
-	       !btag(*(ANLJet *)h[0]) || !btag(*(ANLJet *)h[1]) ||
-	        TMath::Abs(hmass - kMassH) > xM2j) continue;
+	       !btag(*static_cast<ANLJet *>(h[0])) || // double b-tag
+	       !btag(*static_cast<ANLJet *>(h[1])) || // h daughters (h->bb)
+	        TMath::Abs(hmass - kMassH) > fM2jCut) continue; // h in the Mh window
             Double_t chi2 = TMath::Power((w1mass - kMassW)/kSigmaMw,2.)
                           + TMath::Power((w2mass - kMassW)/kSigmaMw,2.)
                           + TMath::Power((t1mass - kMasst)/kSigmaMt,2.)
@@ -442,9 +385,6 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
 	    ANLPair *hpp = new ANLPair(h);
             solutions.Add(new ANLPair(ttp,hpp,chi2));
             ok = kTRUE;
-            // hEw1Ew2->Fill(w1()(0),w2()(0),1.0);
-            // hMw1Mw2->Fill(w1mass,w2mass,1.0);
-            // hMt1Mt2->Fill(t1mass,t2mass,1.0);
           }
           if (!ok) {
 	    delete bw1p;
@@ -458,98 +398,87 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     w1.UnlockChildren();
   }
 
+  //--
   // Cut on No. of solutions.
+  //--
 
-  if ( !solutions.GetEntries() ) { CleanUp(&tracks); return kFALSE; }
+  if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"|m_jj - m_W| <= %g && |m_3j - m_t| <= %g",xM2j,xM3j);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|m_jj - m_W| <= " << fM2jCut << " && "
+	                   << "|m_3j - m_t| <= " << fM3jCut << " && "
+	                   << "|m_jj - m_h| <= " << fM2jCut << ends;
   }
 
+  //--
   // Cut on cos(theta_bW).
+  //--
 
   TIter nextsol(&solutions);
-  ANLPair *sol;
-  while ((sol = (ANLPair *)nextsol())) {
-    ANLPair &tt  = *(ANLPair *)(*sol)[0];
-    ANLPair &bw1 = *(ANLPair *)tt[0];
-    ANLPair &bw2 = *(ANLPair *)tt[1];
-    ANL4DVector &b1 = *(ANL4DVector *)bw1[0];
-    ANL4DVector &w1 = *(ANL4DVector *)bw1[1];
-    ANL4DVector &b2 = *(ANL4DVector *)bw2[0];
-    ANL4DVector &w2 = *(ANL4DVector *)bw2[1];
+  ANLPair *solp;
+  while ((solp = static_cast<ANLPair *>(nextsol()))) {
+    ANLPair &sol = *solp;
+    ANLPair &tt  = *static_cast<ANLPair *>(sol[0]);
+    ANLPair &bw1 = *static_cast<ANLPair *>(tt[0]);
+    ANLPair &bw2 = *static_cast<ANLPair *>(tt[1]);
+    ANL4DVector &b1 = *static_cast<ANL4DVector *>(bw1[0]);
+    ANL4DVector &w1 = *static_cast<ANL4DVector *>(bw1[1]);
+    ANL4DVector &b2 = *static_cast<ANL4DVector *>(bw2[0]);
+    ANL4DVector &w2 = *static_cast<ANL4DVector *>(bw2[1]);
     Double_t cosbw1 = b1.CosTheta(w1);
     Double_t cosbw2 = b2.CosTheta(w2);
-    hCosbw1Cosbw2->Fill(cosbw1,cosbw2,1.0);
-    if (cosbw1 > xCosbw || cosbw2 > xCosbw) {
-      solutions.Remove(sol);
-      sol->Delete();
-      delete sol;
+    if (cosbw1 > fCosbwCut || cosbw2 > fCosbwCut) {
+      sol.Delete();
     }
   }
-  if ( !solutions.GetEntries() ) { CleanUp(&tracks); return kFALSE; }
+  if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"|cos(theta_bw)| > %g",xCosbw);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|cos(theta_bw)| > " << fCosbwCut << ends;
   }
 
+  //--
   // Cut on Thrust.
+  //--
 
   ANLEventShape eshape;
   eshape.Initialize(tracks);
-  fThrust = eshape.GetThrust();
-  hThrust->Fill(fThrust);
-  if ( fThrust > xThrust ) {
+  Double_t thrust = eshape.GetThrust();
+  if (thrust > fThrustCut) {
   	nextsol.Reset();
-  	while ((sol = (ANLPair *)nextsol())) sol->Delete();
-  	CleanUp(&solutions);
-  	CleanUp(&tracks);
+  	while ((solp = static_cast<ANLPair *>(nextsol()))) solp->Delete();
   	return kFALSE;
   }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Thrust <= %g",xThrust);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Thrust <= " << fThrustCut << ends;
   }
-
 
   // ----------------------
   // End of event selection
   // ----------------------
 
-  if ( Ngoods == 0 ) {
-    selid++;
-    sprintf(msg,"END");
-    strcpy(&cutName[(Int_t)selid][0],msg);
-  }
-  Ngoods++;
+  gNgoods++;
 
-  cerr << "------------------------------------------" << endl
-       << "Event " << gJSF->GetEventNumber()
+  cerr << "--------------------------------------------------" << endl
+       << "Event "                   << gJSF->GetEventNumber()
        << ": Number of solutions = " << solutions.GetEntries() << endl
-       << "------------------------------------------" << endl;
+       << "--------------------------------------------------" << endl;
 
+  //--
   // Sort the solutions in the ascending order of chi2 vlues.
+  //--
 
   solutions.Sort();
 
-  // Now store this in TTH8JAnalysisBuf.
-
-  a.fNtracks	= fNtracks;
-  a.fEvis	= fEvis;
-  a.fPt		= fPt;
-  a.fPl		= fPl;
-  a.fYcut	= fYcut;
-  a.fNjets	= fNjets;
-
-  // Hists and plots for selected events.
+  //--
+  // Now store this in the Ntuple.
+  //--
 
   if (gDEBUG) {
     Int_t nj = 0;
     nextjet.Reset();
-    while ((jetp = (ANLJet *)nextjet())) {
+    while ((jetp = static_cast<ANLJet *>(nextjet()))) {
        cerr << "------" << endl
             << "Jet " << ++nj << endl
             << "------" << endl;
@@ -557,40 +486,71 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     }
   }
 
-  hNsols->Fill(solutions.GetEntries());
-  hEvisPl->Fill(fEvis,fPl,1.);
 
+  Int_t nsols = solutions.GetEntries();
   nextsol.Reset();
-  Int_t nsols = 0;
-  while ((sol = (ANLPair *)nextsol())) {
-    if ( nsols++ ) break;				// choose the best
-    ANLPair &tt  = *(ANLPair *)(*sol)[0];
-    ANLPair &h   = *(ANLPair *)(*sol)[1];
-    ANLPair &bw1 = *(ANLPair *)tt[0];
-    ANLPair &bw2 = *(ANLPair *)tt[1];
-    ANL4DVector &w1 = *(ANL4DVector *)bw1[1];
-    ANL4DVector &w2 = *(ANL4DVector *)bw2[1];
-    Double_t chi2   = sol->GetQuality();
-    Double_t w1mass = w1.GetMass();
-    Double_t w2mass = w2.GetMass();
-    Double_t t1mass = bw1().GetMass();
-    Double_t t2mass = bw2().GetMass();
-    Double_t hmass  = h.GetMass();
-          hChi2->Fill(chi2);
-          hEw1Ew2->Fill(w1(0),w2(0),1.0);
-          hMw1Mw2->Fill(w1mass,w2mass,1.0);
-          hMt1Mt2->Fill(t1mass,t2mass,1.0);
-          hMw2Mh->Fill(w2mass,hmass,1.0);
+  Int_t nsol = 0;
+  while ((solp = static_cast<ANLPair *>(nextsol()))) {
+    if (nsol++) break;				// choose the best
+    ANLPair &sol = *solp;
+    ANLPair &tt  = *static_cast<ANLPair *>(sol[0]);
+    ANLPair &h   = *static_cast<ANLPair *>(sol[1]);
+    ANLPair &bw1 = *static_cast<ANLPair *>(tt[0]);
+    ANLPair &bw2 = *static_cast<ANLPair *>(tt[1]);
+    ANL4DVector &b1 = *static_cast<ANL4DVector *>(bw1[0]);
+    ANL4DVector &w1 = *static_cast<ANL4DVector *>(bw1[1]);
+    ANL4DVector &b2 = *static_cast<ANL4DVector *>(bw2[0]);
+    ANL4DVector &w2 = *static_cast<ANL4DVector *>(bw2[1]);
+    Int_t    nev   = gJSF->GetEventNumber();
+    Double_t ecm   = GetEcm();
+    Double_t chi2  = sol.GetQuality();
+    Double_t mw1   = w1.GetMass();
+    Double_t mw2   = w2.GetMass();
+    Double_t mt1   = bw1.GetMass();
+    Double_t mt2   = bw2.GetMass();
+    Double_t mh    = h.GetMass();
+    Double_t csbw1 = b1.CosTheta(w1);
+    Double_t csbw2 = b2.CosTheta(w2);
+  // nev
+  // ntracks, evis, pt, pl, ycut, chi2, nsols
+  // ejetmin, cosjmax
+  // csbw1, csbw2, mw1, mw2, mt1, mt2, mh, thrust
+    Double_t data[100];
+    data[ 0] = nev;
+    data[ 1] = ecm;
+    data[ 2] = ntracks;
+    data[ 3] = evis;
+    data[ 4] = pt;
+    data[ 5] = pl;
+    data[ 6] = ycut;
+    data[ 7] = chi2;
+    data[ 8] = nsols;
+    data[ 9] = ejetmin;
+    data[10] = cosjmax;
+    data[11] = csbw1;
+    data[12] = csbw2;
+    data[13] = mw1;
+    data[14] = mw2;
+    data[15] = mt1;
+    data[16] = mt2;
+    data[17] = mh;
+    data[18] = thrust;
+
+    hEvt->Fill(data);
   }
 
-  // Clean up
+  //--
+  // Clean up.
+  //--
 
   nextsol.Reset();
-  while ((sol = (ANLPair *)nextsol())) sol->Delete();
-  CleanUp(&solutions);
-  CleanUp(&tracks);
+  while ((solp = (ANLPair *)nextsol())) solp->Delete();
 
   last->cd();
+
+  // ------------------------
+  //  That's it.
+  // ------------------------
   return kTRUE;
 }
 
@@ -598,20 +558,25 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
 Bool_t TTH8JAnalysis::Terminate()
 {
   // This function is called at the end of job.
-  cout << endl;
-  cout << "  =============" << endl;
-  cout << "   Cut Summary " << endl;
-  cout << "  =============" << endl;
-  cout << endl;
-  cout << "  -----------------------------------------------------------" << endl;
-  cout << "   ID   No.Events    Cut Description" << endl;
-  cout << "  -----------------------------------------------------------" << endl;
-  Int_t i;
-  for ( i = 0; strncmp(&cutName[i][0],"END",4) && i < MAXCUT ; i++ ) {
-    printf("  %3d  %10d  : %s\n",i,(int)hStat->GetBinContent(i+1),&cutName[i][0]);
+  //--
+  // Print out cut statistics
+  //--
+  cerr << endl
+       << "  =============" << endl
+       << "   Cut Summary " << endl
+       << "  =============" << endl
+       << endl
+       << "  -----------------------------------------------------------" << endl
+       << "   ID   No.Events    Cut Description                         " << endl
+       << "  -----------------------------------------------------------" << endl;
+  for (int id=0; id<kMaxCuts && gCutName[id].str().data()[0]; id++) {
+    cerr << "  " << setw( 3) << id
+         << "  " << setw(10) << static_cast<int>(hStat->GetBinContent(id+1))
+         << "  : " << gCutName[id].str().data() << endl;
   }
-  cout << "  -----------------------------------------------------------" << endl;
+  cerr << "  -----------------------------------------------------------" << endl;
+  //--
+  // That's it!
+  //--
   return 0;
 }
-
-

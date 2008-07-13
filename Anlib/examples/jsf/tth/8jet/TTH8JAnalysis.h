@@ -1,5 +1,5 @@
-#ifndef __TTH8JAnalysis__
-#define __TTH8JAnalysis__
+#ifndef TTH8JAnalysis_H
+#define TTH8JAnalysis_H
 //*************************************************************************
 //* =======================
 //*  TTH8JAnalysis Classes
@@ -13,66 +13,15 @@
 //* 	library TTHStudy
 //* (Provides)
 //* 	class TTH8JAnalysis
-//* 	class TTH8JAnalysisBuf
 //* (Usage)
 //*   Take a look at anl8J.C.
 //* (Update Recored)
 //*   2002/08/15  K.Fujii	Original version.
+//*   2008/07/13  K.Fujii	Clean up.
 //*
 //*************************************************************************
-//
-#include "TROOT.h"
-#include "TFile.h"
-#include "TCanvas.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "JSFSteer.h"
+
 #include "JSFModule.h"
-#include "JSFSIMDST.h"
-#include "Anlib.h"
-
-#define MAXCUT 50
-//_____________________________________________________________________
-//  ----------------------
-//  TTH8JAnalysisBuf Class
-//  ----------------------
-//
-//  This class is to store data summary of a selected event.
-//  Add more data members as needed.
-//
-class TTH8JAnalysis;
-
-class TTH8JAnalysisBuf : public JSFEventBuf {
-friend class TTH8JAnalysis;
-public:
-  TTH8JAnalysisBuf(const char *name="TTH8JAnalysisBuf",
-                  const char *title="TT 6-Jet Data", TTH8JAnalysis *mod=0);
-  TTH8JAnalysisBuf(TTH8JAnalysis *mod, const char *name="TTH8JAnalysisBuf",
-                  const char *title="TT 6-Jet Data");
-  virtual ~TTH8JAnalysisBuf() {}
-
-  inline Int_t    GetNtracks()	const { return fNtracks; }
-  inline Double_t GetEvis()	const { return fEvis; }
-  inline Double_t GetPt()	const { return fPt; }
-  inline Double_t GetPl()	const { return fPl; }
-  inline Int_t    GetNjets()	const { return fNjets; }
-  inline Double_t GetYcut()	const { return fYcut; }
-  inline Double_t GetThrust()	const { return fThrust; }
-
-  inline void SetEcm(Double_t ecm) { fEcm = ecm; }
-
-private:
-  Int_t     	fNtracks;	// track multiplicity
-  Double_t  	fEvis;		// visible energy
-  Double_t  	fPt;		// Pt
-  Double_t  	fPl;		// Pl
-  Double_t  	fYcut;		// y_cut to force the event to 4 jets
-  Int_t        	fNjets;		// jet multiplicity
-  Double_t  	fThrust;	// thrust
-  Double_t	fEcm;		// nominal Ecm
-
-  ClassDef(TTH8JAnalysisBuf, 1) // TTH8JAnalysis Buffer Example
-};
 
 //_____________________________________________________________________
 //  -------------------
@@ -81,70 +30,50 @@ private:
 //
 //
 class TTH8JAnalysis : public JSFModule {
-private:
-  Int_t    xNtracks;    // No. of tracks
-  Double_t xEtrack;     // track energy
-  Double_t xEvis;       // Minimum visible energy
-  Double_t xPt;         // Pt maximum
-  Double_t xPl;         // Pl maximum
-  Double_t xYcut;       // y_cut to force the event to 4 jets
-  Int_t    xNjets;      // No. of jets
-  Double_t xEjet;	// E_jet minimum
-  Double_t xCosjet;	// |cos(theta_j)| maximum
-  Double_t xCosbw;	// cos(theta_bw) maximum
-  Double_t xM2j;	// |m_jj-m_W| maximum
-  Double_t xM3j;	// |m_3j-m_t| maximum
-  Double_t xThrust;	// Thrust maximum
-
-  static Int_t Ngoods;	// Number of good events
-  Char_t cutName[MAXCUT][256]; // Cut names
-public:
-  TCanvas *cHist;
-  TH1F *hStat;
-  TH1F *hNtracks;
-  TH1F *hEvis;
-  TH1F *hPt;
-  TH1F *hNjets;
-  TH1F *hEjet;
-  TH1F *hCosjet;
-  TH1F *hNsols;
-  TH1F *hChi2;
-  TH2F *hEw1Ew2;
-  TH2F *hCosbw1Cosbw2;
-  TH2F *hMw1Mw2;
-  TH2F *hMt1Mt2;
-  TH2F *hMw2Mh;
-  TH2F *hEvisPl;
-  TH1F *hThrust;
-  TH1F *hYcut;
 public:
   TTH8JAnalysis() : JSFModule("TTH8JAnalysis", "TTH8JAnalysis Example") {}
   TTH8JAnalysis(const Char_t *name, const Char_t *title);
   virtual ~TTH8JAnalysis();
 
-  void CleanUp(TObjArray *objs);
+  inline void SetEcm      (Double_t x) { fEcm        = x; }
 
-  inline void SetNtrackCut(Int_t    x) { xNtracks = x; }
-  inline void SetEtrackCut(Double_t x) { xEtrack = x; }
-  inline void SetEvisCut  (Double_t x) { xEvis = x; }
-  inline void SetPtCut    (Double_t x) { xPt = x; }
-  inline void SetPlCut    (Double_t x) { xPl = x; }
-  inline void SetMinYcut  (Double_t x) { xYcut  = x; }
-  inline void SetNjetCut  (Int_t    x) { xNjets = x; }
-  inline void SetEjetCut  (Double_t x) { xEjet = x; }
-  inline void SetCosjetCut(Double_t x) { xCosjet = x; }
-  inline void SetCosbwCut (Double_t x) { xCosbw = x; }
-  inline void SetM2jCut   (Double_t x) { xM2j = x; }
-  inline void SetM3jCut   (Double_t x) { xM3j = x; }
-  inline void SetThrustCut(Double_t x) { xThrust = x; }
+  inline void SetNtrackCut(Int_t    x) { fNtracksCut = x; }
+  inline void SetEtrackCut(Double_t x) { fEtrackCut  = x; }
+  inline void SetEvisCut  (Double_t x) { fEvisCut    = x; }
+  inline void SetPtCut    (Double_t x) { fPtCut      = x; }
+  inline void SetPlCut    (Double_t x) { fPlCut      = x; }
+  inline void SetMinYcut  (Double_t x) { fYcutCut    = x; }
+  inline void SetNjetCut  (Int_t    x) { fNjetsCut   = x; }
+  inline void SetEjetCut  (Double_t x) { fEjetCut    = x; }
+  inline void SetCosjetCut(Double_t x) { fCosjetCut  = x; }
+  inline void SetCosbwCut (Double_t x) { fCosbwCut   = x; }
+  inline void SetM2jCut   (Double_t x) { fM2jCut     = x; }
+  inline void SetM3jCut   (Double_t x) { fM3jCut     = x; }
+  inline void SetThrustCut(Double_t x) { fThrustCut  = x; }
+
+  inline Double_t GetEcm() const { return fEcm; }
 
   Bool_t Initialize();
   Bool_t Process(Int_t ev);
   Bool_t Terminate();
-  void DrawHist();
 
-  ClassDef(TTH8JAnalysis, 1) // TTH8JAnalysis Example
+private:
+  Double_t fEcm;           // Ecm
+  Int_t    fNtracksCut;    // No. of tracks
+  Double_t fEtrackCut;     // track energy
+  Double_t fEvisCut;       // Minimum visible energy
+  Double_t fPtCut;         // Pt maximum
+  Double_t fPlCut;         // Pl maximum
+  Double_t fYcutCut;       // y_cut to force the event to 4 jets
+  Int_t    fNjetsCut;      // No. of jets
+  Double_t fEjetCut;       // E_jet minimum
+  Double_t fCosjetCut;     // |cos(theta_j)| maximum
+  Double_t fCosbwCut;      // cos(theta_bw) maximum
+  Double_t fM2jCut;        // |m_jj-m_W| maximum
+  Double_t fM3jCut;        // |m_3j-m_t| maximum
+  Double_t fThrustCut;     // Thrust maximum
+
+  ClassDef(TTH8JAnalysis, 2) // TTH8JAnalysis Example
 };
 
 #endif
-

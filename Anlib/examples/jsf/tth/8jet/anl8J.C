@@ -55,15 +55,20 @@ int anl8J()
 
   myanl->SetNtrackCut(25);
   myanl->SetEvisCut(300.);
-  myanl->SetPtCut(50.);
+  myanl->SetPtCut(100.);
   myanl->SetPlCut(9999.);
   myanl->SetNjetCut(8);
   myanl->SetMinYcut(0.001);
   myanl->SetEjetCut(5);
   myanl->SetCosjetCut(1.);
   myanl->SetCosbwCut(1.);
+#if 0
   myanl->SetM2jCut(16.);
   myanl->SetM3jCut(30.);
+#else
+  myanl->SetM2jCut(30.);
+  myanl->SetM3jCut(50.);
+#endif
   myanl->SetThrustCut(0.8);
 
   jsf->BeginRun(1);      			// Set run number to 1.
@@ -72,11 +77,9 @@ int anl8J()
      if (!(jsf->GetEvent(ev))) break;		// Read in an event.
      if (!(jsf->Process(ev))) continue;		// Do SIMDST and TTH8JAnalysis.
      if (!(gROOT->IsBatch())) {
-        if (nok++%freq == 0) myanl->DrawHist();	// Draw hists, if interactive.
      }
      jsf->Clear();
   }
-  if (!(gROOT->IsBatch())) myanl->DrawHist();	// Draw hists, if interactive.
 
   jsf->Terminate();				// Terminate analysis.
 
