@@ -34,8 +34,8 @@ static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
 static const Double_t kMasst   = 175.0; 	// top mass
 static const Double_t kMassH   = 120.0;		// Higgs mass
-static const Double_t kSigmaMw =   8.0; 	// W mass resolution
-static const Double_t kSigmaMz =   8.0; 	// Z mass resolution
+static const Double_t kSigmaMw =   4.0; 	// W mass resolution
+static const Double_t kSigmaMz =   4.0; 	// Z mass resolution
 static const Double_t kSigmaMt =  15.0; 	// top mass resolution
 static const Double_t kSigmaMh =   8.0; 	// H mass resolution
 
@@ -67,7 +67,11 @@ TTH8JAnalysis::TTH8JAnalysis(const Char_t *name,
                 fCosbwCut  ( 1.00),   // cos(theta_bw) maximum
                 fM2jCut    ( 18.0),   // |m_jj-m_W| maximum
                 fM3jCut    ( 24.0),   // |m_3j-m_t| maximum
-                fThrustCut (  0.8)    // Thrust maximum
+                fThrustCut (  0.8),   // Thrust maximum
+                fBtagNsig  (  1.0),   // Nsig for b-tag
+                fBtagNoffv (    2),   // Noffv for b-tag
+                fBTtagNsig (  3.0),   // Nsig for b-tag (tight)
+                fBTtagNoffv(    2)    // Noffv for b-tag (tight)
 {
 }
 
@@ -295,19 +299,14 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     w1candidates.DebugPrint();
   }
 
-#if 0
-  ANLVTXTagger btag(2.,2); // (sigma, n-offv tracks) b-tagger
-#else
-  ANLVTXTagger btag(1.,2); // (sigma, n-offv tracks) b-tagger
-#endif
+  ANLVTXTagger btag (fBtagNsig,fBtagNoffv);   // (sigma, n-offv tracks) b-tagger
+  ANLVTXTagger bttag(fBTtagNsig,fBTtagNoffv); // (sigma, n-offv tracks) tight b-tagger
   
   ANLPair *w1p, *w2p, *bbp, *hp;
   while ((w1p = static_cast<ANLPair *>(w1candidates()))) {
     ANLPair &w1 = *w1p;
-#if 0
-    if (btag(*static_cast<ANLJet *>(w1[0])) || 
-        btag(*static_cast<ANLJet *>(w1[1]))) continue;   // anti-b-tag for W daughters
-#endif
+    if (bttag(*static_cast<ANLJet *>(w1[0])) || 
+        bttag(*static_cast<ANLJet *>(w1[1]))) continue;   // anti-b-tag for W daughters
     Double_t w1mass = w1.GetMass();
     if (TMath::Abs(w1mass - kMassW) > fM2jCut) continue; // in the Mw window
     w1.LockChildren();
@@ -318,10 +317,8 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     }
     while ((w2p = static_cast<ANLPair *>(w2candidates()))) {
       ANLPair &w2 = *w2p;
-#if 0
-      if (btag(*static_cast<ANLJet *>(w2[0])) || 
-          btag(*static_cast<ANLJet *>(w2[1]))) continue;   // anti-b-tag for W daughters
-#endif
+      if (bttag(*static_cast<ANLJet *>(w2[0])) || 
+          bttag(*static_cast<ANLJet *>(w2[1]))) continue;   // anti-b-tag for W daughters
       if (w2.IsLocked()) continue;
       Double_t w2mass = w2.GetMass();
       if (TMath::Abs(w2mass - kMassW) > fM2jCut) continue; // in the Mw window

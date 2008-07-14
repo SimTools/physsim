@@ -37,19 +37,23 @@ public:
 
   inline void SetEcm      (Double_t x) { fEcm        = x; }
 
-  inline void SetNtrackCut(Int_t    x) { fNtracksCut = x; }
-  inline void SetEtrackCut(Double_t x) { fEtrackCut  = x; }
-  inline void SetEvisCut  (Double_t x) { fEvisCut    = x; }
-  inline void SetPtCut    (Double_t x) { fPtCut      = x; }
-  inline void SetPlCut    (Double_t x) { fPlCut      = x; }
-  inline void SetMinYcut  (Double_t x) { fYcutCut    = x; }
-  inline void SetNjetCut  (Int_t    x) { fNjetsCut   = x; }
-  inline void SetEjetCut  (Double_t x) { fEjetCut    = x; }
-  inline void SetCosjetCut(Double_t x) { fCosjetCut  = x; }
-  inline void SetCosbwCut (Double_t x) { fCosbwCut   = x; }
-  inline void SetM2jCut   (Double_t x) { fM2jCut     = x; }
-  inline void SetM3jCut   (Double_t x) { fM3jCut     = x; }
-  inline void SetThrustCut(Double_t x) { fThrustCut  = x; }
+  inline void SetNtrackCut (Int_t    x) { fNtracksCut = x; }
+  inline void SetEtrackCut (Double_t x) { fEtrackCut  = x; }
+  inline void SetEvisCut   (Double_t x) { fEvisCut    = x; }
+  inline void SetPtCut     (Double_t x) { fPtCut      = x; }
+  inline void SetPlCut     (Double_t x) { fPlCut      = x; }
+  inline void SetMinYcut   (Double_t x) { fYcutCut    = x; }
+  inline void SetNjetCut   (Int_t    x) { fNjetsCut   = x; }
+  inline void SetEjetCut   (Double_t x) { fEjetCut    = x; }
+  inline void SetCosjetCut (Double_t x) { fCosjetCut  = x; }
+  inline void SetCosbwCut  (Double_t x) { fCosbwCut   = x; }
+  inline void SetM2jCut    (Double_t x) { fM2jCut     = x; }
+  inline void SetM3jCut    (Double_t x) { fM3jCut     = x; }
+  inline void SetThrustCut (Double_t x) { fThrustCut  = x; }
+  inline void SetBtagNsig  (Double_t x) { fBtagNsig   = x; }
+  inline void SetBtagNoffv (Int_t    x) { fBtagNoffv  = x; }
+  inline void SetBTtagNsig (Double_t x) { fBTtagNsig  = x; }
+  inline void SetBTtagNoffv(Int_t    x) { fBTtagNoffv = x; }
 
   inline Double_t GetEcm() const { return fEcm; }
 
@@ -72,6 +76,10 @@ private:
   Double_t fM2jCut;        // |m_jj-m_W| maximum
   Double_t fM3jCut;        // |m_3j-m_t| maximum
   Double_t fThrustCut;     // Thrust maximum
+  Double_t fBtagNsig;      // Nsig  for b-tag (loose)
+  Int_t    fBtagNoffv;     // Noffv for b-tag (loose)
+  Double_t fBTtagNsig;     // Nsig  for b-tag (tight)
+  Int_t    fBTtagNoffv;    // Noffv for b-tag (tight)
 
   ClassDef(TTH8JAnalysis, 2) // TTH8JAnalysis Example
 };

@@ -11,8 +11,8 @@
 //*
 //* $Id$
 //*************************************************************************
-//
-Int_t maxevt = 5000;
+
+Int_t maxevt = 999999;
 Int_t freq   = 10;
 
 int anl8J()
@@ -63,13 +63,18 @@ int anl8J()
   myanl->SetCosjetCut(1.);
   myanl->SetCosbwCut(1.);
 #if 0
-  myanl->SetM2jCut(16.);
+  myanl->SetM2jCut(20.);
   myanl->SetM3jCut(30.);
 #else
   myanl->SetM2jCut(30.);
   myanl->SetM3jCut(50.);
 #endif
   myanl->SetThrustCut(0.8);
+
+  myanl->SetBtagNsig  (1.0); // loose b-tag used to tag b's
+  myanl->SetBtagNoffv (2);   //
+  myanl->SetBTtagNsig (3.0); // tight b-tag used to veto any b in W
+  myanl->SetBTtagNoffv(2);   // 
 
   jsf->BeginRun(1);      			// Set run number to 1.
   Int_t nok = 0;
