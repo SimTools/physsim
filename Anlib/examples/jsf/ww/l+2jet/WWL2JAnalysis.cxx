@@ -20,6 +20,7 @@
 //*************************************************************************
 //
 #include "WWL2JAnalysis.h"
+#include "ANLTrack.h"
 
 static const Double_t kMassW   = 80.00; // W mass
 static const Double_t kMassZ   = 91.19; // Z mass

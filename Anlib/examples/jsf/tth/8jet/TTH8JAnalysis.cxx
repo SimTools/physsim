@@ -26,6 +26,7 @@
 #include "TH1D.h"
 #include "JSFSIMDST.h"
 #include "Anlib.h"
+#include "ANLVTXTagger.h"
 
 #include <sstream>
 #include <iomanip>
@@ -514,10 +515,7 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     Double_t mh    = h.GetMass();
     Double_t csbw1 = b1.CosTheta(w1);
     Double_t csbw2 = b2.CosTheta(w2);
-  // nev
-  // ntracks, evis, pt, pl, ycut, chi2, nsols
-  // ejetmin, cosjmax
-  // csbw1, csbw2, mw1, mw2, mt1, mt2, mh, thrust
+
     Double_t data[100];
     data[ 0] = nev;
     data[ 1] = ecm;

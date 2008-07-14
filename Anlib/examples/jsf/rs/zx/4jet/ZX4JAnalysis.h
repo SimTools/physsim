@@ -31,7 +31,7 @@ class ZX4JAnalysis : public JSFModule {
 public:
   ZX4JAnalysis() : JSFModule("ZX4JAnalysis","ZX4JAnalysis Example") {}
   ZX4JAnalysis(const Char_t *name,
-                 const Char_t *title);
+               const Char_t *title);
   virtual ~ZX4JAnalysis();
   
   Bool_t Process   (Int_t evt);

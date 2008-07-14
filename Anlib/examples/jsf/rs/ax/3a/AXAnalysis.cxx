@@ -20,6 +20,7 @@
 #include "AXAnalysis.h"
 #include "JSFGeneratorParticle.h"
 #include "TNtupleD.h"
+#include "ANLTrack.h"
 
 #include <sstream>
 #include <iomanip>

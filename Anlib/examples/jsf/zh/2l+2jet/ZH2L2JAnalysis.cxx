@@ -22,6 +22,7 @@
 //***************************************************************************
 
 #include "ZH2L2JAnalysis.h"
+#include "ANLTrack.h"
 
 static const Double_t kMassH   = 120.0; // H mass
 static const Double_t kMassZ   = 91.19;	// Z mass

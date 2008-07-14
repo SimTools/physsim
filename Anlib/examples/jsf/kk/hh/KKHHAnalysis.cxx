@@ -18,6 +18,7 @@
 //***************************************************************************
 
 #include "KKHHAnalysis.h"
+#include "ANLVTXTagger.h"
 
 static const Double_t kMassH   = 120.0; // H mass
 //static const Double_t kMassZ   = 91.19;	// Z mass
