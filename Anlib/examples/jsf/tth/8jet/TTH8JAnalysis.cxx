@@ -27,6 +27,7 @@
 #include "JSFSIMDST.h"
 #include "Anlib.h"
 #include "ANLVTXTagger.h"
+#include "ANLCheatedJetFinder.h"
 
 #include <sstream>
 #include <iomanip>
@@ -35,10 +36,17 @@ static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
 static const Double_t kMasst   = 175.0; 	// top mass
 static const Double_t kMassH   = 120.0;		// Higgs mass
+#if 0
 static const Double_t kSigmaMw =   4.0; 	// W mass resolution
 static const Double_t kSigmaMz =   4.0; 	// Z mass resolution
 static const Double_t kSigmaMt =  15.0; 	// top mass resolution
 static const Double_t kSigmaMh =   8.0; 	// H mass resolution
+#else
+static const Double_t kSigmaMw =   4.0; 	// W mass resolution
+static const Double_t kSigmaMz =   4.0; 	// Z mass resolution
+static const Double_t kSigmaMt =   8.0; 	// top mass resolution
+static const Double_t kSigmaMh =   6.0; 	// H mass resolution
+#endif
 
 Bool_t gDEBUG = kFALSE;
 Int_t  gNgoods  = 0;
@@ -88,7 +96,7 @@ Bool_t TTH8JAnalysis::Initialize()
   //  Read in Generator info.
   //--
   gJSF->GetInput()->cd("/conf/init");
-  TTHBases *bsp = (TTHBases *)gROOT->FindObject("TTHBases");
+  TTHBases *bsp = static_cast<TTHBases *>(gROOT->FindObject("TTHBases"));
   cerr << "------------------------------------" << endl
        << " Ecm = " << bsp->GetRoots() << " GeV" << endl
        << "------------------------------------" << endl;
@@ -211,7 +219,16 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   // Find jets.
   //--
 
+#if 1
   ANLJadeEJetFinder jclust(fYcutCut);
+#else
+  ANLCheatedJadeEJetFinder jclust(fYcutCut);
+  TIter nexttrk(&tracks);
+  ANLTrack *trkp;
+  while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
+    trkp->SetColorSingletID();
+  }
+#endif
   jclust.Initialize(tracks);
   jclust.FindJets();
   Double_t ycut  = jclust.GetYcut();
@@ -226,7 +243,7 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   if (njets < fNjetsCut) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
-    gCutName[(Int_t)selid] << "Njets >= 4 for Ycut = " << fYcutCut << ends;
+    gCutName[(Int_t)selid] << "Njets >= " << fNjetsCut << " for Ycut = " << fYcutCut << ends;
   }
 
   //--
@@ -426,6 +443,7 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     Double_t cosbw1 = b1.CosTheta(w1);
     Double_t cosbw2 = b2.CosTheta(w2);
     if (cosbw1 > fCosbwCut || cosbw2 > fCosbwCut) {
+      solutions.Remove(solp);
       ANLPair &tt = *static_cast<ANLPair *>(sol[0]);
       tt.Delete();
       sol.Delete();
@@ -545,7 +563,7 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   //--
 
   nextsol.Reset();
-  while ((solp = (ANLPair *)nextsol())) {
+  while ((solp = static_cast<ANLPair *>(nextsol()))) {
     ANLPair *ttp = static_cast<ANLPair *>((*solp)[0]);
     ttp ->Delete();
     solp->Delete();

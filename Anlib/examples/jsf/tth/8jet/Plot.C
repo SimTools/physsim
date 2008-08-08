@@ -29,12 +29,6 @@ TH1D *hEvis      = new TH1D("hEvis"    , "", 120,    0.,  600.);
 TH2D *hPtPl      = new TH2D("hPtPl"    , "", 100,    0.,  200.,
                                              200, -200., +200.);
 
-        hMhMw->Fill(mh,  mw1, 1.);
-        hMwMw->Fill(mw1, mw2, 1.);
-        hMtMt->Fill(mt1, mt2, 1.);
-	hEvis->Fill(evis, 1.);
-	hPtPl->Fill(pt, pl, 1.);
-
 void Plot(Char_t *filen = "jsf.root")
 {
   //gROOT->Reset();
@@ -58,7 +52,11 @@ void Plot(Char_t *filen = "jsf.root")
   //--
   // Preselection
   //--
+#if 0
   TString sel("evis>0.");
+#else
+  TString sel("pt<20.&&abs(pl)<30.&&ycut>0.0015");
+#endif
   tup->Draw(">>elist",sel.Data(),"goff");
 
   TEventList *elist = static_cast<TEventList*>(gROOT->FindObject("elist"));
