@@ -28,6 +28,8 @@ TH1D *hEvis      = new TH1D("hEvis"    , "", 120,    0.,  600.);
 
 TH2D *hPtPl      = new TH2D("hPtPl"    , "", 100,    0.,  200.,
                                              200, -200., +200.);
+TH2D *hMttMh     = new TH2D("hMttMh"   , "", 120,  200.,  440.,
+                                             120,   60.,  150.);
 
 void Plot(Char_t *filen = "jsf.root")
 {
@@ -85,6 +87,7 @@ void Plot(Char_t *filen = "jsf.root")
         Double_t mw2;
         Double_t mt1;
         Double_t mt2;
+        Double_t mtt;
 
         tup->SetBranchAddress("ntracks",&ntracks);
         tup->SetBranchAddress("evis",&evis);
@@ -97,6 +100,7 @@ void Plot(Char_t *filen = "jsf.root")
         tup->SetBranchAddress("mw2",&mw2);
         tup->SetBranchAddress("mt1",&mt1);
         tup->SetBranchAddress("mt2",&mt2);
+        tup->SetBranchAddress("mtt",&mtt);
 
         tup->GetEntry(event);
 
@@ -105,6 +109,7 @@ void Plot(Char_t *filen = "jsf.root")
         hMtMt->Fill(mt1, mt2, 1.);
 	hEvis->Fill(evis, 1.);
 	hPtPl->Fill(pt, pl, 1.);
+        hMttMh->Fill(mtt,  mh, 1.);
   }
   Int_t id = 0;
   id++; c1->cd(id); hStat->Draw();
@@ -118,4 +123,5 @@ void Plot(Char_t *filen = "jsf.root")
   id++; c1->cd(id); hMtMt->Draw();
   id++; c1->cd(id); hMtMt->ProjectionX()->Draw();
   id++; c1->cd(id); hMtMt->ProjectionY()->Draw();
+  id++; c1->cd(id); hMttMh->ProjectionX()->Draw();
 }

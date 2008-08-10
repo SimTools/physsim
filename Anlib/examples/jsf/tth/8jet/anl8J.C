@@ -71,10 +71,17 @@ int anl8J()
 #endif
   myanl->SetThrustCut(0.8);
 
+#if 0
   myanl->SetBtagNsig  (2.5); // loose b-tag used to tag b's
-  myanl->SetBtagNoffv (3);   //
+  myanl->SetBtagNoffv (2);   //
   myanl->SetBTtagNsig (3.0); // tight b-tag used to veto any b in W
-  myanl->SetBTtagNoffv(3);   // 
+  myanl->SetBTtagNoffv(99);   // 
+#else
+  myanl->SetBtagNsig  (2.5); // loose b-tag used to tag b's
+  myanl->SetBtagNoffv (0);   //
+  myanl->SetBTtagNsig (90.0); // tight b-tag used to veto any b in W
+  myanl->SetBTtagNoffv(99);   // 
+#endif
 
   jsf->BeginRun(1);      			// Set run number to 1.
   Int_t nok = 0;

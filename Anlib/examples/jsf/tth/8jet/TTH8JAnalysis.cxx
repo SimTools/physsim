@@ -18,6 +18,8 @@
 //*   2008/07/13  K.Fujii	Clean up.
 //*************************************************************************
 
+#define __CHEAT__
+
 #include "TTH8JAnalysis.h"
 #include "TTHSpring.h"
 #include "TROOT.h"
@@ -42,10 +44,10 @@ static const Double_t kSigmaMz =   4.0; 	// Z mass resolution
 static const Double_t kSigmaMt =  15.0; 	// top mass resolution
 static const Double_t kSigmaMh =   8.0; 	// H mass resolution
 #else
-static const Double_t kSigmaMw =   4.0; 	// W mass resolution
-static const Double_t kSigmaMz =   4.0; 	// Z mass resolution
-static const Double_t kSigmaMt =   8.0; 	// top mass resolution
-static const Double_t kSigmaMh =   6.0; 	// H mass resolution
+static const Double_t kSigmaMw =   6.0; 	// W mass resolution
+static const Double_t kSigmaMz =   6.0; 	// Z mass resolution
+static const Double_t kSigmaMt =  14.0; 	// top mass resolution
+static const Double_t kSigmaMh =  11.0; 	// H mass resolution
 #endif
 
 Bool_t gDEBUG = kFALSE;
@@ -124,7 +126,7 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     tupstr << "nev:ecm:ntracks:evis:pt:pl:ycut:chi2"                    << ":"
            << "nsols:ejmin:csjmax"                                      << ":"
            << "csbw1:csbw2"                                             << ":"
-           << "mw1:mw2:mt1:mt2:mh:thrust"                               << ":"
+           << "mw1:mw2:mt1:mt2:mh:mtt:thrust"                           << ":"
            << ends;
 
     hEvt = new TNtupleD("hEvt", "", tupstr.str().data());
@@ -219,7 +221,7 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   // Find jets.
   //--
 
-#if 1
+#ifndef __CHEAT__
   ANLJadeEJetFinder jclust(fYcutCut);
 #else
   ANLCheatedJadeEJetFinder jclust(fYcutCut);
@@ -278,11 +280,22 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   while ((jetp = static_cast<ANLJet *>(nextjet()))) {
     ANLJet &jet = *jetp;
     if (gDEBUG) jet.DebugPrint();
+#ifdef __CHEAT__
+    if (gDEBUG) {
+      ANLTaggedJet *tjetp = dynamic_cast<ANLTaggedJet *>(jetp);
+      cerr << " " << tjetp->GetTag();
+    }
+#endif
     Double_t ejet = jet.E();
     if (ejet < ejetmin) ejetmin = ejet;
     Double_t cosj = jet.CosTheta();
     if (TMath::Abs(cosj) > TMath::Abs(cosjmax)) cosjmax = cosj;
   }
+#ifdef __CHEAT__
+  if (gDEBUG) {
+    cerr << endl;
+  }
+#endif
 
   //--
   // Cut on Ejet_min.
@@ -323,6 +336,18 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   ANLPair *w1p, *w2p, *bbp, *hp;
   while ((w1p = static_cast<ANLPair *>(w1candidates()))) {
     ANLPair &w1 = *w1p;
+#ifdef __CHEAT__
+    ANLTaggedJet *j1p = dynamic_cast<ANLTaggedJet *>(w1[0]);
+    ANLTaggedJet *j2p = dynamic_cast<ANLTaggedJet *>(w1[1]);
+    if (!((j1p->GetTag() == -8 && j2p->GetTag() == -8) ||
+          (j1p->GetTag() == -8 && j2p->GetTag() == -9) ||
+          (j1p->GetTag() == -9 && j2p->GetTag() == -8) ||
+          (j1p->GetTag() == -9 && j2p->GetTag() == -9) ||
+          (j1p->GetTag() == -10 && j2p->GetTag() == -10) ||
+          (j1p->GetTag() == -10 && j2p->GetTag() == -11) ||
+          (j1p->GetTag() == -11 && j2p->GetTag() == -10) ||
+          (j1p->GetTag() == -11 && j2p->GetTag() == -11))) continue;
+#endif
     if (bttag(*static_cast<ANLJet *>(w1[0])) || 
         bttag(*static_cast<ANLJet *>(w1[1]))) continue;   // anti-b-tag for W daughters
     Double_t w1mass = w1.GetMass();
@@ -335,6 +360,18 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     }
     while ((w2p = static_cast<ANLPair *>(w2candidates()))) {
       ANLPair &w2 = *w2p;
+#ifdef __CHEAT__
+      j1p = dynamic_cast<ANLTaggedJet *>(w2[0]);
+      j2p = dynamic_cast<ANLTaggedJet *>(w2[1]);
+      if (!((j1p->GetTag() == -8 && j2p->GetTag() == -8) ||
+            (j1p->GetTag() == -8 && j2p->GetTag() == -9) ||
+            (j1p->GetTag() == -9 && j2p->GetTag() == -8) ||
+            (j1p->GetTag() == -9 && j2p->GetTag() == -9) ||
+            (j1p->GetTag() == -10 && j2p->GetTag() == -10) ||
+            (j1p->GetTag() == -10 && j2p->GetTag() == -11) ||
+            (j1p->GetTag() == -11 && j2p->GetTag() == -10) ||
+            (j1p->GetTag() == -11 && j2p->GetTag() == -11))) continue;
+#endif
       if (bttag(*static_cast<ANLJet *>(w2[0])) || 
           bttag(*static_cast<ANLJet *>(w2[1]))) continue;   // anti-b-tag for W daughters
       if (w2.IsLocked()) continue;
@@ -350,6 +387,14 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
       while ((bbp = static_cast<ANLPair *>(bbcandidates()))) {
         ANLPair &bb = *bbp;
         if (bb.IsLocked()) continue;
+#ifdef __CHEAT__
+        j1p = dynamic_cast<ANLTaggedJet *>(bb[0]);
+        j2p = dynamic_cast<ANLTaggedJet *>(bb[1]);
+        if (!((j1p->GetTag() == -4 && j2p->GetTag() == -4) ||
+              (j1p->GetTag() == -4 && j2p->GetTag() == -6) ||
+              (j1p->GetTag() == -6 && j2p->GetTag() == -4) ||
+              (j1p->GetTag() == -6 && j2p->GetTag() == -6))) continue;
+#endif
         if (!btag(*static_cast<ANLJet *>(bb[0])) || 
             !btag(*static_cast<ANLJet *>(bb[1]))) continue;   // double b-tag for b's from t's
         bb.LockChildren();
@@ -386,6 +431,12 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
 	  Bool_t ok = kFALSE;
 	  while ((hp = static_cast<ANLPair *>(hcandidates()))) { 
 	    ANLPair &h = *hp;
+#ifdef __CHEAT__
+            j1p = dynamic_cast<ANLTaggedJet *>(h[0]);
+            j2p = dynamic_cast<ANLTaggedJet *>(h[1]);
+            if (j1p->GetTag() != j2p->GetTag()) continue;
+            if (j1p->GetTag() != -3) continue;
+#endif
 	    Double_t hmass = h.GetMass();
 	    if (h.IsLocked() ||
 	       !btag(*static_cast<ANLJet *>(h[0])) || // double b-tag
@@ -519,10 +570,10 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     ANLPair &h   = *static_cast<ANLPair *>(sol[1]);
     ANLPair &bw1 = *static_cast<ANLPair *>(tt[0]);
     ANLPair &bw2 = *static_cast<ANLPair *>(tt[1]);
-    ANL4DVector &b1 = *static_cast<ANL4DVector *>(bw1[0]);
-    ANL4DVector &w1 = *static_cast<ANL4DVector *>(bw1[1]);
-    ANL4DVector &b2 = *static_cast<ANL4DVector *>(bw2[0]);
-    ANL4DVector &w2 = *static_cast<ANL4DVector *>(bw2[1]);
+    ANLJet  &b1  = *static_cast<ANLJet  *>(bw1[0]);
+    ANLPair &w1  = *static_cast<ANLPair *>(bw1[1]);
+    ANLJet  &b2  = *static_cast<ANLJet  *>(bw2[0]);
+    ANLPair &w2  = *static_cast<ANLPair *>(bw2[1]);
     Int_t    nev   = gJSF->GetEventNumber();
     Double_t ecm   = GetEcm();
     Double_t chi2  = sol.GetQuality();
@@ -531,8 +582,31 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     Double_t mt1   = bw1.GetMass();
     Double_t mt2   = bw2.GetMass();
     Double_t mh    = h.GetMass();
+    Double_t mtt   = tt.GetMass();
     Double_t csbw1 = b1.CosTheta(w1);
     Double_t csbw2 = b2.CosTheta(w2);
+#ifdef __CHEAT__
+    ANLTaggedJet *b1p   = dynamic_cast<ANLTaggedJet *>(&b1);
+    ANLTaggedJet *w1j1p = dynamic_cast<ANLTaggedJet *>(w1[0]);
+    ANLTaggedJet *w1j2p = dynamic_cast<ANLTaggedJet *>(w1[1]);
+    ANLTaggedJet *b2p   = dynamic_cast<ANLTaggedJet *>(&b2);
+    ANLTaggedJet *w2j1p = dynamic_cast<ANLTaggedJet *>(w2[0]);
+    ANLTaggedJet *w2j2p = dynamic_cast<ANLTaggedJet *>(w2[1]);
+    ANLTaggedJet *hj1p  = dynamic_cast<ANLTaggedJet *>(h[0]);
+    ANLTaggedJet *hj2p  = dynamic_cast<ANLTaggedJet *>(h[1]);
+#if 1
+    cerr << "(b1,w1j1,w1j2; b2,w2j1,w2j2; hj1, hj2) = ("
+         << b1p  ->GetTag() << ","
+         << w1j1p->GetTag() << ","
+         << w1j2p->GetTag() << ";"
+         << b2p  ->GetTag() << ","
+         << w2j1p->GetTag() << ","
+         << w2j2p->GetTag() << ";"
+	 << hj1p ->GetTag() << ","
+	 << hj2p ->GetTag() << ")"
+	 << endl;
+#endif
+#endif
 
     Double_t data[100];
     data[ 0] = nev;
@@ -553,7 +627,8 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
     data[15] = mt1;
     data[16] = mt2;
     data[17] = mh;
-    data[18] = thrust;
+    data[18] = mtt;
+    data[19] = thrust;
 
     hEvt->Fill(data);
   }
