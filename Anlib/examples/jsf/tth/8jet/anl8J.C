@@ -66,10 +66,12 @@ int anl8J()
   myanl->SetM2jCut(20.);
   myanl->SetM3jCut(30.);
 #else
-  myanl->SetM2jCut(40.);
-  myanl->SetM3jCut(50.);
+  //myanl->SetM2jCut(40.);
+  //myanl->SetM3jCut(50.);
+  myanl->SetM2jCut(900.);
+  myanl->SetM3jCut(900.);
 #endif
-  myanl->SetThrustCut(0.8);
+  myanl->SetThrustCut(1.);
 
 #if 0
   myanl->SetBtagNsig  (2.5); // loose b-tag used to tag b's
