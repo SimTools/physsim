@@ -18,41 +18,44 @@
 //*   2002/08/15  K.Fujii	Derived from TTL4JAnalysis.cxx.
 ///*
 //*************************************************************************
-//
+
+#define __CHEAT__
+
 #include "TTHL6JAnalysis.h"
 #include "TTHSpring.h"
+#include "TROOT.h"
+#include "TFile.h"
+#include "TNtupleD.h"
+#include "TH1D.h"
+#include "JSFSIMDST.h"
+#include "Anlib.h"
 #include "ANLVTXTagger.h"
+#include "ANLCheatedJetFinder.h"
+
+#include <sstream>
+#include <iomanip>
 
 static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
 static const Double_t kMasst   = 175.0; 	// top mass
 static const Double_t kMassH   = 120.0;		// Higgs mass
+#if 0
 static const Double_t kSigmaMw =   8.0; 	// W mass resolution
 static const Double_t kSigmaMz =   8.0; 	// Z mass resolution
 static const Double_t kSigmaMt =  15.0; 	// top mass resolution
 static const Double_t kSigmaMh =   8.0; 	// H mass resolution
-static const Int_t    kZoneX   =     6;		// No. X Zones in the Canvas
-static const Int_t    kZoneY   =     4;		// No. Y Zones in the Canvas
+#else
+static const Double_t kSigmaMw =   6.0; 	// W mass resolution
+static const Double_t kSigmaMz =   6.0; 	// Z mass resolution
+static const Double_t kSigmaMt =  14.0; 	// top mass resolution
+static const Double_t kSigmaMh =  11.0; 	// H mass resolution
+#endif
 
-Int_t TTHL6JAnalysis::Ngoods = 0;
 Bool_t gDEBUG = kFALSE;
-
-//_____________________________________________________________________
-//  -----------------------
-//  TTHL6JAnalysisBuf Class
-//  -----------------------
-//
-//
-ClassImp(TTHL6JAnalysisBuf)
-
-//_________________________________________________________
-TTHL6JAnalysisBuf::TTHL6JAnalysisBuf(const Char_t *name, const Char_t *title,
-   TTHL6JAnalysis *module) : JSFEventBuf(name, title, (JSFModule*)module) {}
-
-//_________________________________________________________
-TTHL6JAnalysisBuf::TTHL6JAnalysisBuf(TTHL6JAnalysis *module, const Char_t *name,
-   const Char_t *title) : JSFEventBuf(name, title, (JSFModule*)module) {}
-
+Int_t  gNgoods  = 0;
+const Int_t  kMaxCuts = 100;
+      stringstream gCutName[kMaxCuts];
+      TH1D  *hStat = 0;
 
 //_____________________________________________________________________
 //  -------------------
@@ -63,395 +66,372 @@ TTHL6JAnalysisBuf::TTHL6JAnalysisBuf(TTHL6JAnalysis *module, const Char_t *name,
 
 ClassImp(TTHL6JAnalysis)
 
-TTHL6JAnalysis::TTHL6JAnalysis(const Char_t *name, const Char_t *title)
-  : JSFModule(name, title), cHist(0)
+TTHL6JAnalysis::TTHL6JAnalysis(const Char_t *name,
+		               const Char_t *title)
+              : JSFModule(name, title),
+                fNtracksCut(   25),   // No. of tracks
+                fEtrackCut (  0.1),   // track energy
+                fEvisCut   ( 80.0),   // Minimum visible energy
+                fPtCut     (999.0),   // Pt maximum
+                fPlCut     (999.0),   // Pl maximum
+                fEleptonCut( 10.0),    // Elepton mimimum
+                fCosConeCut( 0.94),    // cos(theta_cone)
+                fYcutCut   (0.004),   // y_cut to force the event to 4 jets
+                fNjetsCut  (    8),   // No. of jets
+                fEjetCut   (  5.0),   // E_jet minimum
+                fCosjetCut ( 0.99),   // |cos(theta_j)| maximum
+                fCosbwCut  ( 1.00),   // cos(theta_bw) maximum
+                fM2jCut    ( 18.0),   // |m_jj-m_W| maximum
+                fM3jCut    ( 24.0),   // |m_3j-m_t| maximum
+                fThrustCut (  0.9),   // Thrust maximum
+                fBtagNsig  (  1.0),   // Nsig for b-tag
+                fBtagNoffv (    2),   // Noffv for b-tag
+                fBTtagNsig (  3.0),   // Nsig for b-tag (tight)
+                fBTtagNoffv(    2)    // Noffv for b-tag (tight)
 {
-  fEventBuf = new TTHL6JAnalysisBuf(this);
-  SetBufferSize(2000);  // buffer size for event data.
-  cout << "TTHL6JAnalysisBuf is created...fEventBuf is "
-       << (Int_t)fEventBuf << endl;
 }
 
 //_____________________________________________________________________
 TTHL6JAnalysis::~TTHL6JAnalysis()
 {
-  cout << "TTHL6JAnalysisBuf will be deleted...fEventBuf is "
-       << (Int_t)fEventBuf << endl;
-  delete fEventBuf; fEventBuf = 0;
-}
-
-//_____________________________________________________________________
-void TTHL6JAnalysis::CleanUp(TObjArray *objs)
-{
-  objs->SetOwner();
 }
 
 //_____________________________________________________________________
 Bool_t TTHL6JAnalysis::Initialize()
 {
-  TDirectory *last = gDirectory;
-  gFile->cd("/");
-
-  hStat         = new TH1F("hStat","Cut Statistics",  20,   0.0,  20.0);
-  hNtracks      = new TH1F("hNtracks","No. tracks" ,  50,   0.0, 400.0);
-  hEvis         = new TH1F("hEvis","Visible energy",  80,   0.0, 800.0);
-  hPt           = new TH1F("hPt","Missing Pt"      ,  60,   0.0, 240.0);
-  hNlptracks    = new TH1F("hNlptracks","No.lp trks", 10,   0.0,  10.0);
-  hNjets        = new TH1F("hNjets","No. jets"     ,  20,   0.0,  20.0);
-  hEjet         = new TH1F("hEjet","Jet energy"    ,  50,   0.0, 200.0);
-  hCosjet       = new TH1F("hCosjet","cos(theta_j)",  50,  -1.0,  +1.0);
-  hNsols        = new TH1F("hNsols","No. solutions",  20,   0.0,  20.0);
-  hChi2         = new TH1F("hChi2","Chi2"          ,  50,   0.0,  50.0);
-  hEw1Ew2       = new TH2F("hEw1Ew2","(E_w1,E_w2)" ,
-  				    50,  0.0, 400.0,  50,   0.0, 400.0);
-  hCosbw1Cosbw2 = new TH2F("hCosbw1Cosbw2","(cos_bw1,cos_bw2)",
-				    50, -1.0,  +1.0,  50,  -1.0,  +1.0);
-  hMw1Mw2       = new TH2F("hMw1Mw2","(m_w1,m_w2)" ,
-  				    60, 50.0, 110.0,  60,  50.0, 110.0);
-  hEvisPl       = new TH2F("hEvisPl","(Evis,Pl)"   ,
-  				    80,  0.0, 800.0,  50,-200.0,+200.0);
-  hMt1Mt2       = new TH2F("hMt1Mt2","(m_t1,m_t2)" ,
-  				    50,120.0, 220.0,  50, 120.0, 220.0);
-  hMw2Mh        = new TH2F("hMw2MH","(m_w2,m_H)" ,
-  				    60, 50.0, 110.0,  50,  70.0, 170.0);
-  hThrust       = new TH1F("hThrust","Thrust"      ,  50,   0.0,   1.0);
-  hPCost        = new TH2F("hPCost ","(P_t,Cos_t)" ,
-			            50,  0.0, 400.0,  50,  -1.0,   1.0);
-  hPCostbar     = new TH2F("hPCostbar","(P_tbar,Cos_tbar)",
-			            50,  0.0, 400.0,  50,  -1.0,   1.0);
-  hElpm         = new TH1F("hElpm","E_l-"          ,  50,   0.0, 200.0);
-  hElpp         = new TH1F("hElpp","E_l+"          ,  50,   0.0, 200.0);
-  hCoslpm       = new TH1F("hCoslpm","cos(theta_l-)", 50,  -1.0,   1.0);
-  hCoslpp       = new TH1F("hCoslpp","cos(theta_l+)", 50,  -1.0,   1.0);
-  hYcut         = new TH1F("hYcut","Ymax"          , 100,   0.0,   0.2);
-
-  xNtracks  =     25;   // No. of tracks
-  xEtrack   =   0.10;   // track energy
-  xEvis     =  80.00;   // Minimum visible energy
-  xPt       = 999.00;   // Pt maximum
-  xPl       = 999.00;   // Pl maximum
-  xElepton  =  10.00;   // Elepton mimimum
-  xCosCone  =   0.94;   // cos(theta_cone)
-  xEcone    =  10.00;   // Ecome maximum
-  xYcut     =  0.004;   // y_cut to force the event to 6 jets
-  xNjets    =      6;   // No. of jets
-  xEjet     =   5.00;	// E_jet minimum
-  xCosjet   =   0.99;	// |cos(theta_j)| maximum
-  xCosbw    =  /* -0.90 */ 999.;	// cos(theta_bw) maximum
-  xM2j      =  18.00;	// |m_jj-m_W| maximum
-  xM3j      =  24.00;	// |m_3j-m_t| maximum
-  xThrust   =   0.90;   // Thrust maximum
-
-  for (Int_t i = 0; i < MAXCUT; i++) {
-    strcpy(&cutName[i][0],"     ");
-  }
-
   //--
   //  Read in Generator info.
   //--
   gJSF->GetInput()->cd("/conf/init");
-  TTHBases *bsp = (TTHBases *)gROOT->FindObject("TTHBases");
+  TTHBases *bsp = static_cast<TTHBases *>(gROOT->FindObject("TTHBases"));
   cerr << "------------------------------------" << endl
        << " Ecm = " << bsp->GetRoots() << " GeV" << endl
        << "------------------------------------" << endl;
-  TTHL6JAnalysisBuf *bufp = (TTHL6JAnalysisBuf *)EventBuf();
-  bufp->SetEcm(bsp->GetRoots());
+  SetEcm(bsp->GetRoots());
 
-  last->cd();
-  return 0;
+  return kTRUE;
 }
 
-//_________________________________________________________
-void TTHL6JAnalysis::DrawHist()
-{
-  TDirectory *last = gDirectory;
-  if (!cHist) {
-    cHist = new TCanvas("cHist","Canvas 1",10, 10, kZoneX*200, kZoneY*200);
-    cHist->Divide(kZoneX,kZoneY);
-  } else {
-    cHist->cd();
-  }
-
-  Int_t Ihist = 0;
-  cHist->cd(++Ihist);	hStat->Draw();
-  cHist->cd(++Ihist);	hNtracks->Draw();
-  cHist->cd(++Ihist);	hEvis->Draw();
-  cHist->cd(++Ihist);	hPt->Draw();
-  cHist->cd(++Ihist);   hNlptracks->Draw();
-  cHist->cd(++Ihist);	hNjets->Draw();
-  cHist->cd(++Ihist);	hEjet->Draw();
-  cHist->cd(++Ihist);	hCosjet->Draw();
-  cHist->cd(++Ihist);	hNsols->Draw();
-  cHist->cd(++Ihist);	hChi2->Draw();
-  cHist->cd(++Ihist);	hEw1Ew2->Draw();
-  cHist->cd(++Ihist);	hCosbw1Cosbw2->Draw();
-  cHist->cd(++Ihist);	hMw1Mw2->Draw();
-  cHist->cd(++Ihist);	hEvisPl->Draw();
-  cHist->cd(++Ihist);	hMt1Mt2->Draw();
-  cHist->cd(++Ihist);	hThrust->Draw();
-  cHist->cd(++Ihist);	hPCost->Draw();
-  cHist->cd(++Ihist);	hPCostbar->Draw();
-  cHist->cd(++Ihist);   hElpm->Draw();
-  cHist->cd(++Ihist);   hElpp->Draw();
-  cHist->cd(++Ihist);   hCoslpm->Draw();
-  cHist->cd(++Ihist);   hCoslpp->Draw();
-  cHist->cd(++Ihist);	hYcut->Draw();
-
-  cHist->Update();
-
-  last->cd();
-}
 
 //_________________________________________________________
 Bool_t TTHL6JAnalysis::Process(Int_t ev)
 {
-  // Local copies of TTHL6JAnalysisBuf data members.
-
-  Int_t     	fNtracks;	// track multiplicity
-  Int_t         fNlptracks;     // Isolated lepton multiplicity
-  Double_t  	fEvis;		// visible energy
-  Double_t  	fPt;		// Pt
-  Double_t  	fPl;		// Pl
-  Double_t  	fYcut;		// y_cut to force the event to 4 jets
-  Int_t        	fNjets;		// jet multiplicity
-  Double_t  	fThrust;	// thrust
+  using namespace std;
 
   // Remember the previous directory.
 
   TDirectory *last = gDirectory;
   gFile->cd("/");
+  if (!hStat) hStat = new TH1D("hStat","Cut Statistics", 20, 0., 20.);
 
-  Char_t msg[60];
+  static TNtupleD *hEvt = 0;
+  if (!hEvt) {
+    stringstream tupstr;
+    tupstr << "nev:ecm:ntracks:evis:pt:pl:ycut:chi2"                    << ":"
+           << "nsols:ejmin:csjmax"                                      << ":"
+           << "csbw1:csbw2"                                             << ":"
+           << "mw1:mw2:mt1:mt2:mh:mtt:thrust"                           << ":"
+           << ends;
+
+    hEvt = new TNtupleD("hEvt", "", tupstr.str().data());
+  }
+#if 0
+  static TNtupleD *hLep = 0;
+  if (!hLep) {
+    stringstream tupstr;
+    tupstr << "nev:ecm:ntracks:evis:pt:pl"                              << ":"
+           << "elep:econe"                                              << ":"
+           << ends;
+
+    hLep = new TNtupleD("hLep", "", tupstr.str().data());
+  }
+#endif
 
   // ---------------------
   // Analysis starts here.
   // ---------------------
 
-  Float_t selid = -0.5;
+  Double_t selid = -0.5;
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) strcpy(&cutName[(Int_t)selid][0],"No cut");
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "No Cuts" << ends;
+  }
 
+  //--
   // Get event buffer and make combined tracks accessible.
+  //--
 
-  JSFSIMDST     *sds     = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
-  JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
-  TTHL6JAnalysisBuf *ua    = (TTHL6JAnalysisBuf *)fEventBuf;
-  TTHL6JAnalysisBuf &a     = *ua;
+  JSFSIMDST     *sdsp    = static_cast<JSFSIMDST *>(gJSF->FindModule("JSFSIMDST"));
+  JSFSIMDSTBuf  *evtp    = static_cast<JSFSIMDSTBuf *>(sdsp->EventBuf());
 
-  Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
-  TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
+  Int_t          ntrks   = evtp->GetNLTKCLTracks(); 	// No. of tracks 
+  TObjArray     *trks    = evtp->GetLTKCLTracks(); 	// combined tracks
 
+  //--
   // Select good tracks and store them in "TObjArray tracks".
+  //--
 
   ANL4DVector qsum;
   TObjArray tracks(1000);
-  fNtracks = 0;
-  for ( Int_t i = 0; i < ntrks; i++ ) {
-    JSFLTKCLTrack *t = (JSFLTKCLTrack*)trks->UncheckedAt(i);
-    if ( t->GetE() > xEtrack ) {
-      //      ANL4DVector *qt = new ANL4DVector(t->GetPV());
-      ANLTrack *qt = new ANLTrack(t);
-      tracks.Add(qt); 		// track 4-momentum
-      qsum += *qt;		// total 4-momentum
-      fNtracks++;
+  tracks.SetOwner();
+  Int_t ntracks = 0;
+  for (Int_t i = 0; i < ntrks; i++) {
+    JSFLTKCLTrack *tp = static_cast<JSFLTKCLTrack*>(trks->UncheckedAt(i));
+    if (tp->GetE() > fEtrackCut) {
+      ANLTrack *qtp = new ANLTrack(tp);
+      tracks.Add(qtp); 		// track 4-momentum
+      qsum += *qtp;		// total 4-momentum
+      ntracks++;
     }				// *qt stays.
   }
-  if (gDEBUG) cerr << "Ntracks = " << fNtracks << endl;
+  if (gDEBUG) cerr << "Ntracks = " << ntracks << endl;
 
+  //--
   // Cut on No. of tracks.
+  //--
 
-  hNtracks->Fill(fNtracks);
-  if ( fNtracks < xNtracks ) { CleanUp(&tracks); return kFALSE; }
+  if (ntracks < fNtracksCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"N_tracks > %i",xNtracks);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Ntracks >= " << fNtracksCut << ends;
   }
 
-  fEvis = qsum(0);		// E_vis
-  fPt   = qsum.GetPt();		// P_t
-  fPl   = qsum(3);		// P_l
+  Double_t evis = qsum(0);		// E_vis
+  Double_t pt   = qsum.GetPt();		// P_t
+  Double_t pl   = qsum(3);		// P_l
 
-  if (gDEBUG) cerr << "Evis = " << fEvis << " Pt = "
-       << fPt << " Pl = " << fPl << endl;
+  if (gDEBUG) cerr << "Evis = " << evis << " Pt = " << pt << " Pl = " << pl << endl;
 
+  //--
   // Cut on Evis.
+  //--
 
-  hEvis->Fill(fEvis);
-  if ( fEvis < xEvis ) { CleanUp(&tracks); return kFALSE; }
+  if (evis < fEvisCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"E_vis > %g",xEvis);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Evis >= " << fEvisCut << ends;
   }
 
+  //--
   // Cut on Pt.
+  //--
 
-  hPt->Fill(fPt);
-  if ( fPt > xPt ) { CleanUp(&tracks); return kFALSE; }
+  if (pt > fPtCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Pt <= %g",xPt);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Pt <= " << fPtCut << ends;
   }
 
+  //--
   // Cut on Pl.
+  //--
 
-  if ( TMath::Abs(fPl) > xPl ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(pl) > fPlCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"|Pl| <= %g",xPl);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|Pl| <= " << fPlCut << ends;
   }
 
+  //--
   // Find Isolated Lepton.
+  //--
 
   TObjArray lptracks(20);
-  fNlptracks = 0;
+  Int_t nlptracks = 0;
   TIter nexttrk (&tracks);
   ANLTrack *trkp;
   Double_t lpcharge = 0.;
-  while ((trkp = (ANLTrack *)nexttrk())) {
+  while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
     ANLTrack &trk = *trkp;
-    if ( ! trk.IsLepton() ) continue;
+    if (!trk.IsLepton()) continue;
     Double_t elepton = trk.E();
-    if ( elepton < xElepton ) continue;
-    Double_t econe = trk.GetConeEnergy(xCosCone, &tracks);
-    if ( econe <= xEcone ) {
+#if 0
+    Int_t    nev   = gJSF->GetEventNumber();
+    Double_t ecm   = GetEcm();
+    Double_t econe = trk.GetConeEnergy(fCosConeCut, &tracks);
+    hLep->Fill(nev,ecm,ntracks,evis,pt,pl,elepton,econe);
+    if (elepton < fEleptonCut) continue;
+#else
+    if (elepton < fEleptonCut) continue;
+    Double_t econe = trk.GetConeEnergy(fCosConeCut, &tracks);
+#endif
+    if (econe <= fEconeCut) {
       lptracks.Add(trkp);
-      fNlptracks++;
+      nlptracks++;
       trk.Lock();
       lpcharge = trk.GetCharge();
     }
   }
 
+  //--
   // Require only one Isolated Lepton.
+  //--
 
-  hNlptracks->Fill(fNlptracks);
-  if ( fNlptracks != 1 ) { CleanUp(&tracks); return kFALSE; }
+  if (nlptracks != 1) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Nlptracks = 1");
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Nlptracks = 1" << ends;
   }
 
+  //--
   // Find jets.
+  //--
 
-  fYcut = xYcut;
-  ANLJadeEJetFinder jclust(fYcut);
+#ifndef __CHEAT__
+  ANLJadeEJetFinder jclust(fYcutCut);
+#else
+  ANLCheatedJadeEJetFinder jclust(fYcutCut);
+  nexttrk.Reset();
+  while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
+    trkp->SetColorSingletID();
+  }
+#endif
   jclust.Initialize(tracks);
   jclust.FindJets();
-  fYcut  = jclust.GetYmax();
-  fNjets = jclust.GetNjets();
+  Double_t ycut  = jclust.GetYcut();
+  Int_t    njets = jclust.GetNjets();
 
-  if (gDEBUG) cerr << "Ycut = " << fYcut << " Njets = " << fNjets << endl;
+  if (gDEBUG) cerr << "Ycut = " << ycut << " Njets = " << njets << endl;
 
+  //--
   // Cut on No. of jets.
+  //--
 
-  hNjets->Fill(fNjets);
-  if ( fNjets < xNjets ) { CleanUp(&tracks); return kFALSE; }
+  if (njets < fNjetsCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Njets >= " << fNjetsCut << " for Ycut = " << fYcutCut << ends;
   }
 
-  // Now force the event to be xNjets.
+  //--
+  // Now force the event to be fNjetsCut.
+  //--
 
-  jclust.ForceNJets(xNjets);
-  fNjets = jclust.GetNjets();
-  fYcut  = jclust.GetYmax();
+  jclust.ForceNJets(fNjetsCut);
+  njets = jclust.GetNjets();
+  ycut  = jclust.GetYcut();
 
-  if (gDEBUG) cerr << "Ycut = " << fYcut << " Njets = " << fNjets << endl;
+  if (gDEBUG) cerr << "Ycut = " << ycut << " Njets = " << njets << endl;
 
-  // Make sure that No. of jets is xNjets.
+  //--
+  // Make sure that No. of jets is fNjetsCut.
+  //--
 
-  hYcut->Fill(fYcut);
-  if ( fNjets != xNjets ) { CleanUp(&tracks); return kFALSE; }
+  if (njets != fNjetsCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Njets = %i",xNjets);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Njets = " << fNjetsCut << ends;
   }
 
+  //--
   // Loop over jets and decide Ejet_min and |cos(theta_j)|_max.
+  //--
 
   TObjArray &jets = jclust.GetJets();
   TIter nextjet(&jets);
   ANLJet *jetp;
   Double_t ejetmin = 999999.;
   Double_t cosjmax = 0.;
-  while ((jetp = (ANLJet *)nextjet())) {
+  while ((jetp = static_cast<ANLJet *>(nextjet()))) {
     ANLJet &jet = *jetp;
     if (gDEBUG) jet.DebugPrint();
-    Double_t ejet = jet()(0);
+    Double_t ejet = jet.E();
     if (ejet < ejetmin) ejetmin = ejet;
-    hEjet->Fill(ejet);
     Double_t cosj = jet.CosTheta();
     if (TMath::Abs(cosj) > TMath::Abs(cosjmax)) cosjmax = cosj;
-    hCosjet->Fill(cosj);
   }
 
+  //--
   // Cut on Ejet_min.
+  //--
 
-  if ( ejetmin < xEjet ) { CleanUp(&tracks); return kFALSE; }
+  if (ejetmin < fEjetCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Ejet > %g",xEjet);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Ejet >= " << fEjetCut << ends;
   }
 
+  //--
   // Cut on |cos(theta_j)|_max.
+  //--
 
-  if ( TMath::Abs(cosjmax) > xCosjet ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(cosjmax) > fCosjetCut) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"|cos(theta_j)| <= %g",xCosjet);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|cos(theta_j)| <= " << fCosjetCut << ends;
   }
 
+  //--
   // Find W and top candidates in given mass windows.
+  //--
 
-  ANL4DVector qcm(a.GetEcm());
+  ANL4DVector qcm(GetEcm());
   ANL4DVector qnu = qcm - qsum;
 
+#ifndef __CHEAT__
   ANLJet lpjet(lptracks);
   ANLJet nujet;
+#else
+  ANLTaggedJet lpjet(lptracks);
+  ANLTaggedJet nujet;
+#endif
   nujet.Add(&qnu);
 
   ANLPair w1(&lpjet, &nujet);
   ANLPair *w1p = &w1;
 
-  ANLPair *w2p, *bbp, *hp;
+  ANLVTXTagger btag (fBtagNsig,fBtagNoffv);   // (sigma, n-offv tracks) b-tagger
+  ANLVTXTagger bttag(fBTtagNsig,fBTtagNoffv); // (sigma, n-offv tracks) tight b-tagger
 
   TObjArray solutions(10);
+  solutions.SetOwner();    // The "solutions" array owns solutions in it.
+
   ANLPairCombiner w2candidates(jets,jets);
-#if 0
-  ANLVTXTagger btag(3.,3);
-#else
-  ANLVTXTagger btag(2.,2);
-#endif
-  while ((w2p = (ANLPair *)w2candidates())) {
+  ANLPair *w2p, *bbp, *hp;
+  while ((w2p = static_cast<ANLPair *>(w2candidates()))) {
     ANLPair &w2 = *w2p;
-    Double_t w2mass = w2().GetMass();
-    if (TMath::Abs(w2mass - kMassW) > xM2j) continue;
+#ifdef __CHEAT__
+    ANLTaggedJet *j1p = dynamic_cast<ANLTaggedJet *>(w2[0]);
+    ANLTaggedJet *j2p = dynamic_cast<ANLTaggedJet *>(w2[1]);
+    if (!((j1p->GetTag() == -8 && j2p->GetTag() == -8) ||
+          (j1p->GetTag() == -8 && j2p->GetTag() == -9) ||
+          (j1p->GetTag() == -9 && j2p->GetTag() == -8) ||
+          (j1p->GetTag() == -9 && j2p->GetTag() == -9) ||
+          (j1p->GetTag() == -10 && j2p->GetTag() == -10) ||
+          (j1p->GetTag() == -10 && j2p->GetTag() == -11) ||
+          (j1p->GetTag() == -11 && j2p->GetTag() == -10) ||
+          (j1p->GetTag() == -11 && j2p->GetTag() == -11))) continue;
+#endif
+    if (bttag(*static_cast<ANLJet *>(w2[0])) || 
+        bttag(*static_cast<ANLJet *>(w2[1]))) continue;   // anti-b-tag for W daughters
+    Double_t w2mass = w2.GetMass();
+    if (TMath::Abs(w2mass - kMassW) > fM2jCut) continue;
     w2.LockChildren();
     ANLPairCombiner bbcandidates(w2candidates);
     bbcandidates.Reset();
-    while ((bbp = (ANLPair *)bbcandidates())) {
+    while ((bbp = static_cast<ANLPair *>(bbcandidates()))) {
       ANLPair &bb = *bbp;
       if (bb.IsLocked()) continue;
-      if (!btag(*(ANLJet *)bb[0]) || !btag(*(ANLJet *)bb[1])) continue;
+#ifdef __CHEAT__
+      j1p = dynamic_cast<ANLTaggedJet *>(bb[0]);
+      j2p = dynamic_cast<ANLTaggedJet *>(bb[1]);
+      if (!((j1p->GetTag() == -4 && j2p->GetTag() == -4) ||
+            (j1p->GetTag() == -4 && j2p->GetTag() == -6) ||
+            (j1p->GetTag() == -6 && j2p->GetTag() == -4) ||
+            (j1p->GetTag() == -6 && j2p->GetTag() == -6))) continue;
+#endif
+      if (!btag(*static_cast<ANLJet *>(bb[0])) || 
+          !btag(*static_cast<ANLJet *>(bb[1]))) continue;   // double b-tag for b's from t's
       bb.LockChildren();
       for (Int_t i = 0; i < 2; i++) {
-	ANL4DVector *b1p = (ANL4DVector *)bb[i];
-	ANL4DVector *b2p = (ANL4DVector *)bb[1-i];
+	ANL4DVector *b1p = static_cast<ANL4DVector *>(bb[i]);
+	ANL4DVector *b2p = static_cast<ANL4DVector *>(bb[1-i]);
 	ANLPair *bw1p = new ANLPair(b1p,w1p);
 	ANLPair *bw2p = new ANLPair(b2p,w2p);
 	ANLPair &bw2  = *bw2p;
-	//	Double_t t1mass = bw1().GetMass();
-	Double_t t2mass = bw2().GetMass();
-	if (TMath::Abs(t2mass - kMasst) > xM3j ) {
+	// Double_t t1mass = bw1.GetMass();
+	Double_t t2mass = bw2.GetMass();
+	if (TMath::Abs(t2mass - kMasst) > fM3jCut) {
 	  delete bw1p;
 	  delete bw2p;
 	  continue;
@@ -459,12 +439,19 @@ Bool_t TTHL6JAnalysis::Process(Int_t ev)
 	ANLPairCombiner hcandidates(bbcandidates);
 	hcandidates.Reset();
 	Bool_t ok = kFALSE;
-	while ((hp = (ANLPair *)hcandidates())) { 
+        while ((hp = static_cast<ANLPair *>(hcandidates()))) { 
 	  ANLPair &h = *hp;
-	  Double_t hmass = h().GetMass();
+#ifdef __CHEAT__
+          j1p = dynamic_cast<ANLTaggedJet *>(h[0]);
+          j2p = dynamic_cast<ANLTaggedJet *>(h[1]);
+          if (j1p->GetTag() != j2p->GetTag()) continue;
+          if (j1p->GetTag() != -3) continue;
+#endif
+	  Double_t hmass = h.GetMass();
 	  if (h.IsLocked() ||
-	     !btag(*(ANLJet *)h[0]) || !btag(*(ANLJet *)h[1]) ||
-	      TMath::Abs(hmass - kMassH) > xM2j) continue;
+	     !btag(*static_cast<ANLJet *>(h[0])) || // double b-tag
+	     !btag(*static_cast<ANLJet *>(h[1])) || // h daughters (h->bb)
+	      TMath::Abs(hmass - kMassH) > fM2jCut) continue; // h in the Mh window
 	  Double_t chi2 = TMath::Power((w2mass - kMassW)/kSigmaMw,2.)
                         + TMath::Power((t2mass - kMasst)/kSigmaMt,2.)
                         + TMath::Power((hmass  - kMassH)/kSigmaMh,2.);
@@ -482,157 +469,175 @@ Bool_t TTHL6JAnalysis::Process(Int_t ev)
     }
     w2.UnlockChildren();
   }
-  // Cut on No. of solutions.
 
-  if ( !solutions.GetEntries() ) { CleanUp(&tracks); return kFALSE; }
+  //--
+  // Cut on No. of solutions.
+  //--
+
+  if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"|m_jj - m_W| <= %g && |m_3j - m_t| <= %g",xM2j,xM3j);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|m_jj - m_W| <= " << fM2jCut << " && "
+	                   << "|m_3j - m_t| <= " << fM3jCut << " && "
+	                   << "|m_jj - m_h| <= " << fM2jCut << ends;
   }
 
+  //--
   // Cut on cos(theta_bW).
+  //--
 
   TIter nextsol(&solutions);
-  ANLPair *sol;
-  while ((sol = (ANLPair *)nextsol())) {
-    ANLPair &tt  = *(ANLPair *)(*sol)[0];
-    ANLPair &bw1 = *(ANLPair *)tt[0];
-    ANLPair &bw2 = *(ANLPair *)tt[1];
-    ANL4DVector &b1 = *(ANL4DVector *)bw1[0];
-    ANL4DVector &w1 = *(ANL4DVector *)bw1[1];
-    ANL4DVector &b2 = *(ANL4DVector *)bw2[0];
-    ANL4DVector &w2 = *(ANL4DVector *)bw2[1];
+  ANLPair *solp;
+  while ((solp = static_cast<ANLPair *>(nextsol()))) {
+    ANLPair &sol = *solp;
+    ANLPair &tt  = *static_cast<ANLPair *>(sol[0]);
+    ANLPair &bw1 = *static_cast<ANLPair *>(tt[0]);
+    ANLPair &bw2 = *static_cast<ANLPair *>(tt[1]);
+    ANLJet  &b1  = *static_cast<ANLJet  *>(bw1[0]);
+    ANLPair &w1  = *static_cast<ANLPair *>(bw1[1]);
+    ANLJet  &b2  = *static_cast<ANLJet  *>(bw2[0]);
+    ANLPair &w2  = *static_cast<ANLPair *>(bw2[1]);
     Double_t cosbw1 = b1.CosTheta(w1);
     Double_t cosbw2 = b2.CosTheta(w2);
-    hCosbw1Cosbw2->Fill(cosbw1,cosbw2,1.0);
-    if ( /*cosbw1 > xCosbw || */ cosbw2 > xCosbw) {
-      solutions.Remove(sol);
-      sol->Delete();
-      delete sol;
+    if (cosbw1 > fCosbwCut || cosbw2 > fCosbwCut) {
+      solutions.Remove(solp);
+      ANLPair &tt = *static_cast<ANLPair *>(sol[0]);
+      tt.Delete();
+      sol.Delete();
     }
   }
-  if ( !solutions.GetEntries() ) { CleanUp(&tracks); return kFALSE; }
+  if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"|cos(theta_bw)| > %g",xCosbw);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "|cos(theta_bw)| > " << fCosbwCut << ends;
   }
 
+  //--
   // Cut on Thrust.
+  //--
 
   ANLEventShape eshape;
   eshape.Initialize(tracks);
-  fThrust = eshape.GetThrust();
-  hThrust->Fill(fThrust);
-  if ( fThrust > xThrust ) {
+  Double_t thrust = eshape.GetThrust();
+  if (thrust > fThrustCut) {
   	nextsol.Reset();
-  	while ((sol = (ANLPair *)nextsol())) sol->Delete();
-  	CleanUp(&solutions);
-  	CleanUp(&tracks);
+  	while ((solp = static_cast<ANLPair *>(nextsol()))) {
+          ANLPair *ttp = static_cast<ANLPair *>((*solp)[0]);
+          ttp ->Delete();
+          solp->Delete();
+        }
   	return kFALSE;
   }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
-    sprintf(msg,"Thrust <= %g",xThrust);
-    strcpy(&cutName[(Int_t)selid][0],msg);
+  if (gNgoods == 0) {
+    gCutName[(Int_t)selid] << "Thrust <= " << fThrustCut << ends;
   }
-
 
   // ----------------------
   // End of event selection
   // ----------------------
 
-  if ( Ngoods == 0 ) {
-    selid++;
-    sprintf(msg,"END");
-    strcpy(&cutName[(Int_t)selid][0],msg);
-  }
-  Ngoods++;
+  gNgoods++;
 
-  cerr << "------------------------------------------" << endl
-       << "Event " << gJSF->GetEventNumber()
+  cerr << "--------------------------------------------------" << endl
+       << "Event "                   << gJSF->GetEventNumber()
        << ": Number of solutions = " << solutions.GetEntries() << endl
-       << "------------------------------------------" << endl;
+       << "--------------------------------------------------" << endl;
 
+  //--
   // Sort the solutions in the ascending order of chi2 vlues.
+  //--
 
   solutions.Sort();
 
-  // Now store this in TTHL6JAnalysisBuf.
+  Int_t nsols = solutions.GetEntries();
+  nextsol.Reset();
+  Int_t nsol = 0;
+  while ((solp = static_cast<ANLPair *>(nextsol()))) {
+    if (nsol++) break;				// choose the best
+    ANLPair &sol = *solp;
+    ANLPair &tt  = *static_cast<ANLPair *>(sol[0]);
+    ANLPair &h   = *static_cast<ANLPair *>(sol[1]);
+    ANLPair &bw1 = *static_cast<ANLPair *>(tt[0]);
+    ANLPair &bw2 = *static_cast<ANLPair *>(tt[1]);
+    ANLJet  &b1  = *static_cast<ANLJet  *>(bw1[0]);
+    ANLPair &w1  = *static_cast<ANLPair *>(bw1[1]);
+    ANLJet  &b2  = *static_cast<ANLJet  *>(bw2[0]);
+    ANLPair &w2  = *static_cast<ANLPair *>(bw2[1]);
+    Int_t    nev   = gJSF->GetEventNumber();
+    Double_t ecm   = GetEcm();
+    Double_t chi2  = sol.GetQuality();
+    Double_t mw1   = w1.GetMass();
+    Double_t mw2   = w2.GetMass();
+    Double_t mt1   = bw1.GetMass();
+    Double_t mt2   = bw2.GetMass();
+    Double_t mh    = h.GetMass();
+    Double_t mtt   = tt.GetMass();
+    Double_t csbw1 = b1.CosTheta(w1);
+    Double_t csbw2 = b2.CosTheta(w2);
+#ifdef __CHEAT__
+    ANLTaggedJet *b1p   = dynamic_cast<ANLTaggedJet *>(&b1);
+    ANLTaggedJet *w1j1p = dynamic_cast<ANLTaggedJet *>(w1[0]);
+    ANLTaggedJet *w1j2p = dynamic_cast<ANLTaggedJet *>(w1[1]);
+    ANLTaggedJet *b2p   = dynamic_cast<ANLTaggedJet *>(&b2);
+    ANLTaggedJet *w2j1p = dynamic_cast<ANLTaggedJet *>(w2[0]);
+    ANLTaggedJet *w2j2p = dynamic_cast<ANLTaggedJet *>(w2[1]);
+    ANLTaggedJet *hj1p  = dynamic_cast<ANLTaggedJet *>(h[0]);
+    ANLTaggedJet *hj2p  = dynamic_cast<ANLTaggedJet *>(h[1]);
+#if 1
+    cerr << "(b1,w1j1,w1j2; b2,w2j1,w2j2; hj1, hj2) = ("
+         << b1p  ->GetTag() << ","
+         << w1j1p->GetTag() << ","
+         << w1j2p->GetTag() << ","
+         << b2p  ->GetTag() << ","
+         << w2j1p->GetTag() << ","
+         << w2j2p->GetTag() << ";"
+	 << hj1p ->GetTag() << ","
+	 << hj2p ->GetTag() << ")"
+	 << endl;
+#endif
+#endif
+    Double_t data[100];
+    data[ 0] = nev;
+    data[ 1] = ecm;
+    data[ 2] = ntracks;
+    data[ 3] = evis;
+    data[ 4] = pt;
+    data[ 5] = pl;
+    data[ 6] = ycut;
+    data[ 7] = chi2;
+    data[ 8] = nsols;
+    data[ 9] = ejetmin;
+    data[10] = cosjmax;
+    data[11] = csbw1;
+    data[12] = csbw2;
+    data[13] = mw1;
+    data[14] = mw2;
+    data[15] = mt1;
+    data[16] = mt2;
+    data[17] = mh;
+    data[18] = mtt;
+    data[19] = thrust;
 
-  a.fNtracks	= fNtracks;
-  a.fEvis	= fEvis;
-  a.fPt		= fPt;
-  a.fPl		= fPl;
-  a.fYcut	= fYcut;
-  a.fNjets	= fNjets;
-
-  // Hists and plots for selected events.
-
-  if (gDEBUG) {
-    Int_t nj = 0;
-    nextjet.Reset();
-    while ((jetp = (ANLJet *)nextjet())) {
-       cerr << "------" << endl
-            << "Jet " << ++nj << endl
-            << "------" << endl;
-       jetp->DebugPrint();
-    }
+    hEvt->Fill(data);
   }
 
-  hNsols->Fill(solutions.GetEntries());
-  hEvisPl->Fill(fEvis,fPl,1.);
+  //--
+  // Clean up.
+  //--
 
   nextsol.Reset();
-  Int_t nsols = 0;
-  while ((sol = (ANLPair *)nextsol())) {
-    if ( nsols++ ) break;				// choose the best
-    ANLPair &tt  = *(ANLPair *)(*sol)[0];
-    ANLPair &h   = *(ANLPair *)(*sol)[1];
-    ANLPair &bw1 = *(ANLPair *)tt[0];
-    ANLPair &bw2 = *(ANLPair *)tt[1];
-    ANL4DVector &w1 = *(ANL4DVector *)bw1[1];
-    ANL4DVector &w2 = *(ANL4DVector *)bw2[1];
-    Double_t chi2   = sol->GetQuality();
-    Double_t w1mass = w1.GetMass();
-    Double_t w2mass = w2.GetMass();
-    Double_t t1mass = bw1().GetMass();
-    Double_t t2mass = bw2().GetMass();
-    Double_t t2mom  = bw2().GetMag();
-    Double_t t2cos  = bw2().CosTheta();
-    Double_t hmass  = h.GetMass();
-          hChi2->Fill(chi2);
-          hEw1Ew2->Fill(w1(0),w2(0),1.0);
-          hMw1Mw2->Fill(w1mass,w2mass,1.0);
-          hMt1Mt2->Fill(t1mass,t2mass,1.0);
-          hMw2Mh->Fill(w2mass,hmass,1.0);
-	  if ( lpcharge < 0. ) hPCost->Fill(t2mom,t2cos,1.0);
-	  else                 hPCostbar->Fill(t2mom,t2cos,1.0);
+  while ((solp = static_cast<ANLPair *>(nextsol()))) {
+    ANLPair *ttp = static_cast<ANLPair *>((*solp)[0]);
+    ttp ->Delete();
+    solp->Delete();
   }
-
-  // Lepton Infomation
-
-  ANLTrack qlepton = *((ANLTrack *)lptracks.UncheckedAt(0));
-
-  Double_t elepton = qlepton.E();
-  Double_t coslepton = qlepton.CosTheta();
-  if ( qlepton.GetCharge() < 0. ) {
-    hElpm->Fill(elepton,1.);
-    hCoslpm->Fill(coslepton,1.);
-  } else {
-    hElpp->Fill(elepton,1.);
-    hCoslpp->Fill(coslepton,1.);
-  }
-
-  // Clean up
-
-  nextsol.Reset();
-  while ((sol = (ANLPair *)nextsol())) sol->Delete();
-  CleanUp(&solutions);
-  CleanUp(&tracks);
 
   last->cd();
+
+  // ------------------------
+  //  That's it.
+  // ------------------------
   return kTRUE;
 }
 
@@ -640,18 +645,25 @@ Bool_t TTHL6JAnalysis::Process(Int_t ev)
 Bool_t TTHL6JAnalysis::Terminate()
 {
   // This function is called at the end of job.
-  cout << endl;
-  cout << "  =============" << endl;
-  cout << "   Cut Summary " << endl;
-  cout << "  =============" << endl;
-  cout << endl;
-  cout << "  -----------------------------------------------------------" << endl;
-  cout << "   ID   No.Events    Cut Description" << endl;
-  cout << "  -----------------------------------------------------------" << endl;
-  Int_t i;
-  for ( i = 0; strncmp(&cutName[i][0],"END",4) && i < MAXCUT ; i++ ) {
-    printf("  %3d  %10d  : %s\n",i,(int)hStat->GetBinContent(i+1),&cutName[i][0]);
+  //--
+  // Print out cut statistics
+  //--
+  cerr << endl
+       << "  =============" << endl
+       << "   Cut Summary " << endl
+       << "  =============" << endl
+       << endl
+       << "  -----------------------------------------------------------" << endl
+       << "   ID   No.Events    Cut Description                         " << endl
+       << "  -----------------------------------------------------------" << endl;
+  for (int id=0; id<kMaxCuts && gCutName[id].str().data()[0]; id++) {
+    cerr << "  " << setw( 3) << id
+         << "  " << setw(10) << static_cast<int>(hStat->GetBinContent(id+1))
+         << "  : " << gCutName[id].str().data() << endl;
   }
-  cout << "  -----------------------------------------------------------" << endl;
+  cerr << "  -----------------------------------------------------------" << endl;
+  //--
+  // That's it!
+  //--
   return 0;
 }

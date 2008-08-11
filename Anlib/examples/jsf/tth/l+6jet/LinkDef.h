@@ -5,6 +5,5 @@
 #pragma link off all functions;
 
 #pragma link C++ class TTHL6JAnalysis;
-#pragma link C++ class TTHL6JAnalysisBuf;
 
 #endif

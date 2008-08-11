@@ -11,8 +11,8 @@
 //*
 //* $Id$
 //*************************************************************************
-//
-Int_t maxevt = 5000;
+
+Int_t maxevt = 99999;
 Int_t freq   = 10;
 
 int anlL6J()
@@ -57,14 +57,28 @@ int anlL6J()
   myanl->SetPtCut(9999.);
   myanl->SetPlCut(9999.);
   myanl->SetNtrackCut(20);
-  myanl->SetMinYcut(0.001);
+  myanl->SetConeAngle(15.);
+  myanl->SetElpCut(10.);
+  myanl->SetEconeCut(5.);
+  myanl->SetMinYcut(0.0001);
   myanl->SetNjetCut(6);
   myanl->SetEjetCut(5.);
   myanl->SetCosjetCut(1.);
-  myanl->SetM2jCut(16.);
-  myanl->SetM3jCut(30.);
+#if 0
+  myanl->SetM2jCut(40.);
+  myanl->SetM3jCut(60.);
+#else
+  myanl->SetM2jCut(900.);
+  myanl->SetM3jCut(900.);
+#endif
   myanl->SetCosbwCut(1.);
-  myanl->SetThrustCut(0.8);
+  //myanl->SetThrustCut(0.8);
+  myanl->SetThrustCut(1.);
+
+  myanl->SetBtagNsig  (2.); // loose b-tag used to tag b's
+  myanl->SetBtagNoffv (0);   //
+  myanl->SetBTtagNsig (10.0); // tight b-tag used to veto any b in W
+  myanl->SetBTtagNoffv(3);   // 
 
   jsf->BeginRun(1);      			// Set run number to 1.
   Int_t nok = 0;
@@ -72,11 +86,9 @@ int anlL6J()
      if (!(jsf->GetEvent(ev))) break;		// Read in an event.
      if (!(jsf->Process(ev))) continue;		// Do SIMDST and TTHL6JAnalysis.
      if (!(gROOT->IsBatch())) {
-        if (nok++%freq == 0) myanl->DrawHist();	// Draw hists, if interactive.
      }
      jsf->Clear();
   }
-  if (!(gROOT->IsBatch())) myanl->DrawHist();	// Draw hists, if interactive.
 
   jsf->Terminate();				// Terminate analysis.
 
