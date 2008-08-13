@@ -20,9 +20,13 @@
 //*
 //* $Id$
 //*************************************************************************
-//
+
+//#define __CHEAT__
+
 #include "TT6JAnalysis.h"
 #include "ANLTrack.h"
+#include "ANLVTXTagger.h"
+#include "ANLCheatedJetFinder.h"
 
 static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
@@ -98,6 +102,7 @@ Bool_t TT6JAnalysis::Initialize()
   hNjets        = new TH1F("hNjets","No. jets"     ,  20,   0.0,  20.0);
   hEjet         = new TH1F("hEjet","Jet energy"    ,  50,   0.0, 100.0);
   hCosjet       = new TH1F("hCosjet","cos(theta_j)",  50,  -1.0,  +1.0);
+  hCosjet->SetMinimum(0.);
   hNsols        = new TH1F("hNsols","No. solutions",  20,   0.0,  20.0);
   hChi2         = new TH1F("hChi2","Chi2"          ,  50,   0.0,  50.0);
   hEw1Ew2       = new TH2F("hEw1Ew2","(E_w1,E_w2)" ,
@@ -272,7 +277,16 @@ Bool_t TT6JAnalysis::Process(Int_t ev)
   // Find jets.
 
   fYcut = xYcut;
+#ifndef __CHEAT__
   ANLJadeEJetFinder jclust(fYcut);
+#else
+  ANLCheatedJadeEJetFinder jclust(fYcut);
+  TIter nexttrk(&tracks);
+  ANLTrack *trkp;
+  while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
+    trkp->SetColorSingletID();
+  }
+#endif
   jclust.Initialize(tracks);
   jclust.FindJets();
   fYcut  = jclust.GetYmax();
@@ -356,6 +370,18 @@ Bool_t TT6JAnalysis::Process(Int_t ev)
   ANLPair *w1p, *w2p, *bbp;
   while ((w1p = (ANLPair *)w1candidates())) {
     ANLPair &w1 = *w1p;
+#ifdef __CHEAT__
+    ANLTaggedJet *j1p = dynamic_cast<ANLTaggedJet *>(w1[0]);
+    ANLTaggedJet *j2p = dynamic_cast<ANLTaggedJet *>(w1[1]);
+    if (!((j1p->GetTag() == -7 && j2p->GetTag() == -7) ||
+          (j1p->GetTag() == -7 && j2p->GetTag() == -8) ||
+          (j1p->GetTag() == -8 && j2p->GetTag() == -7) ||
+          (j1p->GetTag() == -8 && j2p->GetTag() == -8) ||
+          (j1p->GetTag() == -9 && j2p->GetTag() == -9) ||
+          (j1p->GetTag() == -9 && j2p->GetTag() == -10) ||
+          (j1p->GetTag() == -10 && j2p->GetTag() == -9) ||
+          (j1p->GetTag() == -10 && j2p->GetTag() == -10))) continue;
+#endif
     Double_t w1mass = w1().GetMass();
     if (TMath::Abs(w1mass - kMassW) > xM2j) continue;
     w1.LockChildren();
@@ -366,6 +392,18 @@ Bool_t TT6JAnalysis::Process(Int_t ev)
     }
     while ((w2p = (ANLPair *)w2candidates())) {
       ANLPair &w2 = *w2p;
+#ifdef __CHEAT__
+      ANLTaggedJet *j1p = dynamic_cast<ANLTaggedJet *>(w2[0]);
+      ANLTaggedJet *j2p = dynamic_cast<ANLTaggedJet *>(w2[1]);
+      if (!((j1p->GetTag() == -7 && j2p->GetTag() == -7) ||
+            (j1p->GetTag() == -7 && j2p->GetTag() == -8) ||
+            (j1p->GetTag() == -8 && j2p->GetTag() == -7) ||
+            (j1p->GetTag() == -8 && j2p->GetTag() == -8) ||
+            (j1p->GetTag() == -9 && j2p->GetTag() == -9) ||
+            (j1p->GetTag() == -9 && j2p->GetTag() == -10) ||
+            (j1p->GetTag() == -10 && j2p->GetTag() == -9) ||
+            (j1p->GetTag() == -10 && j2p->GetTag() == -10))) continue;
+#endif
       if (w2.IsLocked()) continue;
       Double_t w2mass = w2().GetMass();
       if (TMath::Abs(w2mass - kMassW) > xM2j) continue;
@@ -378,6 +416,14 @@ Bool_t TT6JAnalysis::Process(Int_t ev)
       }
       while ((bbp = (ANLPair *)bbcandidates())) {
         ANLPair &bb = *bbp;
+#ifdef __CHEAT__
+        j1p = dynamic_cast<ANLTaggedJet *>(bb[0]);
+        j2p = dynamic_cast<ANLTaggedJet *>(bb[1]);
+        if (!((j1p->GetTag() == -3 && j2p->GetTag() == -3) ||
+              (j1p->GetTag() == -3 && j2p->GetTag() == -5) ||
+              (j1p->GetTag() == -5 && j2p->GetTag() == -3) ||
+              (j1p->GetTag() == -5 && j2p->GetTag() == -5))) continue;
+#endif
         if (bb.IsLocked()) continue;
         for (Int_t i = 0; i < 2; i++) {
           ANL4DVector *b1p = (ANL4DVector *)bb[i];
