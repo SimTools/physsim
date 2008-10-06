@@ -4,13 +4,21 @@
   jsf    = new JSFSteer();
   full   = new JSFLCFULL();
   spring = new TTSpring("TTSpring");
+#if 0
+  hdr=new JSFHadronizer();
+  sim=new JSFQuickSim();
  
+  TFile flast("ttsim.root","READ");
+  jsf->GetLastRunInfo(&flast);
+  flast.Close();
+#else
   TFile flast("ttsim.root","READ");
   jsf->GetLastRunInfo(&flast);
   flast.Close();
 
   hdr=new JSFHadronizer();
   sim=new JSFQuickSim();
+#endif
 
   spring->ReadBases("bases.root");
 
