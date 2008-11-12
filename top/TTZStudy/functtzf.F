@@ -74,6 +74,13 @@ C--
 C--
          AME   = AMF(1,2,1)
          xALF0 = 1/137.0359895E0
+C--
+         XZMN  = BRVDK(IMDZMN-1,2)
+         XZMX  = BRVDK(IMDZMX  ,2)
+         XW1MN = BRVDK(IMD1MN-1,1)
+         XW1MX = BRVDK(IMD1MX  ,1)
+         XW2MN = BRVDK(IMD2MN-1,1)
+         XW2MX = BRVDK(IMD2MX  ,1)
       ENDIF
 C--
 C  Shuffle integration variables.
@@ -180,9 +187,9 @@ C--
       IDPTCL(2, 6) = 2
       IDPTCL(3, 6) = 2
 C-- Z.
-      XZ = Z(26)
-      DO 100 IMD = 1, 12
-         IF ( XZ.LT.BRVDK(IMD,2) )               GO TO 110
+      XZ = XZMN + Z(26)*(XZMX-XZMN)
+      DO 100 IMD = IMDZMN, IMDZMX
+         IF ( XZ.LE.BRVDK(IMD,2) )               GO TO 110
 100   CONTINUE
 C--
 110   IDPTCL(1, 9) = MDVDK(1,IMD,2)
@@ -192,12 +199,14 @@ C--
       IDPTCL(2,10) = MDVDK(2,IMD,2)
       IDPTCL(3,10) = MDVDK(3,IMD,2)
 C--
-      BRZ = BRVDK(IMD,2) - BRVDK(IMD-1,2)
+      BRZ  = BRVDK(IMD,2) - BRVDK(IMD-1,2)
+      IMDZ = IMD
+      WAT  = WAT*(XZMX-XZMN)/BRZ
 C
 C-- W from t-bar.
-      XW1 = (XZ-BRVDK(IMD-1,2))/BRZ
-      DO 200 IMD = 1, 12
-         IF ( XW1.LT.BRVDK(IMD,1) )              GO TO 210
+      XW1 = XW1MN + ((XZ-BRVDK(IMD-1,2))/BRZ)*(XW1MX-XW1MN)
+      DO 200 IMD = IMD1MN, IMD1MX
+         IF ( XW1.LE.BRVDK(IMD,1) )              GO TO 210
 200   CONTINUE
 C--
 210   IDPTCL(1, 4) = MDVDK(1,IMD,1)
@@ -208,11 +217,13 @@ C--
       IDPTCL(3, 5) = MDVDK(3,IMD,1)
 C--
       BRW1 = BRVDK(IMD,1) - BRVDK(IMD-1,1)
+      IMD1 = IMD
+      WAT  = WAT*(XW1MX-XW1MN)/BRW1
 C
 C-- W from t.
-      XW2 = (XW1-BRVDK(IMD-1,1))/BRW1
-      DO 300 IMD = 1, 12
-         IF ( XW2.LT.BRVDK(IMD,1) )              GO TO 310
+      XW2 = XW2MN + ((XW1-BRVDK(IMD-1,1))/BRW1)*(XW2MX-XW2MN)
+      DO 300 IMD = IMD2MN, IMD2MX
+         IF ( XW2.LE.BRVDK(IMD,1) )              GO TO 310
 300   CONTINUE
 C--
 310   IDPTCL(1, 7) = MDVDK(1,IMD,1)
@@ -223,7 +234,8 @@ C--
       IDPTCL(3, 8) = MDVDK(3,IMD,1)
 C--
       BRW2 = BRVDK(IMD,1) - BRVDK(IMD-1,1)
-      WAT  = WAT/BRZ/BRW1/BRW2
+      IMD2 = IMD
+      WAT  = WAT*(XW2MX-XW2MN)/BRW2
 C--
 C  Select electron helicity.
 C--
@@ -416,6 +428,9 @@ C--
       CALL XHFILL( 'h07', DBLE(ICMB)        ,FUNC )
       CALL DHFILL( 'hd09', DBLE(EZ/EBM), DBLE(COSZ)    , FUNC )
       CALL DHFILL( 'hd10', DBLE(ET/EBM), DBLE(ETB/EBM) , FUNC )
+      CALL XHFILL( 'h12', DBLE(IMDZ+.1)     ,FUNC )
+      CALL XHFILL( 'h13', DBLE(IMD1+.1)     ,FUNC )
+      CALL XHFILL( 'h14', DBLE(IMD2+.1)     ,FUNC )
 C--
 C  That's it.
 C--

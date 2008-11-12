@@ -155,6 +155,12 @@ TTZBases::TTZBases(const char *name, const char *title)
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("TTZBases.ISRBM","3"),"%d",&fISRBM);
+  sscanf(gJSF->Env()->GetValue("TTZBases.ZModesLo","1"),"%d",&fZModesLo);
+  sscanf(gJSF->Env()->GetValue("TTZBases.ZModesHi","12"),"%d",&fZModesHi);
+  sscanf(gJSF->Env()->GetValue("TTZBases.WmModesLo","1"),"%d",&fWmModesLo);
+  sscanf(gJSF->Env()->GetValue("TTZBases.WmModesHi","12"),"%d",&fWmModesHi);
+  sscanf(gJSF->Env()->GetValue("TTZBases.WpModesLo","1"),"%d",&fWpModesLo);
+  sscanf(gJSF->Env()->GetValue("TTZBases.WpModesHi","12"),"%d",&fWpModesHi);
   sscanf(gJSF->Env()->GetValue("TTZBases.ACC1","0.4"),"%lg",&fACC1);
   sscanf(gJSF->Env()->GetValue("TTZBases.ACC2","0.2"),"%lg",&fACC2);
   sscanf(gJSF->Env()->GetValue("TTZBases.ITMX1","5"),"%d",&fITMX1);
@@ -224,6 +230,12 @@ void TTZBases::PrintParameters()
   printf("       = 1 ; None\n");
   printf("       = 2 ; ISR only\n");
   printf("       = 3 ; ISR + BM\n");
+  printf("  Z- Decey Mode Lo =%d\n",fZModesLo);
+  printf("                Hi =%d\n",fZModesHi);
+  printf("  W- Decey Mode Lo =%d\n",fWmModesLo);
+  printf("                Hi =%d\n",fWmModesHi);
+  printf("  W+ Decey Mode Lo =%d\n",fWpModesLo);
+  printf("                Hi =%d\n",fWpModesHi);
 
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
@@ -272,6 +284,12 @@ void TTZBases::Userin()
   usrprm_.polebm = fPolElectron;
   usrprm_.sgmebm = fSigmaEbeam;
   usrprm_.isrb   = fISRBM;
+  usrprm_.imdzlo = fZModesLo;
+  usrprm_.imdzhi = fZModesHi;
+  usrprm_.imd1lo = fWmModesLo;
+  usrprm_.imd1hi = fWmModesHi;
+  usrprm_.imd2lo = fWpModesLo;
+  usrprm_.imd2hi = fWpModesHi;
 
   // Copy class data member into common /bshufl/
   bshufl_.nzz = fNDIM;
@@ -294,6 +312,9 @@ void TTZBases::Userin()
   Xhinit("h07",  1.0,  5.,  4,"helicity combination");
   Dhinit("hd09",0.,1.,50,-1.,1.,50,"E_Z/E_bm-cos(th_Z)");
   Dhinit("hd10",0.,1.,50, 0.,1.,50,"E_t/E_bm-E_tb/E_bm");
+  Xhinit("h12",  1.0, 13., 12,"Z  decay mode ");
+  Xhinit("h13",  1.0, 13., 12,"W- decay mode ");
+  Xhinit("h14",  1.0, 13., 12,"W+ decay mode ");
 }
 
 //_____________________________________________________________________________
