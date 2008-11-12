@@ -51,6 +51,10 @@ extern COMMON_USMPRM usmprm_;
 typedef struct {
   Float_t  sqrts, polebm, sgmebm;
   Int_t    isrb;
+  Int_t    imd1lo;	// W- decay mode ID.
+  Int_t    imd1hi;	// W- decay mode ID.
+  Int_t    imd2lo;	// W+ decay mode ID.
+  Int_t    imd2hi;	// W+ decay mode ID.
 } COMMON_USRPRM;             //  Common /USRPRM/
 
 extern COMMON_USRPRM usrprm_;
@@ -61,6 +65,10 @@ protected:
   Double_t fPolElectron;	// e- polarization
   Double_t fSigmaEbeam;	// beam energy spread
   Int_t    fISRBM;	// Flag for ISR & Beamstrahlung
+  Int_t    fWmModesLo;	// W- decay mode ID.
+  Int_t    fWmModesHi;	// W- decay mode ID.
+  Int_t    fWpModesLo;	// W+ decay mode ID.
+  Int_t    fWpModesHi;	// W+ decay mode ID.
   Double_t fAlphai;	// 1/alpha(m_Z)
   Double_t fAlphas;	// alpha_s(m_Z)
   Double_t fMassW;	// m_W

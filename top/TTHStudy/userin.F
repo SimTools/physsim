@@ -33,12 +33,20 @@ C--
       POLE   = POLEBM
       SGEBM  = SGMEBM
       ISRBM  = ISRB
+      IMD1MN = IMD1LO
+      IMD1MX = IMD1HI
+      IMD2MN = IMD2LO
+      IMD2MX = IMD2HI
       PRINT *, ' ******< Job constants >*********** '
       PRINT *, '  '
       PRINT *, '     ROOTS  = ', ROOTS
       PRINT *, '     SGEBM  = ', SGEBM
       PRINT *, '     POLE   = ', POLE
       PRINT *, '     ISRBM  = ', ISRBM
+      PRINT *, '     IMD1MN = ', IMD1MN
+      PRINT *, '     IMD1MX = ', IMD1MX      
+      PRINT *, '     IMD2MN = ', IMD2MN
+      PRINT *, '     IMD2MX = ', IMD2MX      
       PRINT *, '  '
       PRINT *, ' ********************************** '
 C--

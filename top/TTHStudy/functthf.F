@@ -69,6 +69,11 @@ C--
 C--
          AME   = AMF(1,2,1)
          xALF0 = 1/137.0359895E0
+C--
+         XW1MN = BRVDK(IMD1MN-1,1)
+         XW1MX = BRVDK(IMD1MX  ,1)
+         XW2MN = BRVDK(IMD2MN-1,1)
+         XW2MX = BRVDK(IMD2MX  ,1)
       ENDIF
 C--
 C  Shuffle integration variables.
@@ -193,9 +198,9 @@ C--
       IDPTCL(3,10) = 2
 C
 C-- W from t-bar.
-      XW1 = Z(26)
-      DO 200 IMD = 1, 12
-         IF ( XW1.LT.BRVDK(IMD,1) )              GO TO 210
+      XW1 = XW1MN + Z(26)*(XW1MX-XW1MN)
+      DO 200 IMD = IMD1MN, IMD1MX
+         IF ( XW1.LE.BRVDK(IMD,1) )              GO TO 210
 200   CONTINUE
 C--
 210   IDPTCL(1, 4) = MDVDK(1,IMD,1)
@@ -206,11 +211,13 @@ C--
       IDPTCL(3, 5) = MDVDK(3,IMD,1)
 C--
       BRW1 = BRVDK(IMD,1) - BRVDK(IMD-1,1)
+      IMD1 = IMD
+      WAT  = WAT*(XW1MX-XW1MN)/BRW1
 C
 C-- W from t.
-      XW2 = (XW1-BRVDK(IMD-1,1))/BRW1
-      DO 300 IMD = 1, 12
-         IF ( XW2.LT.BRVDK(IMD,1) )              GO TO 310
+      XW2 = XW2MN + ((XW1-BRVDK(IMD-1,1))/BRW1)*(XW2MX-XW2MN)
+      DO 300 IMD = IMD2MN, IMD2MX
+         IF ( XW2.LE.BRVDK(IMD,1) )              GO TO 310
 300   CONTINUE
 C--
 310   IDPTCL(1, 7) = MDVDK(1,IMD,1)
@@ -221,7 +228,8 @@ C--
       IDPTCL(3, 8) = MDVDK(3,IMD,1)
 C--
       BRW2 = BRVDK(IMD,1) - BRVDK(IMD-1,1)
-      WAT  = WAT/BRW1/BRW2
+      IMD2 = IMD
+      WAT  = WAT*(XW2MX-XW2MN)/BRW2
 C--
 C  Select electron helicity.
 C--
@@ -457,6 +465,8 @@ C--
       CALL XHFILL( 'h13', DBLE(RS/ROOTS)    ,FUNC )
       CALL DHFILL( 'hd21', DBLE(EZ/EBM), DBLE(COSZ)    , FUNC )
       CALL DHFILL( 'hd22', DBLE(ET/EBM), DBLE(ETB/EBM) , FUNC )
+      CALL XHFILL( 'h15', DBLE(IMD1+.1)     ,FUNC )
+      CALL XHFILL( 'h16', DBLE(IMD2+.1)     ,FUNC )
 #ifdef DEBUG
        print *, 'That''s it.'
 #endif

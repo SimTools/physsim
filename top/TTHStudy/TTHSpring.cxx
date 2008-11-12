@@ -155,6 +155,10 @@ TTHBases::TTHBases(const char *name, const char *title)
 // Get parameters from jsf.conf, if specified.
 
   sscanf(gJSF->Env()->GetValue("TTHBases.ISRBM","3"),"%d",&fISRBM);
+  sscanf(gJSF->Env()->GetValue("TTHBases.WmModesLo","1"),"%d",&fWmModesLo);
+  sscanf(gJSF->Env()->GetValue("TTHBases.WmModesHi","12"),"%d",&fWmModesHi);
+  sscanf(gJSF->Env()->GetValue("TTHBases.WpModesLo","1"),"%d",&fWpModesLo);
+  sscanf(gJSF->Env()->GetValue("TTHBases.WpModesHi","12"),"%d",&fWpModesHi);
   sscanf(gJSF->Env()->GetValue("TTHBases.ACC1","0.4"),"%lg",&fACC1);
   sscanf(gJSF->Env()->GetValue("TTHBases.ACC2","0.2"),"%lg",&fACC2);
   sscanf(gJSF->Env()->GetValue("TTHBases.ITMX1","5"),"%d",&fITMX1);
@@ -224,6 +228,10 @@ void TTHBases::PrintParameters()
   printf("       = 1 ; None\n");
   printf("       = 2 ; ISR only\n");
   printf("       = 3 ; ISR + BM\n");
+  printf("  W- Decey Mode Lo =%d\n",fWmModesLo);
+  printf("                Hi =%d\n",fWmModesHi);
+  printf("  W+ Decey Mode Lo =%d\n",fWpModesLo);
+  printf("                Hi =%d\n",fWpModesHi);
 
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
@@ -272,6 +280,10 @@ void TTHBases::Userin()
   usrprm_.polebm = fPolElectron;
   usrprm_.sgmebm = fSigmaEbeam;
   usrprm_.isrb   = fISRBM;
+  usrprm_.imd1lo = fWmModesLo;
+  usrprm_.imd1hi = fWmModesHi;
+  usrprm_.imd2lo = fWpModesLo;
+  usrprm_.imd2hi = fWpModesHi;
 
   // Copy class data member into common /bshufl/
   bshufl_.nzz = fNDIM;
@@ -298,6 +310,8 @@ void TTHBases::Userin()
   Xhinit("h11", 40.0,120., 50,"m_W-         ");
   Xhinit("h12", 40.0,120., 50,"m_W+         ");
   Xhinit("h13",  0.0, 1.0, 50,"rsh/roots    ");
+  Xhinit("h15",  1.0, 13., 12,"W- decay mode ");
+  Xhinit("h16",  1.0, 13., 12,"W+ decay mode ");
   Dhinit("hd21",0.,1.,50,-1.,1.,50,"E_H/E_bm-cos(th_H)");
   Dhinit("hd22",0.,1.,50, 0.,1.,50,"E_t/E_bm-E_tb/E_bm");
 }
@@ -311,6 +325,10 @@ void TTHBases::Userout()
   printf("       = 1 ; None\n");
   printf("       = 2 ; ISR only\n");
   printf("       = 3 ; ISR + BM\n");
+  printf("  W- Decey Mode Lo =%d\n",fWmModesLo);
+  printf("                Hi =%d\n",fWmModesHi);
+  printf("  W+ Decey Mode Lo =%d\n",fWpModesLo);
+  printf("                Hi =%d\n",fWpModesHi);
   printf("Ecm                  = %g (GeV)\n",fRoots);
   printf("Total Cross section  = %g +- %g (fb)\n",GetEstimate(),GetError());
   printf("Number of iterations = %d\n",GetNoOfIterate());  
