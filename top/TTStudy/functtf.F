@@ -172,7 +172,7 @@ C
 C-- W from t-bar.
       XW1 = XW1MN + Z(19)*(XW1MX-XW1MN)
       DO 200 IMD = IMD1MN, IMD1MX
-         IF ( XW1.LT.BRVDK(IMD,1) )              GO TO 210
+         IF ( XW1.LE.BRVDK(IMD,1) )              GO TO 210
 200   CONTINUE
 C--
 210   IDPTCL(1, 4) = MDVDK(1,IMD,1)
@@ -189,7 +189,7 @@ C
 C-- W from t.
       XW2 = XW2MN + ((XW1-BRVDK(IMD-1,1))/BRW1)*(XW2MX-XW2MN)
       DO 300 IMD = IMD2MN, IMD2MX
-         IF ( XW2.LT.BRVDK(IMD,1) )              GO TO 310
+         IF ( XW2.LE.BRVDK(IMD,1) )              GO TO 310
 300   CONTINUE
 C--
 310   IDPTCL(1, 7) = MDVDK(1,IMD,1)
