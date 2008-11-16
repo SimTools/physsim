@@ -514,7 +514,8 @@ Double_t ZHHBases::DSigmaDX(GENBranch &cmbranch)
   Double_t phih = hhbranch.GetPhi     ();
   Double_t mh12 = hhbranch.GetM12();
   Double_t mh22 = hhbranch.GetM22();
-  GENPhase2 phaseHH(phh, mh12, mh22, cmframe, cosh, phih, 1);
+  GENFrame hhframe = phaseCM.GetFrame();
+  GENPhase2 phaseHH(phh, mh12, mh22, hhframe, cosh, phih, 1);
   ANL4DVector ph1 = phaseHH.GetFourMomentum(0);
   ANL4DVector ph2 = phaseHH.GetFourMomentum(1);
   fP[0] = ph1;
