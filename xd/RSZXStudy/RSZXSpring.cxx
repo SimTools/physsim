@@ -709,7 +709,7 @@ Complex_t RSZXBases::FullAmplitude()
    HELFermion em(fK[0], kM_e, fHelInitial[0], +1, kIsIncoming);
    HELFermion ep(fK[1], kM_e, fHelInitial[1], -1, kIsOutgoing);
 
-   HELScalar  xf(fP[0]+fP[1], kFALSE);
+   HELScalar  xf(fP[0]+fP[1]);
 
    HELFermion f (fP[2], fM[2], fHelFinal [2], +1, kIsOutgoing);
    HELFermion fb(fP[3], fM[3], fHelFinal [3], -1, kIsIncoming);

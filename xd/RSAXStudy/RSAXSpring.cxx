@@ -613,7 +613,7 @@ Complex_t RSAXBases::FullAmplitude()
    HELFermion em(fK[0], kM_e, fHelInitial[0], +1, kIsIncoming);
    HELFermion ep(fK[1], kM_e, fHelInitial[1], -1, kIsOutgoing);
 
-   HELScalar  xf(fP[0]+fP[1], kFALSE);
+   HELScalar  xf(fP[0]+fP[1]);
    HELVector  af(fP[2], 0., fHelFinal[2], +1);
 
    Complex_t amp = AmpEEtoAX(em, ep, xf, af);
