@@ -1,5 +1,5 @@
-#ifndef __HELLIB__
-#define __HELLIB__
+#ifndef HELLIB_H
+#define HELLIB_H
 //*****************************************************************************
 //* =====================
 //*  HELLib Classes
@@ -125,6 +125,11 @@ public:
 		   Double_t    grz,
 		   Double_t    m,
 		   Double_t    gm);
+   HELVector(const HELVector   &v,
+             const HELScalar   &sc,
+		   Double_t    g,
+		   Double_t    m,
+		   Double_t    gm);
    virtual ~HELVector() {}
 
    inline const ANL4DVector &GetFourMomentum() const  { return fP;   }
@@ -151,9 +156,20 @@ friend class HELFermion;
 friend class HELVector;
 friend class HELVertex;
 public:
-   HELScalar() {}
+   HELScalar(Complex_t s = Complex_t(1., 0.));
    HELScalar(const ANL4DVector &p,
 		   Int_t        nss = 1);
+   HELScalar(const HELVector  &vc,
+             const HELScalar  &sc,
+                   Double_t    g,
+                   Double_t    m,
+                   Double_t    gm);
+   HELScalar(const HELScalar  &s1,
+             const HELScalar  &s2,
+                   Double_t    g,
+                   Double_t    m,
+                   Double_t    gm);
+
    virtual ~HELScalar() {}
 
    inline const ANL4DVector &GetFourMomentum() const  { return fP;   }
@@ -187,6 +203,15 @@ public:
              const HELVector  &v2,
              const HELVector  &v3,
                    Double_t    g);
+   HELVertex(const HELVector  &vc,
+             const HELScalar  &s1,
+             const HELScalar  &s2,
+	           Double_t    g);
+   HELVertex(const HELVector  &v1,
+             const HELVector  &v2,
+             const HELScalar  &s1,
+             const HELScalar  &s2,
+	           Double_t    g);
             
    virtual ~HELVertex() {}
 

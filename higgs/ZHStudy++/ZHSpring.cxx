@@ -165,6 +165,8 @@ Bool_t ZHSpringBuf::SetPartons()
   Double_t chrg    = bases->f3Ptr->GetCharge();   // F charge
   Double_t m3      = bases->f3Ptr->GetMass  ();   // F mass
   Double_t m4      = m3;                          // F mass
+  Int_t    hel1    = bases->fHelFinal[0];         // f1 helicity
+  Int_t    hel2    = bases->fHelFinal[1];         // f2 helicity
   Double_t color   = bases->f3Ptr->GetColor();    // color factor
   Int_t    islev   = color > 1. ? 201 : 0;  	  // shower level
   Int_t    icf     = 2;                           // color flux id
@@ -214,23 +216,23 @@ Bool_t ZHSpringBuf::SetPartons()
 #endif
 
   if (!ZHBases::fgEnableHtoAA) {
-  //                                No. PID  Mass  Charge   pv   Nd 1st Mom hel col shower
-    new (partons[0]) JSFSpringParton(1, idh, mass,    0., *qp[0], 0, 0,  0, 0,   0,     0);
-    new (partons[1]) JSFSpringParton(2, idz, rq2z,    0., *qp[1], 2, 3,  0, 0,   0,     0);
-    new (partons[2]) JSFSpringParton(3, idf,   m3,  chrg, *qp[2], 0, 0,  2, 0, icf, islev);
-    new (partons[3]) JSFSpringParton(4,-idf,   m4, -chrg, *qp[3], 0, 0,  2, 0, icf, islev);
+  //                                No. PID  Mass  Charge   pv    Nd 1st Mom hel  col shower
+    new (partons[0]) JSFSpringParton(1, idh, mass,    0., *qp[0], 0, 0,  0,    0,   0,     0);
+    new (partons[1]) JSFSpringParton(2, idz, rq2z,    0., *qp[1], 2, 3,  0,    0,   0,     0);
+    new (partons[2]) JSFSpringParton(3, idf,   m3,  chrg, *qp[2], 0, 0,  2, hel1, icf, islev);
+    new (partons[3]) JSFSpringParton(4,-idf,   m4, -chrg, *qp[3], 0, 0,  2, hel2, icf, islev);
   } else {
-  //                                 No. PID  Mass  Charge   pv   Nd 1st Mom hel col shower
-    new (partons[0]) JSFSpringParton( 1, idh, mass,    0., *qp[0], 2, 5,  0, 0,   0,     0);
-    new (partons[1]) JSFSpringParton( 2, idz, rq2z,    0., *qp[1], 2, 3,  0, 0,   0,     0);
-    new (partons[2]) JSFSpringParton( 3, idf,   m3,  chrg, *qp[2], 0, 0,  2, 0, icf, islev);
-    new (partons[3]) JSFSpringParton( 4,-idf,   m4, -chrg, *qp[3], 0, 0,  2, 0, icf, islev);
-    new (partons[4]) JSFSpringParton( 5, idp,pmass,    0., *qp[4], 2, 7,  1, 0,   0,     0);
-    new (partons[5]) JSFSpringParton( 6, idp,pmass,    0., *qp[5], 2, 9,  1, 0,   0,     0);
-    new (partons[6]) JSFSpringParton( 7, ida,   0.,    0., *qp[6], 0, 0,  5, 0,   0,     0);
-    new (partons[7]) JSFSpringParton( 8, ida,   0.,    0., *qp[7], 0, 0,  5, 0,   0,     0);
-    new (partons[8]) JSFSpringParton( 9, ida,   0.,    0., *qp[8], 0, 0,  6, 0,   0,     0);
-    new (partons[9]) JSFSpringParton(10, ida,   0.,    0., *qp[9], 0, 0,  6, 0,   0,     0);
+  //                                 No. PID  Mass  Charge   pv    Nd 1st Mom hel  col shower
+    new (partons[0]) JSFSpringParton( 1, idh, mass,    0., *qp[0], 2, 5,  0,    0,   0,     0);
+    new (partons[1]) JSFSpringParton( 2, idz, rq2z,    0., *qp[1], 2, 3,  0,    0,   0,     0);
+    new (partons[2]) JSFSpringParton( 3, idf,   m3,  chrg, *qp[2], 0, 0,  2, hel1, icf, islev);
+    new (partons[3]) JSFSpringParton( 4,-idf,   m4, -chrg, *qp[3], 0, 0,  2, hel2, icf, islev);
+    new (partons[4]) JSFSpringParton( 5, idp,pmass,    0., *qp[4], 2, 7,  1,    0,   0,     0);
+    new (partons[5]) JSFSpringParton( 6, idp,pmass,    0., *qp[5], 2, 9,  1,    0,   0,     0);
+    new (partons[6]) JSFSpringParton( 7, ida,   0.,    0., *qp[6], 0, 0,  5,    0,   0,     0);
+    new (partons[7]) JSFSpringParton( 8, ida,   0.,    0., *qp[7], 0, 0,  5,    0,   0,     0);
+    new (partons[8]) JSFSpringParton( 9, ida,   0.,    0., *qp[8], 0, 0,  6,    0,   0,     0);
+    new (partons[9]) JSFSpringParton(10, ida,   0.,    0., *qp[9], 0, 0,  6,    0,   0,     0);
   }
   return kTRUE ;
 }
@@ -691,7 +693,7 @@ Complex_t ZHBases::FullAmplitude()
    HELFermion em(fK[0], kM_e, fHelInitial[0], +1, kIsIncoming);
    HELFermion ep(fK[1], kM_e, fHelInitial[1], -1, kIsOutgoing);
 
-   HELScalar  xf(fP[0], kFALSE);
+   HELScalar  xf(fP[0]);
 
    HELFermion f (fP[1], fM[1], fHelFinal [0], +1, kIsOutgoing);
    HELFermion fb(fP[2], fM[2], fHelFinal [1], -1, kIsIncoming);
