@@ -1,4 +1,5 @@
-{ gROOT->Reset();
+{ 
+  gROOT->Reset();
   TFile file("ttsim02.root","RECREATE");  // Output file
  
   jsf    = new JSFSteer();
@@ -22,7 +23,7 @@
 
   spring->ReadBases("bases.root");
 
-  Int_t maxevt=1000;      // Number of events.
+  Int_t maxevt=10000;      // Number of events.
   jsf->Initialize();
 
 
@@ -40,9 +41,6 @@
     jsf->FillTree();
     jsf->Clear();
   }
-
   jsf->Terminate();
   file->Write();
-
 }
-

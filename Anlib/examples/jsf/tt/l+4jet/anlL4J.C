@@ -12,7 +12,7 @@
 //* $Id$
 //*************************************************************************
 //
-Int_t maxevt = 5000;
+Int_t maxevt = 1000;
 Int_t freq   = 10;
 
 int anlL4J()
@@ -22,7 +22,7 @@ int anlL4J()
   JSFSteer *jsf  = new JSFSteer();			// Create JSF object
 
   Char_t *outputfile="jsf.root";  // A file to output histograms
-  Char_t *inputfile="../../../../../top/TTStudy/prod/ttsim.root";
+  Char_t *inputfile="../../../../../top/TTStudy/prod/ttsim02.root";
   // Char_t *inputfile="ttsim.root";	// Input simulator file.
 
       gSystem->Load("libS4Utils.so");
@@ -59,11 +59,11 @@ int anlL4J()
   myanl->SetMinYcut(0.001);
   myanl->SetCosjetCut(1.);
   myanl->SetCosbwCut(1.);
-  myanl->SetM2jCut(12.);
-#if 0
-  myanl->SetM3jCut(30.);
-  myanl->SetCosbwCut(-0.90);
+#if 1
+  myanl->SetM2jCut(40.);
+  myanl->SetM3jCut(60.);
 #else
+  myanl->SetM2jCut(12.);
   myanl->SetM3jCut(15.);
   myanl->SetCosbwCut(-0.85);
 #endif

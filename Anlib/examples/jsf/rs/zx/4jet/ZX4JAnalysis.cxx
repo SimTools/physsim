@@ -52,7 +52,7 @@ ClassImp(ZX4JAnalysis)
 
 // Constructor
 ZX4JAnalysis::ZX4JAnalysis(const Char_t *name, 
-                               const Char_t *title)
+                           const Char_t *title)
               : JSFModule(name, title),
                 fEtrackCut( 0.10),
                 fYcutCut  (0.004),

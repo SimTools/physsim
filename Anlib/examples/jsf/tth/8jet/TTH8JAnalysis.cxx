@@ -18,7 +18,7 @@
 //*   2008/07/13  K.Fujii	Clean up.
 //*************************************************************************
 
-#define __CHEAT__
+//#define __CHEAT__
 
 #include "TTH8JAnalysis.h"
 #include "TTHSpring.h"

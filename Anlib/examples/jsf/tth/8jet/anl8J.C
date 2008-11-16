@@ -12,7 +12,8 @@
 //* $Id$
 //*************************************************************************
 
-Int_t maxevt = 50000;
+//Int_t maxevt = 50000;
+Int_t maxevt = 5000;
 Int_t freq   = 10;
 
 int anl8J()
@@ -62,7 +63,7 @@ int anl8J()
   myanl->SetEjetCut(5);
   myanl->SetCosjetCut(1.);
   myanl->SetCosbwCut(1.);
-#if 0
+#if 1
   myanl->SetM2jCut(20.);
   myanl->SetM3jCut(30.);
 #else
@@ -73,7 +74,7 @@ int anl8J()
 #endif
   myanl->SetThrustCut(1.);
 
-#if 0
+#if 1
   myanl->SetBtagNsig  (2.5); // loose b-tag used to tag b's
   myanl->SetBtagNoffv (2);   //
   myanl->SetBTtagNsig (3.0); // tight b-tag used to veto any b in W

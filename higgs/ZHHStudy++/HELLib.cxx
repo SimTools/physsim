@@ -453,12 +453,6 @@ HELVector::HELVector(const HELVector  &vc,
 // --------------------------
 //  C-tor
 // --------------------------
-HELScalar::HELScalar(Complex_t s)
-          : Complex_t(s),
-            fNSS(1)
-{
-}
-
 //----------
 // SXXXXX()
 //----------
@@ -486,7 +480,7 @@ HELScalar::HELScalar(const HELVector  &vc,
    Complex_t dg  = -g/Complex_t(q2 - m*m, mg);
    Complex_t qvv = vc.fP(0)*vc[0] - vc.fP(1)*vc[1] - vc.fP(2)*vc[2] - vc.fP(3)*vc[3];
    Complex_t qpv = sc.fP(0)*vc[0] - sc.fP(1)*vc[1] - sc.fP(2)*vc[2] - sc.fP(3)*vc[3];
-   *this = dg*(2.*qpv+qvv)*sc;
+   this->Complex_t::operator=(dg*(2.*qpv+qvv)*sc);
 }
 
 //----------
@@ -503,7 +497,7 @@ HELScalar::HELScalar(const HELScalar  &s1,
    Double_t  q2  = fP.Mag2();
    Double_t  mg  = TMath::Max(TMath::Sign(m*gm, q2), 0.);
    Complex_t dg  = -g/Complex_t(q2 - m*m, mg);
-   *this = dg*s1*s2;
+   this->Complex_t::operator=(dg*s1*s2);
 }
 
 //-----------------------------------------------------------------------------

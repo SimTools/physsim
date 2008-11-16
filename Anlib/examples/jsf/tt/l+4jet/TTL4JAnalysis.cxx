@@ -20,9 +20,12 @@
 //*
 //* $Id$
 //*************************************************************************
-//
 #include "TTL4JAnalysis.h"
 #include "ANLVTXTagger.h"
+//#define __CHEAT__
+#ifdef __CHEAT__
+#include "ANLCheatedJetFinder.h"
+#endif
 
 static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
@@ -41,17 +44,24 @@ Bool_t gDEBUG = kFALSE;
 //  TTL4JAnalysisBuf Class
 //  ----------------------
 //
-//
+
 ClassImp(TTL4JAnalysisBuf)
 
 //_________________________________________________________
-TTL4JAnalysisBuf::TTL4JAnalysisBuf(const Char_t *name, const Char_t *title,
-   TTL4JAnalysis *module) : JSFEventBuf(name, title, (JSFModule*)module) {}
+TTL4JAnalysisBuf::TTL4JAnalysisBuf(const Char_t  *name, 
+                                   const Char_t  *title,
+                                   TTL4JAnalysis *module)
+                : JSFEventBuf(name, title, module)
+{
+}
 
 //_________________________________________________________
-TTL4JAnalysisBuf::TTL4JAnalysisBuf(TTL4JAnalysis *module, const Char_t *name,
-   const Char_t *title) : JSFEventBuf(name, title, (JSFModule*)module) {}
-
+TTL4JAnalysisBuf::TTL4JAnalysisBuf(TTL4JAnalysis *module,
+                                   const Char_t  *name,
+                                   const Char_t *title)
+                : JSFEventBuf(name, title, module)
+{
+}
 
 //_____________________________________________________________________
 //  -------------------
@@ -62,27 +72,23 @@ TTL4JAnalysisBuf::TTL4JAnalysisBuf(TTL4JAnalysis *module, const Char_t *name,
 
 ClassImp(TTL4JAnalysis)
 
-TTL4JAnalysis::TTL4JAnalysis(const Char_t *name, const Char_t *title)
-  : JSFModule(name, title), cHist(0)
+TTL4JAnalysis::TTL4JAnalysis(const Char_t *name,
+		             const Char_t *title)
+             : JSFModule(name, title),
+               cHist(0)
 {
   fEventBuf = new TTL4JAnalysisBuf(this);
   SetBufferSize(2000);  // buffer size for event data.
   cout << "TTL4JAnalysisBuf is created...fEventBuf is "
-       << (Int_t)fEventBuf << endl;
+       << fEventBuf << endl;
 }
 
 //_____________________________________________________________________
 TTL4JAnalysis::~TTL4JAnalysis()
 {
   cout << "TTL4JAnalysisBuf will be deleted...fEventBuf is "
-       << (Int_t)fEventBuf << endl;
-  delete fEventBuf; fEventBuf = 0;
-}
-
-//_____________________________________________________________________
-void TTL4JAnalysis::CleanUp(TObjArray *objs)
-{
-  objs->SetOwner();
+       << fEventBuf << endl;
+  delete fEventBuf;
 }
 
 //_____________________________________________________________________
@@ -215,14 +221,14 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
 
   Float_t selid = -0.5;
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) strcpy(&cutName[(Int_t)selid][0],"No cut");
+  if (Ngoods == 0) strcpy(&cutName[(Int_t)selid][0],"No cut");
 
   // Get event buffer and make combined tracks accessible.
 
-  JSFSIMDST     *sds     = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
-  JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
-  TTL4JAnalysisBuf *ua    = (TTL4JAnalysisBuf *)fEventBuf;
-  TTL4JAnalysisBuf &a     = *ua;
+  JSFSIMDST        *sds  = static_cast<JSFSIMDST*>(gJSF->FindModule("JSFSIMDST"));
+  JSFSIMDSTBuf     *evt  = static_cast<JSFSIMDSTBuf*>(sds->EventBuf());
+  TTL4JAnalysisBuf *ua   = static_cast<TTL4JAnalysisBuf *>(fEventBuf);
+  TTL4JAnalysisBuf &a    = *ua;
 
   Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
   TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
@@ -231,10 +237,11 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
 
   ANL4DVector qsum;
   TObjArray tracks(1000);
+  tracks.SetOwner(); // tracks owns contents.
   fNtracks = 0;
-  for ( Int_t i = 0; i < ntrks; i++ ) {
-    JSFLTKCLTrack *t = (JSFLTKCLTrack*)trks->UncheckedAt(i);
-    if ( t->GetE() > xEtrack ) {
+  for (Int_t i = 0; i < ntrks; i++) {
+    JSFLTKCLTrack *t = static_cast<JSFLTKCLTrack*>(trks->UncheckedAt(i));
+    if (t->GetE() > xEtrack) {
       //      ANL4DVector *qt = new ANL4DVector(t->GetPV());
       ANLTrack *qt = new ANLTrack(t);
       tracks.Add(qt); 		// track 4-momentum
@@ -247,9 +254,9 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // Cut on No. of tracks.
 
   hNtracks->Fill(fNtracks);
-  if ( fNtracks < xNtracks ) { CleanUp(&tracks); return kFALSE; }
+  if (fNtracks < xNtracks) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"N_tracks > %i",xNtracks);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -264,9 +271,9 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // Cut on Evis.
 
   hEvis->Fill(fEvis);
-  if ( fEvis < xEvis ) { CleanUp(&tracks); return kFALSE; }
+  if (fEvis < xEvis) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"E_vis > %g",xEvis);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -274,18 +281,18 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // Cut on Pt.
 
   hPt->Fill(fPt);
-  if ( fPt > xPt ) { CleanUp(&tracks); return kFALSE; }
+  if (fPt > xPt) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Pt <= %g",xPt);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
 
   // Cut on Pl.
 
-  if ( TMath::Abs(fPl) > xPl ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(fPl) > xPl) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"|Pl| <= %g",xPl);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -297,13 +304,13 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   TIter nexttrk (&tracks);
   ANLTrack *trkp;
   Double_t lpcharge = 0.;
-  while ((trkp = (ANLTrack *)nexttrk())) {
+  while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
     ANLTrack &trk = *trkp;
-    if ( ! trk.IsLepton() ) continue;
+    if (!trk.IsLepton()) continue;
     Double_t elepton = trk.E();
-    if ( elepton < xElepton ) continue;
+    if (elepton < xElepton) continue;
     Double_t econe = trk.GetConeEnergy(xCosCone, &tracks);
-    if ( econe <= xEcone ) {
+    if (econe <= xEcone) {
       lptracks.Add(trkp);
       fNlptracks++;
       trk.Lock();
@@ -314,9 +321,9 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // Require only one Isolated Lepton.
 
   hNlptracks->Fill(fNlptracks);
-  if ( fNlptracks != 1 ) { CleanUp(&tracks); return kFALSE; }
+  if (fNlptracks != 1) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Nlptracks = 1");
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -324,7 +331,15 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // Find jets.
 
   fYcut = xYcut;
+#ifndef __CHEAT__
   ANLJadeEJetFinder jclust(fYcut);
+#else
+  ANLCheatedJadeEJetFinder jclust(fYcut);
+  nexttrk.Reset();
+  while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
+    trkp->SetColorSingletID();
+  }
+#endif
   jclust.Initialize(tracks);
   jclust.FindJets();
   fYcut  = jclust.GetYmax();
@@ -335,9 +350,9 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // Cut on No. of jets.
 
   hNjets->Fill(fNjets);
-  if ( fNjets < xNjets ) { CleanUp(&tracks); return kFALSE; }
+  if (fNjets < xNjets) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -353,9 +368,9 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // Make sure that No. of jets is xNjets.
 
   hYcut->Fill(fYcut);
-  if ( fNjets != xNjets ) { CleanUp(&tracks); return kFALSE; }
+  if (fNjets != xNjets) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Njets = %i",xNjets);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -367,7 +382,7 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   ANLJet *jetp;
   Double_t ejetmin = 999999.;
   Double_t cosjmax = 0.;
-  while ((jetp = (ANLJet *)nextjet())) {
+  while ((jetp = static_cast<ANLJet *>(nextjet()))) {
     ANLJet &jet = *jetp;
     if (gDEBUG) jet.DebugPrint();
     Double_t ejet = jet()(0);
@@ -380,18 +395,18 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
 
   // Cut on Ejet_min.
 
-  if ( ejetmin < xEjet ) { CleanUp(&tracks); return kFALSE; }
+  if (ejetmin < xEjet) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Ejet > %g",xEjet);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
 
   // Cut on |cos(theta_j)|_max.
 
-  if ( TMath::Abs(cosjmax) > xCosjet ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(cosjmax) > xCosjet) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"|cos(theta_j)| <= %g",xCosjet);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -401,8 +416,13 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   ANL4DVector qcm(a.GetEcm());
   ANL4DVector qnu = qcm - qsum;
 
+#ifndef __CHEAT__
   ANLJet lpjet(lptracks);
   ANLJet nujet;
+#else
+  ANLTaggedJet lpjet(lptracks);
+  ANLTaggedJet nujet;
+#endif
   nujet.Add(&qnu);
 
   ANLPair w1(&lpjet, &nujet);
@@ -411,29 +431,30 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   ANLPair *w2p, *bbp;
 
   TObjArray solutions(10);
+  solutions.SetOwner();
   ANLPairCombiner w2candidates(jets,jets);
   ANLVTXTagger btag(3.,3);
 
-  while ((w2p = (ANLPair *)w2candidates())) {
+  while ((w2p = static_cast<ANLPair *>(w2candidates()))) {
     ANLPair &w2 = *w2p;
     Double_t w2mass = w2().GetMass();
     if (TMath::Abs(w2mass - kMassW) > xM2j) continue;
     w2.LockChildren();
     ANLPairCombiner bbcandidates(w2candidates);
     bbcandidates.Reset();
-    while ((bbp = (ANLPair *)bbcandidates())) {
+    while ((bbp = static_cast<ANLPair *>(bbcandidates()))) {
       ANLPair &bb = *bbp;
       if (bb.IsLocked()) continue;
-      if (!btag(*(ANLJet *)bb[0]) || !btag(*(ANLJet *)bb[1])) continue;
+      if (!btag(*static_cast<ANLJet *>(bb[0])) || !btag(*static_cast<ANLJet *>(bb[1]))) continue;
       for (Int_t i = 0; i < 2; i++) {
-	ANL4DVector *b1p = (ANL4DVector *)bb[i];
-	ANL4DVector *b2p = (ANL4DVector *)bb[1-i];
+	ANL4DVector *b1p = static_cast<ANL4DVector *>(bb[i]);
+	ANL4DVector *b2p = static_cast<ANL4DVector *>(bb[1-i]);
 	ANLPair *bw1p = new ANLPair(b1p,w1p);
 	ANLPair *bw2p = new ANLPair(b2p,w2p);
 	ANLPair &bw2  = *bw2p;
 	//	Double_t t1mass = bw1().GetMass();
 	Double_t t2mass = bw2().GetMass();
-	if (TMath::Abs(t2mass - kMasst) > xM3j ) {
+	if (TMath::Abs(t2mass - kMasst) > xM3j) {
 	  delete bw1p;
 	  delete bw2p;
 	  continue;
@@ -448,9 +469,9 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
 
   // Cut on No. of solutions.
 
-  if ( !solutions.GetEntries() ) { CleanUp(&tracks); return kFALSE; }
+  if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"|m_jj - m_W| <= %g && |m_3j - m_t| <= %g",xM2j,xM3j);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -459,25 +480,25 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
 
   TIter nextsol(&solutions);
   ANLPair *sol;
-  while ((sol = (ANLPair *)nextsol())) {
-    ANLPair &bw1 = *(ANLPair *)(*sol)[0];
-    ANLPair &bw2 = *(ANLPair *)(*sol)[1];
-    ANL4DVector &b1 = *(ANL4DVector *)bw1[0];
-    ANL4DVector &w1 = *(ANL4DVector *)bw1[1];
-    ANL4DVector &b2 = *(ANL4DVector *)bw2[0];
-    ANL4DVector &w2 = *(ANL4DVector *)bw2[1];
+  while ((sol = static_cast<ANLPair *>(nextsol()))) {
+    ANLPair &bw1 = *static_cast<ANLPair *>((*sol)[0]);
+    ANLPair &bw2 = *static_cast<ANLPair *>((*sol)[1]);
+    ANL4DVector &b1 = *static_cast<ANL4DVector *>(bw1[0]);
+    ANL4DVector &w1 = *static_cast<ANL4DVector *>(bw1[1]);
+    ANL4DVector &b2 = *static_cast<ANL4DVector *>(bw2[0]);
+    ANL4DVector &w2 = *static_cast<ANL4DVector *>(bw2[1]);
     Double_t cosbw1 = b1.CosTheta(w1);
     Double_t cosbw2 = b2.CosTheta(w2);
     hCosbw1Cosbw2->Fill(cosbw1,cosbw2,1.0);
-    if ( /*cosbw1 > xCosbw || */ cosbw2 > xCosbw) {
+    if (/*cosbw1 > xCosbw || */ cosbw2 > xCosbw) {
       solutions.Remove(sol);
       sol->Delete();
       delete sol;
     }
   }
-  if ( !solutions.GetEntries() ) { CleanUp(&tracks); return kFALSE; }
+  if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"|cos(theta_bw)| > %g",xCosbw);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -488,15 +509,13 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   eshape.Initialize(tracks);
   fThrust = eshape.GetThrust();
   hThrust->Fill(fThrust);
-  if ( fThrust > xThrust ) {
+  if (fThrust > xThrust) {
   	nextsol.Reset();
-  	while ((sol = (ANLPair *)nextsol())) sol->Delete();
-  	CleanUp(&solutions);
-  	CleanUp(&tracks);
+  	while ((sol = static_cast<ANLPair *>(nextsol()))) sol->Delete();
   	return kFALSE;
   }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Thrust <= %g",xThrust);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -506,7 +525,7 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // End of event selection
   // ----------------------
 
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     selid++;
     sprintf(msg,"END");
     strcpy(&cutName[(Int_t)selid][0],msg);
@@ -536,7 +555,7 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   if (gDEBUG) {
     Int_t nj = 0;
     nextjet.Reset();
-    while ((jetp = (ANLJet *)nextjet())) {
+    while ((jetp = static_cast<ANLJet *>(nextjet()))) {
        cerr << "------" << endl
             << "Jet " << ++nj << endl
             << "------" << endl;
@@ -549,12 +568,12 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
 
   nextsol.Reset();
   Int_t nsols = 0;
-  while ((sol = (ANLPair *)nextsol())) {
-    if ( nsols++ ) break;				// choose the best
-    ANLPair &bw1 = *(ANLPair *)(*sol)[0];
-    ANLPair &bw2 = *(ANLPair *)(*sol)[1];
-    ANL4DVector &w1 = *(ANL4DVector *)bw1[1];
-    ANL4DVector &w2 = *(ANL4DVector *)bw2[1];
+  while ((sol = static_cast<ANLPair *>(nextsol()))) {
+    if (nsols++) break;				// choose the best
+    ANLPair &bw1 = *static_cast<ANLPair *>((*sol)[0]);
+    ANLPair &bw2 = *static_cast<ANLPair *>((*sol)[1]);
+    ANL4DVector &w1 = *static_cast<ANL4DVector *>(bw1[1]);
+    ANL4DVector &w2 = *static_cast<ANL4DVector *>(bw2[1]);
     Double_t chi2   = sol->GetQuality();
     Double_t w1mass = w1.GetMass();
     Double_t w2mass = w2.GetMass();
@@ -566,17 +585,17 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
           hEw1Ew2->Fill(w1(0),w2(0),1.0);
           hMw1Mw2->Fill(w1mass,w2mass,1.0);
           hMt1Mt2->Fill(t1mass,t2mass,1.0);
-	  if ( lpcharge < 0. ) hPCost->Fill(t2mom,t2cos,1.0);
-	  else                 hPCostbar->Fill(t2mom,t2cos,1.0);
+	  if (lpcharge < 0.) hPCost->Fill(t2mom,t2cos,1.0);
+	  else               hPCostbar->Fill(t2mom,t2cos,1.0);
   }
 
   // Lepton Infomation
 
-  ANLTrack qlepton = *((ANLTrack *)lptracks.UncheckedAt(0));
+  ANLTrack qlepton = *static_cast<ANLTrack *>(lptracks.UncheckedAt(0));
 
   Double_t elepton = qlepton.E();
   Double_t coslepton = qlepton.CosTheta();
-  if ( qlepton.GetCharge() < 0. ) {
+  if (qlepton.GetCharge() < 0.) {
     hElpm->Fill(elepton,1.);
     hCoslpm->Fill(coslepton,1.);
   } else {
@@ -587,9 +606,7 @@ Bool_t TTL4JAnalysis::Process(Int_t ev)
   // Clean up
 
   nextsol.Reset();
-  while ((sol = (ANLPair *)nextsol())) sol->Delete();
-  CleanUp(&solutions);
-  CleanUp(&tracks);
+  while ((sol = static_cast<ANLPair *>(nextsol()))) sol->Delete();
 
   last->cd();
   return kTRUE;

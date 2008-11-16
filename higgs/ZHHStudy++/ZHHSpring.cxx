@@ -19,7 +19,7 @@
 #include <sstream>
 #include <iomanip>
 //#define __DEBUG__
-//#define __ZEROWIDTH__
+#define __ZEROWIDTH__
 //#define __PHASESPACE__
 #ifdef __PHASESPACE__
 #define __NODECAY__

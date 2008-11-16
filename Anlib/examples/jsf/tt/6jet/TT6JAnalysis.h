@@ -1,5 +1,5 @@
-#ifndef __TT6JAnalysis__
-#define __TT6JAnalysis__
+#ifndef TT6JAnalysis_H
+#define TT6JAnalysis_H
 //*************************************************************************
 //* ======================
 //*  TT6JAnalysis Classes
@@ -119,8 +119,6 @@ public:
   TT6JAnalysis() : JSFModule("TT6JAnalysis", "TT6JAnalysis Example") {}
   TT6JAnalysis(const Char_t *name, const Char_t *title);
   virtual ~TT6JAnalysis();
-
-  void CleanUp(TObjArray *objs);
 
   inline void SetNtrackCut(Int_t    x) { xNtracks = x; }
   inline void SetEtrackCut(Double_t x) { xEtrack = x; }

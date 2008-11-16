@@ -156,7 +156,6 @@ friend class HELFermion;
 friend class HELVector;
 friend class HELVertex;
 public:
-   HELScalar(Complex_t s = Complex_t(1., 0.));
    HELScalar(const ANL4DVector &p,
 		   Int_t        nss = 1);
    HELScalar(const HELVector  &vc,

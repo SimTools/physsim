@@ -1,5 +1,5 @@
-#ifndef __TTL4JAnalysis__
-#define __TTL4JAnalysis__
+#ifndef TTL4JAnalysis_H
+#define TTL4JAnalysis_H
 //*************************************************************************
 //* =======================
 //*  TTL4JAnalysis Classes
@@ -132,8 +132,6 @@ public:
   TTL4JAnalysis() : JSFModule("TTL4JAnalysis", "TTL4JAnalysis Example") {}
   TTL4JAnalysis(const Char_t *name, const Char_t *title);
   virtual ~TTL4JAnalysis();
-
-  void CleanUp(TObjArray *objs);
 
   inline void SetNtrackCut(Int_t    x) { xNtracks = x; }
   inline void SetEtrackCut(Double_t x) { xEtrack = x; }

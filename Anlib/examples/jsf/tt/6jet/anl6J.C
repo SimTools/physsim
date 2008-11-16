@@ -12,7 +12,7 @@
 //* $Id$
 //*************************************************************************
 //
-Int_t maxevt = 5000;
+Int_t maxevt = 50000;
 Int_t freq   = 10;
 
 int anl6J()
@@ -56,15 +56,17 @@ int anl6J()
 
   myanl->SetEvisCut(250.);
   myanl->SetPtCut(40.);
-  myanl->SetPlCut(20.);
+  //myanl->SetPlCut(20.);
+  myanl->SetPlCut(40.);
   myanl->SetMinYcut(0.001);
   myanl->SetCosjetCut(1.);
+#if 1
+  myanl->SetM2jCut(24.);
+  myanl->SetM3jCut(48.);
+  //myanl->SetCosbwCut(-0.80);
   myanl->SetCosbwCut(1.);
-  myanl->SetM2jCut(12.);
-#if 0
-  myanl->SetM3jCut(30.);
-  myanl->SetCosbwCut(-0.90);
 #else
+  myanl->SetM2jCut(12.);
   myanl->SetM3jCut(40.);
   myanl->SetCosbwCut(-0.80);
 #endif

@@ -13,6 +13,7 @@
 //*************************************************************************
 
 Int_t maxevt = 99999;
+//Int_t maxevt = 1000;
 Int_t freq   = 10;
 
 int anlL6J()
@@ -74,11 +75,17 @@ int anlL6J()
   myanl->SetCosbwCut(1.);
   //myanl->SetThrustCut(0.8);
   myanl->SetThrustCut(1.);
-
+#if 0
   myanl->SetBtagNsig  (2.); // loose b-tag used to tag b's
   myanl->SetBtagNoffv (0);   //
   myanl->SetBTtagNsig (10.0); // tight b-tag used to veto any b in W
   myanl->SetBTtagNoffv(3);   // 
+#else
+  myanl->SetBtagNsig  (3.0); // loose b-tag used to tag b's
+  myanl->SetBtagNoffv (2);   //
+  myanl->SetBTtagNsig (100.); // tight b-tag used to veto any b in W
+  myanl->SetBTtagNoffv(3);   // 
+#endif
 
   jsf->BeginRun(1);      			// Set run number to 1.
   Int_t nok = 0;

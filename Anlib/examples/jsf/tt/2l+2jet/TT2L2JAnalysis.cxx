@@ -20,9 +20,13 @@
 //*
 //* $Id$
 //*************************************************************************
-//
+
 #include "TT2L2JAnalysis.h"
 #include "ANLTrack.h"
+//#define __CHEAT__
+#ifdef __CHEAT__
+#include "ANLCheatedJetFinder.h"
+#endif
 
 static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
@@ -77,12 +81,6 @@ TT2L2JAnalysis::~TT2L2JAnalysis()
   cout << "TT2L2JAnalysisBuf will be deleted...fEventBuf is "
        << (Int_t)fEventBuf << endl;
   delete fEventBuf; fEventBuf = 0;
-}
-
-//_____________________________________________________________________
-void TT2L2JAnalysis::CleanUp(TObjArray *objs)
-{
-  objs->SetOwner();
 }
 
 //_____________________________________________________________________
@@ -194,14 +192,14 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
 
   Float_t selid = -0.5;
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) strcpy(&cutName[(Int_t)selid][0],"No cut");
+  if (Ngoods == 0) strcpy(&cutName[(Int_t)selid][0],"No cut");
 
   // Get event buffer and make combined tracks accessible.
 
-  JSFSIMDST     *sds     = (JSFSIMDST*)gJSF->FindModule("JSFSIMDST");
-  JSFSIMDSTBuf  *evt     = (JSFSIMDSTBuf*)sds->EventBuf();
-  TT2L2JAnalysisBuf *ua    = (TT2L2JAnalysisBuf *)fEventBuf;
-  TT2L2JAnalysisBuf &a     = *ua;
+  JSFSIMDST         *sds = static_cast<JSFSIMDST*>(gJSF->FindModule("JSFSIMDST"));
+  JSFSIMDSTBuf      *evt = static_cast<JSFSIMDSTBuf*>(sds->EventBuf());
+  TT2L2JAnalysisBuf *ua  = static_cast<TT2L2JAnalysisBuf *>(fEventBuf);
+  TT2L2JAnalysisBuf &a   = *ua;
 
   Int_t          ntrks   = evt->GetNLTKCLTracks(); 	// No. of tracks 
   TObjArray     *trks    = evt->GetLTKCLTracks(); 	// combined tracks
@@ -211,9 +209,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   ANL4DVector qsum;
   TObjArray tracks(1000);
   fNtracks = 0;
-  for ( Int_t i = 0; i < ntrks; i++ ) {
-    JSFLTKCLTrack *t = (JSFLTKCLTrack*)trks->UncheckedAt(i);
-    if ( t->GetE() > xEtrack ) {
+  for (Int_t i = 0; i < ntrks; i++) {
+    JSFLTKCLTrack *t = static_cast<JSFLTKCLTrack*>(trks->UncheckedAt(i));
+    if (t->GetE() > xEtrack) {
       ANLTrack *qt = new ANLTrack(t);
       tracks.Add(qt); 		// track 4-momentum
       qsum += *qt;		// total 4-momentum
@@ -225,9 +223,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // Cut on No. of tracks.
 
   hNtracks->Fill(fNtracks);
-  if ( fNtracks < xNtracks ) { CleanUp(&tracks); return kFALSE; }
+  if (fNtracks < xNtracks) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"N_tracks > %i",xNtracks);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -242,9 +240,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // Cut on Evis.
 
   hEvis->Fill(fEvis);
-  if ( fEvis > xEvis ) { CleanUp(&tracks); return kFALSE; }
+  if (fEvis > xEvis) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"E_vis < %g",xEvis);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -252,18 +250,18 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // Cut on Pt.
 
   hPt->Fill(fPt);
-  if ( fPt > xPt ) { CleanUp(&tracks); return kFALSE; }
+  if (fPt > xPt) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Pt <= %g",xPt);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
 
   // Cut on Pl.
 
-  if ( TMath::Abs(fPl) > xPl ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(fPl) > xPl) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"|Pl| <= %g",xPl);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -277,16 +275,16 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   TIter nexttrk (&tracks);
   ANLTrack *trkp;
   Double_t lpcharge = 0.;
-  while ((trkp = (ANLTrack *)nexttrk())) {
+  while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
     ANLTrack &trk = *trkp;
-    if ( ! trk.IsLepton() ) continue;
+    if (!trk.IsLepton()) continue;
     Double_t elepton = trk.E();
-    if ( elepton < xElepton ) continue;
+    if (elepton < xElepton) continue;
     Double_t econe = trk.GetConeEnergy(xCosCone, &tracks);
-    if ( econe <= xEcone ) {
+    if (econe <= xEcone) {
       lptracks.Add(trkp);
       fNlptracks++;
-      if ( trk.GetCharge() < 0. ) {
+      if (trk.GetCharge() < 0.) {
 	//	cerr << "charge is " << trk.GetCharge() << endl;
 	fNlpmtracks++;
       } else {
@@ -301,9 +299,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // Require two Isolated Leptons.
 
   hNlptracks->Fill(fNlptracks);
-  if ( fNlptracks != 2 ) { CleanUp(&tracks); return kFALSE; }
+  if (fNlptracks != 2) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Nlptracks = 2");
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -312,11 +310,11 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
 
   hNlpmtracks->Fill(fNlpmtracks);
   hNlpptracks->Fill(fNlpptracks);
-  if ( fNlpmtracks != 1 && fNlpptracks != 1) {
-    CleanUp(&tracks); return kFALSE;
+  if (fNlpmtracks != 1 && fNlpptracks != 1) {
+    return kFALSE;
   }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Charge oppositeness of two Leptons");
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -324,7 +322,15 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // Find jets.
 
   fYcut = xYcut;
+#ifndef __CHEAT__
   ANLJadeEJetFinder jclust(fYcut);
+#else
+  ANLCheatedJadeEJetFinder jclust(fYcut);
+  nexttrk.Reset();
+  while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
+    trkp->SetColorSingletID();
+  }
+#endif
   jclust.Initialize(tracks);
   jclust.FindJets();
   fYcut  = jclust.GetYmax();
@@ -335,9 +341,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // Cut on No. of jets.
 
   hNjets->Fill(fNjets);
-  if ( fNjets < xNjets ) { CleanUp(&tracks); return kFALSE; }
+  if (fNjets < xNjets) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Njets >= %i for Ycut = %g",xNjets,xYcut);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -353,9 +359,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // Make sure that No. of jets is xNjets.
 
   hYcut->Fill(fYcut);
-  if ( fNjets != xNjets ) { CleanUp(&tracks); return kFALSE; }
+  if (fNjets != xNjets) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Njets = %i",xNjets);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -367,7 +373,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   ANLJet *jetp;
   Double_t ejetmin = 999999.;
   Double_t cosjmax = 0.;
-  while ((jetp = (ANLJet *)nextjet())) {
+  while ((jetp = static_cast<ANLJet *>(nextjet()))) {
     ANLJet &jet = *jetp;
     if (gDEBUG) jet.DebugPrint();
     Double_t ejet = jet()(0);
@@ -380,18 +386,18 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
 
   // Cut on Ejet_min.
 
-  if ( ejetmin < xEjet ) { CleanUp(&tracks); return kFALSE; }
+  if (ejetmin < xEjet) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Ejet > %g",xEjet);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
 
   // Cut on |cos(theta_j)|_max.
 
-  if ( TMath::Abs(cosjmax) > xCosjet ) { CleanUp(&tracks); return kFALSE; }
+  if (TMath::Abs(cosjmax) > xCosjet) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"|cos(theta_j)| <= %g",xCosjet);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -402,9 +408,9 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   eshape.Initialize(tracks);
   fThrust = eshape.GetThrust();
   hThrust->Fill(fThrust);
-  if ( fThrust > xThrust ) { CleanUp(&tracks); return kFALSE; }
+  if (fThrust > xThrust) { return kFALSE; }
   hStat->Fill(++selid);
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     sprintf(msg,"Thrust <= %g",xThrust);
     strcpy(&cutName[(Int_t)selid][0],msg);
   }
@@ -413,7 +419,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   // End of event selection
   // ----------------------
 
-  if ( Ngoods == 0 ) {
+  if (Ngoods == 0) {
     selid++;
     sprintf(msg,"END");
     strcpy(&cutName[(Int_t)selid][0],msg);
@@ -438,7 +444,7 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   if (gDEBUG) {
     Int_t nj = 0;
     nextjet.Reset();
-    while ((jetp = (ANLJet *)nextjet())) {
+    while ((jetp = static_cast<ANLJet *>(nextjet()))) {
        cerr << "------" << endl
             << "Jet " << ++nj << endl
             << "------" << endl;
@@ -448,12 +454,12 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
 
   ANLTrack qm, qp;
 
-  if ( ((ANLTrack *)lptracks.UncheckedAt(0))->GetCharge() < 0. ) {
-    qm = *((ANLTrack *)lptracks.UncheckedAt(0));
-    qp = *((ANLTrack *)lptracks.UncheckedAt(1));
+  if (static_cast<ANLTrack *>(lptracks.UncheckedAt(0))->GetCharge() < 0.) {
+    qm = *static_cast<ANLTrack *>(lptracks.UncheckedAt(0));
+    qp = *static_cast<ANLTrack *>(lptracks.UncheckedAt(1));
   } else {
-    qp = *((ANLTrack *)lptracks.UncheckedAt(0));
-    qm = *((ANLTrack *)lptracks.UncheckedAt(1));
+    qp = *static_cast<ANLTrack *>(lptracks.UncheckedAt(0));
+    qm = *static_cast<ANLTrack *>(lptracks.UncheckedAt(1));
   }
   Double_t elpm = qm.E();
   Double_t coslpm = qm.CosTheta();
@@ -468,8 +474,6 @@ Bool_t TT2L2JAnalysis::Process(Int_t ev)
   //  Double_t emup = qp.IsMuon();
 
   hEvisPl->Fill(fEvis,fPl,1.);
-
-  CleanUp(&tracks);
 
   last->cd();
   return kTRUE;

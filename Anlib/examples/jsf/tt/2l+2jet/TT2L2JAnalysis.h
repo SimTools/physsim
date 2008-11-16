@@ -1,5 +1,5 @@
-#ifndef __TT2L2JAnalysis__
-#define __TT2L2JAnalysis__
+#ifndef TT2L2JAnalysis_H
+#define TT2L2JAnalysis_H
 //*************************************************************************
 //* ========================
 //*  TT2L2JAnalysis Classes
@@ -121,8 +121,6 @@ public:
   TT2L2JAnalysis() : JSFModule("TT2L2JAnalysis", "TT2L2JAnalysis Example") {}
   TT2L2JAnalysis(const Char_t *name, const Char_t *title);
   virtual ~TT2L2JAnalysis();
-
-  void CleanUp(TObjArray *objs);
 
   inline void SetNtrackCut(Int_t    x) { xNtracks = x; }
   inline void SetEtrackCut(Double_t x) { xEtrack = x; }
