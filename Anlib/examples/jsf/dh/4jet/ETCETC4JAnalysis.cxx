@@ -123,7 +123,7 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
     stringstream tupstr;
     tupstr << "nev:ecm:ntracks:evis:pt:pl:elmax:ycut:chi2"              << ":"
            << "nsols:ejmin:csjmax"                                      << ":"
-           << "csw1:csw2"                                               << ":"
+           << "csw1:csw2:ew1:ew2"                                       << ":"
            << "mw1:mw2:mm:acop"                                         << ":"
            << "csj11h:fij11h:csj12h:fij12h:csj21h:fij21h:csj22h:fij22h" << ends;
 
@@ -544,6 +544,8 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
   Double_t      mw2   = w2.GetMass();
   Double_t      csw1  = w1.CosTheta();
   Double_t      csw2  = w2.CosTheta();
+  Double_t      ew1   = w1.E();
+  Double_t      ew2   = w2.E();
   Double_t      acop  = w1.Acop(w2);
 #ifdef __CHEAT__
   ANLTaggedJet *w1j1p = dynamic_cast<ANLTaggedJet *>(w1[0]);
@@ -575,18 +577,20 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
   data[11] = cosjmax;
   data[12] = csw1;
   data[13] = csw2;
-  data[14] = mw1;
-  data[15] = mw2;
-  data[16] = mm;
-  data[17] = acop;
-  data[18] = csj11h;
-  data[19] = fij11h;
-  data[20] = csj12h;
-  data[21] = fij12h;
-  data[22] = csj21h;
-  data[23] = fij21h;
-  data[24] = csj22h;
-  data[25] = fij22h;
+  data[14] = ew1;
+  data[15] = ew2;
+  data[16] = mw1;
+  data[17] = mw2;
+  data[18] = mm;
+  data[19] = acop;
+  data[20] = csj11h;
+  data[21] = fij11h;
+  data[22] = csj12h;
+  data[23] = fij12h;
+  data[24] = csj21h;
+  data[25] = fij21h;
+  data[26] = csj22h;
+  data[27] = fij22h;
 
   hEvt->Fill(data);
 
