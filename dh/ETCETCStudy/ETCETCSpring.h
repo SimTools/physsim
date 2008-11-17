@@ -257,8 +257,8 @@ private:
   Double_t fQ2W2;            // q^2 of final state W+
   Double_t fCosThetaF2;      // cos(theta_f2) in W+  frame
   Double_t fPhiF2;           // phi_f2        in W+  frame
-  Double_t fZBoost;         // p_z(cm)      in lab frame
-  Double_t fEcmIP;          // Ecm after B-strahlung
+  Double_t fZBoost;          // p_z(cm)      in lab frame
+  Double_t fEcmIP;           // Ecm after B-strahlung
 
   ClassDef(ETCETCSpringBuf, 1)  // ETCETCSpring event buffer
 };
