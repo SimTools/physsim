@@ -69,6 +69,28 @@ ETCETCSpring::~ETCETCSpring()
   delete GetBases();
 }
 
+//_____________________________________________________________________________
+// --------------------------
+//  Initialize
+// --------------------------
+Bool_t ETCETCSpring::Initialize()
+{
+  JSFSpring::Initialize();
+
+  if (fFile->IsWritable()) {
+    ETCETCBases *bs = static_cast<ETCETCBases *>(GetBases());
+    TDirectory *last = gDirectory;
+    fFile->cd("/conf");
+    TList *dlist = gDirectory->GetListOfKeys();
+    if (!dlist->FindObject("init")) gDirectory->mkdir("init");
+    fFile->cd("/conf/init");
+    bs->Write();
+    last->cd(); 
+    cerr << ">>>>>> ETCETCBases written to file" << endl;
+  }
+
+  return kTRUE;
+}
 
 //-----------------------------------------------------------------------------
 // ==============================

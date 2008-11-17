@@ -281,6 +281,8 @@ public:
                 ETCETCBases  *bases = 0);
    virtual ~ETCETCSpring();
 
+   virtual Bool_t Initialize(); // overload the base class method
+
    ClassDef(ETCETCSpring, 1)  // ETCETCSpring class
 };
 
