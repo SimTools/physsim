@@ -1163,7 +1163,11 @@ Double_t ETCBoson::GamToSV(Double_t m1, // 1st daughter mass
 ETIBoson::ETIBoson(Double_t m)
 {
    fName    = TString("ETI");
+#if 0
    fPID     = 200000001;
+#else
+   fPID     = 220000; // LSP code for JSFHadronizer.
+#endif
    fCharge  =  0.0;
    fSpin    =  0.0;
    fMass    =    m;
