@@ -318,49 +318,6 @@ ETCETCBases::ETCETCBases(const char *name, const char *title)
   ins >> fPole;
 
   // --------------------------------------------
-  //  Open beamstrahlung data
-  // --------------------------------------------
-  string bsfiledir;
-  string bsfilename;
-
-  if (fBeamStr) {
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("ETCETCBases.BeamstrahlungFilepath",
-                                  "/proj/soft/jsf/pro/data/bsdata/"));
-    ins >> bsfiledir;
-
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("ETCETCBases.BeamstrahlungFilename","trc500"));
-    ins >> bsfilename;
-    
-    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
-    if (!fBeamFile) {
-      cerr << " Unable to open a file for beamstrahlung" << endl;
-      abort();
-    }
-    
-  // --------------------------------------------
-  //  Initialize beam generator
-  // --------------------------------------------
-
-    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
-
-    fBM->MakeBSMap();
-    fBM->Print(); 
-
-    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
-         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
-         << endl;
-
-    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
-      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
-           << " which is different from fEcm/2: "    << (fEcmInit/2)
-           << endl;        
-    } // check the energy homogeneity
-  } // if beamstrahlung is on
-
-  // --------------------------------------------
   //  Registor random numbers
   // --------------------------------------------
   //--
@@ -967,27 +924,67 @@ Complex_t ETCETCBases::AmpEEtoXX(const HELFermion &em,
 void ETCETCBases::Userin()
 {
   // --------------------------------------------
+  //  Open beamstrahlung data
+  // --------------------------------------------
+  string bsfiledir;
+  string bsfilename;
+
+  if (fBeamStr) {
+    stringstream ins(gJSF->Env()->GetValue("ETCETCBases.BeamstrahlungFilepath",
+                                           "/proj/soft/jsf/pro/data/bsdata/"));
+    ins >> bsfiledir;
+
+    ins.clear();
+    ins.str(gJSF->Env()->GetValue("ETCETCBases.BeamstrahlungFilename","trc500"));
+    ins >> bsfilename;
+    
+    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
+    if (!fBeamFile) {
+      cerr << " Unable to open a file for beamstrahlung" << endl;
+      abort();
+    }
+    
+  // --------------------------------------------
+  //  Initialize beam generator
+  // --------------------------------------------
+    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
+    fBM->SetIBParameters(0.0);
+
+    fBM->MakeBSMap();
+    fBM->Print(); 
+
+    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
+         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
+         << endl;
+
+    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
+      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
+           << " which is different from fEcm/2: "    << (fEcmInit/2)
+           << endl;        
+    } // check the energy homogeneity
+  } // if beamstrahlung is on
+
+  // --------------------------------------------
   //  Initialize Z decay table
   // --------------------------------------------
+  if (!fWBosonPtr) fWBosonPtr = new GENPDTWBoson();
+  fWBosonPtr->DebugPrint();
+  if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
+  fZBosonPtr->DebugPrint();
+  if (!fPhotonPtr) fPhotonPtr = new GENPDTPhoton();
+  //fPhotonPtr->DebugPrint();
+  if (!fGluonPtr)  fGluonPtr  = new GENPDTGluon();
+  //fGluonPtr->DebugPrint();
 
-   if (!fWBosonPtr) fWBosonPtr = new GENPDTWBoson();
-   fWBosonPtr->DebugPrint();
-   if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
-   fZBosonPtr->DebugPrint();
-   if (!fPhotonPtr) fPhotonPtr = new GENPDTPhoton();
-   //fPhotonPtr->DebugPrint();
-   if (!fGluonPtr)  fGluonPtr  = new GENPDTGluon();
-   //fGluonPtr->DebugPrint();
+  cerr << " Eta +/- Boson " << endl;
+  if (!fXBosonPtr)  fXBosonPtr  = new ETCBoson(fMass,fMassDM);
+  fXBosonPtr->DebugPrint();
 
-   cerr << " Eta +/- Boson " << endl;
-   if (!fXBosonPtr)  fXBosonPtr  = new ETCBoson(fMass,fMassDM);
-   fXBosonPtr->DebugPrint();
+  cerr << " Eta_I Boson " << endl;
+  if (!fDMBosonPtr) fDMBosonPtr = new ETIBoson(fMassDM);
+  fDMBosonPtr->DebugPrint();
 
-   cerr << " Eta_I Boson " << endl;
-   if (!fDMBosonPtr) fDMBosonPtr = new ETIBoson(fMassDM);
-   fDMBosonPtr->DebugPrint();
-
-   Double_t mx = fMass;
+  Double_t mx = fMass;
 
   // --------------------------------------------
   //  Define some plots
