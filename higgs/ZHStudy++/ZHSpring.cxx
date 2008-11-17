@@ -67,6 +67,30 @@ ZHSpring::~ZHSpring()
   delete GetBases();
 }
 
+//_____________________________________________________________________________
+// --------------------------
+//  Initialize
+// --------------------------
+Bool_t ZHSpring::Initialize()
+{
+  JSFSpring::Initialize();
+
+  if (fFile->IsWritable()) {
+    ZHBases *bs = static_cast<ZHBases *>(GetBases());
+    TDirectory *last = gDirectory;
+    fFile->cd("/conf");
+    TList *dlist = gDirectory->GetListOfKeys();
+    if (!dlist->FindObject("init")) gDirectory->mkdir("init");
+    fFile->cd("/conf/init");
+    bs->Write();
+    last->cd(); 
+    cerr << ">>>>>> ZHBases written to file" << endl;
+  }
+
+  return kTRUE;
+}
+
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 // ==============================
@@ -325,49 +349,6 @@ ZHBases::ZHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHBases.Pole","0."));         // electron polarization
   ins >> fPole;
-
-  // --------------------------------------------
-  //  Open beamstrahlung data
-  // --------------------------------------------
-  string bsfiledir;
-  string bsfilename;
-
-  if (fBeamStr) {
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("ZHBases.BeamstrahlungFilepath",
-                                  "/proj/soft/jsf/pro/data/bsdata/"));
-    ins >> bsfiledir;
-
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("ZHBases.BeamstrahlungFilename","trc500"));
-    ins >> bsfilename;
-    
-    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
-    if (!fBeamFile) {
-      cerr << " Unable to open a file for beamstrahlung" << endl;
-      abort();
-    }
-    
-  // --------------------------------------------
-  //  Initialize beam generator
-  // --------------------------------------------
-
-    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
-
-    fBM->MakeBSMap();
-    fBM->Print(); 
-
-    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
-         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
-         << endl;
-
-    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
-      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
-           << " which is different from fEcm/2: "    << (fEcmInit/2)
-           << endl;        
-    } // check the energy homogeneity
-  } // if beamstrahlung is on
 
   // --------------------------------------------
   //  Registor random numbers
@@ -746,6 +727,48 @@ Complex_t ZHBases::AmpEEtoZH(const HELFermion &em,
 // --------------------------
 void ZHBases::Userin()
 {
+  // --------------------------------------------
+  //  Open beamstrahlung data
+  // --------------------------------------------
+  string bsfiledir;
+  string bsfilename;
+
+  if (fBeamStr) {
+    stringstream ins(gJSF->Env()->GetValue("ZHBases.BeamstrahlungFilepath",
+                                  "/proj/soft/jsf/pro/data/bsdata/"));
+    ins >> bsfiledir;
+
+    ins.clear();
+    ins.str(gJSF->Env()->GetValue("ZHBases.BeamstrahlungFilename","trc500"));
+    ins >> bsfilename;
+    
+    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
+    if (!fBeamFile) {
+      cerr << " Unable to open a file for beamstrahlung" << endl;
+      abort();
+    }
+    
+  // --------------------------------------------
+  //  Initialize beam generator
+  // --------------------------------------------
+
+    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
+    fBM->SetIBParameters(0.0);
+
+    fBM->MakeBSMap();
+    fBM->Print(); 
+
+    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
+         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
+         << endl;
+
+    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
+      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
+           << " which is different from fEcm/2: "    << (fEcmInit/2)
+           << endl;        
+    } // check the energy homogeneity
+  } // if beamstrahlung is on
+
   // --------------------------------------------
   //  Initialize Z decay table
   // --------------------------------------------

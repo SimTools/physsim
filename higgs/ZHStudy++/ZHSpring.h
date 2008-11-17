@@ -232,6 +232,8 @@ public:
               ZHBases  *bases = 0);
    virtual ~ZHSpring();
 
+   virtual Bool_t Initialize(); // overload the base class method
+
    ClassDef(ZHSpring, 1)  // ZHSpring class
 };
 #endif
