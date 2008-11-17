@@ -17,9 +17,15 @@
 
 #include <sstream>
 #include <iomanip>
+//#define __NODECAY__
 //#define __DEBUG__
 //#define __ZEROWIDTH__
 //#define __PAHSESPACE__
+#ifdef __NODECAY__
+#ifndef __ZEROWIDTH__
+#define __ZEROWIDTH__
+#endif
+#endif
 
 //*----------------------------------------------------------------------
 //*     Numerical and Natural Constants
@@ -150,13 +156,13 @@ Bool_t ETCETCSpringBuf::SetPartons()
   Int_t    islevm  = colorm > 1. ? 101 : 0;        // shower level
   Int_t    icfm    = 1;                            // color flux id
 
-  Int_t    id3     = bases->f3Ptr->GetPID();       // PDG code for 1st daughter
-  Int_t    id4     = bases->f4Ptr->GetPID();       // PDG code for 2nd daughter
-  Double_t m3      = bases->f3Ptr->GetMass();      // 1st daughter mass
-  Double_t m4      = bases->f4Ptr->GetMass();      // 2nd daughter mass
-  Double_t colorp  = bases->f3Ptr->GetColor();     // color factor
-  Double_t chg3    = bases->f3Ptr->GetCharge();    // 1st daughter charge
-  Double_t chg4    = bases->f4Ptr->GetCharge();    // 2nd daughter charge
+  Int_t    id4     = bases->f4Ptr->GetPID();       // PDG code for 1st daughter
+  Int_t    id5     = bases->f5Ptr->GetPID();       // PDG code for 2nd daughter
+  Double_t m4      = bases->f4Ptr->GetMass();      // 1st daughter mass
+  Double_t m5      = bases->f5Ptr->GetMass();      // 2nd daughter mass
+  Double_t colorp  = bases->f4Ptr->GetColor();     // color factor
+  Double_t chg3    = bases->f4Ptr->GetCharge();    // 1st daughter charge
+  Double_t chg4    = bases->f5Ptr->GetCharge();    // 2nd daughter charge
   Int_t    islevp  = colorp > 1. ? 201 : 0;        // shower level
   Int_t    icfp    = 2;                            // color flux id
 
@@ -177,8 +183,8 @@ Bool_t ETCETCSpringBuf::SetPartons()
   new (partons[5]) JSFSpringParton( 6,-idw , rq2wp,   +1., *qp[5], 2, 9,  2, 0,   0,     0);
   new (partons[6]) JSFSpringParton( 7, id1 ,    m1,  chg1, *qp[6], 0, 0,  4, 0,icfm,islevm);
   new (partons[7]) JSFSpringParton( 8, id2 ,    m2,  chg2, *qp[7], 0, 0,  4, 0,icfm,islevm);
-  new (partons[8]) JSFSpringParton( 9, id3 ,    m3,  chg3, *qp[8], 0, 0,  6, 0,icfp,islevp);
-  new (partons[9]) JSFSpringParton(10, id4 ,    m4,  chg4, *qp[9], 0, 0,  6, 0,icfp,islevp);
+  new (partons[8]) JSFSpringParton( 9, id4 ,    m4,  chg3, *qp[8], 0, 0,  6, 0,icfp,islevp);
+  new (partons[9]) JSFSpringParton(10, id5 ,    m5,  chg4, *qp[9], 0, 0,  6, 0,icfp,islevp);
 
   return kTRUE ;
 }
@@ -215,8 +221,8 @@ ETCETCBases::ETCETCBases(const char *name, const char *title)
            f2Ptr      (0),
            fQ2W1      (0.),
            fW2ModePtr (0),
-           f3Ptr      (0),
            f4Ptr      (0),
+           f5Ptr      (0),
            fQ2W2      (0.),
            fCosTheta  (0.),
            fPhi       (0.),
@@ -414,11 +420,11 @@ ETCETCBases::ETCETCBases(const char *name, const char *title)
   // --------------------------------------------
   //  Set Bases integration parameters
   // --------------------------------------------
-  SetNoOfSample(80000);
+  SetNoOfSample(10000);
 
   SetTuneValue (1.5);
   SetIteration1(0.05, 20);
-  SetIteration2(0.05, 50);
+  SetIteration2(0.05,100);
 
 }
 // --------------------------
@@ -496,23 +502,27 @@ Double_t ETCETCBases::Func()
   Double_t weight = 1;
 
   fW1ModePtr = fWBosonPtr->PickMode(fW1DecayMode, weight, fW1Mode);
+#ifndef __NODECAY__
   bsWeight *= weight;
+#endif
   f1Ptr = static_cast<GENPDTEntry *>(fW1ModePtr->At(0));
   f2Ptr = static_cast<GENPDTEntry *>(fW1ModePtr->At(1));
   Double_t m1   = f1Ptr->GetMass();
   Double_t m2   = f2Ptr->GetMass();
 
   fW2ModePtr = fWBosonPtr->PickMode(fW2DecayMode, weight, fW2Mode);
+#ifndef __NODECAY__
   bsWeight *= weight;
-  f3Ptr = static_cast<GENPDTEntry *>(fW2ModePtr->At(0));
-  f4Ptr = static_cast<GENPDTEntry *>(fW2ModePtr->At(1));
-  Double_t m3   = f3Ptr->GetMass();
+#endif
+  f4Ptr = static_cast<GENPDTEntry *>(fW2ModePtr->At(0));
+  f5Ptr = static_cast<GENPDTEntry *>(fW2ModePtr->At(1));
   Double_t m4   = f4Ptr->GetMass();
+  Double_t m5   = f5Ptr->GetMass();
 
   // --------------------------------------------
   //  Check if reduced Ecm enough for prod.
   // --------------------------------------------
-  if (fEcmIP < 2*fMassDM + m1 + m2 + m3 + m4) {
+  if (fEcmIP < 2*fMassDM + m1 + m2 + m4 + m5) {
     return 0.;
   }
 
@@ -531,35 +541,57 @@ Double_t ETCETCBases::Func()
 
   Double_t rs   = fEcmIP;
   Double_t qmin = fMassDM + m1 + m2;
-  Double_t qmax = rs - (fMassDM + m3 + m4);
+  Double_t qmax = rs - (fMassDM + m4 + m5);
 #ifndef __ZEROWIDTH__
   fQ2X1 = fXBosonPtr->GetQ2BW(qmin, qmax, fXQ2X1, weight);
 #else
   fQ2X1 = TMath::Power(fXBosonPtr->GetMass(),2);
   weight = kPi*fXBosonPtr->GetMass()*fXBosonPtr->GetWidth();
+#ifdef __NODECAY__
+  weight = 1.;
+#endif
 #endif
   Double_t qx1 = TMath::Sqrt(fQ2X1);
   bsWeight *= weight;
 
 #ifndef __ZEROWIDTH__
-  qmin  = fMassDM + m3 + m4;
+  qmin  = fMassDM + m4 + m5;
   qmax  = rs - qx1;
   fQ2X2 = fXBosonPtr->GetQ2BW(qmin, qmax, fXQ2X2, weight);
 #else
   fQ2X2 = TMath::Power(fXBosonPtr->GetMass(),2);
   weight = kPi*fXBosonPtr->GetMass()*fXBosonPtr->GetWidth();
+#ifdef __NODECAY__
+  weight = 1.;
+#endif
 #endif
   Double_t qx2 = TMath::Sqrt(fQ2X2);
   bsWeight *= weight;
 
+#ifndef __ZEROWIDTH__
   qmin  = m1 + m2;
   qmax  = qx1 - fMassDM;
   fQ2W1 = fWBosonPtr->GetQ2BW(qmin, qmax, fXQ2W1, weight);
+#else
+  fQ2W1  = TMath::Power(fWBosonPtr->GetMass(),2);
+  weight = kPi*fWBosonPtr->GetMass()*fWBosonPtr->GetWidth();
+#ifdef __NODECAY__
+  weight = 1.;
+#endif
+#endif
   bsWeight *= weight;
 
-  qmin  = m3 + m4;
+#ifndef __ZEROWIDTH__
+  qmin  = m4 + m5;
   qmax  = qx2 - fMassDM;
   fQ2W2 = fWBosonPtr->GetQ2BW(qmin, qmax, fXQ2W2, weight);
+#else
+  fQ2W2  = TMath::Power(fWBosonPtr->GetMass(),2);
+  weight = kPi*fWBosonPtr->GetMass()*fWBosonPtr->GetWidth();
+#ifdef __NODECAY__
+  weight = 1.;
+#endif
+#endif
   bsWeight *= weight;
 
   // --------------------------------------------
@@ -568,7 +600,7 @@ Double_t ETCETCBases::Func()
 
   GENBranch w1branch(fQ2W1, fCosThetaF1, fPhiF1, m1*m1    , m2*m2          );
   GENBranch x1branch(fQ2X1, fCosThetaW1, fPhiW1, &w1branch, fMassDM*fMassDM);
-  GENBranch w2branch(fQ2W2, fCosThetaF2, fPhiF2, m3*m3    , m4*m4          );
+  GENBranch w2branch(fQ2W2, fCosThetaF2, fPhiF2, m4*m4    , m5*m5          );
   GENBranch x2branch(fQ2X2, fCosThetaW2, fPhiW2, &w2branch, fMassDM*fMassDM);
   GENBranch cmbranch(fQ2XX, fCosTheta  , fPhi  , &x1branch, &x2branch      );
 
@@ -670,14 +702,14 @@ Double_t ETCETCBases::DSigmaDX(GENBranch &cmbranch)
   GENBranch &w2branch = * x2branch.GetBranchPtr(0);
   Double_t cosf2   = w2branch.GetCosTheta();
   Double_t phif2   = w2branch.GetPhi     ();
-  Double_t m32     = w2branch.GetM12();
-  Double_t m42     = w2branch.GetM22();
+  Double_t m42     = w2branch.GetM12();
+  Double_t m52     = w2branch.GetM22();
   GENFrame x2frame = phaseX2.GetFrame();
-  GENPhase2 phaseW2(pw2, m32, m42, x2frame, cosf2, phif2, 1);
+  GENPhase2 phaseW2(pw2, m42, m52, x2frame, cosf2, phif2, 1);
   fP[4] = phaseW2.GetFourMomentum(0);
   fP[5] = phaseW2.GetFourMomentum(1);
-  fM[4] = TMath::Sqrt(m32);
-  fM[5] = TMath::Sqrt(m42);
+  fM[4] = TMath::Sqrt(m42);
+  fM[5] = TMath::Sqrt(m52);
   Double_t betaf2 = phaseW2.GetBetaBar();
   if (betaf2 <= 0.) return 0.;
 
@@ -762,8 +794,16 @@ Double_t ETCETCBases::DSigmaDX(GENBranch &cmbranch)
   // -------------------
   //  Put them together
   // -------------------
+#ifndef __NODECAY__
   static const Int_t    kNbr  = 5;
   static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr));
+#else
+  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3+4));
+  betaw1 = 1.;
+  betaw2 = 1.;
+  betaf1 = 1.;
+  betaf2 = 1.;
+#endif
 
   Double_t identp = 1.;                              // identical particle factor
   Double_t dPhase = kFact * betax * betaw1 * betaw2  // phase space factor
@@ -783,9 +823,19 @@ Double_t ETCETCBases::DSigmaDX(GENBranch &cmbranch)
 // --------------------------
 Double_t ETCETCBases::AmpSquared(GENBranch &cmbranch)
 {
-  Double_t  color = f1Ptr->GetColor() * f3Ptr->GetColor();
+#ifndef __NODECAY__
+  Double_t  color = f1Ptr->GetColor() * f4Ptr->GetColor();
+  Int_t     ig1   = f1Ptr->GetGenNo() - 1;
+  Int_t     ig2   = f2Ptr->GetGenNo() - 1;
+  Int_t     ig4   = f4Ptr->GetGenNo() - 1;
+  Int_t     ig5   = f5Ptr->GetGenNo() - 1;
+  Double_t  mix   = TMath::Power(kVkm[ig1][ig2]*kVkm[ig4][ig5],2);
+#else
+  Double_t  color = 1.;
+  Double_t  mix   = 1.;
+#endif
   Complex_t amp   = FullAmplitude();
-  Double_t  amp2  = TMath::Power(abs(amp),2) * color;
+  Double_t  amp2  = TMath::Power(abs(amp),2) * color * mix;
 
   return amp2;
 }
@@ -811,6 +861,7 @@ Complex_t ETCETCBases::FullAmplitude()
    HELFermion em(fK[0], kM_e, fHelInitial[0], +1, kIsIncoming);
    HELFermion ep(fK[1], kM_e, fHelInitial[1], -1, kIsOutgoing);
 
+#ifndef __NODECAY__
    HELScalar  dm1(fP[0], +1);
    HELFermion fd (fP[2], fM[2], fHelFinal [2], +1, kIsOutgoing);
    HELFermion fub(fP[1], fM[1], fHelFinal [1], -1, kIsIncoming);
@@ -822,6 +873,12 @@ Complex_t ETCETCBases::FullAmplitude()
    HELFermion fdb(fP[5], fM[5], fHelFinal [5], -1, kIsIncoming);
    HELVector  wp(fdb, fu, glw, grw, kM_w, gamw);
    HELScalar  xp(wp, dm2, gxdmw, mx, gamx);
+#else
+   ANL4DVector pxm = fP[0] + fP[1] + fP[2];
+   ANL4DVector pxp = fP[3] + fP[4] + fP[5];
+   HELScalar  xm(pxm, +1);
+   HELScalar  xp(pxp, +1);
+#endif
 #ifdef __DEBUG__
    cerr << " dm1 = " << static_cast<Complex_t>(dm1) << " ";
    dm1.GetFourMomentum().DebugPrint();
@@ -930,19 +987,21 @@ void ETCETCBases::Userin()
    if (!fDMBosonPtr) fDMBosonPtr = new ETIBoson(fMassDM);
    fDMBosonPtr->DebugPrint();
 
+   Double_t mx = fMass;
+
   // --------------------------------------------
   //  Define some plots
   // --------------------------------------------
   Xh_init( 1,     0., fEcmInit*1.1, 50, "Ecm"    );
   Xh_init( 2, fXL[0], fXU[0],       50, "Costh"  );
   Xh_init( 3, fXL[1], fXU[1],       50, "Phi"    );
-  Xh_init( 4,   100.,   300.,       50, "Mx-"    );
+  Xh_init( 4, mx-10., mx+10.,       50, "Mx-"    );
   Xh_init( 5, fXL[2], fXU[2],       50, "CosthW-");
   Xh_init( 6, fXL[3], fXU[3],       50, "PhiW-"  );
   Xh_init( 7,    60.,   100.,       50, "MW-"    );
   Xh_init( 8, fXL[4], fXU[4],       50, "CosthF1");
   Xh_init( 9, fXL[5], fXU[5],       50, "PhiF1"  );
-  Xh_init(10,   100.,   300.,       50, "Mx+"    );
+  Xh_init(10, mx-10., mx+10.,       50, "Mx+"    );
   Xh_init(11, fXL[2], fXU[2],       50, "CosthW+");
   Xh_init(12, fXL[3], fXU[3],       50, "PhiW+"  );
   Xh_init(13,    60.,   100.,       50, "MW+"    );

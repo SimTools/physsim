@@ -136,8 +136,8 @@ private:
   GENPDTEntry   *f2Ptr;           // point to 2nd W- daughter
   Double_t       fQ2W1;           // q^2 of final state W-
   GENDecayMode  *fW2ModePtr;      // pointer to W+ decay mode
-  GENPDTEntry   *f3Ptr;           // point to 1st W+ daughter
-  GENPDTEntry   *f4Ptr;           // point to 2nd W+ daughter
+  GENPDTEntry   *f4Ptr;           // point to 1st W+ daughter
+  GENPDTEntry   *f5Ptr;           // point to 2nd W+ daughter
   Double_t       fQ2W2;           // q^2 of final state W+
   Int_t          fHelInitial[2];  // initial state helicities
   Int_t          fHelFinal  [6];  // final   state helicities
