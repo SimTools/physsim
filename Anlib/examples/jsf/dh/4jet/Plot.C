@@ -18,16 +18,21 @@
 //*
 //*----------------------------------------------------------------------------
 
+const Double_t kPi = TMath::Pi();
+
 TH2D *hMwMw      = new TH2D("hMwMw"    , "", 130,   10.,  140.,
                                              130,   10.,  140.);
 TH1D *hEvis      = new TH1D("hEvis"    , "", 120,    0.,  600.);
 
 TH2D *hPtPl      = new TH2D("hPtPl"    , "", 100,    0.,  200.,
                                              200, -200., +200.);
-TH1D *hElmx      = new TH1D("hElmx"    , "", 120,    0.,  600.);
+TH1D *hElmx      = new TH1D("hElmx"    , "", 100,    0.,  100.);
 TH1D *hCjmx      = new TH1D("hCjmx"    , "", 100,   -1.,   +1.);
 TH2D *hCwCw      = new TH2D("hCwCw"    , "", 100,   -1.,   +1.,
                                              100,   -1.,   +1.);
+TH1D *hCosW      = new TH1D("hCosW"    , "", 100,   -1.,   +1.);
+TH1D *hCsjh      = new TH1D("hCsjh"    , "", 100,   -1.,   +1.);
+TH1D *hFijh      = new TH1D("hFijh"    , "", 100,  -kPi,  +kPi);
 
 void Plot(Char_t *filen = "jsf.root")
 {
@@ -85,6 +90,14 @@ void Plot(Char_t *filen = "jsf.root")
         Double_t csw2;
         Double_t mm;
         Double_t acop;
+	Double_t csj11h;
+	Double_t fij11h;
+	Double_t csj12h;
+	Double_t fij12h;
+	Double_t csj21h;
+	Double_t fij21h;
+	Double_t csj22h;
+	Double_t fij22h;
 
         tup->SetBranchAddress("ntracks",&ntracks);
         tup->SetBranchAddress("evis",&evis);
@@ -101,6 +114,14 @@ void Plot(Char_t *filen = "jsf.root")
         tup->SetBranchAddress("csw2",&csw2);
         tup->SetBranchAddress("mm",&mm);
         tup->SetBranchAddress("acop",&acop);
+        tup->SetBranchAddress("csj11h",&csj11h);
+        tup->SetBranchAddress("fij11h",&fij11h);
+        tup->SetBranchAddress("csj12h",&csj12h);
+        tup->SetBranchAddress("fij12h",&fij12h);
+        tup->SetBranchAddress("csj21h",&csj21h);
+        tup->SetBranchAddress("fij21h",&fij21h);
+        tup->SetBranchAddress("csj22h",&csj22h);
+        tup->SetBranchAddress("fij22h",&fij22h);
 
         tup->GetEntry(event);
 
@@ -109,7 +130,17 @@ void Plot(Char_t *filen = "jsf.root")
 	hElmx->Fill(elmax, 1.);
 	hCjmx->Fill(csjmax, 1.);
 	hCwCw->Fill(csw1, csw2, 1.);
+	hCosW->Fill(csw1, 1.);
+	hCosW->Fill(csw2, 1.);
 	hPtPl->Fill(pt, pl, 1.);
+	hCsjh->Fill(csj11h, 1.);
+	hCsjh->Fill(csj12h, 1.);
+	hCsjh->Fill(csj21h, 1.);
+	hCsjh->Fill(csj22h, 1.);
+	hFijh->Fill(fij11h, 1.);
+	hFijh->Fill(fij12h, 1.);
+	hFijh->Fill(fij21h, 1.);
+	hFijh->Fill(fij22h, 1.);
   }
   Int_t id = 0;
   id++; c1->cd(id); hStat->Draw();
@@ -120,6 +151,10 @@ void Plot(Char_t *filen = "jsf.root")
   id++; c1->cd(id); hMwMw->ProjectionX()->Draw();
   id++; c1->cd(id); hMwMw->ProjectionY()->Draw();
   id++; c1->cd(id); hCwCw->Draw();
-  id++; c1->cd(id); hCwCw->ProjectionX()->Draw();
-  id++; c1->cd(id); hCwCw->ProjectionY()->Draw();
+  hCosW->SetMinimum(0.);
+  id++; c1->cd(id); hCosW->Draw();
+  hCsjh->SetMinimum(0.);
+  id++; c1->cd(id); hCsjh->Draw();
+  hFijh->SetMinimum(0.);
+  id++; c1->cd(id); hFijh->Draw();
 }

@@ -125,7 +125,7 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
            << "nsols:ejmin:csjmax"                                      << ":"
            << "csw1:csw2"                                               << ":"
            << "mw1:mw2:mm:acop"                                         << ":"
-           << ends;
+           << "csj11h:fij11h:csj12h:fij12h:csj21h:fij21h:csj22h:fij22h" << ends;
 
     hEvt = new TNtupleD("hEvt", "", tupstr.str().data());
   }
@@ -466,10 +466,6 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
 
   solutions.Sort();
 
-  //--
-  // Now store this in the Ntuple.
-  //--
-
   if (gDEBUG) {
     Int_t nj = 0;
     nextjet.Reset();
@@ -481,59 +477,118 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
     }
   }
 
+  //--
+  // Select the best solution.
+  //--
+  solutions.Sort();  
+  ANLPair &sol = *static_cast<ANLPair *>(solutions.At(0));
   Int_t nsols = solutions.GetEntries();
-  nextsol.Reset();
-  Int_t nsol = 0;
-  while ((solp = static_cast<ANLPair *>(nextsol()))) {
-    if (nsol++) break;				// choose the best
-    ANLPair &sol = *solp;
-    ANL4DVector  &w1    = *static_cast<ANL4DVector *>(sol[0]);
-    ANL4DVector  &w2    = *static_cast<ANL4DVector *>(sol[1]);
-    Int_t         nev   = gJSF->GetEventNumber();
-    Double_t      ecm   = GetEcm();
-    Double_t      chi2  = sol.GetQuality();
-    Double_t      mw1   = w1.GetMass();
-    Double_t      mw2   = w2.GetMass();
-    Double_t      csw1  = w1.CosTheta();
-    Double_t      csw2  = w2.CosTheta();
-    Double_t      acop  = w1.Acop(w2);
+  ANLPair      &w1    = *static_cast<ANLPair *>(sol[0]);
+  ANLPair      &w2    = *static_cast<ANLPair *>(sol[1]);
+  ANLJet       &j11   = *static_cast<ANLJet  *>(w1[0]);
+  ANLJet       &j12   = *static_cast<ANLJet  *>(w1[1]);
+  ANLJet       &j21   = *static_cast<ANLJet  *>(w2[0]);
+  ANLJet       &j22   = *static_cast<ANLJet  *>(w2[1]);
+
+  //--
+  // Calculate helicity angles.
+  //--
+  TVector3    ez     = TVector3(0., 0., 1.);
+  TVector3    ew1z   = w1.Vect().Unit();
+  TVector3    ew1x   = ew1z.Cross(ez).Unit();
+  TVector3    ew1y   = ew1z.Cross(ew1x);
+
+  TVector3    bstw1  = TVector3(0., 0., w1.Vect().Mag()/w1.E());
+  ANL4DVector j11h   = ANL4DVector(j11.E(), j11.Vect()*ew1x,
+                                            j11.Vect()*ew1y,
+                                            j11.Vect()*ew1z);
+  j11h.Boost(-bstw1);
+  Double_t    csj11h = j11h.CosTheta();
+  Double_t    fij11h = j11h.Phi();
+
+  ANL4DVector j12h   = ANL4DVector(j12.E(), j12.Vect()*ew1x,
+                                            j12.Vect()*ew1y,
+                                            j12.Vect()*ew1z);
+  j12h.Boost(-bstw1);
+  Double_t    csj12h = j12h.CosTheta();
+  Double_t    fij12h = j12h.Phi();
+
+
+  TVector3    ew2z   = w2.Vect().Unit();
+  TVector3    ew2x   = ew2z.Cross(ez).Unit();
+  TVector3    ew2y   = ew2z.Cross(ew2x);
+
+  TVector3    bstw2  = TVector3(0., 0., w2.Vect().Mag()/w2.E());
+  ANL4DVector j21h   = ANL4DVector(j21.E(), j21.Vect()*ew2x,
+                                            j21.Vect()*ew2y,
+                                            j21.Vect()*ew2z);
+  j21h.Boost(-bstw2);
+  Double_t    csj21h = j21h.CosTheta();
+  Double_t    fij21h = j21h.Phi();
+
+  ANL4DVector j22h   = ANL4DVector(j22.E(), j22.Vect()*ew2x,
+                                            j22.Vect()*ew2y,
+                                            j22.Vect()*ew2z);
+  j22h.Boost(-bstw2);
+  Double_t    csj22h = j22h.CosTheta();
+  Double_t    fij22h = j22h.Phi();
+
+  //--
+  // Now store this in the Ntuple.
+  //--
+
+  Int_t         nev   = gJSF->GetEventNumber();
+  Double_t      ecm   = GetEcm();
+  Double_t      chi2  = sol.GetQuality();
+  Double_t      mw1   = w1.GetMass();
+  Double_t      mw2   = w2.GetMass();
+  Double_t      csw1  = w1.CosTheta();
+  Double_t      csw2  = w2.CosTheta();
+  Double_t      acop  = w1.Acop(w2);
 #ifdef __CHEAT__
-    ANLTaggedJet *w1j1p = dynamic_cast<ANLTaggedJet *>(w1[0]);
-    ANLTaggedJet *w1j2p = dynamic_cast<ANLTaggedJet *>(w1[1]);
-    ANLTaggedJet *w2j1p = dynamic_cast<ANLTaggedJet *>(w2[0]);
-    ANLTaggedJet *w2j2p = dynamic_cast<ANLTaggedJet *>(w2[1]);
+  ANLTaggedJet *w1j1p = dynamic_cast<ANLTaggedJet *>(w1[0]);
+  ANLTaggedJet *w1j2p = dynamic_cast<ANLTaggedJet *>(w1[1]);
+  ANLTaggedJet *w2j1p = dynamic_cast<ANLTaggedJet *>(w2[0]);
+  ANLTaggedJet *w2j2p = dynamic_cast<ANLTaggedJet *>(w2[1]);
 #if 1
-    cerr << "(w1j1,w1j2; w2j1,w2j2) = ("
-         << w1j1p->GetTag() << ","
-         << w1j2p->GetTag() << ";"
-         << w2j1p->GetTag() << ","
-         << w2j2p->GetTag() << ";"
-	 << endl;
+  cerr << "(w1j1,w1j2; w2j1,w2j2) = ("
+       << w1j1p->GetTag() << ","
+       << w1j2p->GetTag() << ";"
+       << w2j1p->GetTag() << ","
+       << w2j2p->GetTag() << ";"
+       << endl;
 #endif
 #endif
 
-    Double_t data[100];
-    data[ 0] = nev;
-    data[ 1] = ecm;
-    data[ 2] = ntracks;
-    data[ 3] = evis;
-    data[ 4] = pt;
-    data[ 5] = pl;
-    data[ 6] = elmax;
-    data[ 7] = ycut;
-    data[ 8] = chi2;
-    data[ 9] = nsols;
-    data[10] = ejetmin;
-    data[11] = cosjmax;
-    data[12] = csw1;
-    data[13] = csw2;
-    data[14] = mw1;
-    data[15] = mw2;
-    data[16] = mm;
-    data[17] = acop;
+  Double_t data[100];
+  data[ 0] = nev;
+  data[ 1] = ecm;
+  data[ 2] = ntracks;
+  data[ 3] = evis;
+  data[ 4] = pt;
+  data[ 5] = pl;
+  data[ 6] = elmax;
+  data[ 7] = ycut;
+  data[ 8] = chi2;
+  data[ 9] = nsols;
+  data[10] = ejetmin;
+  data[11] = cosjmax;
+  data[12] = csw1;
+  data[13] = csw2;
+  data[14] = mw1;
+  data[15] = mw2;
+  data[16] = mm;
+  data[17] = acop;
+  data[18] = csj11h;
+  data[19] = fij11h;
+  data[20] = csj12h;
+  data[21] = fij12h;
+  data[22] = csj21h;
+  data[23] = fij21h;
+  data[24] = csj22h;
+  data[25] = fij22h;
 
-    hEvt->Fill(data);
-  }
+  hEvt->Fill(data);
 
   last->cd();
 
