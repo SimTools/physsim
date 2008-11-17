@@ -212,7 +212,7 @@ public:
   // ----------------------
   //  Getters and Setters
   // ----------------------
-  Double_t GetQ2ZX      ()           const { return fQ2XX;       }
+  Double_t GetQ2XX      ()           const { return fQ2XX;       }
   Double_t GetCosTheta  ()           const { return fCosTheta;   }
   Double_t GetPhi       ()           const { return fPhi;        }
   Double_t GetQ2X1      ()           const { return fQ2X1;       }
