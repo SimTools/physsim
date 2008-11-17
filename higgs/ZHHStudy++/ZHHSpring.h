@@ -239,6 +239,8 @@ public:
               ZHHBases  *bases = 0);
    virtual ~ZHHSpring();
 
+   virtual Bool_t Initialize(); // overload the base class method
+
    ClassDef(ZHHSpring, 1)  // ZHHSpring class
 };
 #endif
