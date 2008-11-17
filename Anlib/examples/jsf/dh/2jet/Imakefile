@@ -1,0 +1,79 @@
+XCOMM ##########################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for ETRETI analysis.
+XCOMM ## (Update Record) 
+XCOMM ##    99/05/22  K.Fujii   Original version.
+XCOMM ##########################################################################
+
+/*
+ * Template Files
+ *
+ */
+#define CXXPACKAGE 
+#include "config/kflib.tmpl"
+
+/*
+ * Headers
+ *
+ */
+
+INCPATH	= -I. -I$(JSFROOT)/include \
+	  -I$(LEDAROOT)/include \
+	  -I../../../../../dh/ETRETIStudy
+EXTRACXXOPT = $(INCPATH)
+
+/*
+ * Package Name
+ *
+ */
+ 
+LIBNAME	= ETRETI4JAnalysis
+
+OBJS		= $(LIBNAME).$(ObjSuf)
+SONAME		= lib$(LIBNAME).$(DllSuf).$(SOREV)
+JSFSOLIB	= $(SONAME)
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+DICTNAME	= $(LIBNAME)Dict
+
+ALLOBJS 	= $(OBJS) $(DICTNAME).$(ObjSuf)
+
+SRCS		= $(subst .$(ObjSuf),.$(SrcSuf),$(ALLOBJS))
+
+HDRS		= $(LIBNAME).h
+
+/*
+ * Make Targets
+ *
+ */
+
+all:: $(JSFSOLIB)
+
+$(JSFSOLIB): $(ALLOBJS)
+	$(LD) -o $@ $(SOFLAGS) $(ALLOBJS)
+	$(RM) $(subst .$(SOREV),,$@)
+	$(LN) $@ $(subst .$(SOREV),,$@)
+
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+
+clean:: 
+	@rm -f *.$(ObjSuf) core $(DICTNAME)*
+
+depend:: $(SRCS) $(HDRS)
+	for i in $(SRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
+
+distclean:: clean
+	@rm -f Makefile $(JSFSOLIB) *.$(SOEXT)
+	@rm -f *.root *.tdr *.out *~ core
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I$(JSFROOT)/include $(INCPATH) $(RCINTDEFINES) \
+		$(HDRS) LinkDef.h
+
+
