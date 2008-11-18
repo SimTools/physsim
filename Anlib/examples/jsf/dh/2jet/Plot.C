@@ -19,6 +19,7 @@
 //*----------------------------------------------------------------------------
 
 const Double_t kPi = TMath::Pi();
+const Double_t kMz = 91.18;
 
 TH1D *hMz        = new TH1D("hMz"      , "",  80,   70.,  110.);
 TH1D *hEvis      = new TH1D("hEvis"    , "", 120,    0.,  600.);
@@ -30,6 +31,7 @@ TH1D *hCosZ      = new TH1D("hCosZ"    , "", 100,   -1.,   +1.);
 TH1D *hCsjh      = new TH1D("hCsjh"    , "", 100,   -1.,   +1.);
 TH1D *hFijh      = new TH1D("hFijh"    , "", 100,  -kPi,  +kPi);
 TH1D *hEz        = new TH1D("hEz"      , "", 150,    0.,  300.);
+TH1D *hPz        = new TH1D("hPz"      , "", 150,    0.,  300.);
 TH1D *hMM        = new TH1D("hMM"      , "", 250,    0.,  500.);
 
 void Plot(Char_t *filen = "jsf.root")
@@ -89,6 +91,14 @@ void Plot(Char_t *filen = "jsf.root")
 	Double_t fij1h;
 	Double_t csj2h;
 	Double_t fij2h;
+	Double_t pj1e;
+	Double_t pj1x;
+	Double_t pj1y;
+	Double_t pj1z;
+	Double_t pj2e;
+	Double_t pj2x;
+	Double_t pj2y;
+	Double_t pj2z;
 
         tup->SetBranchAddress("ntracks",&ntracks);
         tup->SetBranchAddress("evis",&evis);
@@ -106,14 +116,33 @@ void Plot(Char_t *filen = "jsf.root")
         tup->SetBranchAddress("fij1h",&fij1h);
         tup->SetBranchAddress("csj2h",&csj2h);
         tup->SetBranchAddress("fij2h",&fij2h);
+        tup->SetBranchAddress("pj1e",&pj1e);
+        tup->SetBranchAddress("pj1x",&pj1x);
+        tup->SetBranchAddress("pj1y",&pj1y);
+        tup->SetBranchAddress("pj1z",&pj1z);
+        tup->SetBranchAddress("pj2e",&pj2e);
+        tup->SetBranchAddress("pj2x",&pj2x);
+        tup->SetBranchAddress("pj2y",&pj2y);
+        tup->SetBranchAddress("pj2z",&pj2z);
 
         tup->GetEntry(event);
+
+	ANL4DVector qj1(pj1e,pj1x,pj1y,pj1z);
+	ANL4DVector qj2(pj2e,pj2x,pj2y,pj2z);
+	ANL4DVector qz  = qj1 + qj2;
+	Double_t    pz  = qz.Vect().Mag();
+	Double_t    ezp = TMath::Sqrt(pz*pz+kMz*kMz);
 
 	hEvis->Fill(evis, 1.);
 	hElmx->Fill(elmax, 1.);
 	hCjmx->Fill(csjmax, 1.);
 	hCosZ->Fill(csz, 1.);
+#if 1
 	hEz  ->Fill(ez , 1.);
+#else
+	hEz  ->Fill(ezp, 1.);
+#endif
+	hPz  ->Fill(pz , 1.);
 	hMz  ->Fill(mz , 1.);
 	hMM  ->Fill(mm , 1.);
 	hPtPl->Fill(pt, pl, 1.);
@@ -129,6 +158,7 @@ void Plot(Char_t *filen = "jsf.root")
   id++; c1->cd(id); hElmx->Draw();
   id++; c1->cd(id); hMz  ->Draw();
   id++; c1->cd(id); hEz  ->Draw();
+  id++; c1->cd(id); hPz  ->Draw();
   id++; c1->cd(id); hMM  ->Draw();
   hCosZ->SetMinimum(0.);
   id++; c1->cd(id); hCosZ->Draw();
