@@ -43,10 +43,11 @@ Int_t sim()
   //  Event loop.
   //  ------------------------------------------------------------
 
-  for(Int_t ev=1;ev<=maxevt;ev++){
+  Int_t ev = 1;
+  while (1) {
     printf(" start event %d ",ev);
 
-    if( !jsf->Process(ev)) break;  
+    if( !jsf->Process(ev)) continue;  
 
     printf("Processed event %d ",ev);
 
@@ -54,6 +55,8 @@ Int_t sim()
     jsf->Clear();
 
     printf(" End event %d \n",ev);
+    if (ev == maxevt) break;
+    ev++;
   }
   
   //  ------------------------------------------------------------
