@@ -157,7 +157,7 @@ Bool_t ZHH4JAnalysis::Process(Int_t ev)
   //--
   // Select good tracks and store them in "TObjArray tracks".
   //--
-  //
+
   ANL4DVector qsum;
   TObjArray tracks(1000);
   tracks.SetOwner();       // the "tracks" array owns tracks in it
@@ -332,6 +332,9 @@ Bool_t ZHH4JAnalysis::Process(Int_t ev)
   // Find H candidates in a given mass window.
   //--
   
+  ANLVTXTagger btag (fBtagNsig,fBtagNoffv);   // (sigma, n-offv tracks) b-tagger
+  ANLVTXTagger bttag(fBTtagNsig,fBTtagNoffv); // (sigma, n-offv tracks) tight b-tagger
+
   TObjArray solutions(10);
   solutions.SetOwner();    // The "solutions" array owns solutions in it.
   ANLPairCombiner h1candidates(jets,jets);
@@ -344,6 +347,8 @@ Bool_t ZHH4JAnalysis::Process(Int_t ev)
     if (!((j1p->GetTag() == -1 && j2p->GetTag() == -1) ||
           (j1p->GetTag() == -2 && j2p->GetTag() == -2))) continue;
 #endif
+    if (!btag(*static_cast<ANLJet *>(j1p)) || 
+        !btag(*static_cast<ANLJet *>(j2p))) continue;   // double b-tag for b's from t's
     Double_t h1mass = h1().GetMass();
     if (TMath::Abs(h1mass - kMassH) > fM2jCut) continue; // in the Mh window
     h1.LockChildren();
@@ -357,6 +362,8 @@ Bool_t ZHH4JAnalysis::Process(Int_t ev)
             (j1p->GetTag() == -2 && j2p->GetTag() == -2))) continue;
 #endif
       if (h2.IsLocked()) continue;
+      if (!btag(*static_cast<ANLJet *>(j1p)) || 
+          !btag(*static_cast<ANLJet *>(j2p))) continue;   // double b-tag for b's from t's
       Double_t h2mass = h2().GetMass();
       if (TMath::Abs(h2mass - kMassH) > fM2jCut) continue; // in the Mh window
       if (gDEBUG) { 
