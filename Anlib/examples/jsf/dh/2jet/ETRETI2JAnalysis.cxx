@@ -1,6 +1,6 @@
 //*************************************************************************
 //* ========================
-//*  ETRETI4JAnalysis Classes
+//*  ETRETI2JAnalysis Classes
 //* ========================
 //*
 //* (Description)
@@ -10,8 +10,8 @@
 //* 	library Anlib
 //* 	library ETRETIStudy
 //* (Provides)
-//* 	class ETRETI4JAnalysis
-//* 	class ETRETI4JAnalysisBuf
+//* 	class ETRETI2JAnalysis
+//* 	class ETRETI2JAnalysisBuf
 //* (Usage)
 //*   Take a look at Anl.C.
 //* (Update Recored)
@@ -21,7 +21,7 @@
 
 //#define __CHEAT__
 
-#include "ETRETI4JAnalysis.h"
+#include "ETRETI2JAnalysis.h"
 #include "ETRETISpring.h"
 #include "TROOT.h"
 #include "TFile.h"
@@ -54,14 +54,14 @@ const Int_t  kMaxCuts = 100;
 
 //_____________________________________________________________________
 //  --------------------
-//  ETRETI4JAnalysis Class
+//  ETRETI2JAnalysis Class
 //  --------------------
 //
 //
 
-ClassImp(ETRETI4JAnalysis)
+ClassImp(ETRETI2JAnalysis)
 
-ETRETI4JAnalysis::ETRETI4JAnalysis(const Char_t *name, const Char_t *title)
+ETRETI2JAnalysis::ETRETI2JAnalysis(const Char_t *name, const Char_t *title)
                 : JSFModule(name, title),
                   fNtracksCut(   25),   // No. of tracks
                   fEtrackCut (  0.1),   // track energy
@@ -87,12 +87,12 @@ ETRETI4JAnalysis::ETRETI4JAnalysis(const Char_t *name, const Char_t *title)
 }
 
 //_____________________________________________________________________
-ETRETI4JAnalysis::~ETRETI4JAnalysis()
+ETRETI2JAnalysis::~ETRETI2JAnalysis()
 {
 }
 
 //_____________________________________________________________________
-Bool_t ETRETI4JAnalysis::Initialize()
+Bool_t ETRETI2JAnalysis::Initialize()
 {
   //--
   //  Read in Generator info.
@@ -108,7 +108,7 @@ Bool_t ETRETI4JAnalysis::Initialize()
 }
 
 //_________________________________________________________
-Bool_t ETRETI4JAnalysis::Process(Int_t ev)
+Bool_t ETRETI2JAnalysis::Process(Int_t ev)
 {
   //--
   // Remember the previous directory.
@@ -444,7 +444,7 @@ Bool_t ETRETI4JAnalysis::Process(Int_t ev)
 }
 
 //_________________________________________________________
-Bool_t ETRETI4JAnalysis::Terminate()
+Bool_t ETRETI2JAnalysis::Terminate()
 {
   // This function is called at the end of job.
   //--

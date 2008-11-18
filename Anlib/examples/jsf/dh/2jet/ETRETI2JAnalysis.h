@@ -1,8 +1,8 @@
-#ifndef USERANALYSIS_H
-#define USERANALYSIS_H
+#ifndef ETRETI2JANALYSIS_H
+#define ETRETI2JANALYSIS_H
 //*************************************************************************
 //* ========================
-//*  ETRETI4JAnalysis Classes
+//*  ETRETI2JAnalysis Classes
 //* ========================
 //*
 //* (Description)
@@ -12,10 +12,10 @@
 //* 	library Anlib
 //* 	library ETRETIStudy
 //* (Provides)
-//* 	class ETRETI4JAnalysis
-//* 	class ETRETI4JAnalysisBuf
+//* 	class ETRETI2JAnalysis
+//* 	class ETRETI2JAnalysisBuf
 //* (Usage)
-//*   Take a look at anl4J.C.  
+//*   Take a look at anl2J.C.  
 //* (Update Recored)
 //*   2008/11/18  K.Fujii	Original version.
 //*
@@ -26,15 +26,15 @@
 
 //_____________________________________________________________________
 //  --------------------
-//  ETRETI4JAnalysis Class
+//  ETRETI2JAnalysis Class
 //  --------------------
 //
 //
-class ETRETI4JAnalysis : public JSFModule {
+class ETRETI2JAnalysis : public JSFModule {
 public:
-  ETRETI4JAnalysis() : JSFModule("ETRETI4JAnalysis", "ETRETI4JAnalysis") {}
-  ETRETI4JAnalysis(const Char_t *name, const Char_t *title);
-  virtual ~ETRETI4JAnalysis();
+  ETRETI2JAnalysis() : JSFModule("ETRETI2JAnalysis", "ETRETI2JAnalysis") {}
+  ETRETI2JAnalysis(const Char_t *name, const Char_t *title);
+  virtual ~ETRETI2JAnalysis();
 
   inline void SetEcm       (Double_t x) { fEcm        = x; }
 
@@ -89,7 +89,7 @@ private:
   Double_t fBTtagNsig;     // Nsig  for b-tag (tight)
   Int_t    fBTtagNoffv;    // Noffv for b-tag (tight)
 
-  ClassDef(ETRETI4JAnalysis, 1) // ETRETI4JAnalysis Example
+  ClassDef(ETRETI2JAnalysis, 1) // ETRETI2JAnalysis Example
 };
 
 #endif

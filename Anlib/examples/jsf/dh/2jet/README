@@ -6,9 +6,9 @@ Generator:	ETRETIStudy
 Usage:		
 
 $ xmkmf -a; make
-$ jsf anl4J.C
+$ jsf anl2J.C
 or to avoid a lot of debug messages
-$ jsf anl4J.C 2>/dev/null
+$ jsf anl2J.C 2>/dev/null
 
 You have to prepare MC data(xcxcsim.root) in ETRETIStudy/prod directory
 before you do the above.

@@ -4,6 +4,6 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class ETRETI4JAnalysis;
+#pragma link C++ class ETRETI2JAnalysis;
 
 #endif

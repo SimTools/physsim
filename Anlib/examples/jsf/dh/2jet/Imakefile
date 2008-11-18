@@ -27,7 +27,7 @@ EXTRACXXOPT = $(INCPATH)
  *
  */
  
-LIBNAME	= ETRETI4JAnalysis
+LIBNAME	= ETRETI2JAnalysis
 
 OBJS		= $(LIBNAME).$(ObjSuf)
 SONAME		= lib$(LIBNAME).$(DllSuf).$(SOREV)

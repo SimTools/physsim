@@ -1,6 +1,6 @@
 Int_t freq   = 10;
 
-int anl4J()
+int anl2J()
 {  
   TFile *file;
   TFile *fin;
@@ -14,7 +14,7 @@ int anl4J()
       gSystem->Load("libAnlib.so");
       gSystem->Load("libJSFAnlib.so");
       gSystem->Load("../../../../../dh/ETRETIStudy/prod/ETRETISpring.so");
-      gSystem->Load("libETRETI4JAnalysis.so");
+      gSystem->Load("libETRETI2JAnalysis.so");
 
   file = new TFile(outputfile,"RECREATE");  	// Output file
   fin  = new TFile(inputfile);            	// Input simulator data
@@ -32,7 +32,7 @@ int anl4J()
   simdst->SetFile(file);			// since we analyze SIMDST
   simdst->NoReadWrite();			// instead of QuickSim data.
   
-  ETRETI4JAnalysis *myanl = new ETRETI4JAnalysis("ETRETI4JAnalysis","My Analysis");
+  ETRETI2JAnalysis *myanl = new ETRETI2JAnalysis("ETRETI2JAnalysis","My Analysis");
 
   jsf->Initialize();             		// JSF Module initialization.
 
@@ -65,7 +65,7 @@ int anl4J()
   Int_t nok = 0;
   for (Int_t ev=minevt; ev <= maxevt; ev++) {
      if (!(jsf->GetEvent(ev))) break;		// Read in an event.
-     if (!(jsf->Process(ev))) continue;		// Do SIMDST and ETRETI4JAnalysis.
+     if (!(jsf->Process(ev))) continue;		// Do SIMDST and ETRETI2JAnalysis.
      jsf->Clear();
   }
   jsf->Terminate();				// Terminate analysis.
