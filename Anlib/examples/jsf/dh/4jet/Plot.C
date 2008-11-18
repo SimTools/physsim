@@ -35,6 +35,7 @@ TH1D *hCosW      = new TH1D("hCosW"    , "", 100,   -1.,   +1.);
 TH1D *hCsjh      = new TH1D("hCsjh"    , "", 100,   -1.,   +1.);
 TH1D *hFijh      = new TH1D("hFijh"    , "", 100,  -kPi,  +kPi);
 TH1D *hEw        = new TH1D("hEw"      , "", 125,    0.,  250.);
+TH1D *hPw        = new TH1D("hPw"      , "", 125,    0.,  250.);
 TH1D *hMM        = new TH1D("hMM"      , "", 250,    0.,  500.);
 
 void Plot(Char_t *filen = "jsf.root")
@@ -43,7 +44,7 @@ void Plot(Char_t *filen = "jsf.root")
   gSystem->Load("libS4Utils.so");
   gSystem->Load("libAnlib.so");
 
-  Int_t nZoneX = 4;
+  Int_t nZoneX = 5;
   Int_t nZoneY = 3;
 
   TCanvas *c1 = new TCanvas("c1","",0,0, 300*nZoneX, 300*nZoneY);
@@ -164,14 +165,16 @@ void Plot(Char_t *filen = "jsf.root")
 
         tup->GetEntry(event);
 
-	ANL4DVector pj11(pj1e,pj1x,pj1y,pj1z);
-	ANL4DVector pj12(pj2e,pj2x,pj2y,pj2z);
-	ANL4DVector pj21(pj3e,pj3x,pj3y,pj3z);
-	ANL4DVector pj22(pj4e,pj4x,pj4y,pj4z);
-	ANL4DVector pw1 = pj11 + pj12;
-	ANL4DVector pw2 = pj21 + pj22;
-	Double_t ew1p = TMath::Sqrt(pw1.Vect().Mag2()+kMw*kMw);
-	Double_t ew2p = TMath::Sqrt(pw2.Vect().Mag2()+kMw*kMw);
+	ANL4DVector qj11(pj1e,pj1x,pj1y,pj1z);
+	ANL4DVector qj12(pj2e,pj2x,pj2y,pj2z);
+	ANL4DVector qj21(pj3e,pj3x,pj3y,pj3z);
+	ANL4DVector qj22(pj4e,pj4x,pj4y,pj4z);
+	ANL4DVector qw1 = qj11 + qj12;
+	ANL4DVector qw2 = qj21 + qj22;
+	Double_t pw1  = qw1.Vect().Mag();
+	Double_t pw2  = qw2.Vect().Mag();
+	Double_t ew1p = TMath::Sqrt(pw1*pw1+kMw*kMw);
+	Double_t ew2p = TMath::Sqrt(pw2*pw2+kMw*kMw);
 
         hMwMw->Fill(mw1, mw2, 1.);
 	hEvis->Fill(evis, 1.);
@@ -187,6 +190,8 @@ void Plot(Char_t *filen = "jsf.root")
 	hEw  ->Fill(ew1p, 1.);
 	hEw  ->Fill(ew2p, 1.);
 #endif
+	hPw  ->Fill(pw1 , 1.);
+	hPw  ->Fill(pw2 , 1.);
 	hMM  ->Fill(mm  , 1.);
 	hPtPl->Fill(pt, pl, 1.);
 	hCsjh->Fill(csj11h, 1.);
@@ -207,6 +212,7 @@ void Plot(Char_t *filen = "jsf.root")
   id++; c1->cd(id); hMwMw->ProjectionX()->Draw();
   id++; c1->cd(id); hMwMw->ProjectionY()->Draw();
   id++; c1->cd(id); hEw ->Draw();
+  id++; c1->cd(id); hPw ->Draw();
   id++; c1->cd(id); hMM ->Draw();
   //id++; c1->cd(id); hCwCw->Draw();
   hCosW->SetMinimum(0.);

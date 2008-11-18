@@ -597,7 +597,7 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
   data[29] = j11.Px();
   data[30] = j11.Py();
   data[31] = j11.Pz();
-  data[32] = j11.E();
+  data[32] = j12.E();
   data[33] = j12.Px();
   data[34] = j12.Py();
   data[35] = j12.Pz();
@@ -605,7 +605,7 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
   data[37] = j21.Px();
   data[38] = j21.Py();
   data[39] = j21.Pz();
-  data[40] = j21.E();
+  data[40] = j22.E();
   data[41] = j22.Px();
   data[42] = j22.Py();
   data[43] = j22.Pz();

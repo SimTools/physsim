@@ -125,7 +125,8 @@ Bool_t ETRETI4JAnalysis::Process(Int_t ev)
            << "ejmin:csjmax"                                            << ":"
            << "csz:ez"                                                  << ":"
            << "mz:mm"                                                   << ":"
-           << "csj1h:fij1h:csj2h:fij2h"                                 << ends;
+           << "csj1h:fij1h:csj2h:fij2h"                                 << ":"
+	   << "pj1e:pj1x:pj1y:pj1z:pj2e:pj2x:pj2y:pj2z"                 << ends;
 
     hEvt = new TNtupleD("hEvt", "", tupstr.str().data());
   }
@@ -423,6 +424,14 @@ Bool_t ETRETI4JAnalysis::Process(Int_t ev)
   data[16] = fij1h;
   data[17] = csj2h;
   data[18] = fij2h;
+  data[19] = j1.E();
+  data[20] = j1.Px();
+  data[21] = j1.Py();
+  data[22] = j1.Pz();
+  data[23] = j2.E();
+  data[24] = j2.Px();
+  data[25] = j2.Py();
+  data[26] = j2.Pz();
 
   hEvt->Fill(data);
 
