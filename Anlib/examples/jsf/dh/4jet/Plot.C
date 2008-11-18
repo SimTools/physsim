@@ -19,6 +19,7 @@
 //*----------------------------------------------------------------------------
 
 const Double_t kPi = TMath::Pi();
+const Double_t kMw = 80.0;
 
 TH2D *hMwMw      = new TH2D("hMwMw"    , "", 130,   10.,  140.,
                                              130,   10.,  140.);
@@ -102,6 +103,22 @@ void Plot(Char_t *filen = "jsf.root")
 	Double_t fij21h;
 	Double_t csj22h;
 	Double_t fij22h;
+	Double_t pj1e;
+	Double_t pj1x;
+	Double_t pj1y;
+	Double_t pj1z;
+	Double_t pj2e;
+	Double_t pj2x;
+	Double_t pj2y;
+	Double_t pj2z;
+	Double_t pj3e;
+	Double_t pj3x;
+	Double_t pj3y;
+	Double_t pj3z;
+	Double_t pj4e;
+	Double_t pj4x;
+	Double_t pj4y;
+	Double_t pj4z;
 
         tup->SetBranchAddress("ntracks",&ntracks);
         tup->SetBranchAddress("evis",&evis);
@@ -128,8 +145,33 @@ void Plot(Char_t *filen = "jsf.root")
         tup->SetBranchAddress("fij21h",&fij21h);
         tup->SetBranchAddress("csj22h",&csj22h);
         tup->SetBranchAddress("fij22h",&fij22h);
+        tup->SetBranchAddress("pj1e",&pj1e);
+        tup->SetBranchAddress("pj1x",&pj1x);
+        tup->SetBranchAddress("pj1y",&pj1y);
+        tup->SetBranchAddress("pj1z",&pj1z);
+        tup->SetBranchAddress("pj2e",&pj2e);
+        tup->SetBranchAddress("pj2x",&pj2x);
+        tup->SetBranchAddress("pj2y",&pj2y);
+        tup->SetBranchAddress("pj2z",&pj2z);
+        tup->SetBranchAddress("pj3e",&pj3e);
+        tup->SetBranchAddress("pj3x",&pj3x);
+        tup->SetBranchAddress("pj3y",&pj3y);
+        tup->SetBranchAddress("pj3z",&pj3z);
+        tup->SetBranchAddress("pj4e",&pj4e);
+        tup->SetBranchAddress("pj4x",&pj4x);
+        tup->SetBranchAddress("pj4y",&pj4y);
+        tup->SetBranchAddress("pj4z",&pj4z);
 
         tup->GetEntry(event);
+
+	ANL4DVector pj11(pj1e,pj1x,pj1y,pj1z);
+	ANL4DVector pj12(pj2e,pj2x,pj2y,pj2z);
+	ANL4DVector pj21(pj3e,pj3x,pj3y,pj3z);
+	ANL4DVector pj22(pj4e,pj4x,pj4y,pj4z);
+	ANL4DVector pw1 = pj11 + pj12;
+	ANL4DVector pw2 = pj21 + pj22;
+	Double_t ew1p = TMath::Sqrt(pw1.Vect().Mag2()+kMw*kMw);
+	Double_t ew2p = TMath::Sqrt(pw2.Vect().Mag2()+kMw*kMw);
 
         hMwMw->Fill(mw1, mw2, 1.);
 	hEvis->Fill(evis, 1.);
@@ -138,8 +180,13 @@ void Plot(Char_t *filen = "jsf.root")
 	hCwCw->Fill(csw1, csw2, 1.);
 	hCosW->Fill(csw1, 1.);
 	hCosW->Fill(csw2, 1.);
+#if 1
 	hEw  ->Fill(ew1 , 1.);
 	hEw  ->Fill(ew2 , 1.);
+#else
+	hEw  ->Fill(ew1p, 1.);
+	hEw  ->Fill(ew2p, 1.);
+#endif
 	hMM  ->Fill(mm  , 1.);
 	hPtPl->Fill(pt, pl, 1.);
 	hCsjh->Fill(csj11h, 1.);

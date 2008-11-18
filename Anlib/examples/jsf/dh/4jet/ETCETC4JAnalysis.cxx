@@ -125,7 +125,9 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
            << "nsols:ejmin:csjmax"                                      << ":"
            << "csw1:csw2:ew1:ew2"                                       << ":"
            << "mw1:mw2:mm:acop"                                         << ":"
-           << "csj11h:fij11h:csj12h:fij12h:csj21h:fij21h:csj22h:fij22h" << ends;
+           << "csj11h:fij11h:csj12h:fij12h:csj21h:fij21h:csj22h:fij22h" << ":"
+	   << "pj1e:pj1x:pj1y:pj1z:pj2e:pj2x:pj2y:pj2z"                 << ":"
+	   << "pj3e:pj3x:pj3y:pj3z:pj4e:pj4x:pj4y:pj4z"                 << ends;
 
     hEvt = new TNtupleD("hEvt", "", tupstr.str().data());
   }
@@ -591,6 +593,22 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
   data[25] = fij21h;
   data[26] = csj22h;
   data[27] = fij22h;
+  data[28] = j11.E();
+  data[29] = j11.Px();
+  data[30] = j11.Py();
+  data[31] = j11.Pz();
+  data[32] = j11.E();
+  data[33] = j12.Px();
+  data[34] = j12.Py();
+  data[35] = j12.Pz();
+  data[36] = j21.E();
+  data[37] = j21.Px();
+  data[38] = j21.Py();
+  data[39] = j21.Pz();
+  data[40] = j21.E();
+  data[41] = j22.Px();
+  data[42] = j22.Py();
+  data[43] = j22.Pz();
 
   hEvt->Fill(data);
 
