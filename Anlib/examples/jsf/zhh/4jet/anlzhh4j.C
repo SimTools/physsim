@@ -1,5 +1,5 @@
 //***************************************************************************
-// anlzhh6j.C
+// anlzhh4j.C
 //
 // JSF macro for analyzing e+e- -> ZHH -> 6 jets process at JLC.
 // This program uses the library physsim-99a-1 of K.Fujii.
@@ -24,7 +24,7 @@ Char_t *outputfile = "jsf.root";	// A file to output histograms
 Char_t *inputfile = "../../../../../higgs/ZHHStudy++/prod/zhhsim.root";	// Input simulator file
 
 
-int anlzhh6j()
+int anlzhh4j()
 {
   jsf  = new JSFSteer();			// Create JSF object
 
