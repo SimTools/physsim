@@ -1,5 +1,5 @@
-#ifndef __KKHHSPRING__
-#define __KKHHSPRING__
+#ifndef KKHHSPRING_H
+#define KKHHSPRING_H
 //*****************************************************************************
 //* =====================
 //*  KKhhSpring
@@ -76,9 +76,7 @@ public:
   // ----------------------
   //   Base class methods
   // ----------------------
-#if 0
   virtual void     Userin();   // Bases user initialization
-#endif
   virtual void     Userout();  // Bases user output 
 
   Double_t Func();     // Bases integration function.

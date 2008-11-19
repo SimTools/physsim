@@ -203,48 +203,6 @@ KKhhBases::KKhhBases(const char *name, const char *title)
   ins >> fISR;
 
   // --------------------------------------------
-  //  Open beamstrahlung data
-  // --------------------------------------------
-  string bsfiledir;
-  string bsfilename;
-
-  if (fBeamStr) {
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("KKhhBases.beamstrahlungFilepath","/proj/soft/jsf/pro/data/bsdata/"));
-    ins >> bsfiledir;
-
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("KKhhBases.beamstrahlungFilename","trc500"));
-    ins >> bsfilename;
-    
-    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
-    if (!fBeamFile) {
-      cerr << " Unable to open a file for beam strahlung" << endl;
-      abort();
-    }
-    
-  // --------------------------------------------
-  //  Initialize beam generator
-  // --------------------------------------------
-
-    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
-
-    fBM->MakeBSMap();
-    fBM->Print(); 
-
-    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
-         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
-         << endl;
-
-    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
-      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
-           << " which is different from fEcm/2: "    << (fEcmInit/2)
-           << endl;        
-    } // check the energy homogeneity
-  } // if beamstrahlung is on
-
-  // --------------------------------------------
   //  Registor random numbers
   // --------------------------------------------
   //--
@@ -283,14 +241,8 @@ KKhhBases::KKhhBases(const char *name, const char *title)
   SetTuneValue (1.5);
   SetIteration1(0.05, 100);
   SetIteration2(0.05, 100);
-
-  // --------------------------------------------
-  //  Define some plots
-  // --------------------------------------------
-  Xh_init(1, fXL[0], fXU[0],       50, "Costh");
-  Xh_init(2, fXL[1], fXU[1],       50, "Phi");
-  Xh_init(3, 0.,     fEcmInit*1.1, 50, "Ecm");
 }
+
 // --------------------------
 //  D-tor
 // --------------------------
@@ -417,6 +369,61 @@ Double_t KKhhBases::Func()
   Xh_fill(3, fEcmIP, (bsWeight*sigma));
 
   return (bsWeight * sigma) ;
+}
+
+//_____________________________________________________________________________
+// --------------------------
+//  Userin
+// --------------------------
+void KKhhBases::Userin()
+{
+  // --------------------------------------------
+  //  Open beamstrahlung data
+  // --------------------------------------------
+  string bsfiledir;
+  string bsfilename;
+
+  if (fBeamStr) {
+    stringstream ins(gJSF->Env()->GetValue("KKhhBases.beamstrahlungFilepath","/proj/soft/jsf/pro/data/bsdata/"));
+    ins >> bsfiledir;
+
+    ins.clear();
+    ins.str(gJSF->Env()->GetValue("KKhhBases.beamstrahlungFilename","trc500"));
+    ins >> bsfilename;
+    
+    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
+    if (!fBeamFile) {
+      cerr << " Unable to open a file for beam strahlung" << endl;
+      abort();
+    }
+    
+  // --------------------------------------------
+  //  Initialize beam generator
+  // --------------------------------------------
+
+    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
+    fBM->SetIBParameters(0.0);
+
+    fBM->MakeBSMap();
+    fBM->Print(); 
+
+    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
+         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
+         << endl;
+
+    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
+      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
+           << " which is different from fEcm/2: "    << (fEcmInit/2)
+           << endl;        
+    } // check the energy homogeneity
+  } // if beamstrahlung is on
+
+  // --------------------------------------------
+  //  Define some plots
+  // --------------------------------------------
+  Xh_init(1, fXL[0], fXU[0],       50, "Costh");
+  Xh_init(2, fXL[1], fXU[1],       50, "Phi");
+  Xh_init(3, 0.,     fEcmInit*1.1, 50, "Ecm");
 }
 
 //_____________________________________________________________________________

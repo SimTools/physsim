@@ -1,5 +1,5 @@
-#ifndef __KKHHAnalysis__
-#define __KKHHAnalysis__
+#ifndef KKHHAnalysis_H
+#define KKHHAnalysis_H
 
 //**********************************************************************
 //* ======================
