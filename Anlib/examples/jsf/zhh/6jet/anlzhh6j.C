@@ -63,9 +63,20 @@ int anlzhh6j()
   myanl->SetPlCut(999.);	// maximum Pl
   myanl->SetCosjetCut(1.00);	
   myanl->SetMinYcut(0.004);
-  myanl->SetM2jCut( 40.);
+  myanl->SetM2jCut( 80.);
   myanl->SetMM1Cut(-10.);
   myanl->SetMM2Cut(250.);
+#if 0
+  myanl->SetBtagNsig  (1.0); // loose b-tag used to tag b's
+  myanl->SetBtagNoffv (2);   //
+  myanl->SetBTtagNsig (3.0); // tight b-tag used to veto any b in W
+  myanl->SetBTtagNoffv(99);   // 
+#else
+  myanl->SetBtagNsig  (2.5); // loose b-tag used to tag b's
+  myanl->SetBtagNoffv (0);   //
+  myanl->SetBTtagNsig (90.0); // tight b-tag used to veto any b in W
+  myanl->SetBTtagNoffv(99);   // 
+#endif
 
   jsf->BeginRun(1);				// Set run number to 1.
   Int_t nok =0;
