@@ -1,5 +1,5 @@
-#ifndef __RSAXSPRING__
-#define __RSAXSPRING__
+#ifndef RSAXSPRING_H
+#define RSAXSPRING_H
 //*****************************************************************************
 //* =====================
 //*  RSAXSpring

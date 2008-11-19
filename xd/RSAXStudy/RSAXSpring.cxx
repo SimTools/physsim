@@ -296,49 +296,6 @@ RSAXBases::RSAXBases(const char *name, const char *title)
   ins >> fPole;
 
   // --------------------------------------------
-  //  Open beamstrahlung data
-  // --------------------------------------------
-  string bsfiledir;
-  string bsfilename;
-
-  if (fBeamStr) {
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("RSAXBases.BeamstrahlungFilepath",
-                                  "/proj/soft/jsf/pro/data/bsdata/"));
-    ins >> bsfiledir;
-
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("RSAXBases.BeamstrahlungFilename","trc500"));
-    ins >> bsfilename;
-    
-    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
-    if (!fBeamFile) {
-      cerr << " Unable to open a file for beamstrahlung" << endl;
-      abort();
-    }
-    
-  // --------------------------------------------
-  //  Initialize beam generator
-  // --------------------------------------------
-
-    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
-
-    fBM->MakeBSMap();
-    fBM->Print(); 
-
-    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
-         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
-         << endl;
-
-    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
-      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
-           << " which is different from fEcm/2: "    << (fEcmInit/2)
-           << endl;        
-    } // check the energy homogeneity
-  } // if beamstrahlung is on
-
-  // --------------------------------------------
   //  Registor random numbers
   // --------------------------------------------
   //--
@@ -700,6 +657,48 @@ Complex_t RSAXBases::AmpEEtoAX(const HELFermion &em,
 // --------------------------
 void RSAXBases::Userin()
 {
+  // --------------------------------------------
+  //  Open beamstrahlung data
+  // --------------------------------------------
+  string bsfiledir;
+  string bsfilename;
+
+  if (fBeamStr) {
+    stringstream ins(gJSF->Env()->GetValue("RSAXBases.BeamstrahlungFilepath",
+                                  "/proj/soft/jsf/pro/data/bsdata/"));
+    ins >> bsfiledir;
+
+    ins.clear();
+    ins.str(gJSF->Env()->GetValue("RSAXBases.BeamstrahlungFilename","trc500"));
+    ins >> bsfilename;
+    
+    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
+    if (!fBeamFile) {
+      cerr << " Unable to open a file for beamstrahlung" << endl;
+      abort();
+    }
+    
+  // --------------------------------------------
+  //  Initialize beam generator
+  // --------------------------------------------
+
+    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
+    fBM->SetIBParameters(0.0);
+
+    fBM->MakeBSMap();
+    fBM->Print(); 
+
+    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
+         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
+         << endl;
+
+    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
+      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
+           << " which is different from fEcm/2: "    << (fEcmInit/2)
+           << endl;        
+    } // check the energy homogeneity
+  } // if beamstrahlung is on
+
   // --------------------------------------------
   //  Initialize Z decay table
   // --------------------------------------------
