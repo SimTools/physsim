@@ -37,6 +37,7 @@ TH1D *hFijh      = new TH1D("hFijh"    , "", 100,  -kPi,  +kPi);
 TH1D *hEw        = new TH1D("hEw"      , "", 125,    0.,  250.);
 TH1D *hPw        = new TH1D("hPw"      , "", 125,    0.,  250.);
 TH1D *hMM        = new TH1D("hMM"      , "", 250,    0.,  500.);
+TH1D *hAcop      = new TH1D("hAcop"    , "", 180,    0.,  180.);
 
 void Plot(Char_t *filen = "jsf.root")
 {
@@ -190,6 +191,7 @@ void Plot(Char_t *filen = "jsf.root")
 	hEw  ->Fill(ew1p, 1.);
 	hEw  ->Fill(ew2p, 1.);
 #endif
+	hAcop->Fill(acop, 1.);
 	hPw  ->Fill(pw1 , 1.);
 	hPw  ->Fill(pw2 , 1.);
 	hMM  ->Fill(mm  , 1.);
@@ -214,6 +216,7 @@ void Plot(Char_t *filen = "jsf.root")
   id++; c1->cd(id); hEw ->Draw();
   id++; c1->cd(id); hPw ->Draw();
   id++; c1->cd(id); hMM ->Draw();
+  id++; c1->cd(id); hAcop->Draw();
   //id++; c1->cd(id); hCwCw->Draw();
   hCosW->SetMinimum(0.);
   id++; c1->cd(id); hCosW->Draw();
