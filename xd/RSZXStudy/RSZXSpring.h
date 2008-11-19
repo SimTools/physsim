@@ -1,5 +1,5 @@
-#ifndef __RSZXSPRING__
-#define __RSZXSPRING__
+#ifndef RSZXSPRING_H
+#define RSZXSPRING_H
 //*****************************************************************************
 //* =====================
 //*  RSZXSpring

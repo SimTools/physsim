@@ -145,6 +145,8 @@ Bool_t RSZXSpringBuf::SetPartons()
   Double_t chrg    = bases->f3Ptr->GetCharge();   // F charge
   Double_t m3      = bases->f3Ptr->GetMass  ();   // F mass
   Double_t m4      = m3;                          // F mass
+  Int_t    hel3    = bases->fHelFinal[2];         // f1 helicity
+  Int_t    hel4    = bases->fHelFinal[3];         // f2 helicity
   Double_t color   = bases->f3Ptr->GetColor();    // color factor
   Int_t    islev   = color > 1. ? 201 : 0;  	  // shower level
   Int_t    icf     = 2;                           // color flux id
@@ -202,13 +204,13 @@ Bool_t RSZXSpringBuf::SetPartons()
                    << qcm[3] << ") " << endl;
 #endif
 
-  //                              No. PID  Mass  Charge   pv   Nd 1st Mom hel col shower
-  new (partons[0]) JSFSpringParton(1, idx, mass,    0., *qp[0], 2, 3,  0, 0,   0,     0);
-  new (partons[1]) JSFSpringParton(2, idz, rq2z,    0., *qp[1], 2, 5,  0, 0,   0,     0);
-  new (partons[2]) JSFSpringParton(3, id1,   m1,  chg1, *qp[2], 0, 0,  1, 0,icfx,islevx);
-  new (partons[3]) JSFSpringParton(4, id2,   m2,  chg2, *qp[3], 0, 0,  1, 0,icfx,islevx);
-  new (partons[4]) JSFSpringParton(5, idf,   m3,  chrg, *qp[4], 0, 0,  2, 0, icf, islev);
-  new (partons[5]) JSFSpringParton(6,-idf,   m4, -chrg, *qp[5], 0, 0,  2, 0, icf, islev);
+  //                              No. PID  Mass  Charge   pv   Nd 1st Mom  hel  col shower
+  new (partons[0]) JSFSpringParton(1, idx, mass,    0., *qp[0], 2, 3,  0,    0,   0,     0);
+  new (partons[1]) JSFSpringParton(2, idz, rq2z,    0., *qp[1], 2, 5,  0,    0,   0,     0);
+  new (partons[2]) JSFSpringParton(3, id1,   m1,  chg1, *qp[2], 0, 0,  1,    0,icfx,islevx);
+  new (partons[3]) JSFSpringParton(4, id2,   m2,  chg2, *qp[3], 0, 0,  1,    0,icfx,islevx);
+  new (partons[4]) JSFSpringParton(5, idf,   m3,  chrg, *qp[4], 0, 0,  2, hel3, icf, islev);
+  new (partons[5]) JSFSpringParton(6,-idf,   m4, -chrg, *qp[5], 0, 0,  2, hel4, icf, islev);
   return kTRUE ;
 }
 
@@ -333,49 +335,6 @@ RSZXBases::RSZXBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("RSZXBases.Pole","0."));         // electron polarization
   ins >> fPole;
-
-  // --------------------------------------------
-  //  Open beamstrahlung data
-  // --------------------------------------------
-  string bsfiledir;
-  string bsfilename;
-
-  if (fBeamStr) {
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("RSZXBases.BeamstrahlungFilepath",
-                                  "/proj/soft/jsf/pro/data/bsdata/"));
-    ins >> bsfiledir;
-
-    ins.clear();
-    ins.str(gJSF->Env()->GetValue("RSZXBases.BeamstrahlungFilename","trc500"));
-    ins >> bsfilename;
-    
-    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
-    if (!fBeamFile) {
-      cerr << " Unable to open a file for beamstrahlung" << endl;
-      abort();
-    }
-    
-  // --------------------------------------------
-  //  Initialize beam generator
-  // --------------------------------------------
-
-    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
-
-    fBM->MakeBSMap();
-    fBM->Print(); 
-
-    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
-         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
-         << endl;
-
-    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
-      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
-           << " which is different from fEcm/2: "    << (fEcmInit/2)
-           << endl;        
-    } // check the energy homogeneity
-  } // if beamstrahlung is on
 
   // --------------------------------------------
   //  Registor random numbers
@@ -855,6 +814,48 @@ Complex_t RSZXBases::AmpEEtoZX(const HELFermion &em,
 // --------------------------
 void RSZXBases::Userin()
 {
+  // --------------------------------------------
+  //  Open beamstrahlung data
+  // --------------------------------------------
+  string bsfiledir;
+  string bsfilename;
+
+  if (fBeamStr) {
+    stringstream ins(gJSF->Env()->GetValue("RSZXBases.BeamstrahlungFilepath",
+                                  "/proj/soft/jsf/pro/data/bsdata/"));
+    ins >> bsfiledir;
+
+    ins.clear();
+    ins.str(gJSF->Env()->GetValue("RSZXBases.BeamstrahlungFilename","trc500"));
+    ins >> bsfilename;
+    
+    TFile *fBeamFile = new TFile((bsfiledir+bsfilename+".root").data());
+    if (!fBeamFile) {
+      cerr << " Unable to open a file for beamstrahlung" << endl;
+      abort();
+    }
+    
+  // --------------------------------------------
+  //  Initialize beam generator
+  // --------------------------------------------
+
+    fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
+    fBM->SetIBParameters(0.0);
+
+    fBM->MakeBSMap();
+    fBM->Print(); 
+
+    cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
+         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
+         << endl;
+
+    if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {
+      cout << "Nominal energy from beamstrahung is " << fBM->GetNominalEnergy() 
+           << " which is different from fEcm/2: "    << (fEcmInit/2)
+           << endl;        
+    } // check the energy homogeneity
+  } // if beamstrahlung is on
+
   // --------------------------------------------
   //  Initialize Z decay table
   // --------------------------------------------
