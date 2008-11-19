@@ -43,11 +43,20 @@ int anl2J()
 
   // Adjust Cut //
 
+#if 1
+  myanl->SetNtrackCut(25.);
+#else
+  myanl->SetNtrackCut(2.); // allow lepton pairs
+#endif
   myanl->SetEvisLoCut(20.);
   myanl->SetEvisHiCut(400.);
   myanl->SetPtCut(0.);
   myanl->SetPlCut(9999.);
-  myanl->SetElCut(25.);
+#if 1
+  myanl->SetElCut(25.); 
+#else
+  myanl->SetElCut(999.); // allow lepton pairs
+#enidf
   myanl->SetCosjetCut(0.95);
   myanl->SetCoszCut(0.95);
   myanl->SetMinYcut(0.01);
