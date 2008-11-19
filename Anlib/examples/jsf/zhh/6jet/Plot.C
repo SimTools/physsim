@@ -23,7 +23,7 @@ const Double_t kMh = 120.0;
 
 TH2D *hMhMh      = new TH2D("hMhMh"    , "", 130,   30.,  160.,
                                              130,   30.,  160.);
-TH1D *hMz        = new TH1D("hMz"      , "", 160,   40.,  120.);
+TH1D *hMz        = new TH1D("hMz"      , "", 130,   20.,  150.);
 TH1D *hEvis      = new TH1D("hEvis"    , "", 120,    0.,  600.);
 
 TH2D *hPtPl      = new TH2D("hPtPl"    , "", 100,    0.,  200.,
@@ -36,6 +36,7 @@ TH1D *hCosH      = new TH1D("hCosH"    , "", 100,   -1.,   +1.);
 TH1D *hCsjh      = new TH1D("hCsjh"    , "", 100,   -1.,   +1.);
 TH1D *hFijh      = new TH1D("hFijh"    , "", 100,  -kPi,  +kPi);
 TH1D *hEh        = new TH1D("hEh"      , "", 125,    0.,  250.);
+TH1D *hEz        = new TH1D("hEz"      , "", 125,    0.,  250.);
 TH1D *hCsjz      = new TH1D("hCsjz"    , "", 100,   -1.,   +1.);
 TH1D *hFijz      = new TH1D("hFijz"    , "", 100,  -kPi,  +kPi);
 TH1D *hPh        = new TH1D("hPh"      , "", 125,    0.,  250.);
@@ -196,8 +197,12 @@ void Plot(Char_t *filen = "jsf.root")
 	ANL4DVector qj12(pj2e,pj2x,pj2y,pj2z);
 	ANL4DVector qj21(pj3e,pj3x,pj3y,pj3z);
 	ANL4DVector qj22(pj4e,pj4x,pj4y,pj4z);
+	ANL4DVector qj31(pj5e,pj5x,pj5y,pj5z);
+	ANL4DVector qj32(pj6e,pj6x,pj6y,pj6z);
 	ANL4DVector qh1 = qj11 + qj12;
 	ANL4DVector qh2 = qj21 + qj22;
+	ANL4DVector qz  = qj31 + qj32;
+	Double_t ez   = qz.E();
 	Double_t ph1  = qh1.Vect().Mag();
 	Double_t ph2  = qh2.Vect().Mag();
 	Double_t eh1p = TMath::Sqrt(ph1*ph1+kMh*kMh);
@@ -218,6 +223,7 @@ void Plot(Char_t *filen = "jsf.root")
 	hEh  ->Fill(eh1p, 1.);
 	hEh  ->Fill(eh2p, 1.);
 #endif
+	hEz  ->Fill(ez  , 1.);
 	hPh  ->Fill(ph1 , 1.);
 	hPh  ->Fill(ph2 , 1.);
 	hMM  ->Fill(mm  , 1.);
@@ -245,6 +251,7 @@ void Plot(Char_t *filen = "jsf.root")
   id++; c1->cd(id); hMhMh->ProjectionY()->Draw();
   id++; c1->cd(id); hMz ->Draw();
   id++; c1->cd(id); hEh ->Draw();
+  id++; c1->cd(id); hEz ->Draw();
   id++; c1->cd(id); hPh ->Draw();
   id++; c1->cd(id); hMM ->Draw();
   //id++; c1->cd(id); hChCh->Draw();
