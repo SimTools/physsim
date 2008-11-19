@@ -59,7 +59,6 @@ int anl2J()
 #endif
   myanl->SetMM1Cut(70.);
   myanl->SetMM2Cut(120.);
-  myanl->SetAcopCut(30./180.*TMath::Pi());
 
   jsf->BeginRun(1);      			// Set run number to 1.  
   Int_t nok = 0;

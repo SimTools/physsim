@@ -58,7 +58,6 @@ public:
 
   inline void SetMM1Cut    (Double_t x) { fMM1Cut     = x; }
   inline void SetMM2Cut    (Double_t x) { fMM2Cut     = x; }
-  inline void SetAcopCut   (Double_t x) { fAcopCut    = x; }
 
   inline Double_t GetEcm() const { return fEcm; }
   
@@ -83,7 +82,6 @@ private:
   Double_t fCoszCut;       // |cos(theta_z)| maximum
   Double_t fMM1Cut;        // mm_WW < fMM1Cut or
   Double_t fMM2Cut;        // mm_WW > fMM2Cut
-  Double_t fAcopCut;       // Minimum Acoplanarity
   Double_t fBtagNsig;      // Nsig  for b-tag (loose)
   Int_t    fBtagNoffv;     // Noffv for b-tag (loose)
   Double_t fBTtagNsig;     // Nsig  for b-tag (tight)

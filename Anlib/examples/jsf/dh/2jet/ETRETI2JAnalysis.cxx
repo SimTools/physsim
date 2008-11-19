@@ -42,7 +42,7 @@ using namespace std;
 static const Double_t kMassW   = 80.00; // W mass
 static const Double_t kMassZ   = 91.19; // Z mass
 static const Double_t kSigmaMw =   6.0; // W mass resolution
-static const Double_t kSigmaMz =   6.0; // W mass resolution
+static const Double_t kSigmaMz =   6.0; // Z mass resolution
 
 typedef enum { kElectron = 11, kMuon = 13 } EPID;
 
@@ -74,11 +74,10 @@ ETRETI2JAnalysis::ETRETI2JAnalysis(const Char_t *name, const Char_t *title)
                   fNjetsCut  (    2),   // No. of jets
                   fEjetCut   (  5.0),   // E_jet minimum
                   fCosjetCut ( 0.99),   // |cos(theta_j)| maximum
-                  fM2jCut    ( 18.0),   // |m_jj-m_W| maximum
-                  fCoszCut   ( 1.00),   // cos(theta_bw) maximum
-                  fMM1Cut    (  70.),   // > mm_WW  
-                  fMM2Cut    ( 120.),   // < mm_WW
-                  fAcopCut   (  0.0),   // Acoplanarity minimum
+                  fM2jCut    ( 18.0),   // |m_jj-m_Z| maximum
+                  fCoszCut   ( 1.00),   // cos(theta_z) maximum
+                  fMM1Cut    (  70.),   // > mm_Z
+                  fMM2Cut    ( 120.),   // < mm_Z
                   fBtagNsig  (  1.0),   // Nsig for b-tag
                   fBtagNoffv (    2),   // Noffv for b-tag
                   fBTtagNsig (  3.0),   // Nsig for b-tag (tight)
@@ -332,7 +331,7 @@ Bool_t ETRETI2JAnalysis::Process(Int_t ev)
   ANLPairCombiner zcandidates(jets,jets);
   ANLPair z(jets[0], jets[1]);
   Double_t zmass = z().GetMass();
-  Double_t chi2 = TMath::Power((zmass - kMassW)/kSigmaMw,2.);
+  Double_t chi2 = TMath::Power((zmass - kMassZ)/kSigmaMz,2.);
   if (TMath::Abs(zmass - kMassZ) > fM2jCut) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {

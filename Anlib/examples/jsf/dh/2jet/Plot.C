@@ -21,7 +21,7 @@
 const Double_t kPi = TMath::Pi();
 const Double_t kMz = 91.18;
 
-TH1D *hMz        = new TH1D("hMz"      , "",  80,   70.,  110.);
+TH1D *hMz        = new TH1D("hMz"      , "", 160,    0.,  160.);
 TH1D *hEvis      = new TH1D("hEvis"    , "", 120,    0.,  600.);
 TH2D *hPtPl      = new TH2D("hPtPl"    , "", 100,    0.,  200.,
                                              200, -200., +200.);
