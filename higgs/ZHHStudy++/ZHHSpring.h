@@ -118,7 +118,7 @@ private:
   GENPDTEntry   *f3Ptr;           // point to 1st Z daughter
   GENPDTEntry   *f4Ptr;           // point to 2nd Z daughter
   Int_t          fHelInitial[2];  // initial state helicities
-  Int_t          fHelFinal  [2];  // final   state helicities
+  Int_t          fHelFinal  [4];  // final   state helicities
   Int_t          fJCombI;         // intial helicity combination
   Int_t          fJCombF;         // final  helicity combination
   Int_t          fZMode;          // Z decay mode

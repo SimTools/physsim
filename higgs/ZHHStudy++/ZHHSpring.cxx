@@ -159,8 +159,8 @@ Bool_t ZHHSpringBuf::SetPartons()
   Int_t    islev   = color > 1. ? 201 : 0;  	  // shower level
   Int_t    icf     = 2;                           // color flux id
   Double_t rq2z    = pv[1].Mag();
-  Int_t    hel1    = bases->fHelFinal[0];
-  Int_t    hel2    = bases->fHelFinal[1];
+  Int_t    hel1    = bases->fHelFinal[2];
+  Int_t    hel2    = bases->fHelFinal[3];
 
   Double_t mass    = bases->GetMass();
 
@@ -627,8 +627,8 @@ Complex_t ZHHBases::FullAmplitude()
    HELScalar  h1(fP[0]);
    HELScalar  h2(fP[1]);
 
-   HELFermion f (fP[2], fM[2], fHelFinal [0], +1, kIsOutgoing);
-   HELFermion fb(fP[3], fM[3], fHelFinal [1], -1, kIsIncoming);
+   HELFermion f (fP[2], fM[2], fHelFinal [2], +1, kIsOutgoing);
+   HELFermion fb(fP[3], fM[3], fHelFinal [3], -1, kIsIncoming);
    HELVector  zf(fb, f, glz, grz, kM_z, gamz);
 
    Complex_t amp = AmpEEtoZHH(em, ep, h1, h2, zf);
@@ -786,8 +786,8 @@ void ZHHBases::SelectHelicities(Double_t &weight)
    static const Int_t kIHelComb[kNi][2] = {{-1, +1},
                                            {+1, -1}};
    static const Int_t kNf = 2;
-   static const Int_t kFHelComb[kNf][2] = {{-1, +1},
-                                           {+1, -1}};
+   static const Int_t kFHelComb[kNf][4] = {{0, 0, -1, +1},
+                                           {0, 0, +1, -1}};
    Double_t helm = (1. - fPole)/2.;
    if (fHelCombInitial < helm) {
       fJCombI = 0;
@@ -800,5 +800,7 @@ void ZHHBases::SelectHelicities(Double_t &weight)
    fJCombF = TMath::Min(fJCombF, kNf-1);
    fHelFinal  [0] = kFHelComb[fJCombF][0];
    fHelFinal  [1] = kFHelComb[fJCombF][1];
+   fHelFinal  [2] = kFHelComb[fJCombF][2];
+   fHelFinal  [3] = kFHelComb[fJCombF][3];
    weight = kNf;
 }
