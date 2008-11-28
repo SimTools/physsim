@@ -159,7 +159,7 @@ C--
       RBUF( 1) =   NPT
       RBUF( 2) =   NCPFLG*24
       RBUF( 3) =   SQRT(VMW2)
-      RBUF( 4) =   -1
+      RBUF( 4) =   NCPFLG
       RBUF( 5) =   QV(1,4)
       RBUF( 6) =   QV(2,4)
       RBUF( 7) =   QV(3,4)
@@ -181,7 +181,7 @@ C--
       RBUF( 1) =   NPT
       RBUF( 2) =   +25
       RBUF( 3) =   SQRT(VMZ2)
-      RBUF( 4) =   +1
+      RBUF( 4) =   0
       RBUF( 5) =   QV(1,5)
       RBUF( 6) =   QV(2,5)
       RBUF( 7) =   QV(3,5)
