@@ -49,7 +49,9 @@ void GENDecayMode::DebugPrint(const Option_t *)
         << " BR = "    << setw(6) << setprecision(4)
                        << setiosflags(ios::fixed)
                        << setiosflags(ios::showpoint)
-        << GetBR()     <<  " : --> ";
+        << GetBR()     
+        << " : " << (IsLocked() ? "off" : "on ")
+        << " : --> ";
    TIter next(this);
    GENPDTEntry *ep;
    while ((ep = static_cast<GENPDTEntry *>(next()))) {
@@ -85,13 +87,30 @@ GENDecayMode *GENModePicker::PickMode(Double_t x,
    TIter next(this);
    GENDecayMode *mp;
    while ((mp = static_cast<GENDecayMode *>(next()))) {
-      if (x <= mp->fCumBR) {
-         weight = 1./mp->fBR; 
+      if ((!mp->IsLocked()) && x*fBRsum <= mp->fCumBR) {
+         weight = fBRsum/mp->fBR; 
          break;
       }
       mode++;
    }
    return static_cast<GENDecayMode *>(mp);
+}
+
+//_____________________________________________________________________________
+// --------------------------
+//  GetMode
+// --------------------------
+const GENDecayMode *GENModePicker::GetMode(Int_t m) const
+{
+   if (m<1 || m>GetEntries()) return 0; 
+   return static_cast<const GENDecayMode *>(At(m-1));
+}
+
+GENDecayMode *GENModePicker::GetMode(Int_t m)
+{
+   fDone = kFALSE;
+   if (m<1 || m>GetEntries()) return 0; 
+   return static_cast<GENDecayMode *>(At(m-1));
 }
 
 //_____________________________________________________________________________
@@ -114,9 +133,10 @@ void GENModePicker::Update()
    next.Reset();
    while ((mp = static_cast<GENDecayMode *>(next()))) {
       mp->fBR = mp->fGamma/fGamma;
-      cum    += mp->fBR;
+      if (!mp->IsLocked()) cum += mp->fBR;
       mp->fCumBR = cum;
    }
+   fBRsum = cum;
 }
 
 //-----------------------------------------------------------------------------
@@ -192,6 +212,9 @@ Double_t GENPDTEntry::GetQ2BW(Double_t    qmin,   // Q_min
 void GENPDTEntry::DebugPrint(const Option_t *opt)
 {
    using namespace std;
+   cerr << "=======================" << endl
+        << " " << fName              << endl
+        << "=======================" << endl;
    cerr << " ---------------------------------------------------- " << endl;
    Update();
    TIter next(this);
@@ -200,7 +223,8 @@ void GENPDTEntry::DebugPrint(const Option_t *opt)
       mp->DebugPrint(opt);
    }
    cerr << " ---------------------------------------------------- " << endl
-        << " Gamma_tot = " << GetWidth() << " [GeV]"                << endl;
+        << " Gamma_tot = " << GetWidth() << " [GeV]"                << endl
+	<< endl;
 }
 
 //-----------------------------------------------------------------------------
