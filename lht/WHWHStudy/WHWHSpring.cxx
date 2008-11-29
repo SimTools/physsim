@@ -954,7 +954,7 @@ Complex_t WHWHBases::AmpEEtoXX(const HELFermion &em,
    HELVertex ampaxx(xm, xp, as, gaxx);
 
    //--
-   // T-channel A
+   // T-channel neH
    //--
    Double_t dummy = 5.; // dummy width for ne_H
    HELFermion neh(em, xm, getxl, getxr, fMassT, dummy);
