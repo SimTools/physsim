@@ -17,7 +17,7 @@
 
 #include <sstream>
 #include <iomanip>
-#define __NODECAY__
+//#define __NODECAY__
 //#define __DEBUG__
 //#define __ZEROWIDTH__
 //#define __PAHSESPACE__

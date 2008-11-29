@@ -14,9 +14,8 @@
 //*****************************************************************************
 
 #include "ANL4DVector.h"
-#if 1
 #include "TObjArray.h"
-#endif
+#include "TAttLockable.h"
 
 class GENPDTEntry;
 class GENPDTWBoson;
@@ -30,7 +29,7 @@ class GENBranch;
 //  class GENDecayMode
 // =====================
 //-----------------------------------------------------------------------
-class GENDecayMode : public TObjArray {
+class GENDecayMode : public TObjArray, public TAttLockable {
 friend class GENModePicker;
 public:
    GENDecayMode(Double_t gm = 0.) : fGamma(gm), fBR(0.), fCumBR(0.) {}
@@ -73,8 +72,8 @@ protected:
    virtual void     Update();
 
 private:
-   Double_t fGamma;		// total width [GeV]
-   Bool_t   fDone;		// true if updated
+   Double_t  fGamma;		// total width [GeV]
+   Bool_t    fDone;		// true if updated
 
    ClassDef(GENModePicker, 1) 	// Decay mode picker class
 };
