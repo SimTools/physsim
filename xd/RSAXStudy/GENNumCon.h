@@ -1,5 +1,5 @@
-#ifndef __GENNUMCON__
-#define __GENNUMCON__
+#ifndef GENNUMCON_H
+#define GENNUMCON_H
 //*----------------------------------------------------------------------
 //*     Numerical and Natural Constants
 //*----------------------------------------------------------------------

@@ -556,7 +556,7 @@ Bool_t ZHH4JAnalysis::Process(Int_t ev)
        << h1j1p->GetTag() << ","
        << h1j2p->GetTag() << ";"
        << h2j1p->GetTag() << ","
-       << h2j2p->GetTag() << ";"
+       << h2j2p->GetTag() << ")"
        << endl;
 #endif
 #endif

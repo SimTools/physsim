@@ -443,6 +443,57 @@ HELVector::HELVector(const HELVector  &vc,
       (*this)[3] = dg * (fP(3)*vk + vc[3]);
    } 
 }
+//----------
+// JVVXXX()
+//----------
+HELVector::HELVector(const HELVector  &v1,
+                     const HELVector  &v2,
+                           Double_t    g,
+                           Double_t    mv,
+                           Double_t    gmv)
+          : TVectorC(4),
+            fP(v1.fP + v2.fP),
+	    fM(mv),
+            fHel(0),
+            fNSV(0)
+{
+   Double_t  s   = fP.Mag2();
+   Double_t  vm2 = mv*mv;
+   Complex_t v12 = v1[0]*v2[0] - v1[1]*v2[1] - v1[2]*v2[2] - v1[3]*v2[3];
+   Complex_t sv1 =  (v2.fP(0)-fP(0))*v1[0] -(v2.fP(1)-fP(1))*v1[1]
+                                           -(v2.fP(2)-fP(2))*v1[2] 
+                                           -(v2.fP(3)-fP(3))*v1[3];
+   Complex_t sv2 = -(v1.fP(0)-fP(0))*v2[0] +(v1.fP(1)-fP(1))*v2[1]
+                                           +(v1.fP(2)-fP(2))*v2[2] 
+                                           +(v1.fP(3)-fP(3))*v2[3];
+   Complex_t j12[4];
+   j12[0] = (v1.fP(0)-v2.fP(0))*v12 + sv1*v2[0] + sv2*v1[0];
+   j12[1] = (v1.fP(1)-v2.fP(1))*v12 + sv1*v2[1] + sv2*v1[1];
+   j12[2] = (v1.fP(2)-v2.fP(2))*v12 + sv1*v2[2] + sv2*v1[2];
+   j12[3] = (v1.fP(3)-v2.fP(3))*v12 + sv1*v2[3] + sv2*v1[3];
+
+   if (mv == 0.) {
+      Double_t gs = -g/s;
+      (*this)[0] = gs * j12[0];
+      (*this)[1] = gs * j12[1];
+      (*this)[2] = gs * j12[2];
+      (*this)[3] = gs * j12[3];
+   } else {
+      Double_t  m1  = v1.fP.Mag2();
+      Double_t  m2  = v2.fP.Mag2();
+      Complex_t s11 = v1.fP(0)*v1[0] - v1.fP(1)*v1[1] - v1.fP(2)*v1[2] - v1.fP(3)*v1[3];
+      Complex_t s12 = v1.fP(0)*v2[0] - v1.fP(1)*v2[1] - v1.fP(2)*v2[2] - v1.fP(3)*v2[3];
+      Complex_t s21 = v2.fP(0)*v1[0] - v2.fP(1)*v1[1] - v2.fP(2)*v1[2] - v2.fP(3)*v1[3];
+      Complex_t s22 = v2.fP(0)*v2[0] - v2.fP(1)*v2[1] - v2.fP(2)*v2[2] - v2.fP(3)*v2[3];
+      Complex_t js  = (v12*(-m1+m2) + s11*s12 - s21*s22)/vm2;
+      Double_t  mg  = TMath::Max(TMath::Sign(mv*gmv, s), 0.);
+      Complex_t dg  = -g/Complex_t(s - vm2, mg);
+      (*this)[0] = dg * (j12[0] - fP(0)*js);
+      (*this)[1] = dg * (j12[1] - fP(1)*js);
+      (*this)[2] = dg * (j12[2] - fP(2)*js);
+      (*this)[3] = dg * (j12[3] - fP(3)*js);
+   }
+}
 
 //-----------------------------------------------------------------------------
 // ==============================

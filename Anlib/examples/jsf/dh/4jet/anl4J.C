@@ -51,12 +51,7 @@ int anl4J()
   myanl->SetCosjetCut(0.95);
   myanl->SetCoswCut(0.95);
   myanl->SetMinYcut(0.01);
-#if 0
-  myanl->SetM2jLoCut(10.);
-  myanl->SetM2jHiCut(10.);
-#else
   myanl->SetM2jCut(30.);
-#endif
   myanl->SetMM1Cut(70.);
   myanl->SetMM2Cut(120.);
   myanl->SetAcopCut(30);

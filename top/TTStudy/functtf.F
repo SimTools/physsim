@@ -7,6 +7,7 @@ C*                      included.
 C* 95/06/07  K.Fujii	Now use INSMCN instead of CONINT.
 C*			Use ISRBM switch.
 C*
+#define __ZEROWIDTH__
       REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
@@ -215,13 +216,15 @@ C--
 C--
 C  Set invariant masses squared.
 C--
-CZEROWIDTH       Q32   = AMT2
-CZEROWIDTH       Q42   = AMT2
-CZEROWIDTH       Q72   = AMW2
-CZEROWIDTH       Q82   = AMW2
-CZEROWIDTH       WAT   = WAT*(xPI*AMT*GMT)**2
-CZEROWIDTH      .           *(xPI*AMW*GMW)**2
-CZEROWIDTH                                         GO TO 350
+#ifdef __ZEROWIDTH__
+      Q32   = AMT2
+      Q42   = AMT2
+      Q72   = AMW2
+      Q82   = AMW2
+      WAT   = WAT*(xPI*AMT*GMT)**2
+     .           *(xPI*AMW*GMW)**2
+                                        GO TO 350
+#endif
 C--
       AM3   = AMF(IDPTCL(1,3),IDPTCL(2,3),IDPTCL(3,3))
       AM4   = AMF(IDPTCL(1,4),IDPTCL(2,4),IDPTCL(3,4))

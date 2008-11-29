@@ -130,6 +130,11 @@ public:
 		   Double_t    g,
 		   Double_t    m,
 		   Double_t    gm);
+   HELVector(const HELVector   &v1,
+             const HELVector   &v2,
+		   Double_t    g,
+		   Double_t    m,
+		   Double_t    gm);
    virtual ~HELVector() {}
 
    inline const ANL4DVector &GetFourMomentum() const  { return fP;   }
