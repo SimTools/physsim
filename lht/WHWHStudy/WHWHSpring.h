@@ -111,13 +111,18 @@ private:
   Int_t    fISR;            // ISR on?
   Int_t    fBeamStr;        // Beamstrahlung on?
   Double_t fPole;           // electron polarization
+  Int_t    fWmModesLo;      // W- decay mode lo;
+  Int_t    fWmModesHi;      // W- decay mode hi;
+  Int_t    fWpModesLo;      // W+ decay mode lo;
+  Int_t    fWpModesHi;      // W+ decay mode hi;
 
   // ----------------
   //  Particle Data
   // ----------------
   WHBoson      *fXBosonPtr;       //! PD table entry of "X"
   AHBoson      *fDMBosonPtr;      //! PD table entry of "DM"
-  GENPDTWBoson *fWBosonPtr;       //! PD table entry of "W"
+  GENPDTWBoson *fW1BosonPtr;      //! PD table entry of "W1"
+  GENPDTWBoson *fW2BosonPtr;      //! PD table entry of "W2"
   GENPDTZBoson *fZBosonPtr;       //! PD table entry of "Z"
   GENPDTPhoton *fPhotonPtr;       //! PD table entry of "Gamma"
   GENPDTGluon  *fGluonPtr;        //! PD table entry of "Gluon"

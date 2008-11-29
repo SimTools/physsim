@@ -231,9 +231,14 @@ WHWHBases::WHWHBases(const char *name, const char *title)
            fISR       ( 1),
            fBeamStr   ( 1),
            fPole      (0.),
+           fWmModesLo ( 1),
+           fWmModesHi (12),
+           fWpModesLo ( 1),
+           fWpModesHi (12),
            fXBosonPtr ( 0),
            fDMBosonPtr( 0),
-           fWBosonPtr ( 0),
+           fW1BosonPtr( 0),
+           fW2BosonPtr( 0),
            fZBosonPtr ( 0),
            fPhotonPtr ( 0),
            fGluonPtr  ( 0),
@@ -343,6 +348,22 @@ WHWHBases::WHWHBases(const char *name, const char *title)
   ins.str(gJSF->Env()->GetValue("WHWHBases.Pole","0."));         // electron polarization
   ins >> fPole;
 
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WHWHBases.WmModesLo","1"));     // W- decay mode lo
+  ins >> fWmModesLo;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WHWHBases.WmModesHi","12"));    // W- decay mode hi
+  ins >> fWmModesHi;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WHWHBases.WpModesLo","1"));     // W+ decay mode lo
+  ins >> fWpModesLo;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WHWHBases.WpModesHi","12"));    // W+ decay mode hi
+  ins >> fWpModesHi;
+
   // --------------------------------------------
   //  Registor random numbers
   // --------------------------------------------
@@ -417,7 +438,8 @@ WHWHBases::~WHWHBases()
 {
   delete fXBosonPtr;
   delete fDMBosonPtr;
-  delete fWBosonPtr;
+  delete fW1BosonPtr;
+  delete fW2BosonPtr;
   delete fZBosonPtr;
   delete fPhotonPtr;
   delete fGluonPtr;
@@ -484,7 +506,7 @@ Double_t WHWHBases::Func()
   // --------------------------------------------
   Double_t weight = 1;
 
-  fW1ModePtr = fWBosonPtr->PickMode(fW1DecayMode, weight, fW1Mode);
+  fW1ModePtr = fW1BosonPtr->PickMode(fW1DecayMode, weight, fW1Mode);
 #ifndef __NODECAY__
   bsWeight *= weight;
 #endif
@@ -493,7 +515,7 @@ Double_t WHWHBases::Func()
   Double_t m1   = f1Ptr->GetMass();
   Double_t m2   = f2Ptr->GetMass();
 
-  fW2ModePtr = fWBosonPtr->PickMode(fW2DecayMode, weight, fW2Mode);
+  fW2ModePtr = fW2BosonPtr->PickMode(fW2DecayMode, weight, fW2Mode);
 #ifndef __NODECAY__
   bsWeight *= weight;
 #endif
@@ -554,10 +576,10 @@ Double_t WHWHBases::Func()
 #ifndef __ZEROWIDTH__
   qmin  = m1 + m2;
   qmax  = qx1 - fMassDM;
-  fQ2W1 = fWBosonPtr->GetQ2BW(qmin, qmax, fXQ2W1, weight);
+  fQ2W1 = fW1BosonPtr->GetQ2BW(qmin, qmax, fXQ2W1, weight);
 #else
-  fQ2W1  = TMath::Power(fWBosonPtr->GetMass(),2);
-  weight = kPi*fWBosonPtr->GetMass()*fWBosonPtr->GetWidth();
+  fQ2W1  = TMath::Power(fW1BosonPtr->GetMass(),2);
+  weight = kPi*fW1BosonPtr->GetMass()*fW1BosonPtr->GetWidth();
 #ifdef __NODECAY__
   weight = 1.;
 #endif
@@ -567,10 +589,10 @@ Double_t WHWHBases::Func()
 #ifndef __ZEROWIDTH__
   qmin  = m4 + m5;
   qmax  = qx2 - fMassDM;
-  fQ2W2 = fWBosonPtr->GetQ2BW(qmin, qmax, fXQ2W2, weight);
+  fQ2W2 = fW2BosonPtr->GetQ2BW(qmin, qmax, fXQ2W2, weight);
 #else
-  fQ2W2  = TMath::Power(fWBosonPtr->GetMass(),2);
-  weight = kPi*fWBosonPtr->GetMass()*fWBosonPtr->GetWidth();
+  fQ2W2  = TMath::Power(fW2BosonPtr->GetMass(),2);
+  weight = kPi*fW2BosonPtr->GetMass()*fW2BosonPtr->GetWidth();
 #ifdef __NODECAY__
   weight = 1.;
 #endif
@@ -829,7 +851,7 @@ Double_t WHWHBases::AmpSquared(GENBranch &cmbranch)
 // --------------------------
 Complex_t WHWHBases::FullAmplitude()
 {
-   Double_t gamw   = fWBosonPtr->GetWidth();
+   Double_t gamw   = fW1BosonPtr->GetWidth();
 
    Double_t glw    = -kGw*kSqh;
    Double_t grw    = 0.;
@@ -1016,18 +1038,33 @@ void WHWHBases::Userin()
   } // if beamstrahlung is on
 
   // --------------------------------------------
-  //  Initialize Z decay table
+  //  Initialize decay table
   // --------------------------------------------
-  if (!fWBosonPtr) fWBosonPtr = new GENPDTWBoson();
-  fWBosonPtr->DebugPrint();
+  if (!fW1BosonPtr) fW1BosonPtr = new GENPDTWBoson();
+  for (Int_t m=1; m<=fW1BosonPtr->GetEntries(); m++) {
+     GENDecayMode *mp = fW1BosonPtr->GetMode(m); 
+     if (mp && (m<fWmModesLo || m>fWmModesHi)) {
+        mp->Lock();
+     }
+  }
+  fW1BosonPtr->DebugPrint();
+  if (!fW2BosonPtr) fW2BosonPtr = new GENPDTWBoson();
+  for (Int_t m=1; m<=fW2BosonPtr->GetEntries(); m++) {
+     GENDecayMode *mp = fW2BosonPtr->GetMode(m); 
+     if (mp && (m<fWpModesLo || m>fWpModesHi)) {
+        mp->Lock();
+     }
+  }
+  fW2BosonPtr->DebugPrint();
+
   if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
   fZBosonPtr->DebugPrint();
+#if 0
   if (!fPhotonPtr) fPhotonPtr = new GENPDTPhoton();
   //fPhotonPtr->DebugPrint();
   if (!fGluonPtr)  fGluonPtr  = new GENPDTGluon();
   //fGluonPtr->DebugPrint();
-  
-  cerr << " WH +/- Boson "      << endl;
+#endif 
   if (!fXBosonPtr)  fXBosonPtr  = new WHBoson(fF);
   fXBosonPtr->DebugPrint();
   fMass   = fXBosonPtr->GetMass();
@@ -1039,7 +1076,6 @@ void WHWHBases::Userin()
        << " M_AH  = " << fMassDM << " [GeV]" << endl
        << " M_neH = " << fMassT  << " [GeV]" << endl;
 
-  cerr << " AH Boson " << endl;
   if (!fDMBosonPtr) fDMBosonPtr = new AHBoson(fMassDM);
   fDMBosonPtr->DebugPrint();
 

@@ -57,22 +57,26 @@ private:
 //-----------------------------------------------------------------------
 class GENModePicker : public TObjArray {
 public:
-   GENModePicker() : fGamma(0.), fDone(kFALSE) {}
+   GENModePicker() : fGamma(0.), fBRsum(0.), fDone(kFALSE) {}
    virtual ~GENModePicker() {}
 
    using TObjArray::Add;
    virtual void     Add          (GENDecayMode *mp);
+
            GENDecayMode *PickMode(Double_t x, 
 			          Double_t &weight,
-				  Int_t &mode);
+				  Int_t    &mode);
 
-           Double_t GetWidth  () { if(!fDone) Update(); return fGamma; }
+   const   GENDecayMode *GetMode (Int_t m) const;
+           GENDecayMode *GetMode (Int_t m);
+           Double_t      GetWidth() { if(!fDone) Update(); return fGamma; }
 
 protected:
    virtual void     Update();
 
 private:
    Double_t  fGamma;		// total width [GeV]
+   Double_t  fBRsum;		// BR sum of unlocked modes
    Bool_t    fDone;		// true if updated
 
    ClassDef(GENModePicker, 1) 	// Decay mode picker class
