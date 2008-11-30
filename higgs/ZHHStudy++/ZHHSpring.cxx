@@ -677,22 +677,21 @@ Complex_t ZHHBases::AmpEEtoZHH(const HELFermion &em,
    //---------------------------
    HELVector zs(em, ep, glze, grze, kM_z, gamz);
 
-   Double_t ee2   = kAlpha*k4Pi;
-   Double_t v     = 2.*kM_z*kSinCosW/TMath::Sqrt(ee2);
+   Double_t v     = 2.*kM_w/kGw;
    Double_t ghhh  = -TMath::Power(fMass,2)/v*3.; 
    Double_t gzzh  = kGz*kM_z;
-   Double_t gzzhh = ee2/TMath::Power(kSinCosW,2)*0.5;
+   Double_t gzzhh = kGz*kGz/2.; 
 
    HELScalar hh(h1, h2, ghhh, fMass, 0.);
-   HELVertex amp1(zs, zf, hh, gzzh);
+   HELVertex amp1(zs, zf, hh, gzzh);         // HHH self-coupling
 
-   HELVertex amp2(zs, zf, h1, h2, gzzhh);
+   HELVertex amp2(zs, zf, h1, h2, gzzhh);    // ZZHH 4-point
 
    HELVector vz1(zf, h1, gzzh, kM_z, gamz);
-   HELVertex amp3(zs, vz1, h2, gzzh);
+   HELVertex amp3(zs, vz1, h2, gzzh);        // double H-strahlung
 
    HELVector vz2(zf, h2, gzzh, kM_z, gamz);
-   HELVertex amp4(zs, vz2, h1, gzzh);
+   HELVertex amp4(zs, vz2, h1, gzzh);        // double H-strahlung
 
    Complex_t amp  = amp1 + amp2 + amp3 + amp4;
 #endif /* end __PHASESPACE__ */
