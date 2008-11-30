@@ -63,9 +63,11 @@ int anlzhh4j()
   myanl->SetPlCut(999.);	// maximum Pl
   myanl->SetCosjetCut(0.99);	
   myanl->SetMinYcut(0.004);
-  myanl->SetM2jCut( 30.);
+  myanl->SetM2jCut( 60.);
   myanl->SetMM1Cut( 50.);
   myanl->SetMM2Cut(250.);
+  myanl->SetBtagNsig(2.);
+  myanl->SetBtagNoffv(0);
 
   jsf->BeginRun(1);				// Set run number to 1.
   Int_t nok =0;

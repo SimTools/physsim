@@ -60,12 +60,12 @@ MFLAGS	=
 CURRDIR	= .
 
 ifeq ($(strip $(LCBASEDIR)),)
-SUBDIR1	= dgen_lib gen_lib Anlib
+SUBDIR1	= dgen_lib gen_lib
 else
 SUBDIR1	= dgen_lib gen_lib
 endif
 SUBDIR2	= anl_lib top/TTLib top/TTPhys/tt_thresh/lib \
-	  top/TTPhys/tt_thresh_new/lib
+	  top/TTPhys/tt_thresh_new/lib Genlib Hellib
 SUBDIRS = $(SUBDIR1) $(SUBDIR2)
 
 all:
@@ -77,7 +77,7 @@ all:
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
 	for i in $(SUBDIR2); do \
 	(cd $$i; echo ``making'' all ``in $(CURRDIR)/$$i...''; \
-	xmkmf; \
+	xmkmf -a; \
 	$(MAKE) $(MFLAGS) install); \
 	done
 	
