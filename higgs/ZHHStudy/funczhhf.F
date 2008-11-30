@@ -1,41 +1,36 @@
-C*  95/03/25  K.Fujii	REAL*4 --> REAL*8 for
+C*  08/11/30  K.Fujii	REAL*4 --> REAL*8 for
 C*			     WAT, Q*MN, Q#MX, TH*MN, TH*MX, TH*
 C*			with * = 3, 4.
 C*  			QED vtx correction ( 1+3*BTE/4 ) and
 C*                      ( 1 + 2*ALF0/PI * ( PI**2/6 - 1/4 ) )
 C*                      included.
 C*			Use INSMCN instead of CONINT.
-C*  00/06/24  K.Fujii	Modified for Bases++.
 C*
       REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)
-#include "ZHCNSF.inc"
+#include "ZHHCNSF.inc"
 #include "SMPTAB.inc"
 #include "SMCONS.inc"
 #include "BSHUFL.inc"
-      PARAMETER  ( NP = 6, NHEL = 4 )
+      PARAMETER  ( NP = 6, NHEL = 2 )
       REAL   *4   SG, PV(0:3,NP), QV(0:3,0:5)
       REAL   *8   WAT
       REAL   *8   Q2MN, Q2MX, TH2MN, TH2MX, TH2,
      .            Q3MN, Q3MX, TH3MN, TH3MX, TH3
 C--
       INTEGER*4  IHEL(NP,2*NHEL)
-      DATA ( ( IHEL(I,J),I=1,NP ), J= 1,2*NHEL )  /
+      DATA ( ( IHEL(I,J),I=1,NP-2 ), J= 1,2*NHEL )  /
 C
-C                              H        Z
-C                            _        _
-C                  e- e+     f   f    f   f
-C               ----------------------------------
-     .             -1,+1,   -1, -1,  -1, +1,
-     .             -1,+1,   -1, -1,  +1, -1,
-     .             -1,+1,   +1, +1,  -1, +1,
-     .             -1,+1,   +1, +1,  +1, -1,
-     .             +1,-1,   -1, -1,  -1, +1,
-     .             +1,-1,   -1, -1,  +1, -1,
-     .             +1,-1,   +1, +1,  -1, +1,
-     .             +1,-1,   +1, +1,  +1, -1 /
+C                              Z
+C                            _
+C                  e- e+     f   f
+C               --------------------
+     .             -1,+1,   +1, -1,
+     .             -1,+1,   -1, +1,
+     .             +1,-1,   +1, -1,
+     .             +1,-1,   -1, +1/
       DATA NCALL / 0 /
       EXTERNAL   XHFILL
 C
@@ -62,8 +57,6 @@ C--
 C--
          XZ1MN = BRVDK(IMD1MN-1,2)
          XZ1MX = BRVDK(IMD1MX  ,2)
-C         XZ2MN = BRVDK(IMD2MN-1,2)
-C         XZ2MX = BRVDK(IMD2MX  ,2)
       ENDIF
 C--
 C  Shuffle integration variables.
@@ -80,14 +73,14 @@ C      ( 4) : e+ beam spread
 C      ( 5) : bremsstrahlng
 C      ( 6) : e- helicity
 C      ( 7) : helicity combination for final states.
-C      ( 8) : m(H)**2
+C      ( 8) : m(HH)**2
 C      ( 9) : m(Z)**2
-C      (10) : cos(theta_H)
-C      (11) : phi_H
-C      (12) : cos(theta_fb)     in H rest frame
-C      (13) : phi_fb            in H rest frame
-C      (14) : cos(theta_fb)     in Z rest frame
-C      (15) : phi_fb            in Z rest frame
+C      (10) : cos(theta_HH)
+C      (11) : phi_HH
+C      (12) : cos(theta_H)     in H rest frame
+C      (13) : phi_H            in H rest frame
+C      (14) : cos(theta_fb)    in Z rest frame
+C      (15) : phi_fb           in Z rest frame
 C      (16) : final state combinations
 C--
       WAT = 1
@@ -139,27 +132,19 @@ C--
       IDPTCL(3, 2) = 1
 C--
 C  Then select final states.
-C     H --> b  + b_bar  only.
 C     Z --> all modes.
-C--
-      IDPTCL(1, 3) = 3
-      IDPTCL(2, 3) = 2
-      IDPTCL(3, 3) = 2
-      IDPTCL(1, 4) = 3
-      IDPTCL(2, 4) = 2
-      IDPTCL(3, 4) = 2
 C--
       XZ1 = XZ1MN + Z(16)*(XZ1MX-XZ1MN)
       DO 100 IMD = IMD1MN, IMD1MX
-         IF ( XZ1.LT.BRVDK(IMD,2) )              GO TO 110
+         IF ( XZ1.LE.BRVDK(IMD,2) )              GO TO 110
 100   CONTINUE
 C--
-110   IDPTCL(1, 5) = MDVDK(1,IMD,2)
-      IDPTCL(2, 5) = MDVDK(2,IMD,2)
-      IDPTCL(3, 5) = MDVDK(3,IMD,2)
-      IDPTCL(1, 6) = MDVDK(1,IMD,2)
-      IDPTCL(2, 6) = MDVDK(2,IMD,2)
-      IDPTCL(3, 6) = MDVDK(3,IMD,2)
+110   IDPTCL(1, 3) = MDVDK(1,IMD,2)
+      IDPTCL(2, 3) = MDVDK(2,IMD,2)
+      IDPTCL(3, 3) = MDVDK(3,IMD,2)
+      IDPTCL(1, 4) = MDVDK(1,IMD,2)
+      IDPTCL(2, 4) = MDVDK(2,IMD,2)
+      IDPTCL(3, 4) = MDVDK(3,IMD,2)
 C--
       BRZ1 = BRVDK(IMD,2) - BRVDK(IMD-1,2)
       IMD1 = IMD
@@ -185,39 +170,38 @@ C--
          ICMB = 2*((ICMB+1)/2)
          WAT  = WAT*NHEL/2
       ENDIF
-      CALL UVCOPY(NP,IHEL(1,ICMB),IHLCMB)
+      CALL UVCOPY(NP-2,IHEL(1,ICMB),IHLCMB)
 C--
 C  Set invariant masses squared.
 C--
       AM3   = AMF(IDPTCL(1, 3),IDPTCL(2, 3),IDPTCL(3, 3))
       AM4   = AMF(IDPTCL(1, 4),IDPTCL(2, 4),IDPTCL(3, 4))
-      AM5   = AMF(IDPTCL(1, 5),IDPTCL(2, 5),IDPTCL(3, 5))
-      AM6   = AMF(IDPTCL(1, 6),IDPTCL(2, 6),IDPTCL(3, 6))
-C-- H.
+      AM5   = AMH
+      AM6   = AMH
+C-- Z.
       Q2MN  = AM3 + AM4
       Q2MX  = RS - (AM5+AM6)
-      TH2MN = ATAN((Q2MN-AMH)*(Q2MN+AMH)/AMGH)
-      TH2MX = ATAN((Q2MX-AMH)*(Q2MX+AMH)/AMGH)
-      TH2   = TH2MN + (TH2MX-TH2MN)*Z(8)
-      Q22   = AMGH*TAN(TH2) + AMH2
+      TH2MN = ATAN((Q2MN-AMZ)*(Q2MN+AMZ)/AMGZ)
+      TH2MX = ATAN((Q2MX-AMZ)*(Q2MX+AMZ)/AMGZ)
+      TH2   = TH2MN + (TH2MX-TH2MN)*Z(9)
+      Q22   = AMGZ*TAN(TH2) + AMZ2
       Q2    = SQRT(Q22)
-      WAT   = WAT*(TH2MX-TH2MN)*( (Q22-AMH2)**2 + AMGH2 )/AMGH
-C-- Z.
+      WAT   = WAT*(TH2MX-TH2MN)*( (Q22-AMZ2)**2 + AMGZ2 )/AMGZ
+C-- HH.
       Q3MN  = AM5 + AM6
       Q3MX  = RS  - Q2
-      TH3MN = ATAN((Q3MN-AMZ)*(Q3MN+AMZ)/AMGZ)
-      TH3MX = ATAN((Q3MX-AMZ)*(Q3MX+AMZ)/AMGZ)
-      TH3   = TH3MN + (TH3MX-TH3MN)*Z(9)
-      Q32   = AMGZ*TAN(TH3) + AMZ2
+      Q32MN = Q3MN*Q3MN
+      Q32MX = Q3MX*Q3MX
+      Q32   = Q32MN + (Q32MX-Q32MN)*Z(8)
       Q3    = SQRT(Q32)
-      WAT   = WAT*(TH3MX-TH3MN)*( (Q32-AMZ2)**2 + AMGZ2 )/AMGZ
+      WAT   = WAT*(Q32MX-Q32MN)
 C>>>
 CDBG        PRINT *, ' AMZ, GMZ, Q3 = ', AMZ, GMZ, Q3
 C>>>
 C--
       XPHASE(1,1) = RS*RS
-      XPHASE(1,2) = Q22
-      XPHASE(1,3) = Q32
+      XPHASE(1,2) = Q32
+      XPHASE(1,3) = Q22
 C--
 C  Angular variables.
 C--
@@ -229,7 +213,7 @@ C--
 C--
 C  Calculate differential cross sections.
 C--
-      CALL SGZHFF(IDPTCL,IHLCMB,XPHASE,SG,PV)
+      CALL SGZHHFF(IDPTCL,IHLCMB,XPHASE,SG,PV)
       SG   = SG*QED
       FUNC = SG*WAT
       IF ( SG.LE.0. ) RETURN
@@ -253,7 +237,7 @@ C>>>
 C--
 C  Fill hists. and plots.
 C--
-      CALL PSUMxx(PV(0,5),PV(0,6),QV(0,3))
+      CALL PSUMxx(PV(0,3),PV(0,4),QV(0,3))
       CALL UVZERO(4,QV(0,0))
       QV(0,0) = ROOTS
       CALL PSUBxx(QV(0,0),QV(0,3),QV(0,4))
