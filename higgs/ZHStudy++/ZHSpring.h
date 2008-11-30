@@ -1,5 +1,5 @@
-#ifndef __ZHSPRING__
-#define __ZHSPRING__
+#ifndef ZHSPRING_H
+#define ZHSPRING_H
 //*****************************************************************************
 //* =====================
 //*  ZHSpring
@@ -37,7 +37,7 @@ public:
   //  C-tor and D-tor
   // ----------------------
   ZHBases(const char *name  = "ZHBases", 
-            const char *title = "ZH Bases");
+          const char *title = "ZH Bases");
   virtual ~ZHBases();
 
   // ----------------------
@@ -101,6 +101,8 @@ private:
   Int_t    fISR;            // ISR on?
   Int_t    fBeamStr;        // Beamstrahlung on?
   Double_t fPole;           // electron polarization
+  Int_t    fZModesLo;       // Z decay mode lo;
+  Int_t    fZModesHi;       // Z decay mode hi;
 
   // ----------------
   //  Particle Data

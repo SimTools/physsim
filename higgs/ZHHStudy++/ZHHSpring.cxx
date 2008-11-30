@@ -189,6 +189,8 @@ ZHHBases::ZHHBases(const char *name, const char *title)
            fISR       ( 1),
            fBeamStr   ( 1),
            fPole      (0.),
+           fZModesLo  ( 1),
+           fZModesHi  (12),
            fZBosonPtr ( 0),
            fZBoost    (0.),
            fEcmIP     (fEcmInit),
@@ -264,6 +266,14 @@ ZHHBases::ZHHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHHBases.Pole","0."));         // electron polarization
   ins >> fPole;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHHBases.ZModesLo","1"));      // Z decay mode lo
+  ins >> fZModesLo;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHHBases.ZModesHi","12"));     // Z decay mode hi
+  ins >> fZModesHi;
 
   // --------------------------------------------
   //  Registor random numbers
@@ -741,8 +751,14 @@ void ZHHBases::Userin()
   // --------------------------------------------
   //  Initialize Z decay table
   // --------------------------------------------
-   if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
-   fZBosonPtr->DebugPrint();
+  if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
+  for (Int_t m=1; m<=fZBosonPtr->GetEntries(); m++) {
+     GENDecayMode *mp = fZBosonPtr->GetMode(m); 
+     if (mp && (m<fZModesLo || m>fZModesHi)) {
+        mp->Lock();
+     }
+  }
+  fZBosonPtr->DebugPrint();
 
   // --------------------------------------------
   //  Define some plots
