@@ -1,4 +1,21 @@
 -------------------------------------------------------------------------------
+2008/11/30	K.Fujii		Physsim-2008a-1
+-------------------------------------------------------------------------------
+1) New Processes
+   dh/ETCETCStudy	: e+e- -> eta+ eta- followd by eta+/- -> W+/- eta_i
+   dh/ETRETIStudy	: e+e- -> eta_r eta_i followed by eta_r -> Z eta_i
+   higgs/ZHStudy++	: e+e- -> ZH (C++ version)
+   higgs/ZHHStudy++	: e+e- -> ZHH (C++ version)
+   lht/WHWHStudy	: e+e- -> WH WH (Little Higgs with T-parity)
+   lht/ZHAHStudy	: e+e- -> ZH AH (LHT)
+   xd/KKHHStudy		: e+e0 -> HH (KK)
+   xd/RSAXStudy		: e+e0 -> gamma X (hidden scalar)
+   xd/RSZXStudy		: e+e0 -> Z X (hidden scalar)
+2) New libraries
+   Genlib	: C++ version of genertor parts such as kinematics, etc.
+   Hellib	: C++ version of helas (still many missing parts)
+	
+-------------------------------------------------------------------------------
 2005/03/26	K.Fujii		Physsim-2005a-2
 -------------------------------------------------------------------------------
 1) Fixed bugs (mostly typos in comments and a problem with sfermion masses
