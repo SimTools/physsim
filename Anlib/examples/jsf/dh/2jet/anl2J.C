@@ -56,7 +56,7 @@ int anl2J()
   myanl->SetElCut(25.); 
 #else
   myanl->SetElCut(999.); // allow lepton pairs
-#enidf
+#endif
   myanl->SetCosjetCut(0.95);
   myanl->SetCoszCut(0.95);
   myanl->SetMinYcut(0.01);
