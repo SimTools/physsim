@@ -196,6 +196,8 @@ ETRETIBases::ETRETIBases(const char *name, const char *title)
            fISR       ( 1),
            fBeamStr   ( 1),
            fPole      (0.),
+           fZModesLo  ( 1),
+           fZModesHi  (12),
            fXBosonPtr ( 0),
            fDMBosonPtr( 0),
            fWBosonPtr ( 0),
@@ -280,6 +282,14 @@ ETRETIBases::ETRETIBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ETRETIBases.Pole","0."));         // electron polarization
   ins >> fPole;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ETRETIBases.ZModesLo","1"));      // Z decay mode lo
+  ins >> fZModesLo;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ETRETIBases.ZModesHi","12"));     // Z decay mode hi
+  ins >> fZModesHi;
 
   // --------------------------------------------
   //  Registor random numbers
@@ -804,17 +814,20 @@ void ETRETIBases::Userin()
   if (!fWBosonPtr) fWBosonPtr = new GENPDTWBoson();
   fWBosonPtr->DebugPrint();
   if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
+  for (Int_t m=1; m<=fZBosonPtr->GetEntries(); m++) {
+     GENDecayMode *mp = fZBosonPtr->GetMode(m); 
+     if (mp && (m<fZModesLo || m>fZModesHi)) {
+        mp->Lock();
+     }
+  }
   fZBosonPtr->DebugPrint();
   if (!fPhotonPtr) fPhotonPtr = new GENPDTPhoton();
   //fPhotonPtr->DebugPrint();
   if (!fGluonPtr)  fGluonPtr  = new GENPDTGluon();
   //fGluonPtr->DebugPrint();
 
-  cerr << " Eta_R Boson " << endl;
   if (!fXBosonPtr)  fXBosonPtr  = new ETRBoson(fMass,fMassDM);
   fXBosonPtr->DebugPrint();
-
-  cerr << " Eta_I Boson " << endl;
   if (!fDMBosonPtr) fDMBosonPtr = new ETIBoson(fMassDM);
   fDMBosonPtr->DebugPrint();
 
