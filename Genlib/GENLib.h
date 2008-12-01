@@ -35,10 +35,10 @@ public:
    GENDecayMode(Double_t gm = 0.) : fGamma(gm), fBR(0.), fCumBR(0.) {}
    virtual ~GENDecayMode() {}
 
-   Double_t GetGamma()             { return fGamma; }
-   Double_t GetBR   ()             { return fBR;    }
-   void     SetGamma(Double_t gm ) { fGamma = gm;   }
-   void     SetBR   (Double_t br ) { fBR    = br;   }
+   inline  Double_t GetGamma()             { return fGamma; }
+   inline  Double_t GetBR   ()             { return fBR;    }
+   inline  void     SetGamma(Double_t gm ) { fGamma = gm;   }
+   inline  void     SetBR   (Double_t br ) { fBR    = br;   }
 
    void     DebugPrint(const Option_t *opt ="");
 
@@ -100,13 +100,13 @@ public:
                      Double_t    color = 1.);
    virtual ~GENPDTEntry();
 
-   TString & GetName  () { return fName;    }
-   Int_t     GetPID   () { return fPID;     }
-   Double_t  GetCharge() { return fCharge;  }
-   Double_t  GetMass  () { return fMass;    }
-   Int_t     GetGenNo () { return fGen;     }
-   Double_t  GetISpin () { return fIsoSpin; }
-   Double_t  GetColor () { return fColor;   }
+   inline  TString & GetName  () { return fName;    }
+   inline  Int_t     GetPID   () { return fPID;     }
+   inline  Double_t  GetCharge() { return fCharge;  }
+   inline  Double_t  GetMass  () { return fMass;    }
+   inline  Int_t     GetGenNo () { return fGen;     }
+   inline  Double_t  GetISpin () { return fIsoSpin; }
+   inline  Double_t  GetColor () { return fColor;   }
 
    Double_t  GetQ2BW  (Double_t    qmin,   // Q_min
                        Double_t    qmax,   // Q_max
@@ -227,18 +227,18 @@ public:
 
    virtual ~GENBranch() {}
 
-   inline Double_t GetQ2      ()            { return fQ2;       }
-   inline Double_t GetCosTheta()            { return fCosTheta; }
-   inline Double_t GetPhi     ()            { return fPhi;      }
-   inline Double_t GetM12     ()            { return fM12;      }
-   inline Double_t GetM22     ()            { return fM22;      }
-   inline Double_t GetBetaBar ()            { return fBetaBar;  }
+   inline  Double_t GetQ2      ()            { return fQ2;       }
+   inline  Double_t GetCosTheta()            { return fCosTheta; }
+   inline  Double_t GetPhi     ()            { return fPhi;      }
+   inline  Double_t GetM12     ()            { return fM12;      }
+   inline  Double_t GetM22     ()            { return fM22;      }
+   inline  Double_t GetBetaBar ()            { return fBetaBar;  }
 
-   inline void     SetQ2      (Double_t q2) { fQ2       = q2;   }
-   inline void     SetCosTheta(Double_t cs) { fCosTheta = cs;   }
-   inline void     SetPhi     (Double_t fi) { fPhi      = fi;   }
+   inline  void     SetQ2      (Double_t q2) { fQ2       = q2;   }
+   inline  void     SetCosTheta(Double_t cs) { fCosTheta = cs;   }
+   inline  void     SetPhi     (Double_t fi) { fPhi      = fi;   }
 
-   inline GENBranch * GetBranchPtr(Int_t i) { return i ? fBR2Ptr
+   inline  GENBranch * GetBranchPtr(Int_t i) { return i ? fBR2Ptr
                                                        : fBR1Ptr; }
 
 private:
