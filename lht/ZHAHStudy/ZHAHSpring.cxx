@@ -17,7 +17,7 @@
 
 #include <sstream>
 #include <iomanip>
-//#define __NODECAY__
+#define __NODECAY__
 //#define __DEBUG__
 //#define __ZEROWIDTH__
 //#define __PAHSESPACE__
@@ -727,7 +727,7 @@ void ZHAHBases::Userin()
   fMassDM = fXBosonPtr->GetMassDM();
 
   fMassT  = TMath::Sqrt(2.)*fKappaL*fF;
-  cerr << " M_WH = " << fMass   << " [GeV]" << endl
+  cerr << " M_ZH = " << fMass   << " [GeV]" << endl
        << " M_AH = " << fMassDM << " [GeV]" << endl
        << " M_eH = " << fMassT  << " [GeV]" << endl;
 
