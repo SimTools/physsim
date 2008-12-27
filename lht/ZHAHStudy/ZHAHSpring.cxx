@@ -17,7 +17,7 @@
 
 #include <sstream>
 #include <iomanip>
-#define __NODECAY__
+//#define __NODECAY__
 //#define __DEBUG__
 //#define __ZEROWIDTH__
 //#define __PAHSESPACE__
@@ -632,6 +632,14 @@ Complex_t ZHAHBases::AmpEEtoXD(const HELFermion &em,
    Double_t  grehzh = 0.;
    Double_t  glehah = kGw*(Sh+Ch*kSinW/(5.*kCosW))/2.;
    Double_t  grehah = 0.;
+#if 0
+   static Int_t ncall = 0;
+   if (!ncall) {
+      ncall = 1;
+      cerr << " gehzh = " << glehzh << endl;
+      cerr << " gehah = " << glehah << endl;
+   }
+#endif
 
    //--------------------------------------------------
    // Calculate Amplitudes
