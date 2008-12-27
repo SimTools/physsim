@@ -227,7 +227,7 @@ ZHAHBases::ZHAHBases(const char *name, const char *title)
   ins >> fXL[1] >> fXU[1];
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("ZHAHBases.CosthZRange","-1.0 1.0"));
+  ins.str(gJSF->Env()->GetValue("ZHAHBases.CosthHRange","-1.0 1.0"));
   ins >> fXL[2] >> fXU[2];
 
   ins.clear();
