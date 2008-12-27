@@ -234,11 +234,11 @@ ZHAHBases::ZHAHBases(const char *name, const char *title)
   ins.str(gJSF->Env()->GetValue("ZHAHBases.PhiHOverPiRange","0.0 2.0"));
   ins >> fXL[3] >> fXU[3];
 
-  ins.str(gJSF->Env()->GetValue("WHWHBases.F","580.")); 	 // F [GeV]
+  ins.str(gJSF->Env()->GetValue("ZHAHBases.F","580.")); 	 // F [GeV]
   ins >> fF;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("WHWHBases.KappaL","0.5")); 	 // kappa_l
+  ins.str(gJSF->Env()->GetValue("ZHAHBases.KappaL","0.5")); 	 // kappa_l
   ins >> fKappaL;
 
   ins.clear();
