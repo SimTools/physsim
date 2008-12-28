@@ -163,19 +163,21 @@ Bool_t ETRETISpringBuf::SetPartons()
   Int_t    idz     = 23;                           // PDG code for Z
   Int_t    idd     = bases->f1Ptr->GetPID();       // PDG code for Z daughter
   Double_t md      = bases->f1Ptr->GetMass();      // Z daughter mass
+  Int_t    hel1    = bases->fHelFinal[1];          // 1st daughter helicity
+  Int_t    hel2    = bases->fHelFinal[2];          // 2nd daughter helicity
   Double_t color   = bases->f1Ptr->GetColor();     // color factor
   Double_t chg     = bases->f1Ptr->GetCharge();    // Z daughter charge
   Int_t    islev   = color > 1. ? 101 : 0;         // shower level
   Int_t    icf     = 1;                            // color flux id
   Double_t rq2z    = pv[3].Mag();
 
-  //                               No. PID   Mass Charge   pv   Nd 1st Mom hel col shower
-  new (partons[0]) JSFSpringParton( 1, idx , mass,    0., *qp[0], 2, 3,  0, 0,   0,     0);
-  new (partons[1]) JSFSpringParton( 2, iddm, msdm,    0., *qp[1], 0, 0,  0, 0,   0,     0);
-  new (partons[2]) JSFSpringParton( 3, iddm, msdm,    0., *qp[2], 0, 0,  1, 0,   0,     0);
-  new (partons[3]) JSFSpringParton( 4, idz , rq2z,    0., *qp[3], 2, 5,  1, 0,   0,     0);
-  new (partons[4]) JSFSpringParton( 5, idd , md  ,   chg, *qp[4], 0, 0,  4, 0, icf, islev);
-  new (partons[5]) JSFSpringParton( 6,-idd , md  ,   chg, *qp[5], 0, 0,  4, 0, icf, islev);
+  //                               No. PID   Mass Charge   pv   Nd 1st Mom   hel col shower
+  new (partons[0]) JSFSpringParton( 1, idx , mass,    0., *qp[0], 2, 3,  0,   0,   0,     0);
+  new (partons[1]) JSFSpringParton( 2, iddm, msdm,    0., *qp[1], 0, 0,  0,   0,   0,     0);
+  new (partons[2]) JSFSpringParton( 3, iddm, msdm,    0., *qp[2], 0, 0,  1,   0,   0,     0);
+  new (partons[3]) JSFSpringParton( 4, idz , rq2z,    0., *qp[3], 2, 5,  1,   0,   0,     0);
+  new (partons[4]) JSFSpringParton( 5, idd , md  ,   chg, *qp[4], 0, 0,  4,hel1, icf, islev);
+  new (partons[5]) JSFSpringParton( 6,-idd , md  ,  -chg, *qp[5], 0, 0,  4,hel2, icf, islev);
 
   return kTRUE ;
 }
