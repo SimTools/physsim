@@ -559,7 +559,7 @@ Bool_t ETCETC4JAnalysis::Process(Int_t ev)
        << w1j1p->GetTag() << ","
        << w1j2p->GetTag() << ";"
        << w2j1p->GetTag() << ","
-       << w2j2p->GetTag() << ";"
+       << w2j2p->GetTag() << ")"
        << endl;
 #endif
 #endif
