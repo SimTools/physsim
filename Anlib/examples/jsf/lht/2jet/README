@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+2008/12/30  K.Fujii 	Sample Analysis Module Using Anlib
+-------------------------------------------------------------------------------
+Reaction: 	e+e- -> ZH AH -> h + missing(2 AH's)
+Generator:	ZHAHStudy
+Usage:		
+
+$ xmkmf -a; make
+$ jsf anl2J.C
+or to avoid a lot of debug messages
+$ jsf anl2J.C 2>/dev/null
+
+You have to prepare MC data(xcxcsim.root) in ZHAHStudy/prod directory
+before you do the above.

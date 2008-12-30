@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+2008/11/18  K.Fujii 	Sample Analysis Module Using Anlib
+-------------------------------------------------------------------------------
+Reaction: 	e+e- -> eta+eta- -> w+w- + missing(2 eta_I's)
+Generator:	WHWHStudy
+Usage:		
+
+$ xmkmf -a; make
+$ jsf anl4J.C
+or to avoid a lot of debug messages
+$ jsf anl4J.C 2>/dev/null
+
+You have to prepare MC data(xcxcsim.root) in WHWHStudy/prod directory
+before you do the above.
