@@ -19,7 +19,7 @@
 //*
 //*************************************************************************
 
-#define __CHEAT__
+//#define __CHEAT__
 
 #include "WHWH4JAnalysis.h"
 #include "WHWHSpring.h"
