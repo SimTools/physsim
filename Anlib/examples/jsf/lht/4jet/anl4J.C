@@ -5,10 +5,6 @@
 //#define BG_ANL "WW"
 Int_t freq   = 10;
 
-int anl2J()
-{  
-Int_t freq   = 10;
-
 int anl4J()
 {  
   TFile *file;
