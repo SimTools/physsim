@@ -77,6 +77,7 @@ int anl4J()
   simdst->NoReadWrite();			// instead of QuickSim data.
   
   WHWH4JAnalysis *myanl = new WHWH4JAnalysis("WHWH4JAnalysis","My Analysis");
+  myanl->SetEcm(1000.); // Ecm set by hand
 
   jsf->Initialize();             		// JSF Module initialization.
 
@@ -87,7 +88,6 @@ int anl4J()
 
   // Adjust Cut //
 
-  myanl->SetEcm(1000.); // Ecm set by hand
   myanl->SetEvisLoCut(20.);
   myanl->SetEvisHiCut(900.);
   myanl->SetPtCut(0.);
