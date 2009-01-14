@@ -158,7 +158,7 @@ Bool_t ZHHSpringBuf::SetPartons()
   Double_t color   = bases->f3Ptr->GetColor();    // color factor
   Int_t    islev   = color > 1. ? 201 : 0;  	  // shower level
   Int_t    icf     = 2;                           // color flux id
-  Double_t rq2z    = pv[1].Mag();
+  Double_t rq2z    = pv[2].Mag();
   Int_t    hel1    = bases->fHelFinal[2];
   Int_t    hel2    = bases->fHelFinal[3];
 
