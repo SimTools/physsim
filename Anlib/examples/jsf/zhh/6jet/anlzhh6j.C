@@ -72,8 +72,8 @@ int anlzhh6j()
   myanl->SetBTtagNsig (3.0); // tight b-tag used to veto any b in W
   myanl->SetBTtagNoffv(99);   // 
 #else
-  myanl->SetBtagNsig  (2.5); // loose b-tag used to tag b's
-  myanl->SetBtagNoffv (0);   //
+  myanl->SetBtagNsig  (2.0); // loose b-tag used to tag b's
+  myanl->SetBtagNoffv (1);   //
   myanl->SetBTtagNsig (90.0); // tight b-tag used to veto any b in W
   myanl->SetBTtagNoffv(99);   // 
 #endif

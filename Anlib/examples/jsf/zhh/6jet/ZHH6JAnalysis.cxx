@@ -19,7 +19,7 @@
 //*
 //*************************************************************************
 
-#define __CHEAT__
+//#define __CHEAT__
 
 #include "ZHH6JAnalysis.h"
 #include "ZHHSpring.h"
@@ -347,6 +347,9 @@ Bool_t ZHH6JAnalysis::Process(Int_t ev)
     ANLTaggedJet *j2p = dynamic_cast<ANLTaggedJet *>(h1[1]);
     if (!((j1p->GetTag() == -1 && j2p->GetTag() == -1) ||
           (j1p->GetTag() == -2 && j2p->GetTag() == -2))) continue;
+#else
+    ANLJet *j1p = dynamic_cast<ANLJet *>(h1[0]);
+    ANLJet *j2p = dynamic_cast<ANLJet *>(h1[1]);
 #endif
     if (!btag(*static_cast<ANLJet *>(j1p)) || 
         !btag(*static_cast<ANLJet *>(j2p))) continue;   // double b-tag for b's from t's
@@ -361,6 +364,9 @@ Bool_t ZHH6JAnalysis::Process(Int_t ev)
       j2p = dynamic_cast<ANLTaggedJet *>(h2[1]);
       if (!((j1p->GetTag() == -1 && j2p->GetTag() == -1) ||
             (j1p->GetTag() == -2 && j2p->GetTag() == -2))) continue;
+#else
+      j1p = dynamic_cast<ANLJet *>(h2[0]);
+      j2p = dynamic_cast<ANLJet *>(h2[1]);
 #endif
       if (!btag(*static_cast<ANLJet *>(j1p)) || 
           !btag(*static_cast<ANLJet *>(j2p))) continue;   // double b-tag for b's from t's

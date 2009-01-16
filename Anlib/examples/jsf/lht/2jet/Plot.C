@@ -34,7 +34,7 @@ TH1D *hEh        = new TH1D("hEh"      , "", 150,    0.,  300.);
 TH1D *hPh        = new TH1D("hPh"      , "", 150,    0.,  300.);
 TH1D *hMM        = new TH1D("hMM"      , "", 250,    0.,  500.);
 
-void Plot(Char_t *filen = "jsf.root")
+void Plot(Char_t *filen = "jsf.zhah.root")
 {
   //gROOT->Reset();
   gSystem->Load("libS4Utils.so");

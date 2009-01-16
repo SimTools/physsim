@@ -1,4 +1,4 @@
-//#define BG_ANL "NNH"
+#define BG_ANL "NNH"
 //#define BG_ANL "ZH"
 //#define BG_ANL "ZZ"
 //#define BG_ANL "NNZ"
@@ -91,15 +91,27 @@ int anl2J()
 
   // Adjust Cut //
 
+#if 0
   myanl->SetNtrackCut(25.);
   myanl->SetEvisLoCut(20.);
   myanl->SetEvisHiCut(400.);
-  myanl->SetPtCut(0.);
+  myanl->SetPtCut(80.);
   myanl->SetPlCut(9999.);
   myanl->SetElCut(20.); 
   myanl->SetCosjetCut(0.999);
   myanl->SetCoshCut(0.8);
   myanl->SetMinYcut(0.01);
+#else
+  myanl->SetNtrackCut(5.);
+  myanl->SetEvisLoCut(0.);
+  myanl->SetEvisHiCut(500.);
+  myanl->SetPtCut(0.);
+  myanl->SetPlCut(99999.);
+  myanl->SetElCut(99999.); 
+  myanl->SetCosjetCut(1.0);
+  myanl->SetCoshCut(1.0);
+  myanl->SetMinYcut(0.01);
+#endif
   myanl->SetM2jLoCut(100.);
   myanl->SetM2jHiCut(140.);
 #if 0

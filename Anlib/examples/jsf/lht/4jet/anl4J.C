@@ -2,7 +2,7 @@
 //#define BG_ANL "NNWW"
 //#define BG_ANL "EEWW"
 //#define BG_ANL "WWZ"
-//#define BG_ANL "WW"
+#define BG_ANL "WW"
 Int_t freq   = 10;
 
 int anl4J()
