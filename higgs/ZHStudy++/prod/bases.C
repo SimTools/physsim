@@ -19,6 +19,5 @@ Int_t bases()
   printf(" Scalls is %d\n",bs->GetScalls());
   bs->Userout();
   bs->Write();
-  //file->Write(); 
+  file->Write(); 
 }
-

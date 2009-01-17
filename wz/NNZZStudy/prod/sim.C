@@ -27,10 +27,6 @@
     jsf->FillTree();
     jsf->Clear();
   }
-
   jsf->Terminate();
-  //file->Write();
-
+  file->Write();
 }
-
-

@@ -18,6 +18,4 @@
 
   bases->Write();
   file->Write();
-
 }
-

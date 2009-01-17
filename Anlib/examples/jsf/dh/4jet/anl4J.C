@@ -65,6 +65,6 @@ int anl4J()
   }
   jsf->Terminate();				// Terminate analysis.
 
-  //file->Write();
+  file->Write();
   return 0;
 }

@@ -17,8 +17,4 @@
   bases->Write();
 
   file->Write();
-
 }
-
-
-
