@@ -21,11 +21,21 @@
   jsf->Initialize();
 
   jsf->BeginRun(30);      // Set run number to 30.
-  for(Int_t ev=1;ev<=maxevt;ev++){
-    printf(" start event %d\n",ev);
-    if( !jsf->Process(ev) ) break;
-    jsf->FillTree();
-    jsf->Clear();
+
+  Int_t ev = 1;
+  while (1) {
+    printf(" start event %d ",ev);
+
+    if(jsf->Process(ev)) {
+      printf("Processed event %d ",ev);
+
+      jsf->FillTree();
+      jsf->Clear();
+
+      printf(" End event %d \n",ev);
+      if (ev >= maxevt) break;
+      ev++;
+    }
   }
   jsf->Terminate();
   file->Write();
