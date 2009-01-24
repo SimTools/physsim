@@ -234,6 +234,7 @@ ZHAHBases::ZHAHBases(const char *name, const char *title)
   ins.str(gJSF->Env()->GetValue("ZHAHBases.PhiHOverPiRange","0.0 2.0"));
   ins >> fXL[3] >> fXU[3];
 
+  ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHAHBases.F","580.")); 	 // F [GeV]
   ins >> fF;
 

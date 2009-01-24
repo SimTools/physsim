@@ -253,6 +253,7 @@ ZHZHBases::ZHZHBases(const char *name, const char *title)
   ins.str(gJSF->Env()->GetValue("ZHZHBases.PhiH2OverPiRange","0.0 2.0"));
   ins >> fXL[5] >> fXU[5];
 
+  ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHZHBases.F","580.")); 	 // F [GeV]
   ins >> fF;
 
