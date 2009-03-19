@@ -230,6 +230,7 @@ ETCETCBases::ETCETCBases(const char *name, const char *title)
            fEcmInit   ( 500.),
            fISR       ( 1),
            fBeamStr   ( 1),
+           fBeamWidth (0.002),
            fPole      (0.),
            fWmModesLo ( 1),
            fWmModesHi (12),
@@ -339,6 +340,10 @@ ETCETCBases::ETCETCBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ETCETCBases.Beamstrahlung","1")); // BmStr (on)
   ins >> fBeamStr;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ETCETCBases.BeamWidth","0.002")); // Beam width
+  ins >> fBeamWidth;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ETCETCBases.Bremsstrahlung","1"));// ISR (on)
@@ -996,13 +1001,13 @@ void ETCETCBases::Userin()
   //  Initialize beam generator
   // --------------------------------------------
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
+    fBM->SetIBParameters(fBeamWidth);
 
     fBM->MakeBSMap();
     fBM->Print(); 
 
     cout << " Nominal Energy (beamstrahlung) = " << fBM->GetNominalEnergy() 
-         << " beam width     (beamstrahlung) ="  << fBM->GetIBWidth() 
+         << " beam width     (beamstrahlung) = " << fBM->GetIBWidth() 
          << endl;
 
     if (!(fBM->GetNominalEnergy() == (fEcmInit/2))) {

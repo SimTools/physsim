@@ -51,11 +51,12 @@ public:
   Double_t GetZBoost   ()           const { return fZBoost;    }
   Double_t GetEcmIP    ()           const { return fEcmIP;     }
 
-  void     SetPID      (Int_t    id     ) { fPID     = id;     }
-  void     SetEcmInit  (Double_t ecm    ) { fEcmInit = ecm;    }
-  void     SetISR      (Bool_t b = kTRUE) { fISR     = b;      }
-  void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr = b;      }
-  void     SetPole     (Double_t p      ) { fPole    = p;      }
+  void     SetPID      (Int_t    id     ) { fPID       = id;   }
+  void     SetEcmInit  (Double_t ecm    ) { fEcmInit   = ecm;  }
+  void     SetISR      (Bool_t b = kTRUE) { fISR       = b;    }
+  void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr   = b;    }
+  void     SetBeamWidth(Double_t w      ) { fBeamWidth = w;    }
+  void     SetPole     (Double_t p      ) { fPole      = p;    }
 
   // ----------------------
   //   Base class methods
@@ -90,6 +91,7 @@ private:
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?
   Int_t    fBeamStr;        // Beamstrahlung on?
+  Double_t fBeamWidth;      // Beam width relative to Ebm(nominal)
   Double_t fPole;           // electron polarization
 
   // ----------------

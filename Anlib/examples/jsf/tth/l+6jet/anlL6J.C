@@ -12,7 +12,7 @@
 //* $Id$
 //*************************************************************************
 
-Int_t maxevt = 99999;
+Int_t maxevt = 99999999;
 //Int_t maxevt = 1000;
 Int_t freq   = 10;
 
@@ -81,8 +81,8 @@ int anlL6J()
   myanl->SetBTtagNsig (10.0); // tight b-tag used to veto any b in W
   myanl->SetBTtagNoffv(3);   // 
 #else
-  myanl->SetBtagNsig  (3.0); // loose b-tag used to tag b's
-  myanl->SetBtagNoffv (2);   //
+  myanl->SetBtagNsig  (2.0); // loose b-tag used to tag b's
+  myanl->SetBtagNoffv (1);   //
   myanl->SetBTtagNsig (100.); // tight b-tag used to veto any b in W
   myanl->SetBTtagNoffv(3);   // 
 #endif

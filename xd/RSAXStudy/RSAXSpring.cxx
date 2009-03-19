@@ -207,6 +207,7 @@ RSAXBases::RSAXBases(const char *name, const char *title)
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
+           fBeamWidth (0.002),
            fPole      (0.),
            fXBosonPtr ( 0),
            fWBosonPtr ( 0),
@@ -286,6 +287,10 @@ RSAXBases::RSAXBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("RSAXBases.Beamstrahlung","1")); // BmStr (on)
   ins >> fBeamStr;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("RSAXBases.BeamWidth","0.002")); // Beam energy spread
+  ins >> fBeamWidth;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("RSAXBases.Bremsstrahlung","1"));// ISR (on)
@@ -683,7 +688,7 @@ void RSAXBases::Userin()
   // --------------------------------------------
 
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
+    fBM->SetIBParameters(fBeamWidth);
 
     fBM->MakeBSMap();
     fBM->Print(); 

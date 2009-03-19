@@ -146,6 +146,7 @@ FFBases::FFBases(const char *name, const char *title)
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
+           fBeamWidth (0.002),
            fPole      (0.),
            fFPtr      (0),
            fZBosonPtr ( 0),
@@ -185,6 +186,10 @@ FFBases::FFBases(const char *name, const char *title)
   ins >> fBeamStr;
 
   ins.clear();
+  ins.str(gJSF->Env()->GetValue("FFBases.BeamWidth","0.002")); // Beam spread
+  ins >> fBeamWidth;
+
+  ins.clear();
   ins.str(gJSF->Env()->GetValue("FFBases.Bremsstrahlung","1"));// ISR (on)
   ins >> fISR;
 
@@ -219,7 +224,7 @@ FFBases::FFBases(const char *name, const char *title)
   // --------------------------------------------
 
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
+    fBM->SetIBParameters(fBeamWidth);
 
     fBM->MakeBSMap();
     fBM->Print(); 

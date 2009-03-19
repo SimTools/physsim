@@ -24,6 +24,13 @@
 #ifdef __PHASESPACE__
 #define __NODECAY__
 #endif
+//#define TEMP_H
+#ifdef TEMP_H
+static TH1F *hMh       = 0;
+static TH1F *hRSH      = 0;
+static TH1F *hEsum     = 0;
+static TH1F *hBSweight = 0;
+#endif
 
 //*----------------------------------------------------------------------
 //*     Numerical and Natural Constants
@@ -275,6 +282,7 @@ ZHBases::ZHBases(const char *name, const char *title)
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
+           fBeamWidth (0.002),
            fPole      (0.),
            fZModesLo  ( 1),
            fZModesHi  (12),
@@ -343,6 +351,10 @@ ZHBases::ZHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHBases.Beamstrahlung","1")); // BmStr (on)
   ins >> fBeamStr;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHBases.BeamWidth","0.002")); // Beam energy spread
+  ins >> fBeamWidth;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHBases.Bremsstrahlung","1"));// ISR (on)
@@ -531,6 +543,19 @@ Double_t ZHBases::Func()
   //  Fill plots
   // --------------------------------------------
 
+#ifdef TEMP_H
+  Double_t elab = TMath::Sqrt(fEcmIP*fEcmIP + fZBoost*fZBoost);
+  TVector3 boostv(0.,0.,fZBoost/elab);
+  ANL4DVector qz  = fP[1] + fP[2];
+  qz.Boost(boostv);
+  ANL4DVector qcm(fEcmInit,0.,0.,0.);
+  ANL4DVector qmm = qcm - qz;
+
+  hMh  ->Fill(qmm.Mag()   , (bsWeight*sigma));
+  hRSH ->Fill(fEcmIP      , (bsWeight*sigma));
+  hEsum->Fill(eplus+eminus, (bsWeight*sigma));
+  hBSweight->Fill(eplus+eminus, (bsWeight));
+#endif
   Xh_fill( 1, fEcmIP           , (bsWeight*sigma));
   Xh_fill( 2, fCosTheta        , (bsWeight*sigma));
   Xh_fill( 3, fPhi             , (bsWeight*sigma));
@@ -763,7 +788,7 @@ void ZHBases::Userin()
   // --------------------------------------------
 
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
+    fBM->SetIBParameters(fBeamWidth);
 
     fBM->MakeBSMap();
     fBM->Print(); 
@@ -803,6 +828,12 @@ void ZHBases::Userin()
   Xh_init( 7,     0.,     2.,        2, "Helin ");
   Xh_init( 8,     0.,     2.,        2, "Helot ");
   Xh_init( 9,     0.,    12.,       12, "Z mode");
+#ifdef TEMP_H
+  if (!hMh)   hMh   = new TH1F("hMh"  ,"", 200,115.,135.);
+  if (!hRSH)  hRSH  = new TH1F("hRSH" ,"",1100,  0.,fEcmInit*1.1);
+  if (!hEsum) hEsum = new TH1F("hEsum","",1100,  0.,fEcmInit*1.1);
+  if (!hBSweight) hBSweight = new TH1F("hBSweight","",1100,0,fEcmInit*1.1);
+#endif
 }
 
 //_____________________________________________________________________________
@@ -818,6 +849,12 @@ void ZHBases::Userout()
        << "Total Cross section  = " << GetEstimate()  << " +/- "
                                     << GetError()     << " [fb]"  << endl
        << "Number of iterations = " << GetNoOfIterate()           << endl;
+#ifdef TEMP_H
+  hMh  ->Write();
+  hRSH ->Write();
+  hEsum->Write();
+  hBSweight->Write();
+#endif
 }
 
 //_____________________________________________________________________________

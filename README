@@ -1,14 +1,15 @@
 ------------------------------------------------------------------------
-   Physics study libraries				2001/05/25
+   Physics study libraries				2008/11/30
 ------------------------------------------------------------------------
  
 [1] Version Information
 
-   Version: 2005a
-   Release: 2
+   Version: 2008a
+   Release: 1
 
 [2] Version History
 
+    2008/11/30  K.Fujii		2008a-1
     2005/03/26  K.Fujii		2005a-2
     2005/03/02  K.Fujii		2005a-1
     2004/11/23  K.Fujii		2004a-1
@@ -53,11 +54,14 @@
 
    Step [3] will create libraries necessary to build various MC
    event generators based on BASES/SPRING stored in
-	higgs	: zh, ...
+	dh	: etcetc, etreti, ...
+	higgs	: zh, zhh, nnh, ...
+	lht	: whwh, zhah, zhzh, ...
 	susy	: sfsf, xcxc, xn1xn2, xn2xn2, ...
 	top	: eett, nntt, tth, tt, ttz, ...
 	twoph	: eeff (f=e,mu,tau,q)
 	wz	: eeww, eezz, eez, enw, nnww, nnzz, nnz, ww, wwz, zz, ...
+	xd	: kkhh, ax, zx
    These subdirectories contain subsubdirectories named
    <PROCESSNAME>Study. The top levelMakefile does NOT build 
    individual Monte Carlo event generators: it only creates

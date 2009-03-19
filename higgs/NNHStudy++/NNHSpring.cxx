@@ -185,6 +185,7 @@ NNHBases::NNHBases(const char *name, const char *title)
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
+           fBeamWidth (0.002),
            fPole      (0.),
            fWBosonPtr ( 0),
            fZBoost    (0.),
@@ -220,6 +221,10 @@ NNHBases::NNHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("NNHBases.Beamstrahlung","1")); // BmStr (on)
   ins >> fBeamStr;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NNHBases.BeamWidth","0.002")); // BmStr (on)
+  ins >> fBeamWidth;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("NNHBases.Bremsstrahlung","1"));// ISR (on)
@@ -621,7 +626,7 @@ void NNHBases::Userin()
   // --------------------------------------------
 
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
+    fBM->SetIBParameters(fBeamWidth);
 
     fBM->MakeBSMap();
     fBM->Print(); 

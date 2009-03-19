@@ -110,6 +110,7 @@ private:
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?
   Int_t    fBeamStr;        // Beamstrahlung on?
+  Double_t fBeamWidth;      // Beam Spread relative to nominal Ebm
   Double_t fPole;           // electron polarization
   Int_t    fWmModesLo;      // W- decay mode lo;
   Int_t    fWmModesHi;      // W- decay mode hi;

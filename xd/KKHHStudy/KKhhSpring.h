@@ -68,10 +68,11 @@ public:
   void     SetID     (Int_t id)         { fID      = id;   }
   void     SetCharge (Double_t c)       { fCharge  = c;    }
 #endif
-  void     SetMass   (Double_t m)       { fMass    = m;    }
-  void     SetEcmInit(Double_t ecm)     { fEcmInit = ecm;  }
-  void     SetISR    (Bool_t b = kTRUE) { fISR     = b;    }
-  void     SetBeamStr(Bool_t b = kTRUE) { fBeamStr = b;    }
+  void     SetMass     (Double_t m)       { fMass      = m;   }
+  void     SetEcmInit  (Double_t ecm)     { fEcmInit   = ecm; }
+  void     SetISR      (Bool_t b = kTRUE) { fISR       = b;   }
+  void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr   = b;   }
+  void     SetBeamWidth(Double_t w      ) { fBeamWidth = w;   }
 
   // ----------------------
   //   Base class methods
@@ -100,6 +101,7 @@ private:
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?
   Int_t    fBeamStr;        // Beamstrahlung on?
+  Double_t fBeamWidth;      // Beam width relative to Ebm(nominal)
 
   // ----------------
   //  Event info

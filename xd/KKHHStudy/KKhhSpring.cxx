@@ -151,6 +151,7 @@ KKhhBases::KKhhBases(const char *name, const char *title)
            fEcmInit(1000.),
            fISR    ( 1),
            fBeamStr( 1),
+           fBeamWidth(0.002),
            fCosth  (0.),
            fPhi    (0.),
            fZBoost (0.),
@@ -197,6 +198,10 @@ KKhhBases::KKhhBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("KKhhBases.beamstrahlung","1")); // BmStr (on)
   ins >> fBeamStr;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("KKhhBases.BeamWidth","0.002")); // Beam energy spread
+  ins >> fBeamWidth;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("KKhhBases.bremstrahlung","1")); // ISR (on)
@@ -402,7 +407,7 @@ void KKhhBases::Userin()
   // --------------------------------------------
 
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
+    fBM->SetIBParameters(fBeamWidth);
 
     fBM->MakeBSMap();
     fBM->Print(); 

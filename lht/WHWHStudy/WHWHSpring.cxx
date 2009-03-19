@@ -234,6 +234,7 @@ WHWHBases::WHWHBases(const char *name, const char *title)
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
+           fBeamWidth (0.002),
            fPole      (0.),
            fWmModesLo ( 1),
            fWmModesHi (12),
@@ -343,6 +344,10 @@ WHWHBases::WHWHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("WHWHBases.Beamstrahlung","1")); // BmStr (on)
   ins >> fBeamStr;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WHWHBases.BeamWidth","0.002")); // Beam spread (relative)
+  ins >> fBeamWidth;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("WHWHBases.Bremsstrahlung","1"));// ISR (on)
@@ -1025,7 +1030,7 @@ void WHWHBases::Userin()
   //  Initialize beam generator
   // --------------------------------------------
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(0.0);
+    fBM->SetIBParameters(fBeamWidth);
 
     fBM->MakeBSMap();
     fBM->Print(); 

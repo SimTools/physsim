@@ -56,12 +56,13 @@ public:
   Double_t GetZBoost   ()           const { return fZBoost;    }
   Double_t GetEcmIP    ()           const { return fEcmIP;     }
 
-  void     SetMass     (Double_t m      ) { fMass    = m;      }
-  void     SetMassA    (Double_t m      ) { fMassA   = m;      }
-  void     SetEcmInit  (Double_t ecm    ) { fEcmInit = ecm;    }
-  void     SetISR      (Bool_t b = kTRUE) { fISR     = b;      }
-  void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr = b;      }
-  void     SetPole     (Double_t p      ) { fPole    = p;      }
+  void     SetMass     (Double_t m      ) { fMass      = m;    }
+  void     SetMassA    (Double_t m      ) { fMassA     = m;    }
+  void     SetEcmInit  (Double_t ecm    ) { fEcmInit   = ecm;  }
+  void     SetISR      (Bool_t b = kTRUE) { fISR       = b;    }
+  void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr   = b;    }
+  void     SetBeamWidth(Double_t w      ) { fBeamWidth = w;    }
+  void     SetPole     (Double_t p      ) { fPole      = p;    }
 
   static void EnableHtoAA(Bool_t b = kTRUE) { fgEnableHtoAA = b; }
 
@@ -100,6 +101,7 @@ private:
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?
   Int_t    fBeamStr;        // Beamstrahlung on?
+  Double_t fBeamWidth;      // Beam width relative to Ebm(nominal)
   Double_t fPole;           // electron polarization
   Int_t    fZModesLo;       // Z decay mode lo;
   Int_t    fZModesHi;       // Z decay mode hi;
