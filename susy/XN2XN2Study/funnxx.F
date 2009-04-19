@@ -186,6 +186,7 @@ c         CALL PROBEB(Z(21),Z(2),EBM,EPBM,EPBM0,PEP)
          BMENGY(3) = EMBM
          BMENGY(4) = EPBM
 cc         DPDEBM    = PEM*PEP
+         wat = wat*dpdebm
       ENDIF
 C--
 C  Then decide reduced sqrt(s) after bremsstrahlung.

@@ -7,7 +7,9 @@ C*                      included.
 C* 95/06/07  K.Fujii	Now use INSMCN instead of CONINT.
 C*			Use ISRBM switch.
 C*
+#if 0
 #define __ZEROWIDTH__
+#endif
       REAL*8 FUNCTION FUNC(ZZ)
  
       IMPLICIT REAL*4 ( A-H, O-Z )
@@ -126,6 +128,7 @@ C--
          BMENGY(2) = EPBM0
          BMENGY(3) = EMBM
          BMENGY(4) = EPBM
+         wat = wat*dpdebm
       ENDIF
 C--
 C  Then decide reduced sqrt(s) after bremsstrahlung.

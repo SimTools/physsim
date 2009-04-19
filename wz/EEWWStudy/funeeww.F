@@ -118,6 +118,7 @@ C--
             FUNC = 0
             RETURN
          ENDIF
+         wat = wat*dpdebm
       ENDIF
 C--
 C  Then decide reduced sqrt(s) after bremsstrahlung.

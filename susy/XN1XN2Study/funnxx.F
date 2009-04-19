@@ -180,6 +180,8 @@ C--
          BMENGY(4) = EPBM
 #if 0
          DPDEBM    = PEM*PEP
+#else
+         wat = wat*dpdebm
 #endif
       ENDIF
 C--

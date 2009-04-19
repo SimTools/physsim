@@ -149,6 +149,7 @@ C--
          BMENGY(2) = EPBM0
          BMENGY(3) = EMBM
          BMENGY(4) = EPBM
+         wat = wat*dpdebm
       ENDIF
 C--
 C  Then decide reduced sqrt(s) after ISR.
