@@ -19,7 +19,7 @@
 ///*
 //*************************************************************************
 
-#define __CHEAT__
+//#define __CHEAT__
 
 #include "TTHL6JAnalysis.h"
 #include "TTHSpring.h"

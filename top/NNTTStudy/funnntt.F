@@ -108,7 +108,7 @@ C  First decide e- and e+ energy.
 C--
       IF ( ISRBM.EQ.3 ) THEN
          EBM = ROOTS/2
-         call jsfbeamgenr(Z(26), Z(27), Z(1), Z(2), ebm,
+         call jsfbeamgend(Z(26), Z(27), Z(1), Z(2), ebm,
      >                    embm, epbm, embm0, epbm0, dpdebm )
          RS  = 2*SQRT(EMBM*EPBM)
          IF ( RS.LT.5.D0 ) THEN

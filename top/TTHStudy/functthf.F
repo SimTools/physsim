@@ -452,7 +452,11 @@ C--
       QMWP  = SQRT(Q82)
       CALL XHFILL( 'h01', DBLE(COSZ)        ,FUNC )
       CALL XHFILL( 'h02', DBLE(PHIZ)*RDDG   ,FUNC )
+#if 0
       CALL XHFILL( 'h03', DBLE(AMTT/ROOTS)  ,FUNC )
+#else
+      CALL XHFILL( 'h03', DBLE(AMTT)        ,FUNC )
+#endif
       CALL XHFILL( 'h04', DBLE(COST)        ,FUNC )
       CALL XHFILL( 'h05', DBLE(PHIT)*RDDG   ,FUNC )
       CALL XHFILL( 'h06', DBLE(CST)         ,FUNC )

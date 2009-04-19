@@ -58,7 +58,11 @@ void Plot(Char_t *filen = "jsf.root")
 #if 1
   TString sel("evis>0.");
 #else
+#if 0
   TString sel("pt<20.&&abs(pl)<30.&&ycut>0.0015");
+#else
+  TString sel("ycut>0.0015");
+#endif
 #endif
   tup->Draw(">>elist",sel.Data(),"goff");
 

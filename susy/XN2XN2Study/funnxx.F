@@ -172,7 +172,7 @@ C--
 c         CALL PROBEB(Z(20),Z(1),EBM,EMBM,EMBM0,PEM)
 c         CALL PROBEB(Z(21),Z(2),EBM,EPBM,EPBM0,PEP)
 
-         call jsfbeamgenr(z(20), z(21), z(1), z(2), ebm, 
+         call jsfbeamgend(z(20), z(21), z(1), z(2), ebm, 
      >      embm, epbm, embm0, epbm0, dpdebm)
 
          RS  = 2*SQRT(EMBM*EPBM)

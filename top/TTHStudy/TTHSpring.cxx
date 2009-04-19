@@ -299,7 +299,11 @@ void TTHBases::Userin()
 
   Xhinit("h01", -1.0, 1.0, 50,"cos(theta_H) ");
   Xhinit("h02",  0.0,360., 50,"phi_H        ");
+#if 0
   Xhinit("h03",  0.0, 1.0, 50,"m(t-tb)/roots");
+#else
+  Xhinit("h03", 340.,380., 50,"m(t-tb)      ");
+#endif
   Xhinit("h04", -1.0, 1.0, 50,"cos(theta_t) ");
   Xhinit("h05",  0.0,360., 50,"phi_t        ");
   Xhinit("h06", -1.0, 1.0, 50,"cos(theta_t)_lab    ");

@@ -165,7 +165,7 @@ C--
          CALL PROBEB(Z(14),Z(1),EBM,EMBM,EMBM0,PEM)
          CALL PROBEB(Z(15),Z(2),EBM,EPBM,EPBM0,PEP)
 #else
-         call jsfbeamgenr(z(14), z(15), z(1), z(2), ebm,
+         call jsfbeamgend(z(14), z(15), z(1), z(2), ebm,
      .                    embm, epbm, embm0, epbm0, dpdebm )
 #endif
          RS  = 2*SQRT(EMBM*EPBM)
