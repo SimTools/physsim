@@ -204,6 +204,7 @@ TTHBases::TTHBases(const char *name, const char *title)
 
   sscanf(gJSF->Env()->GetValue("TTHBases.Roots","700."),"%lg",&fRoots);
   sscanf(gJSF->Env()->GetValue("TTHBases.PolElectron","0."),"%lg",&fPolElectron);
+  sscanf(gJSF->Env()->GetValue("TTHBases.PolPositron","0."),"%lg",&fPolPositron);
   sscanf(gJSF->Env()->GetValue("TTHBases.SigmaEbeam","0.005"),"%lg",&fSigmaEbeam);
   sscanf(gJSF->Env()->GetValue("TTHBases.Alphai","128."),"%lg",&fAlphai);
   sscanf(gJSF->Env()->GetValue("TTHBases.Alphas","0.120"),"%lg",&fAlphas);
@@ -223,6 +224,7 @@ void TTHBases::PrintParameters()
   printf("Parameters for ee->TTH generator\n");
   printf("  Roots  = %g (GeV)\n",fRoots);
   printf("  PolElectron = %g\n",fPolElectron);
+  printf("  PolPositorn = %g\n",fPolPositron);
   printf("  SigmaEbeam  = %g\n",fSigmaEbeam);
   printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
   printf("       = 1 ; None\n");
@@ -278,6 +280,7 @@ void TTHBases::Userin()
   // Copy class data member into common /usrprm/
   usrprm_.sqrts  = fRoots;
   usrprm_.polebm = fPolElectron;
+  usrprm_.polpbm = fPolPositron;
   usrprm_.sgmebm = fSigmaEbeam;
   usrprm_.isrb   = fISRBM;
   usrprm_.imd1lo = fWmModesLo;

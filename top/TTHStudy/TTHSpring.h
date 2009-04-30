@@ -55,6 +55,7 @@ typedef struct {
   Int_t    imd1hi;	// W- decay mode ID.
   Int_t    imd2lo;	// W+ decay mode ID.
   Int_t    imd2hi;	// W+ decay mode ID.
+  Float_t  polpbm;      // positron polarization.
 } COMMON_USRPRM;             //  Common /USRPRM/
 
 extern COMMON_USRPRM usrprm_;
@@ -63,6 +64,7 @@ class TTHBases  : public JSFBases {
 protected:
   Double_t fRoots;	// CM Energy (GeV)
   Double_t fPolElectron;	// e- polarization
+  Double_t fPolPositron;	// e- polarization
   Double_t fSigmaEbeam;	// beam energy spread
   Int_t    fISRBM;	// Flag for ISR & Beamstrahlung
   Int_t    fWmModesLo;	// W- decay mode ID.
@@ -86,6 +88,9 @@ public:
   
   void SetPolElectron(Double_t polebm){ fPolElectron=polebm; }
   Double_t GetPolElectron(){ return fPolElectron;}
+
+  void SetPolPositron(Double_t polpbm){ fPolPositron=polpbm; }
+  Double_t GetPolPositron(){ return fPolPositron;}
   
   void SetSigmaEbeam(Double_t sgmebm){ fSigmaEbeam=sgmebm; }
   Double_t GetSigmaEbeam(){ return fSigmaEbeam;}
