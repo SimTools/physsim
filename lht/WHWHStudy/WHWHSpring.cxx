@@ -233,6 +233,7 @@ WHWHBases::WHWHBases(const char *name, const char *title)
            fMassT     ( 410.),
            fEcmInit   (1000.),
            fISR       ( 1),
+           fIBType    ( 2),
            fBeamStr   ( 1),
            fBeamWidth (0.002),
            fPole      (0.),
@@ -352,6 +353,10 @@ WHWHBases::WHWHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("WHWHBases.Bremsstrahlung","1"));// ISR (on)
   ins >> fISR;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WHWHBases.IBType","2"));    // Beam spread type (1: Uniform, 2: Gaussian)
+  ins >> fIBType;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("WHWHBases.Pole","0."));         // electron polarization
@@ -1029,8 +1034,11 @@ void WHWHBases::Userin()
   // --------------------------------------------
   //  Initialize beam generator
   // --------------------------------------------
+    JSFBeamGenerationCain::EIBType bstype=JSFBeamGenerationCain::kUniform;
+    if ( fIBType == 2 ) { bstype=JSFBeamGenerationCain::kGauss; }
+
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(fBeamWidth);
+    fBM->SetIBParameters(fBeamWidth, bstype);
 
     fBM->MakeBSMap();
     fBM->Print(); 
