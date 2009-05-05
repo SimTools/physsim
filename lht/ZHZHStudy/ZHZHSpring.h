@@ -105,6 +105,7 @@ private:
 
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?
+  Int_t    fIBType;            // Beam spread type (1: Uniform, 2: Gauss)
   Int_t    fBeamStr;        // Beamstrahlung on?
   Double_t fBeamWidth;      // Beam Spread relative to nominal Ebm
   Double_t fPole;           // electron polarization
