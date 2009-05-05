@@ -193,6 +193,7 @@ ZHZHBases::ZHZHBases(const char *name, const char *title)
            fMassHiggs ( 134.),
            fEcmInit   (1000.),
            fISR       ( 1),
+           fIBType    ( 2),
            fBeamStr   ( 1),
            fBeamWidth (0.002),
            fPole      (0.),
@@ -275,6 +276,10 @@ ZHZHBases::ZHZHBases(const char *name, const char *title)
   ins >> fBeamStr;
 
   ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHZHBases.IBType","2")); // Beam spread type (1: Uniform, 2: Gauss)
+  ins >> fIBType;
+
+  ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHZHBases.BeamWidth","0.002")); // Beam spread (relative)
   ins >> fBeamWidth;
 
@@ -285,6 +290,7 @@ ZHZHBases::ZHZHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHZHBases.Pole","0."));         // electron polarization
   ins >> fPole;
+
 
   // --------------------------------------------
   //  Registor random numbers
@@ -748,8 +754,11 @@ void ZHZHBases::Userin()
   // --------------------------------------------
   //  Initialize beam generator
   // --------------------------------------------
+    JSFBeamGenerationCain::EIBType bstype=JSFBeamGenerationCain::kUniform;
+    if ( fIBType == 2 ) { bstype=JSFBeamGenerationCain::kGauss; }
+
     fBM = (JSFBeamGenerationCain*)fBeamFile->Get(bsfilename.data());
-    fBM->SetIBParameters(fBeamWidth);
+    fBM->SetIBParameters(fBeamWidth, bstype);
 
     fBM->MakeBSMap();
     fBM->Print(); 
