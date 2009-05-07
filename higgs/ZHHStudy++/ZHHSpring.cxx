@@ -62,7 +62,7 @@ ZHHSpring::ZHHSpring(const char      *name,
 ZHHSpring::~ZHHSpring()
 {
   delete fEventBuf;
-  delete GetBases();
+  //delete GetBases();
 }
 
 //_____________________________________________________________________________

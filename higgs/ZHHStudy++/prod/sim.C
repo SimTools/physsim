@@ -27,13 +27,11 @@ Int_t sim()
   pythia = new JSFHadronizer();
   sim    = new JSFQuickSim();
 
-  //Int_t maxevt=10000;      // Number of event 
-  Int_t maxevt=100;     // Number of event is 10.
+  //Int_t maxevt=50000;      // Number of events
+  Int_t maxevt=100;        // Number of events
   jsf->Initialize();
 
-  //spring->GetBases()->Bases();
   spring->ReadBases("bases.root");  // ReadBases must be called before BeginRun
-  //spring->Bases()->SetSeed(12345);  // Set seed for Spring
   spring->SetPrintInfo(kTRUE);
   spring->SetPrintHist(kTRUE);
 
@@ -42,22 +40,21 @@ Int_t sim()
   //  ------------------------------------------------------------
   //  Event loop.
   //  ------------------------------------------------------------
-
-  for(Int_t ev=1;ev<=maxevt;ev++){
+  Int_t ev = 1;
+  while (1) {
     printf(" start event %d ",ev);
+    if (jsf->Process(ev)) {
+      printf("Processed event %d ",ev);
 
-    if( !jsf->Process(ev)) break;  
+      jsf->FillTree();
+      jsf->Clear();
 
-    printf("Processed event %d ",ev);
-
-    jsf->FillTree();
-    jsf->Clear();
-
-    printf(" End event %d \n",ev);
+      printf(" End event %d \n",ev);
+      if (ev >= maxevt) break;
+      ev++;
+    }
   }
-  
   //  ------------------------------------------------------------
-
   jsf->Terminate();
   file->Write();
 }
