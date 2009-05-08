@@ -1,3 +1,4 @@
+//#define BG_PROC "ZH"
 //***************************************************************************
 // anlzhh4j.C
 //
@@ -12,17 +13,57 @@
 //	22 Nov 1999	A.L.C. Sanchez	*Modified for testing ZHH4JAnalysis
 //***************************************************************************
 
-Int_t maxnevt = 200000;
+Int_t maxnevt = 20000000;
 
 Char_t *utils_so = "libS4Utils.so";
 Char_t *anlib_so = "libAnlib.so";
 Char_t *jsfanlib_so = "libJSFAnlib.so";
-Char_t *zhhspr_so = "../../../../../higgs/ZHHStudy++/prod/ZHHSpring.so";
 Char_t *procanl_so = "libZHH4JAnalysis.so";
-
-Char_t *outputfile = "jsf.root";	// A file to output histograms
-Char_t *inputfile = "../../../../../higgs/ZHHStudy++/prod/zhhsim.root";	// Input simulator file
-
+#ifndef BG_PROC
+Char_t *zhhspr_so = "../../../../../higgs/ZHHStudy++/prod/ZHHSpring.so";
+Char_t *outputfile = "jsf.zhh.root";	// A file to output histograms
+const Int_t kNfiles = 2;
+Char_t *inputfile[] = {"../../../../../higgs/ZHHStudy++/prod/zhhsim.root", // Input simulator file
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim001.root",
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim002.root",
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim003.root",
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim004.root",
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim005.root",
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim006.root",
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim007.root",
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim008.root",
+                       "../../../../../higgs/ZHHStudy++/prod/zhhsim009.root"};
+#else
+#if BG_PROC == "ZH"
+Char_t *zhhspr_so = "../../../../../higgs/ZHStudy++/prod/ZHSpring.so";
+Char_t *outputfile = "jsf.zh.root";	// A file to output histograms
+const Int_t kNfiles = 1;
+Char_t *inputfile[] = {"../../../../../higgs/ZHStudy++/prod/zhsim.root", // Input simulator file
+                       "../../../../../higgs/ZHStudy++/prod/zhsim001.root",
+                       "../../../../../higgs/ZHStudy++/prod/zhsim002.root",
+                       "../../../../../higgs/ZHStudy++/prod/zhsim003.root",
+                       "../../../../../higgs/ZHStudy++/prod/zhsim004.root",
+                       "../../../../../higgs/ZHStudy++/prod/zhsim005.root",
+                       "../../../../../higgs/ZHStudy++/prod/zhsim006.root",
+                       "../../../../../higgs/ZHStudy++/prod/zhsim007.root",
+                       "../../../../../higgs/ZHStudy++/prod/zhsim008.root",
+                       "../../../../../higgs/ZHStudy++/prod/zhsim009.root"};
+#elif BG_PROC == "TT"
+Char_t *zhhspr_so = "../../../../../top/TTStudy/prod/TTSpring.so";
+Char_t *outputfile = "jsf.tt.root";	// A file to output histograms
+const Int_t kNfiles = 1;
+Char_t *inputfile[] = {"../../../top/TTStudy/prod/data/ttsim.root",	// Input simulator file
+                       "../../../top/TTStudy/prod/data/ttsim002.root",
+                       "../../../top/TTStudy/prod/data/ttsim003.root",
+                       "../../../top/TTStudy/prod/data/ttsim004.root",
+                       "../../../top/TTStudy/prod/data/ttsim005.root",
+                       "../../../top/TTStudy/prod/data/ttsim006.root",
+                       "../../../top/TTStudy/prod/data/ttsim007.root",
+                       "../../../top/TTStudy/prod/data/ttsim008.root",
+                       "../../../top/TTStudy/prod/data/ttsim009.root",
+                       "../../../top/TTStudy/prod/data/ttsim010.root"};
+#endif
+#endif
 
 int anlzhh4j()
 {
@@ -34,8 +75,9 @@ int anlzhh4j()
   gSystem->Load(zhhspr_so);
   gSystem->Load(procanl_so);
 
+  Int_t ifile = 0;
   file = new TFile(outputfile,"RECREATE");	// Outputfile
-  fin  = new TFile(inputfile);			// Input simulator data
+  fin  = new TFile(inputfile[ifile]);			// Input simulator data
 
   jsf->SetInput(*fin);
   jsf->SetOutput(*file);
@@ -47,6 +89,8 @@ int anlzhh4j()
   simdst->NoReadWrite();			// instead of QuickSim data.
 
   ZHH4JAnalysis *myanl  = new ZHH4JAnalysis("ZHH4JAnalysis","My Analysis");
+  Double_t ecm = 500.; // should be correctly set by hand
+  myanl->SetEcm(ecm);
   
   jsf->Initialize();
 
@@ -70,11 +114,30 @@ int anlzhh4j()
   myanl->SetBtagNoffv(1);
 
   jsf->BeginRun(1);				// Set run number to 1.
-  Int_t nok =0;
-  for (Int_t evt=1; evt<=maxnevt; evt++) {
-    if (!(jsf->GetEvent(evt))) break;		// Read in an event.
-    if (!(jsf->Process(evt))) continue;		// Do SIMDST and ZHH4JAnalysis.
+  Int_t nok = 0;
+  Int_t nrd = 0;
+  while (nok < maxnevt) {
+    if (!(jsf->GetEvent(++nrd))) {		// Read in an event.
+      JSFSteer::EJSFReturnCode iret = jsf->GetReturnCode();
+      if (iret & jsf->kJSFEOF) {
+        cerr << " EOF of " << inputfile[ifile] << endl;
+        cerr << "  reached after reading " << nrd-1 << " events" << endl;
+	ifile++;
+        if (ifile >= kNfiles) break;
+        fin  = new TFile(inputfile[ifile]);			// Input simulator data
+	jsf->SetInput(*fin);
+	nrd = 1;
+      } else {
+        cerr << " Error reading event " << nrd << " of " << inputfile[ifile] << endl;
+	cerr << " Terminate analysis" << endl;
+	break;
+      }
+    } else {
+        ++nok;
+    }
+    if (!(jsf->Process(nrd))) continue;	// Do SIMDST and ZHH4JAnalysis.
   }
+  cerr << " Analyzed  " << nok << " events" << endl;
   
   jsf->Terminate();
   return 0;
