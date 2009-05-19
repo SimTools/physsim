@@ -173,6 +173,17 @@ public:
                    Double_t    g,
                    Double_t    m,
                    Double_t    gm);
+   HELScalar(const HELVector  &v1,
+             const HELVector  &v2,
+                   Double_t    g,
+                   Double_t    m,
+                   Double_t    gm);
+   HELScalar(const HELFermion &in,
+             const HELFermion &out,
+                   Complex_t   gl,
+                   Complex_t   gr,
+                   Double_t    m,
+                   Double_t    gm);
 
    virtual ~HELScalar() {}
 
@@ -216,6 +227,11 @@ public:
              const HELScalar  &s1,
              const HELScalar  &s2,
 	           Double_t    g);
+   HELVertex(const HELFermion &in,
+             const HELFermion &out,
+             const HELScalar  &sc,
+	           Complex_t   gl,
+		   Complex_t   gr);
             
    virtual ~HELVertex() {}
 

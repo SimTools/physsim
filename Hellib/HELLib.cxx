@@ -551,6 +551,44 @@ HELScalar::HELScalar(const HELScalar  &s1,
    this->Complex_t::operator=(dg*s1*s2);
 }
 
+//----------
+// HVVXXX()
+//----------
+HELScalar::HELScalar(const HELVector  &v1,
+                     const HELVector  &v2,
+                           Double_t    g,
+                           Double_t    m,
+                           Double_t    gm)
+          : fP(v1.fP + v2.fP),
+            fNSS(1)
+{
+   Double_t  q2  = fP.Mag2();
+   Double_t  mg  = TMath::Max(TMath::Sign(m*gm, q2), 0.);
+   Complex_t dg  = -g/Complex_t(q2 - m*m, mg);
+
+   this->Complex_t::operator=(dg * (v1[0]*v2[0] - v1[1]*v2[1] - v1[2]*v2[2] - v1[3]*v2[3]));
+}
+
+//----------
+// HIOXXX()
+//----------
+HELScalar::HELScalar(const HELFermion &fin,
+                     const HELFermion &fout,
+                           Complex_t   gl,
+                           Complex_t   gr,
+                           Double_t    m,
+                           Double_t    gm)
+          : fP(fout.fP - fin.fP),
+	    fNSS(1)
+{
+   Double_t  q2  = fP.Mag2();
+   Double_t  mg  = TMath::Max(TMath::Sign(m*gm, q2), 0.);
+   Complex_t dn  = Complex_t(q2 - m*m, mg);
+
+   this->Complex_t::operator=((gl*(fout[0]*fin[0]+fout[1]*fin[1]) 
+		             +gr*(fout[2]*fin[2]+fout[3]*fout[3]))/dn);
+}
+
 //-----------------------------------------------------------------------------
 // ==============================
 //  class HELVertex
@@ -674,4 +712,17 @@ HELVertex::HELVertex(const HELVector &v1,
                            Double_t    g)
 {
    *this = g*s1*s2*(v1[0]*v2[0] - v1[1]*v2[1] - v1[2]*v2[2] - v1[3]*v2[3]);
+}
+
+//----------
+// IOSXXX()
+//----------
+HELVertex::HELVertex(const HELFermion &fin,
+                     const HELFermion &fout,
+                     const HELScalar  &sc,
+                           Complex_t   gl,
+                           Complex_t   gr)
+{
+   *this = sc * (gl*(fout[0]*fin[0]+fout[1]*fin[1]) 
+               + gr*(fout[2]*fin[2]+fout[3]*fout[3])) ;
 }
