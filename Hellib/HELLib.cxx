@@ -586,7 +586,7 @@ HELScalar::HELScalar(const HELFermion &fin,
    Complex_t dn  = Complex_t(q2 - m*m, mg);
 
    this->Complex_t::operator=((gl*(fout[0]*fin[0]+fout[1]*fin[1]) 
-		             +gr*(fout[2]*fin[2]+fout[3]*fout[3]))/dn);
+		              +gr*(fout[2]*fin[2]+fout[3]*fin[3]))/dn);
 }
 
 //-----------------------------------------------------------------------------
@@ -724,5 +724,5 @@ HELVertex::HELVertex(const HELFermion &fin,
                            Complex_t   gr)
 {
    *this = sc * (gl*(fout[0]*fin[0]+fout[1]*fin[1]) 
-               + gr*(fout[2]*fin[2]+fout[3]*fout[3])) ;
+               + gr*(fout[2]*fin[2]+fout[3]*fin[3])) ;
 }
