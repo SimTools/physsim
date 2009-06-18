@@ -125,7 +125,6 @@ C--
          BMENGY(2) = EPBM0
          BMENGY(3) = EMBM
          BMENGY(4) = EPBM
-         DPDEBM    = PEM*PEP
          wat = wat*dpdebm
       ELSE
          BMENGY(0) = EBM
