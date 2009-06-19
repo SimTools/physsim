@@ -295,14 +295,18 @@ void WWZBases::Userin()
 
   // Define histograms
 
+      Xhinit("h00",  0.0, 1.1,220,"rsh/roots    ");
       Xhinit("h01", -1.0, 1.0, 50,"cos(theta_Z) ");
       Xhinit("h02",  0.0,360., 50,"phi_Z        ");
       Xhinit("h03",  0.4, 0.8, 50,"m(W-W+)/roots");
       Xhinit("h04", -1.0, 1.0, 50,"cos(theta_W-)");
       Xhinit("h05",  0.0,360., 50,"phi_W-       ");
-      Xhinit("h07",  1.0,  5.,  4,"helicity combination  ");
-      Dhinit("hd09",0.,1.,50,-1.,1.,50,"E_Z/E_bm-cos(theta_Z)");
-      Dhinit("hd10",0.,1.,50, 0.,1.,50,"E_W-/E_bm-E_W+/E_bm ");
+      Xhinit("h06",  60.,120.,120,"m(Z)         ");
+      Xhinit("h07",  50.,110.,110,"m(W-)        ");
+      Xhinit("h08",  50.,110.,110,"m(W+)        ");
+      Xhinit("h09",  1.0,  5.,  4,"helicity combination  ");
+      Dhinit("hd20",0.,1.,200,-1.,1.,200,"E_Z/E_bm-cos(theta_Z)");
+      Dhinit("hd21",0.,1.,200, 0.,1.,200,"E_W-/E_bm-E_W+/E_bm  ");
 }
 
 //_____________________________________________________________________________

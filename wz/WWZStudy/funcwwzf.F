@@ -366,14 +366,18 @@ C--
       PHIZ  = XPHASE(3,1)
       COSWM = XPHASE(2,2)
       PHIWM = XPHASE(3,2)
+      CALL XHFILL( 'h00', DBLE(RS)/ROOTS    ,FUNC )
       CALL XHFILL( 'h01', DBLE(COSZ)        ,FUNC )
       CALL XHFILL( 'h02', DBLE(PHIZ*RDDG)   ,FUNC )
       CALL XHFILL( 'h03', DBLE(AMWW/ROOTS)  ,FUNC )
       CALL XHFILL( 'h04', DBLE(COSWM)       ,FUNC )
       CALL XHFILL( 'h05', DBLE(PHIWM*RDDG)  ,FUNC )
-      CALL XHFILL( 'h07', DBLE(ICMB)        ,FUNC )
-      CALL DHFILL( 'hd09', DBLE(EZ/EBM),  DBLE(COSZ)   , FUNC )
-      CALL DHFILL( 'hd10', DBLE(EWM/EBM), DBLE(EWP/EBM), FUNC )
+      CALL XHFILL( 'h06', DBLE(Q2)          ,FUNC )
+      CALL XHFILL( 'h07', DBLE(Q4)          ,FUNC )
+      CALL XHFILL( 'h08', DBLE(Q5)          ,FUNC )
+      CALL XHFILL( 'h09', DBLE(ICMB)        ,FUNC )
+      CALL DHFILL( 'hd20', DBLE(EZ/EBM),  DBLE(COSZ)   , FUNC )
+      CALL DHFILL( 'hd21', DBLE(EWM/EBM), DBLE(EWP/EBM), FUNC )
 C--
 C  That's it.
 C--
