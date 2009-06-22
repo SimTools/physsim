@@ -1,0 +1,88 @@
+-------------------------------------------------------------------------------
+		Physsim ZZZ Generator
+-------------------------------------------------------------------------------
+
+Description:	ZZZ generator based on BASES/SPRING that works in JSF
+
+UpdateRecord:	
+  2009/06/18	K.Fujii		Original version.
+
+Installation:
+  You should prepare physsim as described by the README file
+  in the physsim top directory.
+  
+  Then for non-resonant ZZZ production, do:
+	
+	$ xmkmf -a; make
+  
+  and for ZH and H->WW(*), do
+	
+	$ xmkmf -a; make EXTRADEFINES=-DHIGGSONLY
+  
+  which produces prod/ZZZSpring.so.
+
+Usage:
+  Edit jsf.conf to change run conditions:
+  	$ vi jsf.conf
+  	ZZZBases.ISRBM:		3 	# (1,2,3)=(none,ISR,ISR+BM)
+  	ZZZBases.ACC1:		0.2	# accuracy goal for grid optimization
+	ZZZBases.ACC2:		0.05	# accuracy goal for integration
+	ZZZBases.ITMX1:		5	# max no. iterations for grid optim.
+	ZZZBases.ITMX2:		5	# max no. iterations for integration.
+	ZZZBases.NCALL:		80000	# no. sample points/iteration
+	ZZZBases.Roots:		350.	# Ecm
+	ZZZBases.PolElectron:	0.0	# Polarization of e-
+	ZZZBases.WmModesLo:	1	# W- decay mode from
+	ZZZBases.WmModesHi:	12	# 		to
+	ZZZBases.WpModesLo:	1	# W+ decay mode from
+	ZZZBases.WpModesHi:	12	#               to
+	ZZZBases.ZModesLo:	1	# Z  decay mode from
+	ZZZBases.ZModesHi:	12	#               to
+	ZZZBases.MassHiggs:	99999.	# Higgs mass
+
+  where decay modes are numbered as
+  
+  	 mode	W decay	 comment	 mode	Z decay	 comment
+  	-------------------------- 	--------------------------
+  	 1	e   nu			 1	nue
+  	 2	mu  nu			 2      numu
+  	 3	tau nu			 3	nutau
+  	 4	d   u			 4	e
+  	 5      d   c			 5	mu
+  	 6      d   t	forbidden	 6	tau
+  	 7      s   u			 7	u
+  	 8      s   c			 8	c
+  	 9      s   t	forbidden	 9	t	forbidden
+  	10      b   u			10	d
+  	11      b   c			11	s
+  	12	b   t	forbidden	12	b
+   	--------------------------	--------------------------
+
+  Once jsf.conf is set, you can go ahead and do:
+ 
+	$ jsf -b -q bases.C >& b.out &	# bases
+	$ jsf -b -q sim.C >& s.out &	# spring
+	$ jsf gui.C			# analysis
+
+  You can specify maxevt in sim.C.
+  UserAnalysis.C gives a very primitive analysis program.
+  More practical ones can be found in
+  	
+  	Anlib/example/jsf/ww/*
+  	
+  which use user compiled analysis classes.
+
+Remark:
+  Watch out for bad convergency of the integration.
+  You should tune
+
+	ZZZBases.ITMX1:		5
+	ZZZBases.ITMX2:		10
+	ZZZBases.NCALL:		200000
+
+  to tame bad behavior, if any.
+  When generating non-resonant ZZZ's, use a big Higgs mass to avoid
+  bad convergence. When generating resonant ZZZ's from ZH, compile
+  it with EXTRADEFINES=-DHIGGSONLY as described above.
+
+

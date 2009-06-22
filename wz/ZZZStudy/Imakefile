@@ -1,0 +1,102 @@
+XCOMM ##########################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for ZZZ generator.
+XCOMM ##	clean    : to clean the directory.
+XCOMM ##	cleanall : to remove everything reproducible.
+XCOMM ## (Update Record) 
+XCOMM ##  2009/06/18  K.Fujii 	Original version.
+XCOMM ###########################################################################
+
+/*
+ * Template Files
+ *
+ */
+
+#define CXXPACKAGE
+#include "config/kflib.tmpl"
+
+INCPATH = -I. -I$(KFLIBROOT)/gen_lib/sm/include \
+	-I$(KFLIBROOT)/gen_lib/ss/include \
+	-I$(KFLIBROOT)/gen_lib/hg/include \
+	-I$(KFLIBROOT)/gen_lib/bm/include \
+	-I$(KFLIBROOT)/gen_lib/bs/include \
+	-I$(LCDIR)/simjlc/src -I$(LCDIR)/util/fortlib/src 
+
+HELASV204 = HELASV204
+
+KFLIB   = $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBSS -lGENLIBSM -lGENLIBHG \
+	-lGENLIBKN -lGENLIBBM  -lANLLIB
+
+/*
+ * Fortran Objects
+ *
+ */
+
+PACKAGENAME   = ZZZSpring
+
+FOBJS = ampzzz.o \
+		ampzz.o \
+		ampzh.o \
+		fulzzz.o \
+		funczzzf.o \
+		sgzzzf.o \
+		spevnt.o \
+		userin.o
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+
+FSRCS         = $(strip $(subst .o,.F,$(FOBJS)))
+
+OBJS          = $(PACKAGENAME).$(ObjSuf) \
+		$(PACKAGENAME)Dict.$(ObjSuf)
+
+SRCS          = $(PACKAGENAME).$(SrcSuf) 
+
+HDRS	      = $(PACKAGENAME).h
+
+DICTNAME      = $(PACKAGENAME)Dict
+
+SONAME	      = $(PACKAGENAME).$(DllSuf)
+
+JSFSOLIB      = prod/$(SONAME)
+
+/*
+ * Make Targets
+ *
+ */
+
+all::  $(JSFSOLIB)
+
+prod/$(SONAME): $(OBJS) $(FOBJS)
+	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS)
+
+clean:: 
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
+
+depend:: $(SRCS) $(HDRS) $(FSRCS)
+	for i in $(SRCS) $(FSRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$I; done
+
+distclean:: clean
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~
+	@rm -f $(JSFSOLIB) *.root Makefile
+	@(cd prod; rm -f *.root *.tdr *.out *~ core)
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I$(JSFROOT)/include $(HDRS) LinkDef.h
+
+/*
+ * Suffix Rules
+ *
+ */
+
+.SUFFIXES: .$(SrcSuf)
+
+.$(SrcSuf).$(ObjSuf):
+	$(CXX) $(CXXFLAGS) -c $<
