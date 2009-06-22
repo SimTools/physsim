@@ -38,6 +38,7 @@ C* (Relation)
 C*    Invokes subroutines in HELAS.LOAD.
 C* (Update Record)
 C*    09/06/18  K.Fujii         Original version.
+C*    09/06/22  J.Tian          another method used
 C*
 CC**********************************************************************
  
@@ -59,60 +60,77 @@ C--
 C  Zero electron width.
 C--
       GME = 0
+
 C--
-C  Calculate virtual e-.
+C  Calculate diagrm (1).
 C--
       CALL FVIXXX(EIN,VCT(1,1),GZL,AME,GME,WRK(1,1))
-      CALL FVIXXX(EIN,VCT(1,2),GZL,AME,GME,WRK(1,2))
-      CALL FVIXXX(EIN,VCT(1,3),GZL,AME,GME,WRK(1,3))
+      CALL FVOXXX(EOT,VCT(1,2),GZL,AME,GME,WRK(1,2))
+      CALL IOVXXX(WRK(1,1),WRK(1,2),VCT(1,3),GZL,AMP(1))
+
 C--
-C  Calculate virtual e+.
+C  Calculate diagrm (2).
 C--
-      CALL FVOXXX(EOT,VCT(1,1),GZL,AME,GME,WRK(1,4))
-      CALL FVOXXX(EOT,VCT(1,2),GZL,AME,GME,WRK(1,5))
-      CALL FVOXXX(EOT,VCT(1,3),GZL,AME,GME,WRK(1,6))
+      CALL FVIXXX(EIN,VCT(1,1),GZL,AME,GME,WRK(1,3))
+      CALL FVOXXX(EOT,VCT(1,3),GZL,AME,GME,WRK(1,4))
+      CALL IOVXXX(WRK(1,3),WRK(1,4),VCT(1,2),GZL,AMP(2))
+
 C--
-C  Set ZVCT.
+C  Calculate diagrm (3).
 C--
-      DO 100 IZ = 1, 3
-         IF (IZ .EQ. 1) THEN
-            IZ1 = 2
-            IZ2 = 3
-         ELSE IF (IZ .EQ. 2) THEN
-            IZ1 = 3
-            IZ2 = 1
-         ELSE
-            IZ1 = 1
-            IZ2 = 2
-         ENDIF
-         DO 10 I = 1, 6
-            ZVCT(I,1,IZ) = VCT(I,IZ1)
-            ZVCT(I,2,IZ) = VCT(I,IZ2)
-10       CONTINUE
-100   CONTINUE
+      CALL FVIXXX(EIN,VCT(1,2),GZL,AME,GME,WRK(1,5))
+      CALL FVOXXX(EOT,VCT(1,1),GZL,AME,GME,WRK(1,6))
+      CALL IOVXXX(WRK(1,5),WRK(1,6),VCT(1,3),GZL,AMP(3))
+
 C--
-C  Calculate diagrams.
+C  Calculate diagrm (4).
 C--
-      DO 200 IZ = 1, 3
-C--      Non-H
-         CALL AMPZZ (GZL, AME,GME, ZVCT(1,1,IZ), WRK(1,IZ),EOT, TMP)
-         AMP(IZ  ) = TMP(0)
-         CALL AMPZZ (GZL, AME,GME, ZVCT(1,1,IZ), EIN,WRK(1,IZ), TMP)
-         AMP(IZ+3) = TMP(0)
-C--      Higgs
-         CALL HVVXXX(ZVCT(1,1,IZ),ZVCT(1,2,IZ),GZH,AMH,GMH,WRK(1,7))
-         CALL AMPZH (GZH,GZL,AMZ,GMZ,VCT(1,IZ),WRK(1,7),EIN,EOT, TMP)
-         AMP(IZ+6) = TMP(0)
-200   CONTINUE
+      CALL FVIXXX(EIN,VCT(1,2),GZL,AME,GME,WRK(1,7))
+      CALL FVOXXX(EOT,VCT(1,3),GZL,AME,GME,WRK(1,8))
+      CALL IOVXXX(WRK(1,7),WRK(1,8),VCT(1,1),GZL,AMP(4))
+
+C--
+C  Calculate diagrm (5).
+C--
+      CALL FVIXXX(EIN,VCT(1,3),GZL,AME,GME,WRK(1,9))
+      CALL FVOXXX(EOT,VCT(1,1),GZL,AME,GME,WRK(1,10))
+      CALL IOVXXX(WRK(1,9),WRK(1,10),VCT(1,2),GZL,AMP(5))
+
+C--
+C  Calculate diagrm (6).
+C--
+      CALL FVIXXX(EIN,VCT(1,3),GZL,AME,GME,WRK(1,11))
+      CALL FVOXXX(EOT,VCT(1,2),GZL,AME,GME,WRK(1,12))
+      CALL IOVXXX(WRK(1,11),WRK(1,12),VCT(1,1),GZL,AMP(6))
+
+C--
+C  Calculate diagrm (7).
+C--
+      CALL HVVXXX(VCT(1,1),VCT(1,2),GZH,AMH,GMH,WRK(1,13))
+      CALL AMPZH (GZH,GZL,AMZ,GMZ,VCT(1,3),WRK(1,13),EIN,EOT, AMP(7))
+
+C--
+C  Calculate diagrm (8).
+C--
+      CALL HVVXXX(VCT(1,1),VCT(1,3),GZH,AMH,GMH,WRK(1,14))
+      CALL AMPZH (GZH,GZL,AMZ,GMZ,VCT(1,2),WRK(1,14),EIN,EOT, AMP(8))
+
+C--
+C  Calculate diagrm (9).
+C--
+      CALL HVVXXX(VCT(1,2),VCT(1,3),GZH,AMH,GMH,WRK(1,15))
+      CALL AMPZH (GZH,GZL,AMZ,GMZ,VCT(1,1),WRK(1,15),EIN,EOT, AMP(9))
+
 C--
 C  Sum non-Higgs and Higgs diagrams.
 C--
       AMPSUM(1) = 0
-      DO 30 I = 1, 3
-         AMPSUM(1) = AMPSUM(1) + AMP(I) + AMP(I+3)
-         AMPSUM(2) = AMPSUM(2) + AMP(I+6)
-30    CONTINUE
+      DO 10 I = 1, 6
+         AMPSUM(1) = AMPSUM(1) + AMP(I)
+10    CONTINUE
+      AMPSUM(2) = AMP(7)+AMP(8)+AMP(9)
       AMPSUM(0) = AMPSUM(1) + AMPSUM(2)
+
 C--
 C  That's it.
 C--
