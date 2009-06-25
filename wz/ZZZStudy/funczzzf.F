@@ -1,5 +1,6 @@
 C* (Update Record)
 C*  09/06/18  K.Fujii		Original version derived from WWZ
+C*  09/06/25  J.Tian            another method for final state helicities combination
 
       REAL*8 FUNCTION FUNC(ZZ)
  
@@ -245,29 +246,29 @@ C--
                WAT  = WAT*NHEL/2
             ENDIF
          ELSE
+            ICMB = ICMB+((ICMB+3)/4-(ICMB+1)/4)*2
             IF ( IDPTCL(2,7).NE.1 .OR. IDPTCL(3,7).NE.1 ) THEN
-               ICMB = 4*((ICMB-1)/4) + MOD(ICMB,2) + 3
                WAT  = WAT*NHEL/2
             ELSE
-               ICMB = 4*((ICMB+3)/4)
+               ICMB = 2*((ICMB+1)/2)
                WAT  = WAT*NHEL/4
             ENDIF
          ENDIF
       ELSE
+         ICMB = ICMB-4*((ICMB+3)/8-(ICMB-1)/8)
          IF ( IDPTCL(2,5).NE.1 .OR. IDPTCL(3,5).NE.1 ) THEN
             IF ( IDPTCL(2,7).NE.1 .OR. IDPTCL(3,7).NE.1 ) THEN
-               ICMB = ICMB - 4*((ICMB-1)/4)
                WAT  = WAT*NHEL/2
             ELSE
-               ICMB = 2*((ICMB - 4*((ICMB-1)/4) + 1)/2)
+               ICMB = 2*((ICMB+1)/2)
                WAT  = WAT*NHEL/4
             ENDIF
          ELSE
+            ICMB = ICMB+((ICMB+3)/4-(ICMB+1)/4)*2
             IF ( IDPTCL(2,7).NE.1 .OR. IDPTCL(3,7).NE.1 ) THEN
-               ICMB = MOD(ICMB,2) + 3
                WAT  = WAT*NHEL/4
             ELSE
-               ICMB = 4
+               ICMB = 2*((ICMB+1)/2)
                WAT  = WAT*NHEL/8
             ENDIF
          ENDIF
