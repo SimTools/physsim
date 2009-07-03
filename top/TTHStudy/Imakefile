@@ -29,7 +29,7 @@ INCPATH	= -I. -I$(KFLIBROOT)/gen_lib/sm/include \
 /* EXTRADEFINES = -DHOFFZ */
 /* EXTRADEFINES = -DDEBUG */
 
-/* FFLAGS += -DNO_H_DECAY */
+FFLAGS += -DNO_H_DECAY
 FFLAGS += -DTT_THRESHOLD
 
 /*
