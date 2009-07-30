@@ -11,6 +11,7 @@ C*                > 0     Warning, continue processing.
 C*                < 0     Error, skip the rest.
 C*                > -999  terminates the job imediately.
 C* (Update Record)
+C*   2009/07/31  T.Tanabe         Fix color strings to work for ttg > ttbb.
 C*   2009/07/30  T.Tanabe         First version, based on the TTH version by K.Fujii.
 C*
 CC**********************************************************************
@@ -176,19 +177,19 @@ C--
       RBUF(12) =   2
       RBUF(13) =   6
       RBUF(14) =   0
-      RBUF(18) =   2
+      RBUF(18) =   1
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
       ENDIF
 C--
-C  Store glue
+C  Store gluon
 C--
       CALL RDOTxx(QV(0,5),QV(0,5),VMT2)
       CALL UVZERO( 20, RBUF )
       NPT      =   NPT + 1
       RBUF( 1) =   NPT
-      RBUF( 2) =   25
+      RBUF( 2) =   21
       RBUF( 3) =   SQRT(VMT2)
       RBUF( 4) =   0
       RBUF( 5) =   QV(1,5)
@@ -198,7 +199,7 @@ C--
       RBUF(12) =   2
       RBUF(13) =  12
       RBUF(14) =   0
-      RBUF(18) =   3
+      RBUF(18) =   6
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -225,7 +226,7 @@ C--
       RBUF(13) =   0
       RBUF(14) =   1
       RBUF(17) =   IHLCMB(3)
-      RBUF(18) =   1
+      RBUF(18) =   5
       RBUF(19) =   101
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
@@ -248,7 +249,7 @@ C--
       RBUF(12) =   2
       RBUF(13) =   8
       RBUF(14) =   1
-      RBUF(18) =   4
+      RBUF(18) =   3
       RBUF(19) =   101
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
@@ -277,7 +278,7 @@ C--
       RBUF(14) =   2
       RBUF(17) =   IHLCMB(6)
       RBUF(18) =   2
-      RBUF(19) =   102
+      RBUF(19) =   401
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -299,8 +300,8 @@ C--
       RBUF(12) =   2
       RBUF(13) =  10
       RBUF(14) =   2
-      RBUF(18) =   5
-      RBUF(19) =   102
+      RBUF(18) =   4
+      RBUF(19) =   401
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -329,7 +330,7 @@ C--
          RBUF(13) =   0
          RBUF(14) =   5
          RBUF(17) =   IHLCMB(IPT)
-         RBUF(18) =   6
+         RBUF(18) =   3
          RBUF(19) =   (LQ-1)*201
          CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
          IF ( NEVENT.LE.NPRINT ) THEN
@@ -360,7 +361,7 @@ C--
          RBUF(13) =   0
          RBUF(14) =   7
          RBUF(17) =   IHLCMB(IPT)
-         RBUF(18) =   7
+         RBUF(18) =   4
          RBUF(19) =   (LQ-1)*301
          CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
          IF ( NEVENT.LE.NPRINT ) THEN
@@ -394,10 +395,11 @@ C--
          RBUF(17) =   IHLCMB(IPT)
          IF (IPT.EQ.9) THEN
             RBUF(18) = 2
+            RBUF(19) =   (LQ-1)*401
          ELSE
-            RBUF(18) = 1
+            RBUF(18) = 5
+            RBUF(19) =   (LQ-1)*101
          ENDIF
-         RBUF(19) =   (LQ-1)*401
          CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
          IF ( NEVENT.LE.NPRINT ) THEN
             CALL SLPRNT(NEVENT,NPT,RBUF(1))
