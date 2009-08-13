@@ -305,7 +305,7 @@ void TTZBases::Userin()
 
   Xhinit("h01", -1.0, 1.0, 50,"cos(theta_Z) ");
   Xhinit("h02",  0.0,360., 50,"phi_Z        ");
-  Xhinit("h03",  0.0, 1.0, 50,"m(t-tb)/roots");
+  Xhinit("h03",  0.0, 1.0,400,"m(t-tb)/roots");
   Xhinit("h04", -1.0, 1.0, 50,"cos(theta_t) ");
   Xhinit("h05",  0.0,360., 50,"phi_t        ");
   Xhinit("h06", -1.0, 1.0, 50,"cos(theta_t)_lab    ");

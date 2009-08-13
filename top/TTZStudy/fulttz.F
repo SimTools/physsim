@@ -38,7 +38,9 @@ C*                              GZH has an opposite sign.
 C*				UHCUPL must be the one in xcxc_lib.
 C*    95/06/09  K.Fujii         Removed UHCUPL call. Now use /SMCUPL/.
 C*				Added QCD correction to ttZ.
-C*				
+C*    09/08/13  K.Ikematsu      Implemented S-wave ttbar threshold
+C*                              enhancement
+C*
 CC**********************************************************************
  
       SUBROUTINE FULTTZ(IDP,IHEL,PV,AMP2)
@@ -52,6 +54,9 @@ CC**********************************************************************
 C--
       REAL   *4  GZH
       COMPLEX*8  GTH(2)
+C--
+      REAL   *4  QV(0:3,3)
+      COMPLEX*8  FQCD
 C--     
       REAL   *4  GZF(2,2,2)
       COMPLEX*8  SPINOR(6,12), WVCT(0:5,2), ZVCT(0:5), AMP(0:2)
@@ -123,6 +128,25 @@ C--
       CALL FVIXXX(SPINOR(1,3),WVCT(0,1),GWF,AMST,GAMT,SPINOR(1,11))
       CALL FVOXXX(SPINOR(1,6),WVCT(0,2),GWF,AMST,GAMT,SPINOR(1,12))
 C--
+C  Calculate QCD correction.
+C--
+#ifdef TT_THRESHOLD
+C      WRITE(*,*)'correction'
+      CALL PSUMxx(PV(0,4),PV(0, 5),QV(0,1))
+      CALL PSUMxx(QV(0,1),PV(0, 3),QV(0,1))
+      CALL PSUMxx(PV(0,7),PV(0, 8),QV(0,2))
+      CALL PSUMxx(QV(0,2),PV(0, 6),QV(0,2))
+      CALL PSUMxx(QV(0,1),QV(0, 2),QV(0,3))
+      CALL RDOTxx(QV(0,1),QV(0,1),S1)
+      CALL RDOTxx(QV(0,2),QV(0,2),S2)
+      CALL RDOTxx(QV(0,3),QV(0,3),SH)
+      RSH = SQRT(SH)
+      CALL QCDMOD(xALFS,AMST,GAMT,AMSH,BETAH,RSH,S1,S2,FQCD)
+#else
+C      WRITE(*,*)'no correction'      
+      FQCD = 1
+#endif
+C--
 C  Calculate amplitude**2.
 C--
       CALL AMPTTZ(GAL,GAU,GZL,GZU,GZH,GTH,
@@ -134,8 +158,8 @@ C--
      .          * VKM( IDP(1,4), IDP(1,5), IDP(3,4) )**2
      .          * VKM(        3, IDP(1,6), IDP(3,6) )**2
      .          * VKM( IDP(1,7), IDP(1,8), IDP(3,7) )**2
-      AMP2(0) = FACT*ABS(AMP(0))**2
-      AMP2(1) = FACT*ABS(AMP(1))**2
+      AMP2(0) = FACT*ABS(FQCD*AMP(1)+AMP(2))**2
+      AMP2(1) = FACT*ABS(FQCD*AMP(1))**2
       AMP2(2) = FACT*ABS(AMP(2))**2
 C--
 C  That's it.
