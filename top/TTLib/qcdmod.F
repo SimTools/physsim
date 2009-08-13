@@ -29,6 +29,7 @@ C*   92/10/27  K.Fujii        QCD hard gluon correction added.
 C*   07/11/08  A.Ishikawa     Allowed sqrt(s) is changed to 
 C*                            2*mt-20 to 2*mt+40GeV for ttH.
 C*                            Set FQCD=1 for sqrt(s)>2*mt+40GeV.
+C*   09/08/13  K.Ikematsu     Extended QCD correction to 2*mt+60GeV.
 C*
 CC**********************************************************************
  
@@ -38,11 +39,11 @@ CC**********************************************************************
       REAL*4      ALFS, AMT, GMT, AMH, BTH, RS, Q12, Q22
       COMPLEX*8   FQCD
 C--
-      PARAMETER    ( NE = 200, NQ = 500 )
+      PARAMETER    ( NE = 300, NQ = 500 )
       INTEGER*4    NBN(3)
-      DATA NBN     /   13, 35, 200 /
+      DATA NBN     /   13, 35, 300 /
       REAL   *8    ERGN(0:3), DERGN(3), DQRGN(0:NE,3)
-      DATA ERGN    / -20.D0, -7.D0, 0.D0, 40.D0 /
+      DATA ERGN    / -20.D0, -7.D0, 0.D0, 60.D0 /
       COMPLEX*16   GQ, GQL, GQH, GQDAT(0:NQ,0:NE,3)
       DATA NCALL   /0/
 C--
