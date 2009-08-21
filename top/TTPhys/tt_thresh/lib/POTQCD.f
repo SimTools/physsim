@@ -42,8 +42,12 @@ C--
       COMMON /VPARA/  X(10)
       REAL   *8       X
 C--
-      PARAMETER      ( NTRMAX = 3000 )
+C>>> 20090815 KF
+      PARAMETER      ( NTRMAX = 15000 )
+C     PARAMETER      ( NTRMAX = 3000 )
+C<<< 20090815
 C     PARAMETER      ( NTRMAX = 1000 )
+C>>>
       COMMON /VR0/    VR(0:NTRMAX), TR(0:NTRMAX), DTR
       REAL   *8       VR          , TR          , DTR
 C--
@@ -128,12 +132,15 @@ C>>>
       PRINT *, 'SETVPR now tabulates QCD potential.'
 C>>>
 C     RMIN = .00005/AMT
-      RMIN = .00001/AMT
+      RMIN = .00001D0/AMT
 C>>>
       IF ( GMT.EQ.0.D0 ) THEN
          RMAX = 1.D0
       ELSE
-         RMAX = 30.D0/SQRT(AMT*GMT)*2.
+C>>> 20090815 KF
+C        RMAX = 30.D0/SQRT(AMT*GMT)*2.
+         RMAX = 150.D0/SQRT(AMT*GMT)*2.
+C<<< 20090815
       END IF
       TRMIN = LOG(RMIN)
       TRMAX = LOG(RMAX)
@@ -255,7 +262,10 @@ C*
       IMPLICIT REAL*8 ( A-H, O-Z )
       REAL   *8       R
 C--
-      PARAMETER      ( NTRMAX = 3000 )
+C>>> 20090815 KF
+      PARAMETER      ( NTRMAX = 15000 )
+C     PARAMETER      ( NTRMAX = 3000 )
+C<<< 20090815
 C     PARAMETER      ( NTRMAX = 1000 )
       COMMON /VR0/    VR(0:NTRMAX), TR(0:NTRMAX), DTR
       REAL   *8       VR          , TR          , DTR

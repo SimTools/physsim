@@ -21,9 +21,9 @@ C--
       COMPLEX*16 D1, D2, D3, D4, E1, E2, E3, E4, G
 C--
       COMPLEX*16      ZI
-      PARAMETER ( ZI = (0.,1.) )
+      PARAMETER ( ZI = (0.D0,1.D0) )
 C--
-      G(X,Y) = - ZMU*( E + .5*ZI*GAMMA0 - V(X) )*Y
+      G(X,Y) = - ZMU*( E + .5D0*ZI*GAMMA0 - V(X) )*Y
 C
 C========< Entry Point >================================================
 C

@@ -149,7 +149,10 @@ C--
 C  Solve Schredinger eq. by Runge-Kutta method.
 C--
 C>>>
-      REND  = 20/SQRT(AMT*GAM)
+C>>> 20090815 KF
+C     REND  = 20/SQRT(AMT*GAM)
+      REND  = 150/SQRT(AMT*GAM)
+C<<< 20090815
 C For narrow width resonances.
 C     REND  = 15/SQRT(AMT*GAM) * MAX(1.D0,(2+E)/1.5D0)
 C>>>

@@ -46,19 +46,26 @@ C--
      .                B, BNEW
 C--
       PARAMETER( NMAX = 50000 )
+#if 0
 C>>> For precision plots.
-C     PARAMETER( EPS = 1.D-11 )
-C     PARAMETER( TST = 5.D-9  )
+      PARAMETER( EPS = 1.D-11 )
+      PARAMETER( TST = 5.D-9  )
+#else
 C>>> For practical use.
       PARAMETER( EPS = 1.D-6  )
       PARAMETER( TST = 5.D-5  )
-C>>>
+#endif
 C--
       REAL   *8       XDATA(0:NMAX)
       COMPLEX*16      YDATA(2,0:NMAX),  GL
+#if 1
       PARAMETER       ( NQ = 500 )
+#else
+      PARAMETER       ( NQ = 5000 )
+#endif
       REAL   *8       QDATA(0:NQ)
-      COMPLEX*16      GRDATA(0:1000), GQDATA(0:NQ)
+      COMPLEX*16      GRDATA(0:NMAX), GQDATA(0:NQ)
+
       DATA AMTS, GAMS / -9999.D0, -9999.D0 /
       DATA NCALL /0/
 C
@@ -118,10 +125,10 @@ C--
 C  Specify boundary conditions for two solutions, y1 and y2,
 C  at r = r0.
 C--
-      R0  = .001/AMT
+      R0  = .001D0/AMT
 C--
       Y1 = R0
-      Z1 = 1.
+      Z1 = 1
 C--
       IF ( IPOT.EQ.1 .OR. IPOT.EQ.2 ) THEN
          Y2 = 1 + BETA*R0*(LOG(LOG(RQCD/R0))
@@ -145,11 +152,16 @@ C--
 C  Solve Schredinger eq. by Runge-Kutta method.
 C--
       NDATA = -1
-      B     = 0.
+      B     = 0
       X     = R0
       DXMIN = .01D0/(AMT**3/7000)
+#if 0
       XMAX  = 5/SQRT(AMT*GAM)
       DXMAX = XMAX/5000 * MAX(1.D0,SQRT(ABS(E+3)))
+#else
+      XMAX  = 150/SQRT(AMT*GAM)
+      DXMAX = XMAX/150000 * MAX(1.D0,SQRT(ABS(E+3)))
+#endif
 C--
       DO 2000 N = 0, NMAX
           DX = MIN(MAX(0.002D0*X,DXMIN),DXMAX)
@@ -255,6 +267,18 @@ C--
          A2 = QDATA(IQ+1) - Q
          GQ = (A2*GQDATA(IQ)+A1*GQDATA(IQ+1))/DQ
       END IF
+#if 0
+C     Free Green's function
+#if 0
+      s1 = amt**2
+      e1 = sqrt(s1 + q**2)
+      e2 = rsh - e1
+      s2 = (e2 - q2)*(e2 + q2)
+      gq = 1/((s1 + s2)/(2*amt) - amt + (0.D0, 1.D0)*gam)
+#else
+      gq = 1/(e - q**2/amt + (0.D0, 1.D0)*gam)
+#endif
+#endif
 C--
 C  That's it.
 C--

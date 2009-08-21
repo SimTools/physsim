@@ -80,8 +80,9 @@ C*    8/21/91  K.Fujii       Original version.
 C*                           W/o radiative correction.
 C*
       IMPLICIT  REAL*8 ( A-H, O-Z )
+      PARAMETER     ( NPT = 1200 )
 C     PARAMETER     ( NPT = 200 )
-      PARAMETER     ( NPT = 30 )
+C     PARAMETER     ( NPT = 30 )
 C     PARAMETER     ( NPT = 40 )
       REAL*8        RDATA(2,0:NPT,0:10)
       CHARACTER*8   JOIN(0:3)
@@ -121,10 +122,12 @@ C>>>
 C--
 C  Energy range.
 C--
+      RSMN = 2*AMT - 20
+      RSMX = 2*AMT + 60
 C     RSMN = 2*AMT - 10
 C     RSMX = 2*AMT + 6
-      RSMN = 2*AMT - 8
-      RSMX = 2*AMT + 4
+C     RSMN = 2*AMT - 8
+C     RSMX = 2*AMT + 4
 C     RSMN = 2*AMT - 4
 C     RSMX = 2*AMT + 1
       DRS  = (RSMX-RSMN)/NPT

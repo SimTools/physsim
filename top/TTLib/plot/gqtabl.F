@@ -1,45 +1,8 @@
-CC**********************************************************************
-C*
-C*===================================================----==
-C* Subroutine QCDMOD(ALFS,AMT,GMT,AMH,BTH,RS,Q12,Q22,FQCD)
-C*===================================================----==
-C*
-C* (Purpose)
-C*    Calculates QCD modification to the ttbar threshold shape
-C*    determined from the EW amplitude for e+e- --> bW+ bbarW-.
-C* (Inputs)
-C*    ALFS   : (R*4) : alpha_s.
-C*    AMT    : (R*4) : top mass.
-C*    GMT    : (R*4) : top width.
-C*    AMH    : (R*4) : Higgs mass.
-C*    BTH    : (R*4) : top's Yukawa coupling normalized by SM.
-C*    RS     : (R*4) : sqrt(s).
-C*    Q12    : (R*4) : virtual top mass squared
-C*    Q22    : (R*4) : virtual anti-top mass squared.
-C* (Output)
-C*    FQCD   : (C*8) : (Q1,Q2)-dependent QCD modification to
-C*                   : the ttbar threshold calculated without QCD.
-C* (Update Record)
-C*   92/10/27  K.Fujii        Original version.
-C*                            This version allows variable sqrt(s)
-C*                            in the range 2*mt-12 to 2*mt+5,
-C*                            though parameters are not allowed to
-C*                            change in the job.
-C*   92/10/27  K.Fujii        QCD hard gluon correction added.
-C*   07/11/08  A.Ishikawa     Allowed sqrt(s) is changed to 
-C*                            2*mt-20 to 2*mt+40GeV for ttH.
-C*                            Set FQCD=1 for sqrt(s)>2*mt+40GeV.
-C*   09/08/13  K.Ikematsu     Extended QCD correction to 2*mt+60GeV.
-C*   09/08/20  K.Fujii        Modified for better matching with the
-C*                            analytic results 
-C*
-CC**********************************************************************
- 
-      SUBROUTINE QCDMOD(ALFS,AMT,GMT,AMH,BTH,RS,Q12,Q22,FQCD)
- 
+      SUBROUTINE GQTABL(ALFS,AMT,AMH,BTH,RS,QR,GQ)
+
       IMPLICIT    REAL*8 ( A-H, O-Z )
-      REAL*4      ALFS, AMT, GMT, AMH, BTH, RS, Q12, Q22
-      COMPLEX*8   FQCD
+      REAL*8      ALFS, AMT, AMH, BTH, RS, QR
+      COMPLEX*16  GQ
 C--
 #if 1
 C     PARAMETER    ( NE = 300, NQ = 500 )
@@ -50,17 +13,14 @@ C     PARAMETER    ( NE = 300, NQ = 5000 )
 #endif
       INTEGER*4    NBN(3)
 C>>> 20090817
-C     DATA NBN     /   13, 35, 300 /
-      DATA NBN     /   46, 35, 600 /
+      DATA NBN     /   23, 35, 300 /
+C     DATA NBN     /   46, 35, 600 /
+C     DATA NBN     /  230, 140, 600 /
 C<<< 20090817
       REAL   *8    ERGN(0:3), DERGN(3), DQRGN(0:NE,3)
       DATA ERGN    / -30.D0, -7.D0, 0.D0, 60.D0 /
-      COMPLEX*16   GQ, GQL, GQH, GQDAT(0:NQ,0:NE,3)
+      COMPLEX*16   GQL, GQH, GQDAT(0:NQ,0:NE,3)
       DATA NCALL   /0/
-C--
-C  Statement function.
-C--
-      BETA(X1,X2) = SQRT( MAX( 1 - 2*(X1+X2) + (X1-X2)**2, 0.D0 ) )
 C
 C========< Entry Point >================================================
 C
@@ -80,7 +40,6 @@ C--
          AMSW   = 80.D0
          AMSB   =  5.D0
          AMST   =  AMT
-         GAMT   =  GMT
          AMSH   =  AMH
          BETH   =  BTH
          VFF    =  1
@@ -92,7 +51,6 @@ C--
          PRINT *, '  VTB2   = ', VFF**2
          PRINT *, '  AMH    = ', AMH
          PRINT *, '  BTH    = ', BTH
-         PRINT *, '  GAMT   = ', GAMT
          MODE  =  0
          DO 100 IRGN = 1, 3
             ME  = NBN(IRGN)
@@ -123,14 +81,12 @@ C--
 C  Calculate the magnitude of the 3-momentum of t and tbar quarks.
 C--
       RSH  = RS
-      S    = RSH*RSH
-      QR   = (RSH/2)*BETA(Q12/S,Q22/S)
 C--
 C  Calculate Green function.
 C--
       E    = RSH - 2*AMST
       IF ( E.LE.ERGN(0) ) THEN
-         FQCD = 1
+         GQ = 0
          RETURN
       ELSE IF ( E.GT.ERGN(3) ) THEN
 C         PRINT *, '>>>>> Error in QCDMOD >>>>>>>>'
@@ -138,7 +94,7 @@ C         PRINT *, '   RS = ', RS, ' is too large!'
 C         STOP
 
 C     no QCD correction for large E
-         FQCD = 1
+         GQ = 0
          RETURN
       ELSE IF ( E.LE.ERGN(1) ) THEN
          IRGN = 1
@@ -177,6 +133,12 @@ C--
             GQH  = GQDAT(NQ ,IE+1,IRGN)
          ENDIF
          GQ  = GQL + (GQH-GQL)*F
+#if 0
+         print *, ' ie = ', ie, ' irgn = ', irgn, ' iql = ', iql,
+     .            ' iqh = ', iqh, ' dql = ', dql, ' dqh = ', dqh
+         print *, ' gq(iql,ie) = ', gqdat(iql,ie,irgn)
+         print *, ' gq(iqh,ie) = ', gqdat(iqh,ie,irgn)
+#endif
       ELSE
          DQ  = DQRGN(ME,IRGN)
          IQ  = QR/DQ
@@ -184,34 +146,6 @@ C--
          GQ  = GQDAT(IQ,ME,IRGN)
      .          + (GQDAT(IQ+1,ME,IRGN)-GQDAT(IQ,ME,IRGN))*F
       ENDIF
-C--
-C  Calculate Green function.
-C--
-#if 1
-      FQCD = ( RSH - 2*AMST - QR*QR/AMST + (0.D0,1.D0)*GAMT )*GQ
-#else
-      RET  = AMST/SQRT(AMST**2+QR**2)
-      FQCD = ( (Q12 + Q22)/(2*AMST) - AMST  + (0.D0,1.D0)*GAMT*RET )*GQ
-#endif
-      W    = (AMSW/AMST)**2
-      RW   = AMST**3*(1+2*W)*(1-W)**2
-      Q1   = SQRT(Q12)
-      X1   = (AMSW/Q1)**2
-      IF (X1.LT.0.9) THEN
-         R1   = RW/(Q1**3*(1+2*X1)*(1-X1)**2)
-      ELSE
-         R1   = 1
-      ENDIF
-      Q2   = SQRT(Q22)
-      X2   = (AMSW/Q2)**2
-      IF (X2.LT.0.9) THEN
-         R2   = RW/(Q2**3*(1+2*X2)*(1-X2)**2)
-      ELSE
-         R2   = 1
-      ENDIF    
-C--
-      FQCD = FQCD*SQRT(R1*R2)
-      FQCD = QCDVTX*FQCD
 C--
 C  That's it.
 C--
