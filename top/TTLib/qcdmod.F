@@ -187,7 +187,7 @@ C--
 C--
 C  Calculate Green function.
 C--
-#if 1
+#if 0
       FQCD = ( RSH - 2*AMST - QR*QR/AMST + (0.D0,1.D0)*GAMT )*GQ
 #else
       RET  = AMST/SQRT(AMST**2+QR**2)
