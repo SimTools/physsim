@@ -38,6 +38,7 @@ C  Set user constants.
 C--
       ROOTS  = SQRTS
       POLE   = POLEBM
+      POLP   = POLPBM
       SGEBM  = SGMEBM
       ISRBM  = ISRB
       IMDZMN = IMDZLO
@@ -51,6 +52,7 @@ C--
       PRINT *, '     ROOTS  = ', ROOTS
       PRINT *, '     SGEBM  = ', SGEBM
       PRINT *, '     POLE   = ', POLE
+      PRINT *, '     POLP   = ', POLP
       PRINT *, '     ISRBM  = ', ISRBM
       PRINT *, '     IMDZMN = ', IMDZMN
       PRINT *, '     IMDZMX = ', IMDZMX      

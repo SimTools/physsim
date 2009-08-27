@@ -243,8 +243,10 @@ C--
       HLM   = (1-POLE)/2
       IF ( Z(4).LT.HLM ) THEN
          IOFF = 0
+          WAT = WAT*(1+POLP)/2
       ELSE
          IOFF = NHEL
+          WAT = WAT*(1-POLP)/2
       ENDIF
 C--
 C  Select final state helicities.

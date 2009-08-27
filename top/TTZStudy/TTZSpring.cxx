@@ -206,6 +206,7 @@ TTZBases::TTZBases(const char *name, const char *title)
 
   sscanf(gJSF->Env()->GetValue("TTZBases.Roots","700."),"%lg",&fRoots);
   sscanf(gJSF->Env()->GetValue("TTZBases.PolElectron","0."),"%lg",&fPolElectron);
+  sscanf(gJSF->Env()->GetValue("TTZBases.PolPositron","0."),"%lg",&fPolPositron);
   sscanf(gJSF->Env()->GetValue("TTZBases.SigmaEbeam","0.005"),"%lg",&fSigmaEbeam);
   sscanf(gJSF->Env()->GetValue("TTZBases.Alphai","128."),"%lg",&fAlphai);
   sscanf(gJSF->Env()->GetValue("TTZBases.Alphas","0.120"),"%lg",&fAlphas);
@@ -225,6 +226,7 @@ void TTZBases::PrintParameters()
   printf("Parameters for ee->TTZ generator\n");
   printf("  Roots  = %g (GeV)\n",fRoots);
   printf("  PolElectron = %g\n",fPolElectron);
+  printf("  PolPositron = %g\n",fPolPositron);
   printf("  SigmaEbeam  = %g\n",fSigmaEbeam);
   printf("  Flag for ISR/BM Effects(ISRBM) =%d\n",fISRBM);
   printf("       = 1 ; None\n");
@@ -282,6 +284,7 @@ void TTZBases::Userin()
   // Copy class data member into common /usrprm/
   usrprm_.sqrts  = fRoots;
   usrprm_.polebm = fPolElectron;
+  usrprm_.polpbm = fPolPositron;
   usrprm_.sgmebm = fSigmaEbeam;
   usrprm_.isrb   = fISRBM;
   usrprm_.imdzlo = fZModesLo;

@@ -13,7 +13,8 @@ C* (Update Record)
 C*   95/03/21  K.Fujii		Original version.
 C*
       COMMON /USRPRM/ SQRTS, POLEBM, SGMEBM, ISRB,
-     .                IMDZLO, IMDZHI, IMD1LO, IMD1HI, IMD2LO, IMD2HI
-      REAL   *4       SQRTS, POLEBM, SGMEBM
+     .                IMDZLO, IMDZHI, IMD1LO, IMD1HI, IMD2LO, IMD2HI,
+     .                POLPBM
+      REAL   *4       SQRTS, POLEBM, SGMEBM, POLPBM
       INTEGER*4       ISRB,  
      .                IMDZLO, IMDZHI, IMD1LO, IMD1HI, IMD2LO, IMD2HI

@@ -67,7 +67,7 @@ C  assumed to be polarized and its spin average is taken in TTATTZ.
 C--
       IF ( NCALL.EQ.0 ) THEN
          NCALL  = 1
-         SPIN   = 2
+         SPIN   = 1
          NB     = 7
          FACT   = xGV2FB*x2PI/(x4PI**(3*NB))/SPIN
          AME    = AMF(1,2,1)
