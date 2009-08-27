@@ -159,9 +159,9 @@ C--
      .          * VKM( IDP(1,4), IDP(1,5), IDP(3,4) )**2
      .          * VKM(        3, IDP(1,6), IDP(3,6) )**2
      .          * VKM( IDP(1,7), IDP(1,8), IDP(3,7) )**2
-      AMP2(0) = FACT*ABS(FQCD*AMP(1)+AMP(2))**2
+      AMP2(0) = FACT*ABS(FQCD*AMP(1)+FQCD*AMP(2))**2
       AMP2(1) = FACT*ABS(FQCD*AMP(1))**2
-      AMP2(2) = FACT*ABS(AMP(2))**2
+      AMP2(2) = FACT*ABS(FQCD*AMP(2))**2
 C--
 C  That's it.
 C--
