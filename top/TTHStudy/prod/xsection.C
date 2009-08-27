@@ -24,5 +24,5 @@ void xsection(Double_t rsi)
   outf << rs << " " << sg << " " << dsg << endl;
 #endif
 
-  file->Write();
+  file.Write();
 }
