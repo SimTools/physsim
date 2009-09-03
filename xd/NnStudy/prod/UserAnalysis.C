@@ -4,11 +4,18 @@
 //*  
 //****************************************************
 
+JetAnalysis  *anal=0;
 TCanvas *cHist;
 TDirectory *cDir;
 TH1F *hNCDC;
 TH1F *hNVTX;
 TH1F *hNGen;
+
+//_________________________________________________________
+void UserAnotherModules()
+{
+  anal=new JetAnalysis();  // define JetAnalysis
+}
 
 //_________________________________________________________
 void UserInitialize()
@@ -127,10 +134,4 @@ void UserSetOptions()
 void UserTerminate()
 {
   // This function is called at the end of job.
-
 }
-
-
-
-
-

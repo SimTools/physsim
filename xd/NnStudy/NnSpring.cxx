@@ -141,7 +141,7 @@ Bool_t NnSpringBuf::SetPartons()
   //  Set final state parton infomation
   // ----------------------------------------------
 
-
+  Int_t cp = bases->fHelCombInitial < 0.5 ? +1 : -1; // cp flip factor
   static TVector **qp = 0;
   if (!qp) {
     qp = new TVector* [fNparton];
@@ -149,43 +149,50 @@ Bool_t NnSpringBuf::SetPartons()
   }
   for (Int_t i=0; i<fNparton; i++) {
     TVector &q = *qp[i];
-    q(0) = pv[i].E ();
-    q(1) = pv[i].Px();
-    q(2) = pv[i].Py();
-    q(3) = pv[i].Pz();
+    q(0) =    pv[i].E ();
+    q(1) = cp*pv[i].Px();
+    q(2) = cp*pv[i].Py();
+    q(3) = cp*pv[i].Pz();
   }
-  Int_t    idnu    = bases->fFPtr->GetPID();   // PDG code for f
-  Double_t mnu     = bases->GetMassnu();       // nu mass
 
-  Int_t    idx     = bases->fNRPtr->GetPID();  // N PDG
-  Int_t    idl     = 2*bases->fGenLepton+9;
+  Int_t    gennu   = bases->GetGenNu();
+  Int_t    idnu    = -cp*(gennu == 1 ? 12 : (gennu == 2 ? 14 : 16));   // PDG code for f
+  Double_t mnu     = kMnu[gennu-1];       // nu mass
+
+#if 0
+  Int_t    idx     = cp*bases->fNRPtr[bases->fGenLepton-1]->GetPID();  // N PDG : meaningless!
+#else
+  Int_t    idx     = cp*bases->fNRPtr[1]->GetPID();  // N PDG : meaningless!
+#endif
+  Int_t    idl     = cp*(2*bases->fGenLepton + 9);
   Double_t ml      = bases->fFPtr->GetMass();
 
-  Int_t    helnu   = bases->fHelFinal[0];
-  Int_t    hell    = bases->fHelFinal[1];
+  Int_t    helnu   = cp*bases->fHelFinal[0];
+  Int_t    hell    = cp*bases->fHelFinal[1];
 
-  Double_t chgl    = -1.;
+  Double_t chgl    = -cp;
+  Double_t chgw    =  cp;
 
-  Int_t    idu     = bases->f1Ptr->GetPID();
-  Int_t    idd     = bases->f2Ptr->GetPID();
+  Int_t    idu     = cp*bases->f1Ptr->GetPID();
+  Int_t    idd     = cp*bases->f2Ptr->GetPID();
   Double_t mu      = bases->f1Ptr->GetMass();
   Double_t md      = bases->f2Ptr->GetMass();
-  Int_t    helu    = bases->fHelFinal[2];
-  Int_t    held    = bases->fHelFinal[3];
+  Int_t    helu    = cp*bases->fHelFinal[2];
+  Int_t    held    = cp*bases->fHelFinal[3];
   Double_t colorp  = bases->f1Ptr->GetColor();
-  Double_t chgu    = bases->f1Ptr->GetCharge();
-  Double_t chgd    = bases->f2Ptr->GetCharge();
+  Double_t chgu    = cp*bases->f1Ptr->GetCharge();
+  Double_t chgd    = cp*bases->f2Ptr->GetCharge();
   Int_t    islev   = colorp > 1. ? 201 : 0;
   Int_t    icfp    = 2;
 
   Double_t mrn     = bases->GetMass();
 
-  Int_t    idw     = 24;
+  Int_t    idw     = cp*24;
   Double_t mw      = bases->fW1BosonPtr->GetMass();
 
   new (partons[0]) JSFSpringParton(1, idnu, mnu,    0, *qp[0], 0, 0, 0, helnu,    0,     0);
   new (partons[1]) JSFSpringParton(2,  idx, mrn,    0, *qp[1], 2, 3, 0,     0,    0,     0);
-  new (partons[2]) JSFSpringParton(3,  idw,  mw,   +1, *qp[2], 2, 5, 2,     0,    0,     0);
+  new (partons[2]) JSFSpringParton(3,  idw,  mw, chgw, *qp[2], 2, 5, 2,     0,    0,     0);
   new (partons[3]) JSFSpringParton(4,  idl,  ml, chgl, *qp[3], 0, 0, 2,  hell,    0,     0);
   new (partons[4]) JSFSpringParton(5,  idu,  mu, chgu, *qp[4], 0, 0, 3,  helu, icfp, islev);
   new (partons[5]) JSFSpringParton(6,  idd,  md, chgd, *qp[5], 0, 0, 3,  held, icfp, islev);
@@ -208,22 +215,21 @@ NnBases::NnBases(const char *name, const char *title)
            fBeamStr   ( 1),
            fBeamWidth (0.002),
            fPole      (0),
-           fMass      (300.),
+           fMass      (100.),
            fMass4     (3.3e-9),
-	   fGenNR     (2),
-	   fGenLepton (2),
-	   fWmModesLo ( 1),
-           fWmModesHi (12),
+           fGenNu     (1),
+           fGenLepton (2),
+           fWpModesLo ( 1),
+           fWpModesHi (12),
            fFPtr      (0),
            fZBosonPtr (0),
-           fNRPtr     (0),
            fW1BosonPtr(0),
            fZBoost    (0.),
            fEcmIP     (fEcmInit),
            fQ2XX      (0.),
            fQ2X1      (0.),
-	   fW1ModePtr (0),
-	   f1Ptr      (0),
+           fW1ModePtr (0),
+           f1Ptr      (0),
            f2Ptr      (0),
            fCosTheta  (0.),
            fPhi       (0.),
@@ -239,6 +245,7 @@ NnBases::NnBases(const char *name, const char *title)
            fPhiF1       (0.)
 {
   //  Constructor of bases.  Default parameter should be initialized here
+  fNRPtr[0] = fNRPtr[1] = fNRPtr[2] = 0;
   //
   // --------------------------------------------
   //  Get parameters from jsf.conf, if specified
@@ -291,15 +298,15 @@ NnBases::NnBases(const char *name, const char *title)
   ins >> fPole;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("NnBases.WmModesLo","1"));     // W- decay mode lo
-  ins >> fWmModesLo;
+  ins.str(gJSF->Env()->GetValue("NnBases.WpModesLo","1"));     // W- decay mode lo
+  ins >> fWpModesLo;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("NnBases.WmModesHi","12"));    // W- decay mode hi
-  ins >> fWmModesHi;
+  ins.str(gJSF->Env()->GetValue("NnBases.WpModesHi","12"));    // W- decay mode hi
+  ins >> fWpModesHi;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("NnBases.NRMass","300."));    // NR mass
+  ins.str(gJSF->Env()->GetValue("NnBases.NRMass","100."));    // NR mass
   ins >> fMass;
 
   ins.clear();
@@ -307,8 +314,8 @@ NnBases::NnBases(const char *name, const char *title)
   ins >> fMass4;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("NnBases.GenNR","2"));    //  NR Generation
-  ins >> fGenNR;
+  ins.str(gJSF->Env()->GetValue("NnBases.GenNu","1"));    //  nu Generation
+  ins >> fGenNu;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("NnBases.GenLepton","2"));    // Lepton Generation
@@ -378,7 +385,7 @@ NnBases::NnBases(const char *name, const char *title)
 NnBases::~NnBases()
 {
   delete fZBosonPtr;
-  delete fNRPtr;
+  for (Int_t jnu=0; jnu<3; jnu++) delete fNRPtr[jnu];
   delete fW1BosonPtr;
 }
 
@@ -454,7 +461,7 @@ Double_t NnBases::Func()
   Double_t md = f2Ptr->GetMass();
 
   Double_t mlep   = fFPtr->GetMass();
-  Double_t mnu    = kMnu[fGenNR-1]; //takubo
+  Double_t mnu    = kMnu[fGenNu-1]; //takubo
 
   // --------------------------------------------
   //  Check if reduced Ecm enough for prod.
@@ -480,10 +487,19 @@ Double_t NnBases::Func()
   Double_t qmin = mlep + mu + md;
   Double_t qmax = rs - mnu;
 #ifndef __ZEROWIDTH__
-  fQ2X1 = fNRPtr->GetQ2BW(qmin,qmax, fXQ2X1, weight);
+#if 0
+  fQ2X1 = fNRPtr[fGenLepton-1]->GetQ2BW(qmin,qmax, fXQ2X1, weight);
 #else
-  fQ2X1  = TMath::Power(fNRPtr->GetMass(),2);
-  weight = kPi*fNRPtr->GetMass()*fNRPtr->GetWidth();
+  fQ2X1 = fNRPtr[1]->GetQ2BW(qmin,qmax, fXQ2X1, weight);
+#endif
+#else
+#if 0
+  fQ2X1  = TMath::Power(fNRPtr[fGenLepton-1]->GetMass(),2);
+  weight = kPi*fNRPtr[fGenLepton-1]->GetMass()*fNRPtr[fGenLepton-1]->GetWidth();
+#else
+  fQ2X1  = TMath::Power(fNRPtr[1]->GetMass(),2);
+  weight = kPi*fNRPtr[1]->GetMass()*fNRPtr[1]->GetWidth();
+#endif
 #ifdef __NODECAY__
   weight = 1.;
 #endif
@@ -502,6 +518,7 @@ Double_t NnBases::Func()
   weight = 1.;
 #endif
 #endif
+
   Double_t qw1 = TMath::Sqrt(fQ2W1);
   bsWeight *= weight;
 
@@ -518,7 +535,7 @@ Double_t NnBases::Func()
   if (!hEcm  ) hEcm   = new TH1D( "hEcm"  , "Ecm"    , 50,     0., fEcmInit*1.1 );
   if (!hCosNR) hCosNR = new TH1D( "hCosNR", "Costh"  , 50, fXL[0],        fXU[0]);
   if (!hPhiNR) hPhiNR = new TH1D( "hPhiNR", "Phi"    , 50, fXL[1],        fXU[1]);
-  if (!hMNR  ) hMNR   = new TH1D( "hMNR"  , "MNR"    , 50, 300-5.e-2,  300+5.e-2);
+  if (!hMNR  ) hMNR   = new TH1D( "hMNR"  , "MNR"    , 50, 100-5.e-2,  100+5.e-2);
   if (!hCosW ) hCosW  = new TH1D( "hCosW" , "CosthW" , 50, fXL[2],        fXU[2]);
   if (!hPhiW ) hPhiW  = new TH1D( "hPhiW" , "PhiW"   , 50, fXL[3],        fXU[3]);
   if (!hMw   ) hMw    = new TH1D( "hMw"   , "Mw"     , 50,    60.,          100.);
@@ -707,24 +724,13 @@ Double_t NnBases::AmpSquared(GENBranch &cmbranch)
 Complex_t NnBases::FullAmplitude()
 {
   Double_t M     = fMass4;              // 4-dim Majorana mass of N 
-  Double_t mnu   = kMnu[fGenNR-1];      // nubar mass
-  Double_t mrnu  = fNRPtr->GetMass();   // R-neutrino mass
-  Double_t gamrn = fNRPtr->GetWidth();
   Double_t gamw  = fW1BosonPtr->GetWidth(); 
 
   //-----------------------------------------
   // e+e- -> nu_jnu N_jnu -> nu_jnu W+ l_il 
   //-----------------------------------------
-  Int_t    il  = fGenLepton - 1;     // l  = mu
-  Int_t    jnu = fGenNR - 1;         // nu = nu_mu
-  Double_t mns = kMNS[il][jnu];
-
-
   Double_t glw = -kGw*kSqh; //takubo
   Double_t grw = 0.; //takubo
-
-  Double_t glrnwl   = -(kGw*kSqh)*(1/(kPi*3./2.))*sqrt(2*mnu/M)*mns; 
-  Double_t grrnwl   = 0.; 
 
   static const Bool_t kIsIncoming = kTRUE;  
   static const Bool_t kIsOutgoing = kFALSE;
@@ -738,17 +744,55 @@ Complex_t NnBases::FullAmplitude()
   HELFermion fu (fP[2], fM[2], fHelFinal [2], +1, kIsOutgoing); // up quark outgoing line
   HELFermion fdb(fP[3], fM[3], fHelFinal [3], -1, kIsIncoming); // down bar quark incoming line
   HELVector  wp (fdb, fu, glw, grw, kM_w, gamw);                // (W+ -> u dbar) internal line
-  HELFermion frn(fl, wp, glrnwl, grrnwl, mrnu, gamrn);          // (N -> W+ l-) internal line
-#else
-  ANL4DVector prnu = fP[1] + fP[2] + fP[3];
-  HELFermion frn(prnu,mrnu, fHelFinal[1], +1, kIsOutgoing);
 #endif
-  
-  Double_t  glznnr  = -(kGz/2)*(1/(kPi*3/2))*sqrt(2*mnu/M);
-  Double_t  grznnr  = 0.;
 
-  Complex_t amp = AmpEEtoNn(em, ep, fn, frn, glznnr, grznnr);
-  
+  Complex_t amp = 0.;
+  for (Int_t j=1; j<=3; j++) {
+    Int_t    il  = fGenLepton - 1;     // l  = mu
+    Int_t    jnu = j - 1;              // N_j
+    if (!fNRPtr[jnu]) continue;
+    Double_t mnu   = kMnu[fGenNu-1];           // nubar mass
+    Double_t mnut  = kMnu[jnu];                // j-th nu mass
+    Double_t mrnu  = fNRPtr[jnu]->GetMass();   // j-th R-neutrino mass
+    Double_t gamrn = fNRPtr[jnu]->GetWidth();  // j-th R-neutrino width
+    Double_t mns   = kMNS[il][jnu];
+
+    Double_t glrnwl   = -(kGw*kSqh)*(1/(kPi*1./2.))*sqrt(2*mnut/M)*mns; 
+    Double_t grrnwl   = 0.; 
+
+#ifndef __NODECAY__
+    HELFermion fnr(fl, wp, glrnwl, grrnwl, mrnu, gamrn);          // (N -> W+ l-) internal line
+#else
+    ANL4DVector prnu = fP[1] + fP[2] + fP[3];
+    HELFermion fnr(prnu,mrnu, fHelFinal[1], +1, kIsOutgoing);
+#endif
+    Double_t glznrn   = -(kGz/2)*(1/(kPi*3/2))*sqrt(2*mnu/M);
+    Double_t grznrn   = 0.;
+    Double_t mnst     = kMNS[0][jnu];
+    Double_t glrnwe   = -(kGw*kSqh)*(1/(kPi*1./2.))*sqrt(2*mnut/M)*mnst; 
+    Double_t grrnwe   = 0.; 
+    Double_t glnwe    = fGenNu == 1 ? glw : 0.;
+    Double_t grnwe    = fGenNu == 1 ? grw : 0.;
+
+    amp += AmpEEtoNn(em, ep, fnr, fn, 
+                     glznrn, grznrn,
+                     glrnwe, grrnwe, 
+                     glnwe , grnwe,
+                     mrnu  , gamrn);
+#if 0
+    cerr << " glrnwl = " << glrnwl
+         << " grrnwl = " << grrnwl
+	 << " glznrn = " << glznrn
+	 << " grznrn = " << grznrn
+	 << " glnwe  = " << glnwe
+	 << " grnwe  = " << grnwe
+	 << " mrnu   = " << mrnu
+	 << " gamrn  = " << gamrn
+	 << endl;
+    cerr << "j = " << j << " amp = " << amp << endl;
+#endif
+  }
+
   return amp;
 }
 
@@ -758,33 +802,46 @@ Complex_t NnBases::FullAmplitude()
 // --------------------------
 Complex_t NnBases::AmpEEtoNn(const HELFermion &em,
                              const HELFermion &ep,
+                             const HELFermion &fnr,
 			     const HELFermion &fn,
-			     const HELFermion &fnr,
-			     Double_t glznnr,
-			     Double_t grznnr)
+			     Double_t glznrn,
+			     Double_t grznrn,
+			     Double_t glrnwe,
+			     Double_t grrnwe,
+			     Double_t glnwe,
+			     Double_t grnwe,
+			     Double_t mrnu,
+			     Double_t gamrn)
+
 {
    Double_t  qe    = -1.;
    Double_t  t3e   = -1./2.;
    Double_t  glze  = -kGz*(t3e - qe*kSin2W);
    Double_t  grze  = -kGz*(    - qe*kSin2W);
 
+   Double_t  gamw  = fW1BosonPtr->GetWidth();
    Double_t  gamz  = fZBosonPtr->GetWidth();
-
-
+  
    //--------------------------------------------------
    // Calculate Amplitudes
    //--------------------------------------------------
+ 
+   Complex_t amp = 0.;
 
-   // S-channel
-   HELVector zs(em, ep, glze, grze, kM_z, gamz);
-   HELVertex ampsch(fn, fnr, zs, glznnr, grznnr);
+   if (glznrn != 0. || grznrn != 0.) {
+     // S-channel
+     HELVector zs(em, ep, glze, grze, kM_z, gamz);
+     HELVertex ampsch(fn, fnr, zs, glznrn, grznrn);
+     amp += ampsch;
+   } 
 
-   /*   // T-channel
-   HELVector ws(em, fp, glw, grw, kM_w, gamw);
-   HELVertex amptch(fm, ep, ws, glw, grw);
-   */
-   Complex_t amp = ampsch;
-   //   Complex_t amp = ampsch + amptch;
+   if ((glnwe != 0. || grnwe != 0.) && 
+       (glrnwe != 0. || grrnwe != 0.)) {
+     // T-channel
+     HELVector ws(em, fnr, glrnwe, grrnwe, kM_w, gamw);
+     HELVertex amptch(fn, ep, ws, glnwe, grnwe);
+     amp += amptch;
+   }
 
    return amp;
 }
@@ -843,7 +900,7 @@ void NnBases::Userin()
   if (!fW1BosonPtr) fW1BosonPtr = new GENPDTWBoson();
   for (Int_t m=1; m<=fW1BosonPtr->GetEntries(); m++) {
     GENDecayMode *mp = fW1BosonPtr->GetMode(m); 
-    if (mp && (m<fWmModesLo || m>fWmModesHi)) {
+    if (mp && (m<fWpModesLo || m>fWpModesHi)) {
       mp->Lock();
     }
   }
@@ -852,10 +909,16 @@ void NnBases::Userin()
   if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
   fZBosonPtr->DebugPrint();
 
-  if (!fNRPtr)  fNRPtr  = new RNeutrino(fMass, fMass4, fGenNR);
-  fNRPtr->DebugPrint();
-  
-  fFPtr = static_cast<GENPDTEntry *>(fNRPtr->GetMode(fGenLepton)->At(0));
+  for (Int_t gen=2; gen<=3; gen++) {  
+    if (!fNRPtr[gen-1])  fNRPtr[gen-1]  = new RNeutrino(fMass, fMass4, gen);
+    fNRPtr[gen-1]->DebugPrint();
+  }
+
+#if 0
+  fFPtr = static_cast<GENPDTEntry *>(fNRPtr[fGenLepton-1]->GetMode(fGenLepton)->At(0));
+#else
+  fFPtr = static_cast<GENPDTEntry *>(fNRPtr[1]->GetMode(fGenLepton)->At(0));
+#endif
 
   // --------------------------------------------
   //  Define some plots
@@ -884,7 +947,7 @@ void NnBases::Userout()
   cout << "End of NnBases----------------------------------- "     << endl
        << "Ecm                   = " << fEcmInit << " [GeV]   "    << endl
        << "Electron Polarization = " << fPole                      << endl
-       << "NR Generation         = " << fGenNR                     << endl
+       << "NR Generation         = " << fGenNu                     << endl
        << "Lepton Generation     = " << fGenLepton                 << endl
        << "NR mass               = " << fMass    << " [GeV]   "    << endl
        << "4-dim NR mass         = " << fMass4   << " [GeV]   "    << endl
@@ -932,10 +995,13 @@ void NnBases::SelectHelicities(Double_t &weight)
 #endif
   
    Double_t helm = (1. - fPole)/2.;
-   if (fHelCombInitial < helm) {
-      fJCombI = 0;
+   Int_t    cp   = fHelCombInitial < 0.5 ? +1 : -1; // cp flipping flag
+   Double_t xhel = cp > 0 ? 2*fHelCombInitial : 2*fHelCombInitial-1;
+   weight = 2;
+   if (xhel < helm) {
+      fJCombI = cp > 0 ? 0 : 1;
    } else {
-      fJCombI = 1;
+      fJCombI = cp > 0 ? 1 : 0;
    }
    fHelInitial[0] = kIHelComb[fJCombI][0];
    fHelInitial[1] = kIHelComb[fJCombI][1];
@@ -945,7 +1011,7 @@ void NnBases::SelectHelicities(Double_t &weight)
    fHelFinal  [1] = kFHelComb[fJCombF][1];
    fHelFinal  [2] = kFHelComb[fJCombF][2];
    fHelFinal  [3] = kFHelComb[fJCombF][3];
-   weight = kNf;
+   weight *= kNf;
 }
 
 //_____________________________________________________________________________
@@ -995,7 +1061,7 @@ void RNeutrino::Initialize()
     Double_t m1    = d1p->GetMass();
     Double_t m2    = d2p->GetMass();
     Double_t ident = 1.;
-    Double_t a     = -(kGw*kSqh)*(1/(kPi*3./2.))*sqrt(2.*kMnu[fGen-1]/fMass4)*kMNS[ig][fGen-1];
+    Double_t a     = -(kGw*kSqh)*(1/(kPi*1./2.))*sqrt(2.*kMnu[fGen-1]/fMass4)*kMNS[ig][fGen-1];
     Double_t gam   = GamToFV(m1, m2, a)/ident;
 
     dmp = new GENDecayMode(gam);

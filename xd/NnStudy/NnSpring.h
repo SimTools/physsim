@@ -48,7 +48,7 @@ public:
   Double_t GetMass     ()           const { return fMass;      }
   Double_t GetMass4    ()           const { return fMass4;     }
   Double_t GetMassnu   ()           const { return fMassnu;    }
-  Int_t    GetGenNR    ()           const { return fGenNR;     }
+  Int_t    GetGenNu    ()           const { return fGenNu;     }
   Int_t    GetGenLepton()           const { return fGenLepton; }
   Double_t GetEcmInit  ()           const { return fEcmInit;   }
 
@@ -92,10 +92,16 @@ private:
   Complex_t FullAmplitude();
   Complex_t AmpEEtoNn    (const HELFermion &em,
                           const HELFermion &ep,
-                          const HELFermion &fm,
-			  const HELFermion &fp,
-			        Double_t    glznnr,
-			        Double_t    grznnr);
+                          const HELFermion &fnr,
+			  const HELFermion &fn,
+			        Double_t glznrn,
+			        Double_t grznrn,
+			        Double_t glrnwe,
+			        Double_t grrnwe,
+			        Double_t glnwe,
+			        Double_t grnwe,
+		  	        Double_t mrnu,
+                                Double_t gamrn);
 
 private:
   // --------------------------------------------------------------------
@@ -113,11 +119,11 @@ private:
   Double_t fMass;           // right handed neutrino mass
   Double_t fMassnu;         // neutrino mass
   Double_t fMass4;          // 4-dim neutrino mass
-  Int_t    fGenNR;          // NR Generation
+  Int_t    fGenNu;          // NR Generation
   Int_t    fGenLepton;      // Lepton Generation
 
-  Int_t    fWmModesLo;      // W- decay mode lo;
-  Int_t    fWmModesHi;      // W- decay mode hi;
+  Int_t    fWpModesLo;      // W- decay mode lo;
+  Int_t    fWpModesHi;      // W- decay mode hi;
 
   // ----------------
   //  Particle Data
@@ -125,7 +131,7 @@ private:
   GENPDTEntry  *fFPtr;            //! PD table entry of "f"
   GENPDTZBoson *fZBosonPtr;       //! PD table entry of "Z"
 
-  RNeutrino    *fNRPtr;           //! PD table entry of "NR"
+  RNeutrino    *fNRPtr[3];        //! PD table entry of "NR[i]"
   GENPDTWBoson *fW1BosonPtr;      //! PD table entry of "W1"
 
   // ----------------
