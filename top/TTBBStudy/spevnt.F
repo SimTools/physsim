@@ -11,6 +11,9 @@ C*                > 0     Warning, continue processing.
 C*                < 0     Error, skip the rest.
 C*                > -999  terminates the job imediately.
 C* (Update Record)
+C*   2009/09/14  T.Tanabe         Provide alternative way to attach color strings.
+C*                                Turn on ALTCS=1 to make (tt)(bb) color singlets
+C*                                ALTCS=0 (default) will make (tb)(tb) color singlets.
 C*   2009/07/31  T.Tanabe         Fix color strings to work for ttg > ttbb.
 C*   2009/07/30  T.Tanabe         First version, based on the TTH version by K.Fujii.
 C*
@@ -199,7 +202,11 @@ C--
       RBUF(12) =   2
       RBUF(13) =  12
       RBUF(14) =   0
-      RBUF(18) =   6
+      IF (USEALTCS.EQ.0) THEN
+         RBUF(18) =   6
+      ELSE
+         RBUF(18) =   5
+      ENDIF
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -226,8 +233,13 @@ C--
       RBUF(13) =   0
       RBUF(14) =   1
       RBUF(17) =   IHLCMB(3)
-      RBUF(18) =   5
-      RBUF(19) =   101
+      IF (USEALTCS.EQ.0) THEN
+         RBUF(18) =   5
+         RBUF(19) =   101
+      ELSE
+         RBUF(18) =   2
+         RBUF(19) =   101
+      ENDIF
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -277,8 +289,13 @@ C--
       RBUF(13) =   0
       RBUF(14) =   2
       RBUF(17) =   IHLCMB(6)
-      RBUF(18) =   2
-      RBUF(19) =   401
+      IF (USEALTCS.EQ.0) THEN
+         RBUF(18) =   2
+         RBUF(19) =   401
+      ELSE
+         RBUF(18) =   2
+         RBUF(19) =   102
+      ENDIF
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -300,8 +317,13 @@ C--
       RBUF(12) =   2
       RBUF(13) =  10
       RBUF(14) =   2
-      RBUF(18) =   4
-      RBUF(19) =   401
+      IF (USEALTCS.EQ.0) THEN
+         RBUF(18) =   4
+         RBUF(19) =   401
+      ELSE
+         RBUF(18) =   4
+         RBUF(19) =   102
+      ENDIF
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -369,9 +391,8 @@ C--
          ENDIF
 300   CONTINUE
 C--
-C  Fermions from H.
+C  Fermions from gluon.
 C--
-#ifndef NO_H_DECAY
       NF =  1
       DO 400 IPT = 9, 10
          CALL IDK2PD(IDPTCL(1,IPT),IDPDG)
@@ -393,19 +414,23 @@ C--
          RBUF(13) =   0
          RBUF(14) =   3
          RBUF(17) =   IHLCMB(IPT)
-         IF (IPT.EQ.9) THEN
-            RBUF(18) = 2
-            RBUF(19) =   (LQ-1)*401
+         IF (USEALTCS.EQ.0) THEN
+            IF (IPT.EQ.9) THEN
+               RBUF(18) = 2
+               RBUF(19) = 401
+            ELSE
+               RBUF(18) = 5
+               RBUF(19) = 101
+            ENDIF
          ELSE
             RBUF(18) = 5
-            RBUF(19) =   (LQ-1)*101
+            RBUF(19) = 401
          ENDIF
          CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
          IF ( NEVENT.LE.NPRINT ) THEN
             CALL SLPRNT(NEVENT,NPT,RBUF(1))
          ENDIF
 400   CONTINUE
-#endif
 C--
 C  That's it.
 C--

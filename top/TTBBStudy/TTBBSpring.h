@@ -56,6 +56,7 @@ typedef struct {
   Int_t    imd2lo;	// W+ decay mode ID.
   Int_t    imd2hi;	// W+ decay mode ID.
   Float_t  polpbm;      // positron polarization.
+  Int_t    altcs;       // switch color strings from (tb)(tb) to (tt)(bb)
 } COMMON_USRPRM;             //  Common /USRPRM/
 
 extern COMMON_USRPRM usrprm_;
@@ -71,6 +72,7 @@ protected:
   Int_t    fWmModesHi;	// W- decay mode ID.
   Int_t    fWpModesLo;	// W+ decay mode ID.
   Int_t    fWpModesHi;	// W+ decay mode ID.
+  Int_t    fAltColorSinglets;	// Alternative color singlets
   Double_t fAlphai;	// 1/alpha(m_Z)
   Double_t fAlphas;	// alpha_s(m_Z)
   Double_t fMassW;	// m_W

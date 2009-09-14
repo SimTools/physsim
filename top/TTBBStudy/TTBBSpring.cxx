@@ -164,6 +164,7 @@ TTBBBases::TTBBBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("TTBBBases.ITMX1","5"),"%d",&fITMX1);
   sscanf(gJSF->Env()->GetValue("TTBBBases.ITMX2","5"),"%d",&fITMX2);
   sscanf(gJSF->Env()->GetValue("TTBBBases.NCALL","80000"),"%d",&fNCALL);
+  sscanf(gJSF->Env()->GetValue("TTBBBases.AltColorSinglets","0"),"%d",&fAltColorSinglets);
 
   Int_t fIOFF;
   if ( fISRBM == 1 ) {
@@ -234,6 +235,7 @@ void TTBBBases::PrintParameters()
   printf("                Hi =%d\n",fWmModesHi);
   printf("  W+ Decey Mode Lo =%d\n",fWpModesLo);
   printf("                Hi =%d\n",fWpModesHi);
+  printf("  Alternative Color Singlets =%d\n",fAltColorSinglets);
 
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
@@ -287,6 +289,7 @@ void TTBBBases::Userin()
   usrprm_.imd1hi = fWmModesHi;
   usrprm_.imd2lo = fWpModesLo;
   usrprm_.imd2hi = fWpModesHi;
+  usrprm_.altcs  = fAltColorSinglets;
 
   // Copy class data member into common /bshufl/
   bshufl_.nzz = fNDIM;

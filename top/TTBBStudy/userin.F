@@ -2,6 +2,7 @@ C* (Update Record)
 C*  95/03/28  K.Fujii	Original version for TTH.
 C*  95/06/07  K.Fujii	Added ISRB switch.
 C*  99/05/21  K.Fujii	Modified for JSF.
+C*  09/09/14  T.Tanabe  Added alternative CS switch.
 C*
 
       SUBROUTINE USERIN
@@ -38,6 +39,7 @@ C--
       IMD1MX = IMD1HI
       IMD2MN = IMD2LO
       IMD2MX = IMD2HI
+      USEALTCS = ALTCS
       PRINT *, ' ******< Job constants >*********** '
       PRINT *, '  '
       PRINT *, '     ROOTS  = ', ROOTS
@@ -49,6 +51,7 @@ C--
       PRINT *, '     IMD1MX = ', IMD1MX      
       PRINT *, '     IMD2MN = ', IMD2MN
       PRINT *, '     IMD2MX = ', IMD2MX      
+      PRINT *, '     USEALTCS = ', USEALTCS
       PRINT *, '  '
       PRINT *, ' ********************************** '
 C--
