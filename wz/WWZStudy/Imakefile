@@ -22,6 +22,8 @@ XCOMM ##########################################################################
 #define CXXPACKAGE
 #include "config/kflib.tmpl"
 
+/* EXTRADEFINES=-DHIGGSONLY */
+
 INCPATH = -I. -I$(KFLIBROOT)/gen_lib/sm/include \
 	-I$(KFLIBROOT)/gen_lib/ss/include \
 	-I$(KFLIBROOT)/gen_lib/hg/include \
