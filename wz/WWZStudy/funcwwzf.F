@@ -376,6 +376,13 @@ C--
       CALL XHFILL( 'h07', DBLE(Q4)          ,FUNC )
       CALL XHFILL( 'h08', DBLE(Q5)          ,FUNC )
       CALL XHFILL( 'h09', DBLE(ICMB)        ,FUNC )
+#if 1
+      phif1 = XPHASE(3,3)
+      phif2 = XPHASE(3,4)
+      dphi  = phif1 - phif2
+      if (dphi<0) dphi = dphi + x2PI
+      CALL XHFILL( 'h10', DBLE(dphi*RDDG)  ,FUNC )
+#endif
       CALL DHFILL( 'hd20', DBLE(EZ/EBM),  DBLE(COSZ)   , FUNC )
       CALL DHFILL( 'hd21', DBLE(EWM/EBM), DBLE(EWP/EBM), FUNC )
 C--

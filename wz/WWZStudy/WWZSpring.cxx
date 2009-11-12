@@ -305,6 +305,7 @@ void WWZBases::Userin()
       Xhinit("h07",  50.,110.,110,"m(W-)        ");
       Xhinit("h08",  50.,110.,110,"m(W+)        ");
       Xhinit("h09",  1.0,  5.,  4,"helicity combination  ");
+      Xhinit("h10",   0.,360., 50,"dphi         ");
       Dhinit("hd20",0.,1.,200,-1.,1.,200,"E_Z/E_bm-cos(theta_Z)");
       Dhinit("hd21",0.,1.,200, 0.,1.,200,"E_W-/E_bm-E_W+/E_bm  ");
 }
