@@ -16,9 +16,10 @@
 //* (Update Recored)
 //*   2002/08/15  K.Fujii	Original version.
 //*   2008/07/13  K.Fujii	Clean up.
+//*   2009/11/22  K.Fujii	Allow external switching of JSFBases module
 //*************************************************************************
 
-//#define __CHEAT__
+#define __CHEAT__
 
 #include "TTH8JAnalysis.h"
 #include "TTHSpring.h"
@@ -33,6 +34,8 @@
 
 #include <sstream>
 #include <iomanip>
+
+std::string TTH8JAnalysis::fgBasesName = "TTHBases";
 
 static const Double_t kMassW   = 80.00; 	// W mass
 static const Double_t kMassZ   = 91.19; 	// Z mass
@@ -98,11 +101,19 @@ Bool_t TTH8JAnalysis::Initialize()
   //  Read in Generator info.
   //--
   gJSF->GetInput()->cd("/conf/init");
-  TTHBases *bsp = static_cast<TTHBases *>(gROOT->FindObject("TTHBases"));
+  stringstream cmd;
+  cmd << "(static_cast<TTH8JAnalysis *>"
+      << "(JSFSteer::Instance()->FindModule(\"TTH8JAnalysis\")))"
+      << "->SetEcm((static_cast<" << fgBasesName.data() << " *>"
+      << "(gROOT->FindObject(\"" << fgBasesName.data() << "\")))"
+      << "->GetRoots());" << ends;
+#if 0
+  cerr << cmd.str().data() << endl;
+#endif
+  gROOT->ProcessLine(cmd.str().data());
   cerr << "------------------------------------" << endl
-       << " Ecm = " << bsp->GetRoots() << " GeV" << endl
+       << " Ecm = " << GetEcm() << " GeV"        << endl
        << "------------------------------------" << endl;
-  SetEcm(bsp->GetRoots()); 
 
   return kTRUE;
 }
@@ -503,7 +514,7 @@ Bool_t TTH8JAnalysis::Process(Int_t ev)
   if (!solutions.GetEntries()) { return kFALSE; }
   hStat->Fill(++selid);
   if (gNgoods == 0) {
-    gCutName[(Int_t)selid] << "|cos(theta_bw)| > " << fCosbwCut << ends;
+    gCutName[(Int_t)selid] << "|cos(theta_bw)| <= " << fCosbwCut << ends;
   }
 
   //--

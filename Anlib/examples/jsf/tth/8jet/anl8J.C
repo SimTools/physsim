@@ -20,7 +20,7 @@ int anl8J()
 {
   TFile *file;
   TFile *fin;
-  JSFSteer *jsf  = new JSFSteer();			// Create JSF object
+  JSFSteer *jsf  = JSFSteer::Instance();	// Create JSF object
 
   Char_t *outputfile="jsf.root";  // A file to output histograms
   Char_t *inputfile="../../../../../top/TTHStudy/prod/tthsim.root";
@@ -31,6 +31,7 @@ int anl8J()
       gSystem->Load("libJSFAnlib.so");
       gSystem->Load("../../../../../top/TTHStudy/prod/TTHSpring.so");
       gSystem->Load("libTTH8JAnalysis.so");
+      TTH8JAnalysis::SetBasesName("TTHBases");
 
   file = new TFile(outputfile,"RECREATE");  	// Output file
   fin  = new TFile(inputfile);            	// Input simulator data

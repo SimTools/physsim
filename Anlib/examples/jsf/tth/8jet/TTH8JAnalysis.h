@@ -22,6 +22,7 @@
 //*************************************************************************
 
 #include "JSFModule.h"
+#include <string>
 
 //_____________________________________________________________________
 //  -------------------
@@ -54,6 +55,7 @@ public:
   inline void SetBtagNoffv (Int_t    x) { fBtagNoffv  = x; }
   inline void SetBTtagNsig (Double_t x) { fBTtagNsig  = x; }
   inline void SetBTtagNoffv(Int_t    x) { fBTtagNoffv = x; }
+  static void SetBasesName (const Char_t *name) { fgBasesName = name; }
 
   inline Double_t GetEcm() const { return fEcm; }
 
@@ -80,6 +82,8 @@ private:
   Int_t    fBtagNoffv;     // Noffv for b-tag (loose)
   Double_t fBTtagNsig;     // Nsig  for b-tag (tight)
   Int_t    fBTtagNoffv;    // Noffv for b-tag (tight)
+  static std::string
+           fgBasesName;    //! Bases Name
 
   ClassDef(TTH8JAnalysis, 2) // TTH8JAnalysis Example
 };
