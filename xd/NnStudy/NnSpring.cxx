@@ -982,7 +982,7 @@ void NnBases::Userout()
   cout << "End of NnBases----------------------------------- "     << endl
        << "Ecm                   = " << fEcmInit << " [GeV]   "    << endl
        << "Electron Polarization = " << fPole                      << endl
-       << "NR Generation         = " << fGenNu                     << endl
+       << "Neutrino Generation   = " << fGenNu                     << endl
        << "Lepton Generation     = " << fGenLepton                 << endl
        << "NR mass               = " << fMass    << " [GeV]   "    << endl
        << "4-dim NR mass         = " << fMass4   << " [GeV]   "    << endl
