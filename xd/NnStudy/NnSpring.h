@@ -48,6 +48,7 @@ public:
   Double_t GetMass     ()           const { return fMass;      }
   Double_t GetMass4    ()           const { return fMass4;     }
   Double_t GetMassnu   ()           const { return fMassnu;    }
+  Int_t    GetNkk      ()           const { return fNkk;       }
   Int_t    GetGenNu    ()           const { return fGenNu;     }
   Int_t    GetGenLepton()           const { return fGenLepton; }
   Double_t GetEcmInit  ()           const { return fEcmInit;   }
@@ -122,6 +123,7 @@ private:
   Double_t fMass;           // right handed neutrino mass
   Double_t fMassnu;         // neutrino mass
   Double_t fMass4;          // 4-dim neutrino mass
+  Int_t    fNkk;            // NR KK mode number
   Int_t    fGenNu;          // NR Generation
   Int_t    fGenLepton;      // Lepton Generation
 
@@ -135,7 +137,7 @@ private:
   GENPDTEntry  *fFPtr;            //! PD table entry of "f"
   GENPDTZBoson *fZBosonPtr;       //! PD table entry of "Z"
 
-  RNeutrino    *fNRPtr[3];        //! PD table entry of "NR[i]"
+  RNeutrino    *fNRPtr;           //! PD table entry of "NR[i]"
   GENPDTWBoson *fW1BosonPtr;      //! PD table entry of "W1"
 
   // ----------------
@@ -302,18 +304,28 @@ public:
 class RNeutrino: public GENPDTEntry {
  public:
 
-  RNeutrino(Double_t m   = 100.,
-	    Double_t m4  = 3.3e-9,
-	    Int_t    gen = 2);
+  RNeutrino(Double_t m      = 100.,
+	    Double_t m4     = 3.3e-9,
+	    Int_t    gen    = 1,
+	    Int_t    kkmode = 1);
   virtual ~RNeutrino() {}
+
+        Int_t     GetNkk()            const { return fN;            }
+  const Double_t *GetGwl()            const { return &fGwl[0];      }
+  const Double_t *GetGwe()            const { return &fGwe[0];      }
+  const Double_t *GetGzn(Int_t j = 1) const { return &fGzn[0][j-1]; }
 
  private:
   void     Initialize();
   Double_t GamToFV(Double_t m1, Double_t m2, Double_t a);
 
  private:
-  Double_t fMass4; // 4-dim NR mass                                  
-  Int_t    fGen;   // NR Generar                                       
+  Double_t fMass4;     // 4-dim NR mass                                  
+  Int_t    fGen;       // N2(basis lepton's geneation)
+  Int_t    fN;         // KK mode number
+  Double_t fGwl[2];    // (gL,gR)_W-NR_2l-l
+  Double_t fGwe[2];    // (gL,gR)_W-NR_2l-e   
+  Double_t fGzn[2][3]; // (gL,gR)_Z-NR_2l-n_j (j=e,mu,tau)
 
   ClassDef(RNeutrino, 1)  // NR boson class
 };
