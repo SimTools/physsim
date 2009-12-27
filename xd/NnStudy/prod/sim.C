@@ -28,7 +28,7 @@ Int_t sim()
   sim    = new JSFQuickSim();
 
   //Int_t maxevt=100000;      // Number of event 
-  Int_t maxevt=100;     // Number of event is 10.
+  Int_t maxevt=20;     // Number of event is 10.
   jsf->Initialize();
 
   //spring->GetBases()->Bases();

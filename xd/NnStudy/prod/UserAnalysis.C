@@ -44,7 +44,7 @@ void UserAnalysis()
   JSFSpring    *sp =(JSFSpring*)jsf->FindModule("NnSpring");
   JSFSpringBuf *spb=(JSFSpringBuf*)sp->EventBuf();
   Int_t nsps = spb->GetNpartons();
-  cerr << " --- Npartons = " << nsps << " -------- " << endl;
+    cerr << " --- Npartons = " << nsps << " -------- " << endl;
   ANL4DVector pcm;
   TClonesArray *partons = spb->GetPartons();
   TIter next(partons);
@@ -62,6 +62,10 @@ void UserAnalysis()
 	            << parton->GetPz() << ")" << endl;
     if (parton->GetNDaughter()) continue;
     pcm += ANL4DVector(parton->GetPV());
+    
+    //    if(parton->GetID() == 1 || 2 || 3 && parton->GetE() )
+
+
   }
   cerr << " SpringParton : ";
   pcm.DebugPrint();

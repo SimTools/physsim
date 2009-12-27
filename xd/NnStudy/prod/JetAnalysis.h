@@ -15,6 +15,8 @@
 #include "ANL4DVector.h"
 #include "JSFModule.h"
 
+const int maxjet_fit = 10;
+
 // *******************************************************
 class JetAnalysis : public JSFModule 
 {
@@ -24,8 +26,6 @@ class JetAnalysis : public JSFModule
   static Double_t fYcut;         // Initial Y Cut value
   static Int_t    fJetFinderAlgorithm;  // =0(JadeFinder), 1=(JadeEJetFinder),2=(DurhamJetFinder)
 
-  static int evn; //prepare for check clustering @ "JetAnalysis.cxx"
-
  public:
   JetAnalysis(const char *name="JetAnalysis", 
 		  const char *title="JetAnalysis");
@@ -34,6 +34,7 @@ class JetAnalysis : public JSFModule
   static Int_t    GetForcedNJets(){ return fForcedNJets;}
   static Double_t GetYcut(){ return fYcut; }
   static Int_t    GetJetFinderAlgorithm(){ return fJetFinderAlgorithm; }
+  void     SetEtrackCut(Double_t x) { fEtrackCut = x; }
 
   //  virtual Bool_t Initialize();
   //  virtual Bool_t BeginRun(Int_t runno=1);
@@ -43,8 +44,21 @@ class JetAnalysis : public JSFModule
   virtual Bool_t Process(Int_t ev=1);
   void JetClustering(TObjArray *particles);
   void ShapeAnalysis(TObjArray *particles);
+  float mass(TLorentzVector tl[], int ijet[], const int njet);
+  float constraint(TLorentzVector tl[], int ijet[], const int njet, float mforce);
+  void dCdf(TLorentzVector tl[], const int njet, int ijet[], float a[]);
 
+  Bool_t dofit(TLorentzVector tlOrig[], float perr[],                // original lorentz vectors, energy uncertainties
+	   const int njet, const int ncons,                      // # jets, # constraints
+	   int ijet[][maxjet_fit], int nforce[], float mforce[], // definition of constraints
+	   float& chisq_out,                                     // fit chisq (output)
+	   TLorentzVector* tlFit[]);                           // fitter 4-vectors
+
+ private:
+  Double_t fEtrackCut;    // cut on track energy
+  
   ClassDef(JetAnalysis, 1)  // JetAnalysis class
+
 
 };
 

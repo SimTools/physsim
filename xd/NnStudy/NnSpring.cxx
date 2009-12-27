@@ -42,6 +42,8 @@ static TH1D *hPhiNR = 0;
 static TH1D *hMNR   = 0;
 static TH1D *hCosW  = 0;
 static TH1D *hPhiW  = 0;
+static TH1D *hCosle = 0;
+static TH1D *hPhile = 0;
 static TH1D *hMw    = 0;
 static TH1D *hCosU  = 0;
 static TH1D *hPhiU  = 0;
@@ -49,10 +51,12 @@ static TH1D *hWDK   = 0;
 static TH1D *hHelIn = 0;
 static TH1D *hHelOt = 0;
 
+static Double_t g_CosThetaLepton = 100.;
 ClassImp(NnSpring)
 ClassImp(NnSpringBuf)
 ClassImp(NnBases)
 ClassImp(RNeutrino)
+
 
 //-----------------------------------------------------------------------------
 // ==============================
@@ -70,6 +74,7 @@ NnSpring::NnSpring(const char      *name,
   fEventBuf = new NnSpringBuf("NnSpringBuf",
                               "NnSpring event buffer",
                               this);
+
   if (!bases) { 
     SetBases(new NnBases);
   }
@@ -96,6 +101,7 @@ NnSpring::~NnSpring()
 // --------------------------
 Bool_t NnSpringBuf::SetPartons()
 {
+  std::cout << "NnSprintBuf::SetPartons()" << std::endl;
   TClonesArray &partons = *fPartons;
   NnBases      *bases   = (NnBases*)((NnSpring*)Module())->GetBases();
 
@@ -129,6 +135,7 @@ Bool_t NnSpringBuf::SetPartons()
   fCosThetaW1   = bases->GetCosThetaW1();
   fPhiW1        = bases->GetPhiW1();
   fQ2W1         = bases->GetQ2W1();
+  fPhiLepton    = bases->GetPhiLepton();
   fCosThetaF1   = bases->GetCosThetaF1();
   fPhiF1        = bases->GetPhiF1();
 
@@ -140,8 +147,8 @@ Bool_t NnSpringBuf::SetPartons()
   // ----------------------------------------------
   //  Set final state parton infomation
   // ----------------------------------------------
-
   Int_t cp = bases->fHelCombInitial < 0.5 ? +1 : -1; // cp flip factor
+
   static TVector **qp = 0;
   if (!qp) {
     qp = new TVector* [fNparton];
@@ -165,6 +172,7 @@ Bool_t NnSpringBuf::SetPartons()
   Int_t    idx     = cp*bases->fNRPtr[1]->GetPID();  // N PDG : meaningless!
 #endif
   Int_t    idl     = cp*(2*bases->fGenLepton + 9);
+
   Double_t ml      = bases->fFPtr->GetMass();
 
   Int_t    helnu   = cp*bases->fHelFinal[0];
@@ -241,6 +249,7 @@ NnBases::NnBases(const char *name, const char *title)
            fR_ISR_side(0),
            fCosThetaW1  (0.),
            fPhiW1       (0.),
+           fPhiLepton       (0.),
            fCosThetaF1  (0.),
            fPhiF1       (0.)
 {
@@ -496,10 +505,12 @@ Double_t NnBases::Func()
 #if 0
   fQ2X1  = TMath::Power(fNRPtr[fGenLepton-1]->GetMass(),2);
   weight = kPi*fNRPtr[fGenLepton-1]->GetMass()*fNRPtr[fGenLepton-1]->GetWidth();
+
 #else
   fQ2X1  = TMath::Power(fNRPtr[1]->GetMass(),2);
   weight = kPi*fNRPtr[1]->GetMass()*fNRPtr[1]->GetWidth();
 #endif
+
 #ifdef __NODECAY__
   weight = 1.;
 #endif
@@ -522,6 +533,7 @@ Double_t NnBases::Func()
   Double_t qw1 = TMath::Sqrt(fQ2W1);
   bsWeight *= weight;
 
+
   GENBranch w1branch(fQ2W1, fCosThetaF1, fPhiF1, mu*mu, md*md);
   GENBranch x1branch(fQ2X1, fCosThetaW1, fPhiW1, &w1branch, mlep*mlep);
   GENBranch cmbranch(fQ2XX, fCosTheta, fPhi, &x1branch, mnu*mnu);
@@ -531,6 +543,7 @@ Double_t NnBases::Func()
   // --------------------------------------------
   //  Fill plots
   // --------------------------------------------
+  //  cout << "CosThetaLepton= " << g_CosThetaLepton << endl;
 
   if (!hEcm  ) hEcm   = new TH1D( "hEcm"  , "Ecm"    , 50,     0., fEcmInit*1.1 );
   if (!hCosNR) hCosNR = new TH1D( "hCosNR", "Costh"  , 50, fXL[0],        fXU[0]);
@@ -538,6 +551,8 @@ Double_t NnBases::Func()
   if (!hMNR  ) hMNR   = new TH1D( "hMNR"  , "MNR"    , 50, 100-5.e-2,  100+5.e-2);
   if (!hCosW ) hCosW  = new TH1D( "hCosW" , "CosthW" , 50, fXL[2],        fXU[2]);
   if (!hPhiW ) hPhiW  = new TH1D( "hPhiW" , "PhiW"   , 50, fXL[3],        fXU[3]);
+  if (!hCosle) hCosle  = new TH1D( "hCosle","CosthLepton", 50, fXL[2],        fXU[2]);
+  if (!hPhile) hPhile  = new TH1D( "hPhile" ,"PhiLepton", 50, fXL[3],        fXU[3]);
   if (!hMw   ) hMw    = new TH1D( "hMw"   , "Mw"     , 50,    60.,          100.);
   if (!hCosU ) hCosU  = new TH1D( "hCosU" , "CosthU" , 50, fXL[4],        fXU[4]);
   if (!hPhiU ) hPhiU  = new TH1D( "hPhiU" , "PhiU"   , 50, fXL[5],        fXU[5]);
@@ -545,12 +560,56 @@ Double_t NnBases::Func()
   if (!hHelIn) hHelIn = new TH1D( "hHelIn", "Helin"  ,  2,     0.,            2.);
   if (!hHelOt) hHelOt = new TH1D( "hHelOt", "Helot"  ,  4,     0.,            4.);
 
+  //test in order to get the angular distribution of Lepton
+  
+      //  std::cout << "NnSprintBuf::Saito()" << std::endl;
+  int S_fNparton = 6;
+
+  static ANL4DVector *pv = 0;
+  if (!pv) {
+    pv = new ANL4DVector [S_fNparton];
+  }
+  pv[0] = fP[0]; // neutrino
+  pv[3] = fP[1]; // charged lepton
+  pv[4] = fP[2]; // up quark
+  pv[5] = fP[3]; // down quark
+  pv[2] = pv[4] + pv[5]; // W
+  pv[1] = pv[2] + pv[3]; // right handed neutrino
+
+  /*
+  Int_t cp = fHelCombInitial < 0.5 ? +1 : -1;
+  static TVector **qp = 0;
+  if (!qp) {
+    qp = new TVector* [S_fNparton];
+    for (Int_t i=0; i<S_fNparton; i++) qp[i] = new TVector(4);
+  }
+  for (Int_t i=0; i<S_fNparton; i++) {
+    TVector &q = *qp[i];
+    q(0) =    pv[i].E ();
+    q(1) = cp*pv[i].Px();
+    q(2) = cp*pv[i].Py();
+    q(3) = cp*pv[i].Pz();
+  }
+  */
+  Double_t plepx = pv[3].Px();
+  Double_t plepy = pv[3].Py();
+  Double_t plepz = pv[3].Pz();
+  Double_t plep = TMath::Sqrt(plepx*plepx+plepy*plepy+plepz*plepz);
+  //  std::cout << "plep= " << plep << endl;
+  
+  g_CosThetaLepton = plepz/plep;
+  //  cerr << "CosThetaLepton00= " << g_CosThetaLepton << ", " << plepz/plep << endl;
+
+  // test end
+
   hEcm  ->Fill(fEcmIP           , (bsWeight*sigma));
   hCosNR->Fill(fCosTheta        , (bsWeight*sigma));
   hPhiNR->Fill(fPhi             , (bsWeight*sigma));
   hMNR  ->Fill(qx1              , (bsWeight*sigma));
   hCosW ->Fill(fCosThetaW1      , (bsWeight*sigma));
   hPhiW ->Fill(fPhiW1           , (bsWeight*sigma));
+  hCosle ->Fill(g_CosThetaLepton , (bsWeight*sigma));
+  hPhile ->Fill(fPhiLepton      , (bsWeight*sigma));
   hMw   ->Fill(qw1              , (bsWeight*sigma));
   hCosU ->Fill(fCosThetaF1      , (bsWeight*sigma));
   hPhiU ->Fill(fPhiF1           , (bsWeight*sigma));
@@ -692,8 +751,9 @@ Double_t NnBases::DSigmaDX(GENBranch &cmbranch)
 
   Double_t sigma  = identp * flux * spin * amp2 * dPhase; // in [1/GeV^2]
            sigma *= kGeV2fb;                              // now in [fb]
-
+	   	   
   return sigma;
+  
 }
 
 //_____________________________________________________________________________
@@ -790,8 +850,10 @@ Complex_t NnBases::FullAmplitude()
 	 << " gamrn  = " << gamrn
 	 << endl;
     cerr << "j = " << j << " amp = " << amp << endl;
+
 #endif
   }
+
 
   return amp;
 }
@@ -930,6 +992,8 @@ void NnBases::Userin()
   H1Init( "hMNR"  , "MNR"    , 50,   299.,          301.);
   H1Init( "hCosW" , "CosthW" , 50, fXL[2],        fXU[2]);
   H1Init( "hPhiW" , "PhiW"   , 50, fXL[3],        fXU[3]);
+  H1Init( "hCosle" , "Costhle" , 50, fXL[2],        fXU[2]);
+  H1Init( "hPhiW" , "PhiW"   , 50, fXL[3],        fXU[3]);
   H1Init( "hMw"   , "Mw"     , 50,    60.,          100.);
   H1Init( "hCosU" , "CosthU" , 50, fXL[4],        fXU[4]);
   H1Init( "hPhiU" , "PhiU"   , 50, fXL[5],        fXU[5]);
@@ -963,6 +1027,8 @@ void NnBases::Userout()
   hMNR  ->SetMinimum(0.); hMNR  ->Write();
   hCosW ->SetMinimum(0.); hCosW ->Write();
   hPhiW ->SetMinimum(0.); hPhiW ->Write();
+  hCosle ->SetMinimum(0.); hCosle ->Write();
+  hPhile ->SetMinimum(0.); hPhile ->Write();
   hMw   ->SetMinimum(0.); hMw   ->Write();
   hCosU ->SetMinimum(0.); hCosU ->Write();
   hPhiU ->SetMinimum(0.); hPhiU ->Write();
@@ -995,11 +1061,13 @@ void NnBases::SelectHelicities(Double_t &weight)
 #endif
   
    Double_t helm = (1. - fPole)/2.;
+
    Int_t    cp   = fHelCombInitial < 0.5 ? +1 : -1; // cp flipping flag
    Double_t xhel = cp > 0 ? 2*fHelCombInitial : 2*fHelCombInitial-1;
    weight = 2;
    if (xhel < helm) {
       fJCombI = cp > 0 ? 0 : 1;
+
    } else {
       fJCombI = cp > 0 ? 1 : 0;
    }

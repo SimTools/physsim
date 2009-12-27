@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 //
 //  JetAnalysis
 //
@@ -8,6 +8,7 @@
 //  
 //////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <iomanip>
 #include "JSFSteer.h"
 #include "JSFSIMDST.h"
 #include "JetAnalysis.h"
@@ -20,32 +21,31 @@
 #include "ANLEventShape.h"
 #include "JSFZVTOP3.h"
 #include "JSFGeoCFit.h"
-#include "TMath.h"
+
 #include "ANLPairCombiner.h"
 #include "TNtupleD.h"
-#include "TVector3.h"
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <map>
 
-#include <fstream>
+#include "TLorentzVector.h"
+#include "TVector3.h"
 
-Bool_t SolveKinematics(Double_t sqrt_s, Double_t mW, const ANL4DVector &p1, const ANL4DVector &p2, Double_t abscosWH1[2], Double_t abscosWH2[2]);
-void BoostJet(ANLPair w, ANLJet &j1, ANLJet &j2, Double_t &cosj1, Double_t &cosj2);
-
+void BoostJet(ANLPair w, ANLJet &j1, ANLJet &j2, Double_t &abscosj1, Double_t &abscosj2);
 
 ClassImp(JetAnalysis)
 
-static const Double_t kMassW   = 79.9661182;         // W mass               
+static const Double_t kMassW   = 80.22;         // W mass               
 static const Double_t kMassZ   = 91.18;         // Z mass           
-static const Double_t kMassH   = 134.0;         // Higgs mass          
-//static const Double_t kSigmaMw =   8.0;         // W mass resolution    
-static const Double_t kSigmaMw =   4.0;         // W mass resolution    
+static const Double_t kMassH   = 120.0;         // Higgs mass          
+static const Double_t kSigmaMw =   8.0;         // W mass resolution    
 static const Double_t kSigmaMz =   8.0;         // Z mass resolution 
 static const Double_t kSigmaMh =   8.0;         // H mass resolution     
+//const int maxjet_fit = 10;
 
-int JetAnalysis::evn = 1; // for check Clustering
+TH1D *hEcone = 0;
+TH2D *hLEcone = 0;
 
 Int_t    JetAnalysis::fForcedNJets=0;
 Double_t JetAnalysis::fYcut=0.005;
@@ -56,9 +56,9 @@ JetAnalysis::JetAnalysis(const char *name, const char *title)
        : JSFModule(name,title)
 {
 
-  fForcedNJets=gJSF->Env()->GetValue("JetAnalysis.ForcedNJets",4);
+  fForcedNJets=gJSF->Env()->GetValue("JetAnalysis.ForcedNJets",2);
   sscanf(gJSF->Env()->GetValue("JetAnalysis.Ycut","0.001"),"%lg",&fYcut);
-  //  sscanf(gJSF->Env()->GetValue("JetAnalysis.Ycut","0.004"),"%lg",&fYcut);
+  //sscanf(gJSF->Env()->GetValue("JetAnalysis.Ycut","0.004"),"%lg",&fYcut);
   fJetFinderAlgorithm=gJSF->Env()->GetValue("JetAnalysis.JetFinderAlgorithm",0);
   
 }
@@ -86,404 +86,171 @@ Bool_t JetAnalysis::Process(Int_t nev)
 //_____________________________________________________________________________
 void JetAnalysis::JetClustering(TObjArray *tracks)
 {
-  //Double_t wn1mass=-1.;
-  //Double_t wn2mass=-1.;
-  //Double_t chi2wnwn=100.;
-  Double_t w1mass=-1.;
-  Double_t w2mass=-1.;
-  Double_t chi2ww=100.;
-  Int_t nb=0;
+  if (!hEcone) hEcone = new TH1D("hEcone", "Econe", 50, 0., 100.);
+  if (!hLEcone) hLEcone = new TH2D("hLEcone", "LEcone for lepton", 120, 0., 120., 120, 0., 120.);
 
-  Double_t ene1=0.;
-  Double_t ene2=0.;
+  Double_t wmass=-1.;
+  Double_t wene=-1.;
+  Double_t wmom=-1.;
 
-  Double_t recm=-1.;
-  Double_t misspt=-1.;
+  Double_t nrene  = -1.;
+  Double_t nrmass = -1.;
+  Double_t cosnr  = -10.;
 
-  Double_t p1x=0.;
-  Double_t p1y=0.;
-  Double_t p1z=0.;
-  Double_t p1=0.;
-  Double_t p2x=0.;
-  Double_t p2y=0.;
-  Double_t p2z=0.;
-  Double_t p2=0.;
+  Double_t nb=0.;
+  Double_t yvalue=0.;
+  Double_t tote=0.; 
+  Double_t lepe=-10.;
+  Double_t coslep=-10;
 
-  Double_t beta1=0.;
-  Double_t beta2=0.;
+  Double_t xCosCone  = 0.94;
+  Double_t xEconeCut = 5.;
 
-  Double_t costheta1=0.;
-  Double_t costheta2=0.;
-  Double_t acop=0.;
+  Double_t lepchg = -9999;
+  Double_t lepgenid = 0.;
+  Double_t lepmom = -10.;
 
-  //Double_t cosWH1=0.;
-  //Double_t cosWH2=0.;
-  Double_t abscosWH1a=0.;
-  Double_t abscosWH1b=0.;
-  Double_t abscosWH2a=0.;
-  Double_t abscosWH2b=0.;
+  Double_t Pxl   =0.;
+  Double_t Pyl   =0.;
+  Double_t Pzl   =0.;
 
-  Double_t abscosj1w1=0.;
-  Double_t abscosj2w1=0.;
-  Double_t abscosj3w2=0.;
-  Double_t abscosj4w2=0.;
+  Double_t PxW   =0.;
+  Double_t PyW   =0.;
+  Double_t PzW   =0.;
 
-  Double_t ene_jet[4]; // for getting Jet Energy before clustering
-  Double_t ene_j1w1 = 0.; // for getting Jet Energy after clustering
-  Double_t ene_j2w1 = 0.;
-  Double_t ene_j3w2 = 0.;
-  Double_t ene_j4w2 = 0.;
+  Double_t cosWl = -10.;
 
+  Double_t misse  = -10.;
+  Double_t missm  = -10.;
+  Double_t missp  = -10.;
+  Double_t misspt = -10.;
 
   //----------------------------------------------------
   // jet clustering
   //----------------------------------------------------
-  //  if( tracks->GetEntries() <= fForcedNJets ) return;  
-
-  /*
-  ANLJetFinder *jclust=0;
-  if( fJetFinderAlgorithm == 0 ) {
-    jclust=new ANLJadeJetFinder(fYcut);
-  }
-  else if( fJetFinderAlgorithm == 1 ) {
-  }
-  else {
-  }
-
-  jclust->Initialize(*tracks);
-  jclust->FindJets();
-  Int_t njets=jclust->GetNjets();
-  */
-
-  ANLDurhamJetFinder* jclust = new ANLDurhamJetFinder();
-  jclust->Initialize(*tracks);
-  
-  if(jclust->GetNjets() < 4)
-    {
-      std::cerr << "less than 4 jests" << std::endl;
-      return;
+  // remove lepton track from track-set used for jet-clustering
+  TIter next(tracks);
+  Double_t  maxe   = -10.;
+  ANLTrack *leptrk = 0;
+  ANLTrack *trk    = 0;
+  while ((trk = static_cast<ANLTrack *>(next()))) {
+    Double_t econe = trk->GetConeEnergy(xCosCone, tracks);
+    //    std::cout << "lep ene: " << trk->IsLepton() << ", " << trk->E() << ", " << econe << std::endl;
+    //    if(trk->IsLepton()){
+    if(econe < xEconeCut){
+      if(trk->E() > maxe){
+	maxe   = trk->E();
+        leptrk = trk;
+      }
+    
     }
+  }
+  if (!leptrk) return;
 
-  Int_t njets = 4;
-  jclust->ForceNJets(njets);
+  lepe   = leptrk->E();
+  lepmom = leptrk->GetMag();
 
-  ANLVTXTagger  btag(5, 3);
+  Pxl = leptrk->Px();
+  Pyl = leptrk->Py();
+  Pzl = leptrk->Pz();
 
-  if( njets == fForcedNJets ) {  // return after delete jclust object.
-    //  if( njets >= fForcedNJets ) {  // return after delete jclust object.
+  coslep = leptrk->CosTheta();
+  lepchg = leptrk->GetCharge();
+
+  /*  ANLTrack *tp;
+  if (tp->IsLepton() ==  1){
+  lepgenid = leptrk->GetLTKCLTrack()->GetCDC()->GetGenID();
+  }
+  */
+  leptrk->Lock();
+  if (lepchg == 0.) cerr << "lepchg = " << lepchg << endl;
+
+  // perform jet-clustering
+  ANLDurhamJetFinder jclust;
+  jclust.Initialize(*tracks);
+  jclust.ForceNJets(fForcedNJets);
+  Int_t njets = jclust.GetNjets();
+
+  if ( njets == fForcedNJets ) {
     //-----------------------------------------------------
     // Does jet pairing
     //-----------------------------------------------------
-    std::vector<ANLPair*> solvec;
-    
-    TObjArray solutions(10);
-    ANLPair *w1p, *w2p;                                     
-    TObjArray &jets = jclust->GetJets();
-    ANLPairCombiner w1candidates(jets,jets);  
+    TObjArray &jets = jclust.GetJets();
+    yvalue = jclust.GetYcut();
 
-    //***********************************
-    //* Get Jet Energy before clustering
-    //***********************************
-    ANLJet *jetp;
-    TIter nextjet(&jets);
-    int i_jet = 0;
-    while ( (jetp = (ANLJet*)nextjet()) )
-    {
-      ANLJet &jet = *jetp;
-      ene_jet[i_jet] = jet()(0);
-      i_jet++;
-    }
+    // --- Reconstruct W-boson
+    ANLPairCombiner wcandidates(jets,jets);  
+    ANLPair &w = *static_cast<ANLPair *>(wcandidates());
+    wmass = w.GetMass();     
+    wene  = w.E();     
+    wmom  = w.Vect().Mag();
 
+    PxW   = w.Px();
+    PyW   = w.Py();
+    PyW   = w.Pz();
 
-    // --- Search W1 pair                                               
-    while ((w1p = (ANLPair *)w1candidates())) {                        
-      ANLPair &w1 = *w1p;                                         
-      w1.LockChildren();                                             
-      Double_t w1mass = w1().GetMass();                              
-      ANLPairCombiner w2candidates(w1candidates);                 
-      w2candidates.Reset();
-      // --- Search W2 pair      
-      while ((w2p = (ANLPair *)w2candidates())) {              
-	ANLPair &w2 = *w2p;             
-	if (w2.IsLocked()) continue;                            
-	Double_t w2mass = w2().GetMass();                         
-	Double_t chi2w = TMath::Power((w1mass - kMassW)/kSigmaMw, 2.)      
-	  + TMath::Power((w2mass - kMassW)/kSigmaMw, 2.);         
-	solutions.Add(new ANLPair(w1p,w2p,chi2w));
-	if(chi2w<chi2ww){
-	  chi2ww=chi2w;
-	}
-      }                  
-      w1.UnlockChildren();                                      
-    }    
+    tote = lepe + wene;
 
-    if (solutions.GetEntries() > 1){
-      solutions.Sort();
-      ANLPair &sol = *static_cast<ANLPair *>(solutions.At(0));
-      ANLPair &w1a   = *static_cast<ANLPair *>(sol[0]);
-      ANLPair &w2a   = *static_cast<ANLPair *>(sol[1]);
+    ANL4DVector qvnr = w + *leptrk;
+    nrene  = qvnr.E();
+    nrmass = qvnr.GetMass();
+    cosnr  = qvnr.CosTheta();
 
-      /*
-      if(btag(*(ANLJet *)w1a[0])) nb++;
-      if(btag(*(ANLJet *)w1a[1])) nb++;
-      if(btag(*(ANLJet *)w2a[0])) nb++;
-      if(btag(*(ANLJet *)w2a[1])) nb++;
-      */
+    cosWl  = (PxW*Pxl+PyW*Pyl+PzW*Pzl) /( wmom * lepmom);
 
-      w1mass = w1a().GetMass();
-      w2mass = w2a().GetMass();
-
-      ene1 = w1a().E();
-      ene2 = w2a().E();
-
-      ANL4DVector ecm = ANL4DVector(1000., 0., 0., 0.);
-      ANL4DVector recoil = ecm - w1a - w2a;
-      recm = recoil.GetMass();
-      misspt = recoil.GetPt();
-
-      p1x = w1a().Px();
-      p1y = w1a().Py();
-      p1z = w1a().Pz();
-      p1 = w1a().GetMag();
-      p2x = w2a().Px();
-      p2y = w2a().Py();
-      p2z = w2a().Pz();
-      p2 = w2a().GetMag();
-
-      beta1 = p1/ene1;
-      beta2 = p2/ene2;
-
-      costheta1 = w1a().CosTheta();
-      costheta2 = w2a().CosTheta();
-
-      acop = w1a().Acop(w2a);
-
-      //======================
-      // Get production angle
-      //======================
-      Double_t abscosWH1[2], abscosWH2[2];
-      if(SolveKinematics(ecm.E(), kMassW, w1a, w2a, abscosWH1, abscosWH2)){
-	abscosWH1a = abscosWH1[0];
-	abscosWH2a = abscosWH2[0];
-	abscosWH1b = abscosWH1[1];
-	abscosWH2b = abscosWH2[1];
-      }
-      else{
-	abscosWH1a = 12345;
-	abscosWH2a = 12345;
-	abscosWH1b = 12345;
-	abscosWH2b = 12345;	
-      }
-
-      //===================
-      // Set jet 4D vector
-      //===================
-      ANLJet &j1w1 = *static_cast<ANLJet *>(w1a[0]);
-      ANLJet &j2w1 = *static_cast<ANLJet *>(w1a[1]);
-      ANLJet &j3w2 = *static_cast<ANLJet *>(w2a[0]);
-      ANLJet &j4w2 = *static_cast<ANLJet *>(w2a[1]);
-
-      //===============================
-      // Get jet angle at W rest frame
-      //===============================
-      BoostJet(w1a, j1w1, j2w1, abscosj1w1, abscosj2w1);
-      BoostJet(w2a, j3w2, j4w2, abscosj3w2, abscosj4w2);
-
-      //**************************************
-      //* Get Jet information afte clustering
-      //**************************************
-      ene_j1w1 = j1w1()(0);
-      ene_j2w1 = j2w1()(0);
-      ene_j3w2 = j3w2()(0);
-      ene_j4w2 = j4w2()(0);
-    }
+   
+    ANL4DVector ecm = ANL4DVector(500., 0., 0., 0.);
+    ANL4DVector recoil = ecm - qvnr;
+    misse = recoil.E();
+    missm = recoil.GetMass();
+    missp = sqrt(recoil.Px()*recoil.Px()+recoil.Py()*recoil.Py()+recoil.Pz()*recoil.Pz());
+    misspt = recoil.Pt();      
   
+    // --- b-tagging ------------------------------------------------------
+    ANLVTXTagger btag(3,3);
+    nb = btag(*(ANLJet *)w[0]) + btag(*(ANLJet *)w[1]);
+
   }
+  
 
-
-//   //===================
-//   //= Check clustering
-//   //===================
-//   char *fname = "test_out.dat";
-//   std::ofstream fout;
-
-//   //int evn = 1;
-
-//   //================
-//   //= Initilization
-//   //================
-//   if(evn==1){
-//     fout.open(fname);
-//     fout.close();
-//   }
-
-//   //==========
-//   //= Writing
-//   //==========
-//   fout.open(fname, ios::app);
-//   /*
-//   fout << evn << "\t" 
-//        << ene_jet[0] << "\t" << ene_jet[1] << "\t" << ene_jet[2] << "\t" << ene_jet[3] << "\t" 
-//        << ene_j1w1 << "\t" << ene_j2w1 << "\t" << ene_j3w2 << "\t" << ene_j4w2 << "\t" 
-//        << ene1 << "\t" << ene2 << "\t" 
-//        << costheta1 << "\t" << costheta2
-//        << std::endl;
-//   */
-//   fout << abscosWH1a <<  "\t" <<  abscosWH1b << "\t" <<  abscosWH2a << "\t" << abscosWH2b << std::endl;
-
-//   fout.close();
-//  evn = evn + 1;
-
-  //----------------
+  //-------------------
   // Prepare Ntuple
-  //----------------
+  //-------------------
+
   static TNtupleD *hEvt = 0;
   if (!hEvt) {
     stringstream tupstr;
-    //    tupstr << "chi2h:chi2z"                                             << ":"
-      //           << "h1mass:h2mass:z1mass:z2mass:njet:cale:emcale:hdcale"     << ""
-    tupstr << "chi2w:w1mass:w2mass"
-	   << ":"
-	   << "ene1:ene2:recm:p1x:p1y:p1z:p1:p2x:p2y:p2z:p2:beta1:beta2:costheta1:costheta2:njets:nb:misspt:acop:abscosWH1a:abscosWH1b:abscosWH2a:abscosWH2b:abscosj1w1:abscosj2w1:abscosj3w2:abscosj4w2:ene_jet[0]:ene_jet[1]:ene_jet[2]:ene_jet[3]:ene_j1w1:ene_j2w1:ene_j3w2:ene_j4w2"
-           << ends;
+    tupstr << "tote:wmass:wene:wmom:coslep:nb:lepe:lepchg:nrene:nrmass:cosnr:lepgenid:cosWl:yvalue:misse:missm:missp:misspt" << ends;
     hEvt = new TNtupleD("hEvt", "", tupstr.str().data());
   }
-
+  
   //--                                                                      
   // Fill up Ntuple.                                              
   //--                                                                    
-  std::multimap<Double_t, std::vector<ANLPair*> >::iterator itr;
   Double_t data[100];
-
-  data[0] = chi2ww;
-  data[1] = w1mass;
-  data[2] = w2mass;
-
-  data[3] = ene1;
-  data[4] = ene2;
-  data[5] = recm;
-
-  data[6] = p1x;
-  data[7] = p1y;
-  data[8] = p1z;
-  data[9] = p1;
-  data[10] = p2x;
-  data[11] = p2y;
-  data[12] = p2z;
-  data[13] = p2;
-
-  data[14] = beta1;
-  data[15] = beta2;
-
-  data[16] = costheta1;
-  data[17] = costheta2;
-
-  data[18] = njets;
-  data[19] = nb;
-
-  data[20] = misspt;
-  data[21] = acop;
-
-  data[22] = abscosWH1a;
-  data[23] = abscosWH1b;
-  data[24] = abscosWH2a;
-  data[25] = abscosWH2b;
-
-  data[26] = abscosj1w1;
-  data[27] = abscosj2w1;
-  data[28] = abscosj3w2;
-  data[29] = abscosj4w2;
-
-  data[30] = ene_jet[0];
-  data[31] = ene_jet[1];
-  data[32] = ene_jet[2];
-  data[33] = ene_jet[3];
-
-  data[34] = ene_j1w1;
-  data[35] = ene_j2w1;
-  data[36] = ene_j3w2;
-  data[37] = ene_j4w2;
+  data[ 0] = tote;
+  data[ 1] = wmass;
+  data[ 2] = wene;
+  data[ 3] = wmom;
+  data[ 4] = coslep;
+  data[ 5] = nb;
+  data[ 6] = lepe;
+  data[ 7] = lepchg;
+  data[ 8] = nrene;
+  data[ 9] = nrmass;
+  data[10] = cosnr;
+  data[11] = lepgenid;
+  data[12] = cosWl;
+  data[13] = yvalue;
+  data[14] = misse;
+  data[15] = missm;
+  data[16] = missp;
+  data[17] = misspt;
 
   hEvt->Fill(data);
 
-  delete jclust; 
-
+  leptrk->Unlock();
 }
-
-Bool_t SolveKinematics(Double_t sqrt_s, Double_t mW, const ANL4DVector &p1, const ANL4DVector &p2, Double_t abscosWH1[2], Double_t abscosWH2[2])
-{
-  //=========================
-  // Prepare base 3D vector
-  //=========================
-  ANL3DVector e1(p1.Get3D().Unit());
-  ANL3DVector e2(p2.Get3D().Unit());
-
-  ANL3DVector ex,ey,ez;
-  Double_t cos12  = e1*e2;
-
-  if (1-cos12*cos12 <= 0.) return kFALSE;
-
-  ex = e1;
-  ey = 1/TMath::Sqrt(1-cos12*cos12) * (e2 - cos12*e1);
-  ez = (ex.Cross(ey)).Unit();
-
-  //===========================
-  // Project WH to base vector 
-  //===========================
-  Double_t mAH = 81.8515;
-  Double_t mWH = 368.154;
-
-  Double_t eneWH, pWH, betaWH;
-  eneWH  = sqrt_s/2;
-  pWH    = TMath::Sqrt(eneWH*eneWH - mWH*mWH);
-  betaWH = pWH/eneWH;
-
-  Double_t eWH1e1, eWH2e2;
-  eWH1e1 = (sqrt_s*p1.E() - (mWH*mWH - mAH*mAH + mW*mW))/(2 * pWH * p1.GetMag());
-  eWH2e2 = (sqrt_s*p2.E() - (mWH*mWH - mAH*mAH + mW*mW))/(2 * pWH * p2.GetMag());
-
-  Double_t cx, cy, cz[2];
-  cx = eWH1e1;
-  cy = 1/TMath::Sqrt(1-cos12*cos12) * (-eWH2e2 - cos12*eWH1e1);
-
-  if(1 - cx*cx - cy*cy < 0.) return kFALSE;
-
-  cz[0] =  TMath::Sqrt(1 - cx*cx - cy*cy);
-  cz[1] = -TMath::Sqrt(1 - cx*cx - cy*cy);
-
-  ANL3DVector eWH1[2]; 
-  for(Int_t i=0; i<2; i++){
-    eWH1[i] = cx*ex + cy*ey + cz[i]*ez;
-
-    abscosWH1[i] = TMath::Abs(eWH1[i](3));
-    abscosWH2[i] = abscosWH1[i];
-  }
-
-  return kTRUE;
-}
-
-
-void BoostJet(ANLPair w, ANLJet &j1, ANLJet &j2, Double_t &abscosj1, Double_t &abscosj2)
-{
-  TVector3 ez = TVector3(0., 0. ,1.);
-
-  TVector3 ewz = w.Vect().Unit();
-  TVector3 ewx = ewz.Cross(ez).Unit();
-  TVector3 ewy = ewz.Cross(ewx);
-
-  TVector3 bstw = TVector3(0., 0., w.Vect().Mag()/w.E());
-
-  ANL4DVector pj1 = ANL4DVector(j1.E(), j1.Vect()*ewx, j1.Vect()*ewy, j1.Vect()*ewz);
-  pj1.Boost(-bstw);
-  abscosj1 = TMath::Abs(pj1.CosTheta());
-
-  ANL4DVector pj2 = ANL4DVector(j2.E(), j2.Vect()*ewx, j2.Vect()*ewy, j2.Vect()*ewz);
-  pj2.Boost(-bstw);
-  abscosj2 = TMath::Abs(pj2.CosTheta());
-
-  return;
-}
-
 
 //_____________________________________________________________________________
 void JetAnalysis::ShapeAnalysis(TObjArray *tracks)
@@ -493,7 +260,7 @@ void JetAnalysis::ShapeAnalysis(TObjArray *tracks)
   JSFGeneratorBuf *geb=(JSFGeneratorBuf*)gen->EventBuf();
 
   Double_t ecm=geb->GetEcm();
-  ecm = 1000.;
+  ecm = 500.;
   //std::cout << "##### Ecm = " << ecm << std::endl;
 
 
@@ -524,3 +291,290 @@ void JetAnalysis::ShapeAnalysis(TObjArray *tracks)
   evshape.Initialize(*tracks);
 }
 
+//_____________________________________________________________________________
+float JetAnalysis::mass(TLorentzVector tl[], int ijet[], const int njet) {
+  // calculate the invariant mass of a collection of lorentzvectors
+  TLorentzVector t(0,0,0,0);
+  for (int i=0; i<njet; i++) {
+    t+=tl[ijet[i]];
+  }
+  return t.M();
+}
+
+float JetAnalysis::constraint(TLorentzVector tl[], int ijet[], const int njet, float mforce) {
+  // calculate value of constraint eqn (0 when constraint is fulfilled)
+  return mass(tl, ijet, njet) - mforce;
+}
+
+void JetAnalysis::dCdf(TLorentzVector tl[], const int njet, int ijet[], float a[]) {
+  TLorentzVector t0(0,0,0,0);
+  for (int i=0; i<njet; i++) {
+    t0+=tl[ijet[i]];
+    float t1=0;
+    float t2=0;
+    float ei = tl[ijet[i]].E();
+    float pi = tl[ijet[i]].Vect().Mag();
+    for (int j=0; j<njet; j++) {
+      if (j==i) continue;
+      float ej = tl[ijet[j]].E();
+      float pj = tl[ijet[j]].Vect().Mag();
+      float costhij = TMath::Cos(tl[ijet[i]].Vect().Angle(tl[ijet[j]].Vect()));
+      t1+=ej;
+      t2+=pj*costhij;
+    }
+    a[i] = t1*pi/ei - t2;
+  }
+  float mass = t0.M();
+  for (int i=0; i<njet; i++) {
+    a[i]/=mass;
+  }
+  return;
+}
+
+
+Bool_t JetAnalysis::dofit(TLorentzVector tlOrig[], float perr[],                // original lorentz vectors, energy uncertainties
+	   const int njet, const int ncons,                      // # jets, # constraints
+	   int ijet[][maxjet_fit], int nforce[], float mforce[], // definition of constraints
+	   float& chisq_out,                                     // fit chisq (output)
+	   TLorentzVector* tlFit[]) {                            // fitter 4-vectors
+
+  //
+  // this routine actually does the fitting  
+  //
+  // it varies the mangitude of the lor.vec momentum, 
+  //    leaving the mass and direction constant
+  //
+
+  const float smallMassDiff = 0.05; // if fitted-requested mass smaller than this, good enough
+
+  cout << "hello from dofit! njet, ncons = " << njet << " " << ncons << endl;
+  
+  // check not too many jets
+  if (njet>maxjet_fit) {
+    cout << "anatreeAnalyse::dofit ERROR increase maxjet_fit" << endl;
+    return false;
+  }
+
+  bool verbose = false; // print many details if true
+
+  const int maxiter = 15; // maximum number of iterations in "fit"
+
+  TVector3 temp;
+
+  // define the parameters
+  float paramsOrig[maxjet_fit];
+  for (int i=0; i<njet; i++) paramsOrig[i] = tlOrig[i].Vect().Mag(); // magnitude of jet momentum
+
+  TLorentzVector tl[njet];
+  for (int i=0; i<njet; i++) tl[i]=tlOrig[i]; // lorentz vectors
+
+  float params[njet];
+  for (int i=0; i<njet; i++) params[i]=paramsOrig[i];
+
+  float a[njet];
+
+  if (verbose)
+    cout << "params, errs = " << endl;
+
+  // check input parameters make sense
+  bool isok=true;
+  for (int i=0; i<njet; i++) {
+    if (verbose) cout << params[i] << " " << perr[i] << endl;
+    if (params[i]<=0 || perr[i]<=0) { // negative |momentum| or uncertainty
+      cout << "ERROR crazy parameters! " << endl;
+      isok=false;
+      for (int ii=0; ii<njet; ii++) cout << ii << " " << params[ii] << " " << perr[ii] << endl;
+      break;
+    }
+  }
+  if (!isok) return false;
+
+
+  float chisq_old = -999;
+  float chisq = -999;
+
+  int iter=0;
+  for (iter=0; iter<maxiter; iter++) { // loop over iterations
+
+    if (verbose) {
+      cout << "--------------------------------------------------" << endl;
+      cout << "iteration " << iter << " parameters ";
+      for (int i=0; i<njet; i++) cout << params[i] << " ";
+      cout << endl;
+    }
+
+    TMatrix C0(ncons,1);
+    TMatrix dF0(njet,1);
+    for (int i=0; i<ncons; i++) {
+      C0(i,0) = constraint(tl, &(ijet[i][0]), nforce[i], mforce[i]);
+      if (verbose)
+	cout << "constraint " << i << " = " << C0(i,0) <<
+	  "  mass = " << mass(tl, &(ijet[i][0]), nforce[i]) << endl;
+    }
+    for (int i=0; i<njet; i++) {
+      dF0(i,0) = params[i]-paramsOrig[i];
+    }
+
+    // define errors on jet energies
+    TMatrix var(njet,njet);
+    for (int i=0; i<njet; i++) {
+      for (int j=0; j<njet; j++) {
+	if (i==j) var(i,j) = perr[i]*perr[i];
+	else var(i,j)=0;
+      }
+    }
+    var.Invert();
+
+    // write them to M
+    TMatrix M(njet+ncons,njet+ncons);
+    for (int i=0; i<njet; i++)
+      for (int j=0; j<njet; j++)
+	M(i,j) = var(i,j);
+
+    // define D matrix = dC/df
+    TMatrix D(ncons, njet);
+    for (int i=0; i<ncons; i++)
+      for (int j=0; j<njet; j++)
+	D(i,j)=0;
+    for (int i=0; i<ncons; i++) {
+      dCdf(tl, nforce[i], &(ijet[i][0]), a);
+      for (int j=0; j<nforce[i]; j++) {
+	D(i,ijet[i][j]) = a[j];
+      }
+    }
+
+    // add constraint part to M
+    for (int i=0; i<ncons; i++) {
+      for (int j=0; j<njet; j++) {
+	M(njet+i, j) = D(i,j);
+	M(j, njet+i) = D(i,j);
+      }
+    }
+
+    if (verbose) {
+      cout << "matrix M" << endl;
+      for (int i=0; i<njet+ncons; i++) {
+	for (int j=0; j<njet+ncons; j++)
+	  cout << std::setprecision(5) << std::setw(10) << M(i,j) << " ";
+	cout << endl;
+      }
+    }
+
+    M.Invert(); // invert M
+
+    // define RHS
+    TMatrix Z(njet+ncons,1);
+    for (int i=0; i<njet; i++)
+      Z(i,0)=0;
+    TMatrix R(D, TMatrix::kMult, dF0);
+    R -= C0;
+    for (int i=0; i<ncons; i++) {
+      Z(njet+i,0)=R(i,0);
+    }
+    if (verbose) {
+      cout << "matrix RHS" << endl;
+      for (int i=0; i<njet+ncons; i++) cout << Z(i,0) << " "; cout << endl;
+    }
+
+    // get the corrections
+    TMatrix Y(M, TMatrix::kMult, Z);
+    if (verbose) {
+      cout << "matrix Y" << endl;
+      for (int i=0; i<njet+ncons; i++) cout << Y(i,0) << " "; cout << endl;
+    }
+
+    // update parameters (momentum magnitude)
+    for (int i=0; i<njet; i++) {
+      params[i]=paramsOrig[i]+Y(i,0);
+    }
+
+    // check that these are ok (ie positive)
+    for (int i=0; i<njet; i++) {
+      if (params[i]<0) { // |momentum| has gone negative; force it positive
+	if (verbose) cout << iter << " correcting " << i << " " << params[i] << endl;
+	params[i]=-params[i]/2;
+      }
+    }
+
+    // update 4vectors
+    for (int i=0; i<njet; i++) {
+      temp.SetMagThetaPhi(params[i], tlOrig[i].Vect().Theta(),
+			  tlOrig[i].Vect().Phi());
+      tl[i].SetVectM(temp,tlOrig[i].M());
+    }
+    float newcons[ncons];
+    for (int i=0; i<ncons; i++) {
+      newcons[i] = constraint(tl, &(ijet[i][0]), nforce[i], mforce[i]);
+    }
+
+
+    if (verbose) {
+      cout << "new constraints ";
+      for (int i=0; i<ncons; i++)
+	cout << newcons[i] << " ";
+      cout << endl;
+    }
+
+    // calculate chisq
+    TMatrix ediff(njet,1);
+    for (int i=0; i<njet; i++) ediff(i,0) = params[i] - paramsOrig[i];
+    TMatrix t2(var, TMatrix::kMult, ediff);
+    TMatrix t3(ediff, TMatrix::kTransposeMult, t2);
+    chisq = t3(0,0);
+    if (verbose) cout << "chisq = " << chisq << endl;
+    bool breakit = true;
+    if (TMath::Abs((chisq-chisq_old)/chisq_old)>0.005) breakit = false; // chisq hasn't changed much - reached min
+    for (int i=0; i<ncons; i++) {
+      if (TMath::Abs(newcons[i])>smallMassDiff) breakit = false;
+    }
+    if (breakit) {
+      if (verbose) cout << "breaking at iteration " << iter << endl;
+      break;
+    }
+    chisq_old=chisq;
+  } // loop over iterations
+
+  if (verbose) {
+    cout << "final params = " << endl;
+    for (int i=0; i<njet; i++) cout << params[i] << " " ;
+    cout << endl;
+  }
+
+  for (int i=0; i<njet; i++) *(tlFit[i]) = tl[i];
+
+
+  chisq_out = chisq;
+
+  return (iter<maxiter-1);
+}
+
+void BoostJet(ANLPair w, ANLJet &j1, ANLJet &j2, Double_t &abscosj1, Double_t &abscosj2)
+{
+  TVector3 ez = TVector3(0., 0. ,1.);
+
+  TVector3 ewz = w.Vect().Unit();
+  TVector3 ewx = ewz.Cross(ez).Unit();
+  TVector3 ewy = ewz.Cross(ewx);
+
+  TVector3 bstw = TVector3(0., 0., w.Vect().Mag()/w.E());
+  //  cout << "hoge: " << w.Vect().Mag()/w.E() << endl; 
+
+  ANL4DVector pj1 = ANL4DVector(j1.E(), j1.Vect()*ewx, j1.Vect()*ewy, j1.Vect()*ewz);
+  pj1.Boost(-bstw);
+  abscosj1 = TMath::Abs(pj1.CosTheta());
+
+  ANL4DVector pj2 = ANL4DVector(j2.E(), j2.Vect()*ewx, j2.Vect()*ewy, j2.Vect()*ewz);
+  pj2.Boost(-bstw);
+  abscosj2 = TMath::Abs(pj2.CosTheta());
+
+  //  Double_t p1x = pj1.Px();  
+  //  Double_t p1y = pj1.Py();  
+  //  Double_t p1z = pj1.Pz();  
+  //  Double_t p2x = pj2.Px();  
+  //  Double_t p2y = pj2.Py();  
+  //  Double_t p2z = pj2.Pz();  
+  
+  //  acolj = (p1x*p2x+p1y*p2y+p1z*p2z)/(sqrt(p1x*p1x+p1y*p1y+p1z*p1z)*sqrt(p2x*p2x+p2y*p2y+p2z*p2z));
+
+  return;
+}

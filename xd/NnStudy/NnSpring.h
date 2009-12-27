@@ -69,6 +69,9 @@ public:
 
   Double_t GetCosThetaW1()           const { return fCosThetaW1; }
   Double_t GetPhiW1     ()           const { return fPhiW1; }
+  Double_t GetCosThetaLepton()           const { return fCosThetaLepton; }
+  Double_t GetPhiLepton     ()           const { return fPhiLepton; }
+
   Double_t GetCosThetaF1()           const { return fCosThetaF1; }
   Double_t GetPhiF1     ()           const { return fPhiF1; }
 
@@ -125,6 +128,7 @@ private:
   Int_t    fWpModesLo;      // W- decay mode lo;
   Int_t    fWpModesHi;      // W- decay mode hi;
 
+
   // ----------------
   //  Particle Data
   // ----------------
@@ -152,6 +156,8 @@ private:
 
   GENDecayMode  *fW1ModePtr;      // pointer to W- decay mode
   Int_t          fW1Mode;         // W- decay mode
+  GENDecayMode  *fZ1ModePtr;      // pointer to Z decay mode
+  Int_t          fZ1Mode;         // Z decay mode
   GENPDTEntry   *f1Ptr;           // point to 1st W- daughter
   GENPDTEntry   *f2Ptr;           // point to 2nd W- daughter
 
@@ -180,6 +186,8 @@ private:
 
   Double_t       fCosThetaW1;     // cos(theta_W-) in X1  frame
   Double_t       fPhiW1;          // phi_W-        in X1  frame
+  Double_t       fCosThetaLepton;     // cos(theta_Lepton) in X1  frame
+  Double_t       fPhiLepton;          // phi_Lepton        in X1  frame
   Double_t       fXQ2X1;          // q^2 of final state X1
   Double_t       fCosThetaF1;     // cos(theta_f1) in W-  frame
   Double_t       fPhiF1;          // phi_f1        in W-  frame
@@ -227,9 +235,12 @@ public:
 
   Double_t GetCosThetaW1()           const { return fCosThetaW1; }
   Double_t GetPhiW1     ()           const { return fPhiW1; }
+  Double_t GetCosThetaLepton()       const { return fCosThetaLepton; }
+  Double_t GetPhiLepton     ()       const { return fPhiLepton; }
   Double_t GetCosThetaF1()           const { return fCosThetaF1; }
   Double_t GetPhiF1     ()           const { return fPhiF1; }
-  // ----------------------
+
+ // ----------------------
   //   Base class methods
   // ----------------------
   virtual Bool_t SetPartons();
@@ -241,13 +252,15 @@ private:
   // ----------------
   //  Event info
   // ----------------
-  Double_t fCosTheta;       // cos(theta_x) in cm  frame
-  Double_t fPhi;            // phi_x        in cm  frame
+  Double_t fCosTheta;       // cos(theta_x2) in cm  frame
+  Double_t fPhi;            // phi_x2        in cm  frame
   Double_t fZBoost;         // p_z(cm)      in lab frame
   Double_t fEcmIP;          // Ecm after B-strahlung
 
   Double_t       fCosThetaW1;     // cos(theta_W-) in X1  frame
   Double_t       fPhiW1;          // phi_W-        in X1  frame
+  Double_t       fCosThetaLepton;     // cos(theta_Lepton) in X1  frame
+  Double_t       fPhiLepton;          // phi_Lepton        in X1  frame
   Double_t       fXQ2X1;          // q^2 of final state X1
   Double_t       fCosThetaF1;     // cos(theta_f1) in W-  frame
   Double_t       fPhiF1;          // phi_f1        in W-  frame
@@ -289,7 +302,7 @@ public:
 class RNeutrino: public GENPDTEntry {
  public:
 
-  RNeutrino(Double_t m   = 300.,
+  RNeutrino(Double_t m   = 100.,
 	    Double_t m4  = 3.3e-9,
 	    Int_t    gen = 2);
   virtual ~RNeutrino() {}
@@ -304,4 +317,5 @@ class RNeutrino: public GENPDTEntry {
 
   ClassDef(RNeutrino, 1)  // NR boson class
 };
+
 #endif
