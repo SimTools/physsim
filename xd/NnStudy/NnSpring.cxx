@@ -879,7 +879,7 @@ Complex_t NnBases::AmpEEtoNn(const HELFermion &em,
      // T-channel
      HELVector ws(em, fnr, glrnwe, grrnwe, kM_w, gamw);
      HELVertex amptch(fn, ep, ws, glnwe, grnwe);
-     amp += amptch;
+     amp += -amptch;
    }
 
    return amp;
@@ -1187,6 +1187,40 @@ void RNeutrino::Initialize()
     dmp->Add(d2p);
     Add(dmp);
   }
+  //--
+  // N --> n + Z 
+  //--
+  Double_t gzl[3];
+  gzl[0] = b*x12;
+  gzl[1] = b*x22;
+  gzl[2] = b*x32;
+  for (Int_t ig=0; ig<3; ig++) {
+    const Char_t   *namd = kName[0][0][ig];
+          Int_t     pidd = kPID [0][0][ig];
+	  Double_t  qfd  = 0;
+	  Double_t  t3d  = +0.5;
+	  Double_t  spin = 0.5;	  
+	  Double_t  md   = kMass[0][0][ig];
+	  Double_t  cf   = 1.;
+
+    GENDecayMode *dmp;
+    GENPDTEntry  *d1p;
+    GENPDTEntry  *d2p;
+    d1p = new GENPDTEntry(namd, pidd, qfd, spin, md, ig+1, t3d, cf);
+    d2p = new GENPDTZBoson();
+  
+    Double_t m1    = d1p->GetMass();
+    Double_t m2    = d2p->GetMass();
+    Double_t ident = 1.;
+    Double_t a     = gzl[ig];
+    Double_t gam   = GamToFV(m1, m2, a)/ident;
+
+    dmp = new GENDecayMode(gam);
+    dmp->Add(d1p);
+    dmp->Add(d2p);
+    Add(dmp);
+  }
+  cerr << "Gamma_NR = " << setprecision(8) << GetWidth() << endl;
 }
 
 // --------------------------
