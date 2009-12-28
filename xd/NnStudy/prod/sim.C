@@ -16,7 +16,7 @@ Int_t sim()
 {
   gROOT->Reset();
 
-  file=new TFile("Nnsim.root","RECREATE");  // Output file
+  file = new TFile("Nnsim.root","RECREATE");  // Output file
 
   // Define modules.  JSFLCFULL must be declared to use JSFHadronizer and 
   // JSFQuickSim, which uses LCLIB libraries.  Each modules are executed
@@ -43,10 +43,10 @@ Int_t sim()
   //  Event loop.
   //  ------------------------------------------------------------
 
-  for(Int_t ev=1;ev<=maxevt;ev++){
+  for (Int_t ev=1;ev<=maxevt;ev++) {
     printf(" start event %d ",ev);
 
-    if( !jsf->Process(ev)) break;  
+    if (!jsf->Process(ev)) break;  
 
     printf("Processed event %d ",ev);
 

@@ -18,10 +18,10 @@
 
 #include <sstream>
 #include <iomanip>
-//#define __NODECAY__
+//#define __NOWDECAY__
 //#define __DEBUG__
 //#define __ZEROWIDTH__
-#ifdef __NODECAY__
+#ifdef __NOWDECAY__
 #ifndef __ZEROWIDTH__
 #define __ZEROWIDTH__
 #endif
@@ -245,11 +245,11 @@ NnBases::NnBases(const char *name, const char *title)
            fR_BS_p    (0),
            fR_ISR_var (0),
            fR_ISR_side(0),
-           fCosThetaW1  (0.),
-           fPhiW1       (0.),
-           fPhiLepton       (0.),
-           fCosThetaF1  (0.),
-           fPhiF1       (0.)
+           fCosThetaW1(0.),
+           fPhiW1     (0.),
+           fPhiLepton (0.),
+           fCosThetaF1(0.),
+           fPhiF1     (0.)
 {
   //  Constructor of bases.  Default parameter should be initialized here
   // --------------------------------------------
@@ -460,7 +460,7 @@ Double_t NnBases::Func()
   Double_t weight = 1;
 
   fW1ModePtr = fW1BosonPtr->PickMode(fW1DecayMode, weight, fW1Mode);
-#ifndef __NODECAY__
+#ifndef __NOWDECAY__
   bsWeight *= weight;
 #endif
   f1Ptr = static_cast<GENPDTEntry *>(fW1ModePtr->At(0));
@@ -501,10 +501,6 @@ Double_t NnBases::Func()
   fQ2X1  = TMath::Power(fNRPtr->GetMass(),2);
   weight = kPi*fNRPtr->GetMass()*fNRPtr->GetWidth();
 #endif
-
-#ifdef __NODECAY__
-  weight = 1.;
-#endif 
   Double_t qx1 = TMath::Sqrt(fQ2X1);
   bsWeight *= weight;
 
@@ -515,7 +511,7 @@ Double_t NnBases::Func()
 #else
   fQ2W1 = TMath::Power(fW1BosonPtr->GetMass(),2);
   weight = kPi*fW1BosonPtr->GetMass()*fW1BosonPtr->GetWidth();
-#ifdef __NODECAY__
+#ifdef __NOWDECAY__
   weight = 1.;
 #endif
 #endif
@@ -541,8 +537,8 @@ Double_t NnBases::Func()
   if (!hMNR  ) hMNR   = new TH1D( "hMNR"  , "MNR"    , 50, 100-5.e-2,  100+5.e-2);
   if (!hCosW ) hCosW  = new TH1D( "hCosW" , "CosthW" , 50, fXL[2],        fXU[2]);
   if (!hPhiW ) hPhiW  = new TH1D( "hPhiW" , "PhiW"   , 50, fXL[3],        fXU[3]);
-  if (!hCosle) hCosle  = new TH1D( "hCosle","CosthLepton", 50, fXL[2],        fXU[2]);
-  if (!hPhile) hPhile  = new TH1D( "hPhile" ,"PhiLepton", 50, fXL[3],        fXU[3]);
+  if (!hCosle) hCosle = new TH1D( "hCosle","CosthLepton", 50, fXL[2],     fXU[2]);
+  if (!hPhile) hPhile = new TH1D( "hPhile","PhiLepton", 50, fXL[3],      fXU[3]);
   if (!hMw   ) hMw    = new TH1D( "hMw"   , "Mw"     , 50,    60.,          100.);
   if (!hCosU ) hCosU  = new TH1D( "hCosU" , "CosthU" , 50, fXL[4],        fXU[4]);
   if (!hPhiU ) hPhiU  = new TH1D( "hPhiU" , "PhiU"   , 50, fXL[5],        fXU[5]);
@@ -598,8 +594,8 @@ Double_t NnBases::Func()
   hMNR  ->Fill(qx1              , (bsWeight*sigma));
   hCosW ->Fill(fCosThetaW1      , (bsWeight*sigma));
   hPhiW ->Fill(fPhiW1           , (bsWeight*sigma));
-  hCosle ->Fill(g_CosThetaLepton , (bsWeight*sigma));
-  hPhile ->Fill(fPhiLepton      , (bsWeight*sigma));
+  hCosle->Fill(g_CosThetaLepton , (bsWeight*sigma));
+  hPhile->Fill(fPhiLepton       , (bsWeight*sigma));
   hMw   ->Fill(qw1              , (bsWeight*sigma));
   hCosU ->Fill(fCosThetaF1      , (bsWeight*sigma));
   hPhiU ->Fill(fPhiF1           , (bsWeight*sigma));
@@ -657,7 +653,7 @@ Double_t NnBases::DSigmaDX(GENBranch &cmbranch)
   fM[1] = TMath::Sqrt(mlep2);
   ANL4DVector pw = phaseX1.GetFourMomentum(0);
   Double_t betaw = phaseX1.GetBetaBar();
-  if(betaw <= 0.) return 0;
+  if (betaw <= 0.) return 0;
 
   //----------------
   // W+ -> fu + fdb
@@ -674,7 +670,7 @@ Double_t NnBases::DSigmaDX(GENBranch &cmbranch)
   fP[3] = phaseW.GetFourMomentum(1);
   fM[3] = TMath::Sqrt(md2);
   Double_t betaf = phaseW.GetBetaBar();
-  if(betaf <= 0.) return 0;
+  if (betaf <= 0.) return 0;
 
   Double_t eb     = rs/2.;
   Double_t pb     = TMath::Sqrt((eb-kM_e)*(eb+kM_e));
@@ -725,12 +721,12 @@ Double_t NnBases::DSigmaDX(GENBranch &cmbranch)
   // -------------------
   //  Put them together
   // -------------------
-#ifndef __NODECAY__
+#ifndef __NOWDECAY__
   static const Int_t    kNbr  = 3;
   static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr));
 #else
-  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3+2));
-  betaw = 1.;
+  static const Int_t    kNbr  = 2;
+  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr+1));
   betaf = 1.;
 #endif
 
@@ -752,7 +748,7 @@ Double_t NnBases::DSigmaDX(GENBranch &cmbranch)
 // --------------------------
 Double_t NnBases::AmpSquared(GENBranch &cmbranch)
 {
-#ifndef __NODECAY__
+#ifndef __NOWDECAY__
   Double_t  color = f1Ptr->GetColor();
   Int_t     ig1   = f1Ptr->GetGenNo() - 1;
   Int_t     ig2   = f2Ptr->GetGenNo() - 1;
@@ -788,25 +784,23 @@ Complex_t NnBases::FullAmplitude()
   HELFermion ep(fK[1], kM_e, fHelInitial[1], -1, kIsOutgoing);
   
   HELFermion fn (fP[0], fM[0], fHelFinal [0], -1, kIsIncoming); // neutrino incoming line
-#ifndef __NODECAY__
   HELFermion fl (fP[1], fM[1], fHelFinal [1], +1, kIsOutgoing); // charged lepton outgoing line
+#ifndef __NOWDECAY__
   HELFermion fu (fP[2], fM[2], fHelFinal [2], +1, kIsOutgoing); // up quark outgoing line
   HELFermion fdb(fP[3], fM[3], fHelFinal [3], -1, kIsIncoming); // down bar quark incoming line
   HELVector  wp (fdb, fu, glw, grw, kM_w, gamw);                // (W+ -> u dbar) internal line
+#else
+  ANL4DVector pwp = fP[2] + fP[3];
+  HELVector   wp (pwp, kM_w, fHelFinal[2], +1);               // W+
 #endif
 
   Complex_t amp = 0.;
-  Double_t mrnu  = fNRPtr->GetMass();   // j-th R-neutrino mass
-  Double_t gamrn = fNRPtr->GetWidth();  // j-th R-neutrino width
+  Double_t mrnu     = fNRPtr->GetMass();   // R-neutrino mass
+  Double_t gamrn    = fNRPtr->GetWidth();  // R-neutrino width
   Double_t glrnwl   = fNRPtr->GetGwl()[0];
   Double_t grrnwl   = fNRPtr->GetGwl()[1];
 
-#ifndef __NODECAY__
-  HELFermion fnr(fl, wp, glrnwl, grrnwl, mrnu, gamrn);          // (N -> W+ l-) internal line
-#else
-  ANL4DVector prnu = fP[1] + fP[2] + fP[3];
-  HELFermion fnr(prnu,mrnu, fHelFinal[1], +1, kIsOutgoing);
-#endif
+  HELFermion fnr(fl, wp, glrnwl, grrnwl, mrnu, gamrn);  // (N -> W+ l-) internal line
   Double_t glznrn   = fNRPtr->GetGzn(fGenNu)[0];
   Double_t grznrn   = fNRPtr->GetGzn(fGenNu)[1];
   Double_t glrnwe   = fNRPtr->GetGwe()[0];
@@ -877,8 +871,8 @@ Complex_t NnBases::AmpEEtoNn(const HELFermion &em,
    if ((glnwe != 0. || grnwe != 0.) && 
        (glrnwe != 0. || grrnwe != 0.)) {
      // T-channel
-     HELVector ws(em, fnr, glrnwe, grrnwe, kM_w, gamw);
-     HELVertex amptch(fn, ep, ws, glnwe, grnwe);
+     HELVector wt(em, fnr, glrnwe, grrnwe, kM_w, gamw);
+     HELVertex amptch(fn, ep, wt, glnwe, grnwe);
      amp += -amptch;
    }
 
@@ -1018,17 +1012,16 @@ void NnBases::SelectHelicities(Double_t &weight)
    static const Int_t kIHelComb[kNi][2] = {{-1, +1},
 					   {+1, -1}};
                                              
-#ifndef __NODECAY__
+#ifndef __NOWDECAY__
    static const Int_t kNf = 1;
    //                                      nub,  l, fu, fdb 
    static const Int_t kFHelComb[kNf][4] = {{+1, -1, -1, +1}};
 #else
-   static const Int_t kNf = 4;
-   //                                      nub,  l, fu, fdb 
-   static const Int_t kFHelComb[kNf][4] = {{-1, -1, -1, +1},
-                                           {-1, +1, -1, +1},
-                                           {+1, -1, -1, +1},
-                                           {+1, +1, -1, +1}};
+   static const Int_t kNf = 3;
+   //                                      nub,  l, W, unused 
+   static const Int_t kFHelComb[kNf][4] = {{+1, -1, -1, +1},
+                                           {+1, -1,  0, +1},
+                                           {+1, -1, +1, +1}};
 #endif
   
    Double_t helm = (1. - fPole)/2.;
