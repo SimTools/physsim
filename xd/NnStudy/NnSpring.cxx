@@ -1054,10 +1054,23 @@ void NnBases::SelectHelicities(Double_t &weight)
 }
 
 //_____________________________________________________________________________
+// ==============================
+//  class RNeutrino 
+// ==============================
+// Notice:
+//   3 generations of NR are degenerate in the model assumed.
+//   In order to simplify the calculation, the NR basis is so 
+//   chosen that the final-state lepton only couples to NR_2.
+//   Consequently the c-tor of this class requires the generation
+//   number of the final-state lepton to be observed.
+//_____________________________________________________________________________
 // --------------------------
-//  SelectHelicities
+//  c-tor
 // --------------------------
-RNeutrino::RNeutrino(Double_t mnr, Double_t m4, Int_t gen, Int_t kkmode)
+RNeutrino::RNeutrino(Double_t mnr, // NR mass
+                     Double_t m4,  // 4-dim NR mass
+                     Int_t gen,    // final-state lepton generation
+                     Int_t kkmode) // KK mode number
 {
   fName    = TString("RN");
   fPID     = 20000000;
@@ -1126,12 +1139,15 @@ void RNeutrino::Initialize()
 	   ::abort();
            break;
   }
+  // G_NR-W-l coupling at the decay vertex
   fGwl[0] = a*(fGen == 1 ? x12 : (fGen == 2 ? x22 : x32));
   fGwl[1] = 0.;
 
+  // G_NR-W-e coupling at the (t-channel) production vertex
   fGwe[0] = a*x12;
   fGwe[1] = 0.;
 
+  // G_NR-Z-n coupling at the (s-channel) production vertex
   fGzn[0][0] = b*x12;
   fGzn[1][0] = 0.; 
   fGzn[0][1] = b*x22;

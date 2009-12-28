@@ -64,17 +64,17 @@ public:
   void     SetBeamWidth(Double_t w      ) { fBeamWidth = w;    }
   void     SetPole     (Double_t p      ) { fPole      = p;    }
 
-  Double_t GetQ2XX      ()           const { return fQ2XX; }
-  Double_t GetQ2X1      ()           const { return fQ2X1; }
-  Double_t GetQ2W1      ()           const { return fQ2W1; }
+  Double_t GetQ2XX      ()           const { return fQ2XX;     }
+  Double_t GetQ2X1      ()           const { return fQ2X1;     }
+  Double_t GetQ2W1      ()           const { return fQ2W1;     }
 
-  Double_t GetCosThetaW1()           const { return fCosThetaW1; }
-  Double_t GetPhiW1     ()           const { return fPhiW1; }
-  Double_t GetCosThetaLepton()           const { return fCosThetaLepton; }
-  Double_t GetPhiLepton     ()           const { return fPhiLepton; }
+  Double_t GetCosThetaW1    ()       const { return fCosThetaW1;     }
+  Double_t GetPhiW1         ()       const { return fPhiW1;          }
+  Double_t GetCosThetaLepton()       const { return fCosThetaLepton; }
+  Double_t GetPhiLepton     ()       const { return fPhiLepton;      }
 
-  Double_t GetCosThetaF1()           const { return fCosThetaF1; }
-  Double_t GetPhiF1     ()           const { return fPhiF1; }
+  Double_t GetCosThetaF1    ()       const { return fCosThetaF1;     }
+  Double_t GetPhiF1         ()       const { return fPhiF1;          }
 
 
   // ----------------------
@@ -127,8 +127,8 @@ private:
   Int_t    fGenNu;          // NR Generation
   Int_t    fGenLepton;      // Lepton Generation
 
-  Int_t    fWpModesLo;      // W- decay mode lo;
-  Int_t    fWpModesHi;      // W- decay mode hi;
+  Int_t    fWpModesLo;      // W+ decay mode lo;
+  Int_t    fWpModesHi;      // W+ decay mode hi;
 
 
   // ----------------
@@ -154,14 +154,14 @@ private:
 
   Double_t       fQ2XX;           // q^2 of XX system
   Double_t       fQ2X1;           // q^2 of final state X1
-  Double_t       fQ2W1;           // q^2 of final state W-
+  Double_t       fQ2W1;           // q^2 of final state W+
 
-  GENDecayMode  *fW1ModePtr;      // pointer to W- decay mode
-  Int_t          fW1Mode;         // W- decay mode
+  GENDecayMode  *fW1ModePtr;      // pointer to W+ decay mode
+  Int_t          fW1Mode;         // W+ decay mode
   GENDecayMode  *fZ1ModePtr;      // pointer to Z decay mode
   Int_t          fZ1Mode;         // Z decay mode
-  GENPDTEntry   *f1Ptr;           // point to 1st W- daughter
-  GENPDTEntry   *f2Ptr;           // point to 2nd W- daughter
+  GENPDTEntry   *f1Ptr;           // point to 1st W+ daughter
+  GENPDTEntry   *f2Ptr;           // point to 2nd W+ daughter
 
   Double_t       fM[4];           // [0,1,2,3] = [nub, lep, up, downb]
 
@@ -170,7 +170,7 @@ private:
   // ----------------
   Double_t       fHelCombInitial; // initial state helicity combination
   Double_t       fHelCombFinal;   // final   state helicity combination
-  Double_t       fW1DecayMode;    // decay mode selector for W-
+  Double_t       fW1DecayMode;    // decay mode selector for W+
 
   Double_t       fCosTheta;       // cos(theta_x) in cm  frame
   Double_t       fPhi;            // phi_x        in cm  frame
@@ -186,14 +186,14 @@ private:
   Double_t       fXU[6];          //! [0,1] = (cosx, phix)
   Double_t       fXL[6];          //!
 
-  Double_t       fCosThetaW1;     // cos(theta_W-) in X1  frame
-  Double_t       fPhiW1;          // phi_W-        in X1  frame
-  Double_t       fCosThetaLepton;     // cos(theta_Lepton) in X1  frame
-  Double_t       fPhiLepton;          // phi_Lepton        in X1  frame
+  Double_t       fCosThetaW1;     // cos(theta_W+) in X1  frame
+  Double_t       fPhiW1;          // phi_W+        in X1  frame
+  Double_t       fCosThetaLepton; // cos(theta_Lepton) in X1  frame
+  Double_t       fPhiLepton;      // phi_Lepton        in X1  frame
   Double_t       fXQ2X1;          // q^2 of final state X1
-  Double_t       fCosThetaF1;     // cos(theta_f1) in W-  frame
-  Double_t       fPhiF1;          // phi_f1        in W-  frame
-  Double_t       fXQ2W1;          // q^2 of final state W-
+  Double_t       fCosThetaF1;     // cos(theta_f1) in W+  frame
+  Double_t       fPhiF1;          // phi_f1        in W+  frame
+  Double_t       fXQ2W1;          // q^2 of final state W+
 
 
   TFile   *fBeamFile;         //! Beamstrahlung data file
@@ -231,16 +231,16 @@ public:
   Double_t GetZBoost    ()           const { return fZBoost;    }
   Double_t GetEcmIP     ()           const { return fEcmIP;     }
 
-  Double_t GetQ2XX      ()           const { return fQ2XX; }
-  Double_t GetQ2X1      ()           const { return fQ2X1; }
-  Double_t GetQ2W1      ()           const { return fQ2W1; }
+  Double_t GetQ2XX      ()           const { return fQ2XX;      }
+  Double_t GetQ2X1      ()           const { return fQ2X1;      }
+  Double_t GetQ2W1      ()           const { return fQ2W1;      }
 
-  Double_t GetCosThetaW1()           const { return fCosThetaW1; }
-  Double_t GetPhiW1     ()           const { return fPhiW1; }
+  Double_t GetCosThetaW1    ()       const { return fCosThetaW1;     }
+  Double_t GetPhiW1         ()       const { return fPhiW1;          }
   Double_t GetCosThetaLepton()       const { return fCosThetaLepton; }
-  Double_t GetPhiLepton     ()       const { return fPhiLepton; }
-  Double_t GetCosThetaF1()           const { return fCosThetaF1; }
-  Double_t GetPhiF1     ()           const { return fPhiF1; }
+  Double_t GetPhiLepton     ()       const { return fPhiLepton;      }
+  Double_t GetCosThetaF1    ()       const { return fCosThetaF1;     }
+  Double_t GetPhiF1         ()       const { return fPhiF1;          }
 
  // ----------------------
   //   Base class methods
@@ -259,18 +259,18 @@ private:
   Double_t fZBoost;         // p_z(cm)      in lab frame
   Double_t fEcmIP;          // Ecm after B-strahlung
 
-  Double_t       fCosThetaW1;     // cos(theta_W-) in X1  frame
-  Double_t       fPhiW1;          // phi_W-        in X1  frame
-  Double_t       fCosThetaLepton;     // cos(theta_Lepton) in X1  frame
-  Double_t       fPhiLepton;          // phi_Lepton        in X1  frame
+  Double_t       fCosThetaW1;     // cos(theta_W+) in X1  frame
+  Double_t       fPhiW1;          // phi_W+        in X1  frame
+  Double_t       fCosThetaLepton; // cos(theta_Lepton) in X1  frame
+  Double_t       fPhiLepton;      // phi_Lepton        in X1  frame
   Double_t       fXQ2X1;          // q^2 of final state X1
-  Double_t       fCosThetaF1;     // cos(theta_f1) in W-  frame
-  Double_t       fPhiF1;          // phi_f1        in W-  frame
-  Double_t       fXQ2W1;          // q^2 of final state W-
+  Double_t       fCosThetaF1;     // cos(theta_f1) in W+  frame
+  Double_t       fPhiF1;          // phi_f1        in W+  frame
+  Double_t       fXQ2W1;          // q^2 of final state W+
 
   Double_t       fQ2XX;           // q^2 of XX system
   Double_t       fQ2X1;           // q^2 of final state X1
-  Double_t       fQ2W1;           // q^2 of final state W-
+  Double_t       fQ2W1;           // q^2 of final state W+
 
   ClassDef(NnSpringBuf, 1)  // NnSpring event buffer
 };
@@ -323,8 +323,8 @@ class RNeutrino: public GENPDTEntry {
   Double_t fMass4;     // 4-dim NR mass                                  
   Int_t    fGen;       // N2(basis lepton's geneation)
   Int_t    fN;         // KK mode number
-  Double_t fGwl[2];    // (gL,gR)_W-NR_2l-l
-  Double_t fGwe[2];    // (gL,gR)_W-NR_2l-e   
+  Double_t fGwl[2];    // (gL,gR)_W+NR_2l-l
+  Double_t fGwe[2];    // (gL,gR)_W+NR_2l-e   
   Double_t fGzn[2][3]; // (gL,gR)_Z-NR_2l-n_j (j=e,mu,tau)
 
   ClassDef(RNeutrino, 1)  // NR boson class
