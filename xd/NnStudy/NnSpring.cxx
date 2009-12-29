@@ -1085,8 +1085,8 @@ RNeutrino::RNeutrino(Double_t mnr,    // NR mass
 // --------------------------
 void RNeutrino::Initialize()
 {
-  Double_t a = -(kGw*kSqh)*(1/(kPi*(2.*fN-1.)/2.))*sqrt(2./fMass4);
-  Double_t b = -(kGz/2)*(1/(kPi*(2.*fN-1.)/2.))*sqrt(2./fMass4);
+  Double_t a = -(kGw*kSqh)          *(1/(kPi*(2.*fN-1.)/2.))*sqrt(2./fMass4);
+  Double_t b = -(kGz/2)             *(1/(kPi*(2.*fN-1.)/2.))*sqrt(2./fMass4);
   Double_t c = -(kGw/2)*(fMass/kM_w)*(1/(kPi*(2.*fN-1.)/2.))*sqrt(2./fMass4);
 
   Double_t x12, x22, x32;
