@@ -52,6 +52,8 @@ static TH1D *hHelIn = 0;
 static TH1D *hHelOt = 0;
 
 static Double_t g_CosThetaLepton = 100.;
+static Double_t g_PhiLepton      = 100.;
+
 ClassImp(NnSpring)
 ClassImp(NnSpringBuf)
 ClassImp(NnBases)
@@ -135,7 +137,6 @@ Bool_t NnSpringBuf::SetPartons()
   fCosThetaW1   = bases->GetCosThetaW1();
   fPhiW1        = bases->GetPhiW1();
   fQ2W1         = bases->GetQ2W1();
-  fPhiLepton    = bases->GetPhiLepton();
   fCosThetaF1   = bases->GetCosThetaF1();
   fPhiF1        = bases->GetPhiF1();
 
@@ -247,7 +248,6 @@ NnBases::NnBases(const char *name, const char *title)
            fR_ISR_side(0),
            fCosThetaW1(0.),
            fPhiW1     (0.),
-           fPhiLepton (0.),
            fCosThetaF1(0.),
            fPhiF1     (0.)
 {
@@ -577,14 +577,9 @@ Double_t NnBases::Func()
     q(3) = cp*pv[i].Pz();
   }
   */
-  Double_t plepx = pv[3].Px();
-  Double_t plepy = pv[3].Py();
-  Double_t plepz = pv[3].Pz();
-  Double_t plep = TMath::Sqrt(plepx*plepx+plepy*plepy+plepz*plepz);
-  //  std::cout << "plep= " << plep << endl;
   
-  g_CosThetaLepton = plepz/plep;
-  //  cerr << "CosThetaLepton00= " << g_CosThetaLepton << ", " << plepz/plep << endl;
+  g_CosThetaLepton = pv[3].CosTheta();
+  g_PhiLepton      = pv[3].Phi();
 
   // test end
 
@@ -595,7 +590,7 @@ Double_t NnBases::Func()
   hCosW ->Fill(fCosThetaW1      , (bsWeight*sigma));
   hPhiW ->Fill(fPhiW1           , (bsWeight*sigma));
   hCosle->Fill(g_CosThetaLepton , (bsWeight*sigma));
-  hPhile->Fill(fPhiLepton       , (bsWeight*sigma));
+  hPhile->Fill(g_PhiLepton      , (bsWeight*sigma));
   hMw   ->Fill(qw1              , (bsWeight*sigma));
   hCosU ->Fill(fCosThetaF1      , (bsWeight*sigma));
   hPhiU ->Fill(fPhiF1           , (bsWeight*sigma));
@@ -723,12 +718,11 @@ Double_t NnBases::DSigmaDX(GENBranch &cmbranch)
   // -------------------
 #ifndef __NOWDECAY__
   static const Int_t    kNbr  = 3;
-  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr));
 #else
   static const Int_t    kNbr  = 2;
-  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr+1));
   betaf = 1.;
 #endif
+  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,2*kNbr+3));
 
   Double_t identp = 1.;                            // identical particle factor
   Double_t dPhase = kFact * betax * betaw * betaf; // phase space factor

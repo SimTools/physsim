@@ -64,23 +64,21 @@ public:
   void     SetBeamWidth(Double_t w      ) { fBeamWidth = w;    }
   void     SetPole     (Double_t p      ) { fPole      = p;    }
 
-  Double_t GetQ2XX      ()           const { return fQ2XX;     }
-  Double_t GetQ2X1      ()           const { return fQ2X1;     }
-  Double_t GetQ2W1      ()           const { return fQ2W1;     }
+  Double_t GetQ2XX     ()           const { return fQ2XX;      }
+  Double_t GetQ2X1     ()           const { return fQ2X1;      }
+  Double_t GetQ2W1     ()           const { return fQ2W1;      }
 
-  Double_t GetCosThetaW1    ()       const { return fCosThetaW1;     }
-  Double_t GetPhiW1         ()       const { return fPhiW1;          }
-  Double_t GetCosThetaLepton()       const { return fCosThetaLepton; }
-  Double_t GetPhiLepton     ()       const { return fPhiLepton;      }
+  Double_t GetCosThetaW1()     const { return fCosThetaW1;     }
+  Double_t GetPhiW1     ()     const { return fPhiW1;          }
 
-  Double_t GetCosThetaF1    ()       const { return fCosThetaF1;     }
-  Double_t GetPhiF1         ()       const { return fPhiF1;          }
+  Double_t GetCosThetaF1()     const { return fCosThetaF1;     }
+  Double_t GetPhiF1     ()     const { return fPhiF1;          }
 
 
   // ----------------------
   //   Base class methods
   // ----------------------
-  virtual void     Userin();   // Bases user initialization
+  virtual void     Userin( );  // Bases user initialization
   virtual void     Userout();  // Bases user output 
 
   Double_t Func();     // Bases integration function.
@@ -188,8 +186,6 @@ private:
 
   Double_t       fCosThetaW1;     // cos(theta_W+) in X1  frame
   Double_t       fPhiW1;          // phi_W+        in X1  frame
-  Double_t       fCosThetaLepton; // cos(theta_Lepton) in X1  frame
-  Double_t       fPhiLepton;      // phi_Lepton        in X1  frame
   Double_t       fXQ2X1;          // q^2 of final state X1
   Double_t       fCosThetaF1;     // cos(theta_f1) in W+  frame
   Double_t       fPhiF1;          // phi_f1        in W+  frame
@@ -237,8 +233,6 @@ public:
 
   Double_t GetCosThetaW1    ()       const { return fCosThetaW1;     }
   Double_t GetPhiW1         ()       const { return fPhiW1;          }
-  Double_t GetCosThetaLepton()       const { return fCosThetaLepton; }
-  Double_t GetPhiLepton     ()       const { return fPhiLepton;      }
   Double_t GetCosThetaF1    ()       const { return fCosThetaF1;     }
   Double_t GetPhiF1         ()       const { return fPhiF1;          }
 
@@ -261,8 +255,6 @@ private:
 
   Double_t       fCosThetaW1;     // cos(theta_W+) in X1  frame
   Double_t       fPhiW1;          // phi_W+        in X1  frame
-  Double_t       fCosThetaLepton; // cos(theta_Lepton) in X1  frame
-  Double_t       fPhiLepton;      // phi_Lepton        in X1  frame
   Double_t       fXQ2X1;          // q^2 of final state X1
   Double_t       fCosThetaF1;     // cos(theta_f1) in W+  frame
   Double_t       fPhiF1;          // phi_f1        in W+  frame
