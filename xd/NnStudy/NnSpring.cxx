@@ -18,7 +18,7 @@
 
 #include <sstream>
 #include <iomanip>
-//#define __NOWDECAY__
+#define __NOWDECAY__
 //#define __DEBUG__
 //#define __ZEROWIDTH__
 #ifdef __NOWDECAY__
@@ -492,10 +492,10 @@ Double_t NnBases::Func()
   // --------------------------------------------
   fQ2XX = fEcmIP*fEcmIP;
   
+#ifndef __ZEROWIDTH__
   Double_t rs   = fEcmIP;
   Double_t qmin = mlep + mu + md;
   Double_t qmax = rs - mnu;
-#ifndef __ZEROWIDTH__
   fQ2X1 = fNRPtr->GetQ2BW(qmin,qmax, fXQ2X1, weight);
 #else
   fQ2X1  = TMath::Power(fNRPtr->GetMass(),2);
@@ -763,8 +763,6 @@ Double_t NnBases::AmpSquared(GENBranch &cmbranch)
 // --------------------------
 Complex_t NnBases::FullAmplitude()
 {
-  Double_t gamw  = fW1BosonPtr->GetWidth(); 
-
   //-----------------------------------------
   // e+e- -> nu_jnu N_jnu -> nu_jnu W+ l_il 
   //-----------------------------------------
@@ -782,6 +780,7 @@ Complex_t NnBases::FullAmplitude()
 #ifndef __NOWDECAY__
   HELFermion fu (fP[2], fM[2], fHelFinal [2], +1, kIsOutgoing); // up quark outgoing line
   HELFermion fdb(fP[3], fM[3], fHelFinal [3], -1, kIsIncoming); // down bar quark incoming line
+  Double_t gamw  = fW1BosonPtr->GetWidth(); 
   HELVector  wp (fdb, fu, glw, grw, kM_w, gamw);                // (W+ -> u dbar) internal line
 #else
   ANL4DVector pwp = fP[2] + fP[3];
