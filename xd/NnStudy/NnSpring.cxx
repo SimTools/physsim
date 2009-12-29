@@ -36,6 +36,7 @@ static const Double_t kMNS [3][3] = {{  0.83,  0.56, -0.07},  // e
                                      { -0.35,  0.61,  0.71},  // mu
                                      {  0.44, -0.56,  0.70}}; // tau
 static const Double_t kMnu [3] = {0., 9.0e-12, 5.9e-11};
+
 static TH1D *hEcm   = 0;
 static TH1D *hCosNR = 0;
 static TH1D *hPhiNR = 0;
@@ -315,15 +316,19 @@ NnBases::NnBases(const char *name, const char *title)
   ins >> fMass;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("NnBases.NRMass4","3.3e-9"));    // 4-dim NR mass
+  ins.str(gJSF->Env()->GetValue("NnBases.NRMass4","3.3e-9")); // 4-dim NR mass
   ins >> fMass4;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("NnBases.Nkk","1"));      //  NR KK mode number
+  ins.str(gJSF->Env()->GetValue("NnBases.Nkk","1"));          //  NR KK mode number
   ins >> fNkk;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("NnBases.GenNu","1"));    //  nu Generation
+  ins.str(gJSF->Env()->GetValue("NnBases.HiggsMass","120.")); //  NR KK mode number
+  ins >> fMassHiggs;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NnBases.GenNu","1"));        //  nu Generation
   ins >> fGenNu;
 
   ins.clear();
@@ -539,7 +544,7 @@ Double_t NnBases::Func()
   if (!hPhiW ) hPhiW  = new TH1D( "hPhiW" , "PhiW"   , 50, fXL[3],        fXU[3]);
   if (!hCosle) hCosle = new TH1D( "hCosle","CosthLepton", 50, fXL[2],     fXU[2]);
   if (!hPhile) hPhile = new TH1D( "hPhile","PhiLepton", 50, fXL[3],      fXU[3]);
-  if (!hMw   ) hMw    = new TH1D( "hMw"   , "Mw"     , 50,    60.,          100.);
+  if (!hMw   ) hMw    = new TH1D( "hMw"   , "Mw"     , 80,    20.,          100.);
   if (!hCosU ) hCosU  = new TH1D( "hCosU" , "CosthU" , 50, fXL[4],        fXU[4]);
   if (!hPhiU ) hPhiU  = new TH1D( "hPhiU" , "PhiU"   , 50, fXL[5],        fXU[5]);
   if (!hWDK  ) hWDK   = new TH1D( "hWDK"  , "W Mode" , 12,     0.,           12.);
@@ -935,7 +940,7 @@ void NnBases::Userin()
   if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
   fZBosonPtr->DebugPrint();
 
-  if (!fNRPtr)  fNRPtr = new RNeutrino(fMass, fMass4, fGenLepton, fNkk);
+  if (!fNRPtr)  fNRPtr = new RNeutrino(fMass, fMass4, fGenLepton, fNkk, fMassHiggs);
   fNRPtr->DebugPrint();
 
   fFPtr = static_cast<GENPDTEntry *>(fNRPtr->GetMode(fGenLepton)->At(0));
@@ -1053,10 +1058,11 @@ void NnBases::SelectHelicities(Double_t &weight)
 // --------------------------
 //  c-tor
 // --------------------------
-RNeutrino::RNeutrino(Double_t mnr, // NR mass
-                     Double_t m4,  // 4-dim NR mass
-                     Int_t gen,    // final-state lepton generation
-                     Int_t kkmode) // KK mode number
+RNeutrino::RNeutrino(Double_t mnr,    // NR mass
+                     Double_t m4,     // 4-dim NR mass
+                     Int_t    gen,    // final-state lepton generation
+                     Int_t    kkmode, // KK mode number
+                     Double_t mh)     // Higgs mass
 {
   fName    = TString("RN");
   fPID     = 20000000;
@@ -1066,6 +1072,7 @@ RNeutrino::RNeutrino(Double_t mnr, // NR mass
   fMass4   = m4;
   fGen     = gen;
   fN       = kkmode;
+  fMassH   = mh;
   fIsoSpin = 0.;
   fColor   = 1.0;
 
@@ -1080,6 +1087,7 @@ void RNeutrino::Initialize()
 {
   Double_t a = -(kGw*kSqh)*(1/(kPi*(2.*fN-1.)/2.))*sqrt(2./fMass4);
   Double_t b = -(kGz/2)*(1/(kPi*(2.*fN-1.)/2.))*sqrt(2./fMass4);
+  Double_t c = -(kGw/2)*(fMass/kM_w)*(1/(kPi*(2.*fN-1.)/2.))*sqrt(2./fMass4);
 
   Double_t x12, x22, x32;
   switch (fGen) { 
@@ -1176,10 +1184,10 @@ void RNeutrino::Initialize()
   //--
   // N --> n + Z 
   //--
-  Double_t gzl[3];
-  gzl[0] = b*x12;
-  gzl[1] = b*x22;
-  gzl[2] = b*x32;
+  Double_t gzn[3];
+  gzn[0] = b*x12;
+  gzn[1] = b*x22;
+  gzn[2] = b*x32;
   for (Int_t ig=0; ig<3; ig++) {
     const Char_t   *namd = kName[0][0][ig];
           Int_t     pidd = kPID [0][0][ig];
@@ -1198,8 +1206,42 @@ void RNeutrino::Initialize()
     Double_t m1    = d1p->GetMass();
     Double_t m2    = d2p->GetMass();
     Double_t ident = 1.;
-    Double_t a     = gzl[ig];
+    Double_t a     = gzn[ig];
     Double_t gam   = GamToFV(m1, m2, a)/ident;
+
+    dmp = new GENDecayMode(gam);
+    dmp->Add(d1p);
+    dmp->Add(d2p);
+    Add(dmp);
+  }
+  //--
+  // N --> n + H 
+  //--
+  Double_t ghn[3];
+  ghn[0] = c*x12;
+  ghn[1] = c*x22;
+  ghn[2] = c*x32;
+  for (Int_t ig=0; ig<3; ig++) {
+    const Char_t   *namd = kName[0][0][ig];
+          Int_t     pidd = kPID [0][0][ig];
+	  Double_t  qfd  = 0;
+	  Double_t  t3d  = +0.5;
+	  Double_t  spin = 0.5;	  
+	  Double_t  md   = kMass[0][0][ig];
+	  Double_t  cf   = 1.;
+	  Double_t  mh   = fMassH;
+
+    GENDecayMode *dmp;
+    GENPDTEntry  *d1p;
+    GENPDTEntry  *d2p;
+    d1p = new GENPDTEntry(namd, pidd, qfd, spin, md, ig+1, t3d, cf);
+    d2p = new GENPDTEntry( "h",   25,  0.,   0., mh,    1,-0.5,  1); // dummy H
+  
+    Double_t m1    = d1p->GetMass();
+    Double_t m2    = d2p->GetMass();
+    Double_t ident = 1.;
+    Double_t a     = ghn[ig];
+    Double_t gam   = GamToFS(m1, m2, a)/ident;
 
     dmp = new GENDecayMode(gam);
     dmp->Add(d1p);
@@ -1212,8 +1254,8 @@ void RNeutrino::Initialize()
 // --------------------------
 //  GamToFV
 // --------------------------
-Double_t RNeutrino::GamToFV(Double_t m1, // 1st daughter mass
-			    Double_t m2, // 2nd daughter mass
+Double_t RNeutrino::GamToFV(Double_t m1, // 1st daughter mass (l/n)
+			    Double_t m2, // 2nd daughter mass (W/Z)
 			    Double_t a)  // coupling
 {
   Double_t x1   = TMath::Power(m1/fMass,2);
@@ -1257,6 +1299,25 @@ Double_t RNeutrino::GamToFV(Double_t m1, // 1st daughter mass
   Double_t spin = 1./2;
   Double_t gam  = (1/(2*fMass))*spin*tta*(beta/(8*kPi));
 #endif
+
+  return gam;
+}
+
+// --------------------------
+//  GamToFS
+// --------------------------
+Double_t RNeutrino::GamToFS(Double_t m1, // 1st daughter mass (n)
+			    Double_t m2, // 2nd daughter mass (h)
+			    Double_t a)  // coupling
+{
+  Double_t x1   = TMath::Power(m1/fMass,2);
+  Double_t x2   = TMath::Power(m2/fMass,2);
+  Double_t beta = 1. - 2.*(x1+x2) + TMath::Power((x1-x2),2);
+
+  if (beta <= 0.) return 0.;
+  beta = TMath::Sqrt(beta);
+
+  Double_t gam = a*a* fMass*beta*beta /(32*kPi);
 
   return gam;
 }

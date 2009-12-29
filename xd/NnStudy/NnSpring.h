@@ -124,6 +124,7 @@ private:
   Int_t    fNkk;            // NR KK mode number
   Int_t    fGenNu;          // NR Generation
   Int_t    fGenLepton;      // Lepton Generation
+  Double_t fMassHiggs;      // Higgs mass
 
   Int_t    fWpModesLo;      // W+ decay mode lo;
   Int_t    fWpModesHi;      // W+ decay mode hi;
@@ -299,7 +300,8 @@ class RNeutrino: public GENPDTEntry {
   RNeutrino(Double_t m      = 100.,
 	    Double_t m4     = 3.3e-9,
 	    Int_t    gen    = 1,
-	    Int_t    kkmode = 1);
+	    Int_t    kkmode = 1,
+	    Double_t mh     = 120.);
   virtual ~RNeutrino() {}
 
         Int_t     GetNkk()            const { return fN;            }
@@ -310,11 +312,13 @@ class RNeutrino: public GENPDTEntry {
  private:
   void     Initialize();
   Double_t GamToFV(Double_t m1, Double_t m2, Double_t a);
+  Double_t GamToFS(Double_t m1, Double_t m2, Double_t a);
 
  private:
   Double_t fMass4;     // 4-dim NR mass                                  
   Int_t    fGen;       // N2(basis lepton's geneation)
   Int_t    fN;         // KK mode number
+  Double_t fMassH;     // Higgs Mass
   Double_t fGwl[2];    // (gL,gR)_W+NR_2l-l
   Double_t fGwe[2];    // (gL,gR)_W+NR_2l-e   
   Double_t fGzn[2][3]; // (gL,gR)_Z-NR_2l-n_j (j=e,mu,tau)
