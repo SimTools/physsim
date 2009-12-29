@@ -1258,6 +1258,7 @@ Double_t RNeutrino::GamToFV(Double_t m1, // 1st daughter mass (l/n)
 			    Double_t m2, // 2nd daughter mass (W/Z)
 			    Double_t a)  // coupling
 {
+  if (m1+m2 >= fMass) return 0.;
   Double_t x1   = TMath::Power(m1/fMass,2);
   Double_t x2   = TMath::Power(m2/fMass,2);
   Double_t beta = 1. - 2.*(x1+x2) + TMath::Power((x1-x2),2);
@@ -1310,6 +1311,7 @@ Double_t RNeutrino::GamToFS(Double_t m1, // 1st daughter mass (n)
 			    Double_t m2, // 2nd daughter mass (h)
 			    Double_t a)  // coupling
 {
+  if (m1+m2 >= fMass) return 0.;
   Double_t x1   = TMath::Power(m1/fMass,2);
   Double_t x2   = TMath::Power(m2/fMass,2);
   Double_t beta = 1. - 2.*(x1+x2) + TMath::Power((x1-x2),2);
