@@ -1252,7 +1252,7 @@ void RNeutrino::Initialize()
 }
 
 // --------------------------
-//  GamToFV
+//  GamToFV: N -> l W or n Z
 // --------------------------
 Double_t RNeutrino::GamToFV(Double_t m1, // 1st daughter mass (l/n)
 			    Double_t m2, // 2nd daughter mass (W/Z)
@@ -1305,7 +1305,7 @@ Double_t RNeutrino::GamToFV(Double_t m1, // 1st daughter mass (l/n)
 }
 
 // --------------------------
-//  GamToFS
+//  GamToFS: N -> n h
 // --------------------------
 Double_t RNeutrino::GamToFS(Double_t m1, // 1st daughter mass (n)
 			    Double_t m2, // 2nd daughter mass (h)
