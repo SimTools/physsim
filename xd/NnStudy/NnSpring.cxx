@@ -1248,7 +1248,6 @@ void RNeutrino::Initialize()
     dmp->Add(d2p);
     Add(dmp);
   }
-  cerr << "Gamma_NR = " << setprecision(8) << GetWidth() << endl;
 }
 
 // --------------------------

@@ -42,11 +42,11 @@ ClassImp(GENPDTGluon)
 void GENDecayMode::DebugPrint(const Option_t *)
 {
    using namespace std;
-   cerr << " Gamma = " << setw(6) << setprecision(4) 
+   cerr << " Gamma = " << setw(11) << setprecision(9) 
                        << setiosflags(ios::fixed)
                        << setiosflags(ios::showpoint)
         << GetGamma() 
-        << " BR = "    << setw(6) << setprecision(4)
+        << " BR = "    << setw(11) << setprecision(9)
                        << setiosflags(ios::fixed)
                        << setiosflags(ios::showpoint)
         << GetBR()     
@@ -215,15 +215,15 @@ void GENPDTEntry::DebugPrint(const Option_t *opt)
    cerr << "=======================" << endl
         << " " << fName              << endl
         << "=======================" << endl;
-   cerr << " ---------------------------------------------------- " << endl;
+   cerr << " --------------------------------------------------------- " << endl;
    Update();
    TIter next(this);
    GENDecayMode *mp;
    while ((mp = static_cast<GENDecayMode *>(next()))) {
       mp->DebugPrint(opt);
    }
-   cerr << " ---------------------------------------------------- " << endl
-        << " Gamma_tot = " << GetWidth() << " [GeV]"                << endl
+   cerr << " --------------------------------------------------------- " << endl
+        << " Gamma_tot = " << GetWidth() << " [GeV]"                     << endl
 	<< endl;
 }
 
