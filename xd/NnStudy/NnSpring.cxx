@@ -18,7 +18,7 @@
 
 #include <sstream>
 #include <iomanip>
-#define __NOWDECAY__
+//#define __NOWDECAY__
 //#define __DEBUG__
 //#define __ZEROWIDTH__
 #ifdef __NOWDECAY__
