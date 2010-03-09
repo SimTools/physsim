@@ -15,10 +15,6 @@ POTQCD      = POTQCD
 POTHIG      = POTHIG
 HELASV204   = HELASV204
 
-/* JLC Starndard Template */
-
-#include "config/lclib.tmpl"
-
 #ifdef CXXPACKAGE
 # include "conf/makejsf.tmpl"
 
@@ -32,6 +28,10 @@ ROOTLIBS     += -lEGPythia6 -lEG $(CERNLIBS)
 ROOTLIBS     += -lEGPythia6 -lEG -Wl,-u,pytest_ $(CERNLIBS)
 # endif
 #endif
+
+/* JLC Starndard Template */
+
+#include "config/lclib.tmpl"
 
 /* Analysis Related Fortran Libraries */
 
