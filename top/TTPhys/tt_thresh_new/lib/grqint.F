@@ -35,7 +35,7 @@ C
 C===========< Entry Point >=============================================
 C
 #if defined(__GFORTRAN__)
-      call grqblk
+      call dummysub(grqblk)
 #endif
 C--
 C  Set up constants.
@@ -151,3 +151,9 @@ C  That's it.
 C--
       RETURN
       END
+#if defined(__GFORTRAN__)
+      subroutine dummysub(sub)
+      external sub
+      return
+      end
+#endif
