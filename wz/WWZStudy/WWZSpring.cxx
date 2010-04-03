@@ -205,6 +205,10 @@ WWZBases::WWZBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("WWZBases.MassZ","91.18"),"%lg",&fMassZ);
   sscanf(gJSF->Env()->GetValue("WWZBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("WWZBases.MassTop","170."),"%lg",&fMassTop);  
+  sscanf(gJSF->Env()->GetValue("WWZBases.Lambda","500."),"%lg",&fLambda);  
+  sscanf(gJSF->Env()->GetValue("WWZBases.A","1."),"%lg",&fA);  
+  sscanf(gJSF->Env()->GetValue("WWZBases.B","1."),"%lg",&fB);  
+  sscanf(gJSF->Env()->GetValue("WWZBases.Btilde","1."),"%lg",&fBtilde);  
 }
 
 
@@ -228,12 +232,16 @@ void WWZBases::PrintParameters()
   printf("                Hi =%d\n",fWpModesHi);
   printf("  Z0 Decey Mode Lo =%d\n",fZModesLo);
   printf("                Hi =%d\n",fZModesHi);
+#ifdef ANOM_HVV
+  printf("  Lambda           =%g\n",fLambda);
+  printf("  A                =%g\n",fA);
+  printf("  B                =%g\n",fB);
+  printf("  Btilde           =%g\n",fBtilde);
+#endif
 
   printf("  Bases integration parameters..\n");
   printf("  ITMX1=%d  ITMX2=%d  NCALL=%d\n",fITMX1, fITMX2, fNCALL);
   printf("  ACC1 =%g  ACC2 =%g\n",fACC1,fACC2);
-
-
 }
 
 //_____________________________________________________________________________
@@ -282,6 +290,10 @@ void WWZBases::Userin()
   usrprm_.imd2hi = fWpModesHi;
   usrprm_.imd3lo = fZModesLo;
   usrprm_.imd3hi = fZModesHi;
+  usrprm_.aalam  = fLambda;
+  usrprm_.aa     = fA;
+  usrprm_.ab     = fB;
+  usrprm_.abtild = fBtilde;
 
   // Copy class data member into common /bshufl/
   bshufl_.nzz = fNDIM;

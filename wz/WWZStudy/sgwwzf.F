@@ -113,6 +113,11 @@ C
      .            QV(0,4),QV(0,5),BT3,EB)
       IF ( BT3.EQ.0. )                           GO TO 9999
       CALL UVCOPY(9,EB,EA)
+#if 0
+      CALL USCLM3(-1,EA(1,1),EA(1,1))
+      CALL USCLM3(-1,EA(1,2),EA(1,2))
+      CALL USCLM3(-1,EA(1,3),EA(1,3))
+#endif
 C
 C-- W- --> f(d) + f(u)-bar
 C

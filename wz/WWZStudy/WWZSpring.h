@@ -59,6 +59,10 @@ typedef struct {
   Int_t    imd2hi;	// lst W+ decay mode ID.
   Int_t    imd3lo;	// 1st Z  decay mode ID.
   Int_t    imd3hi;	// lst Z  decay mode ID.
+  Float_t  aalam;
+  Float_t  aa;
+  Float_t  ab;
+  Float_t  abtild;
 } COMMON_USRPRM;             //  Common /USRPRM/
 
 extern COMMON_USRPRM usrprm_;
@@ -81,7 +85,11 @@ protected:
   Double_t fMassZ;	// m_Z
   Double_t fMassHiggs;	// m_H
   Double_t fMassTop;	// m_t
-  Int_t   fISHUFL[50];  // random number shuffler
+  Int_t    fISHUFL[50]; // random number shuffler
+  Double_t fLambda;     // lambda
+  Double_t fA;          // a
+  Double_t fB;          // b
+  Double_t fBtilde;     // btilde
 public:
   WWZBases(const char *name="WWZBases", 
 	     const char *title="WWZbar  Bases");

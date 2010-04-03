@@ -41,6 +41,9 @@ CC**********************************************************************
 #include "SMCONS.inc"
 #include "SMPTAB.inc"
 #include "SMCUPL.inc"
+#ifdef ANOM_HVV
+#include "WWZCNF.inc"
+#endif
       INTEGER*4  IDP(3,8), IHEL(8)
       REAL   *4  PV(0:3,8), AMP2(0:2)
 C--
@@ -104,9 +107,16 @@ C--
 C--
 C  Calculate amplitude**2.
 C--
+#ifndef ANOM_HVV
       CALL AMPWWZ(GAL,GZN,GZL,GWF,GZH,GWH,GW,GWWZ,
      .            AMSE,AMSW,GAMW,AMSZ,GAMZ,AMSH,GAMH,
      .            VCT, SPINOR(1,1),SPINOR(1,2), AMP)
+#else
+      CALL AMPWWZ(GAL,GZN,GZL,GWF,GZH,GWH,GW,GWWZ,
+     .            ALAM,A,B,BTILDE,
+     .            AMSE,AMSW,GAMW,AMSZ,GAMZ,AMSH,GAMH,
+     .            VCT, SPINOR(1,1),SPINOR(1,2), AMP)
+#endif
       FACT    = COLOR**(IDP(3,3)+IDP(3,5)+IDP(3,7)-3)
      .          * VKM( IDP(1,4), IDP(1,3), IDP(3,3) )**2
      .          * VKM( IDP(1,6), IDP(1,5), IDP(3,5) )**2

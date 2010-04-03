@@ -42,9 +42,16 @@ C*    95/03/12  K.Fujii		Modiifed to HELAS V204.
 C*
 CC**********************************************************************
  
+#ifndef ANOM_HVV
       SUBROUTINE AMPWWZ(GAL,GZN,GZL,GWF,GZH,GWH,GW,GWWZ,
      .                  AME,AMW,GMW,AMZ,GMZ,AMH,GMH,
      .                  VCT,EIN,EOT, AMPSUM)
+#else
+      SUBROUTINE AMPWWZ(GAL,GZN,GZL,GWF,GZH,GWH,GW,GWWZ,
+     .                  ALAM,A,B,BTILDE,
+     .                  AME,AMW,GMW,AMZ,GMZ,AMH,GMH,
+     .                  VCT,EIN,EOT, AMPSUM)
+#endif
  
       IMPLICIT   REAL*4  ( A-H, O-Z )
       REAL   *4  GAL(2), GZN(2), GZL(2), GWF(2), GZH, GWH,
@@ -108,7 +115,14 @@ C--
 C  Calculate diagrm (9).
 C--
       CALL JIOXXX(EIN,EOT,GZL,AMZ,GMZ,WRK(1,10))
+#ifndef ANOM_HVV
       CALL HVVXXX(VCT(1,1),VCT(1,2),GWH,AMH,GMH,WRK(1,11))
+#else
+      G1 = GWH + 2*AMW**2*A/ALAM
+      G2 = -2*B/ALAM
+      G3 = -4*BTILDE/ALAM
+      CALL HVVXXA(VCT(1,1),VCT(1,2),G1,G2,G3,AMH,GMH,WRK(1,11))
+#endif
       CALL VVSXXX(VCT(1,3),WRK(1,10),WRK(1,11),GZH,AMP(9))
 C--
 C  Sum non-Higgs and Higgs diagrams.

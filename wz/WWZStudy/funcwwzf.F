@@ -381,8 +381,8 @@ C--
       phif1 = XPHASE(3,3)
       cosf2 = XPHASE(2,4)
       phif2 = XPHASE(3,4)
-      dphi  = phif1 - phif2
-      if (dphi<0) dphi = dphi + x2PI
+      dphi  = phif1 + phif2
+      if (dphi>x2PI) dphi = dphi - x2PI
       CALL XHFILL( 'h10', DBLE(dphi*RDDG)  ,FUNC )
       CALL XHFILL( 'h11', DBLE(cosf1)      ,FUNC )
       CALL XHFILL( 'h12', DBLE(cosf2)      ,FUNC )

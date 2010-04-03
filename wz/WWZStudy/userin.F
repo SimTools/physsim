@@ -40,6 +40,12 @@ C--
       IMD2MX = IMD2HI
       IMD3MN = IMD3LO
       IMD3MX = IMD3HI
+#ifdef ANOM_HVV
+      ALAM   = AALAM
+      A      = AA
+      B      = AB
+      BTILDE = ABTILD
+#endif
       PRINT *, ' ******< Job constants >*********** '
       PRINT *, '  '
       PRINT *, '     ROOTS  = ', ROOTS
@@ -52,6 +58,12 @@ C--
       PRINT *, '     IMD2MX = ', IMD2MX      
       PRINT *, '     IMD3MN = ', IMD3MN
       PRINT *, '     IMD3MX = ', IMD3MX      
+#ifdef ANOM_HVV
+      PRINT *, '     LAMBDA = ', ALAM
+      PRINT *, '     A      = ', A
+      PRINT *, '     B      = ', B
+      PRINT *, '     BTILDE = ', BTILDE
+#endif
       PRINT *, '  '
       PRINT *, ' ********************************** '
 C--

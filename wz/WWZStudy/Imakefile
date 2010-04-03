@@ -22,7 +22,13 @@ XCOMM ##########################################################################
 #define CXXPACKAGE
 #include "config/kflib.tmpl"
 
-/* EXTRADEFINES=-DHIGGSONLY */
+/*
+ * The following line forces the amplitude to the ZH diagram only
+ *
+ */
+EXTRADEFINES=-DHIGGSONLY -DANOM_HVV
+
+CXXFLAGS +=$(EXTRADEFINES)
 
 INCPATH = -I. -I$(KFLIBROOT)/gen_lib/sm/include \
 	-I$(KFLIBROOT)/gen_lib/ss/include \
@@ -46,6 +52,7 @@ PACKAGENAME   = WWZSpring
 FOBJS = ampwwz2.o \
 		fulwwz.o \
 		funcwwzf.o \
+		hvvxxa.o \
 		sgwwzf.o \
 		spevnt.o \
 		userin.o
