@@ -68,6 +68,7 @@ public:
   void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr   = b;    }
   void     SetBeamWidth(Double_t w      ) { fBeamWidth = w;    }
   void     SetPole     (Double_t p      ) { fPole      = p;    }
+  void     SetPolp     (Double_t p      ) { fPolp      = p;    }
 
   // ----------------------
   //   Base class methods
@@ -107,6 +108,7 @@ private:
   Int_t    fBeamStr;        // Beamstrahlung on?
   Double_t fBeamWidth;      // Beam width relative to Ebm(nominal)
   Double_t fPole;           // electron polarization
+  Double_t fPolp;           // positron polarization
   Int_t    fZModesLo;       // Z decay mode lo;
   Int_t    fZModesHi;       // Z decay mode hi;
   Double_t fCv;             // Cv
