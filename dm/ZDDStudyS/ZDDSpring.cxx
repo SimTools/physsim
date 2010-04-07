@@ -610,7 +610,8 @@ Double_t ZDDBases::DSigmaDX(GENBranch &cmbranch)
   Double_t identp = 1./2.;                         // identical particle factor
   Double_t dPhase = kFact * betax * betaf * betah; // phase space factor
   Double_t flux   = 1./(2.* s * beta_e);           // beam flux factor
-  Double_t spin   = 1./2.;                         // spin average for e+
+  //  Double_t spin   = 1./2.;                         // spin average for e+
+  Double_t spin   = 1.;                         // spin average for e+
 
   Double_t sigma  = identp * flux * spin * amp2 * dPhase; // in [1/GeV^2]
            sigma *= kGeV2fb;                              // now in [fb]
