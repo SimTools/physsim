@@ -195,6 +195,7 @@ ZDDBases::ZDDBases(const char *name, const char *title)
            fBeamStr   ( 1),
            fBeamWidth (0.002),
            fPole      (0.),
+           fPolp      (0.),
            fZModesLo  ( 1),
            fZModesHi  (12),
 	   fCs        (0.105),
@@ -285,6 +286,10 @@ ZDDBases::ZDDBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZDDBases.Pole","0."));         // electron polarization
   ins >> fPole;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZDDBases.Polp","0."));         // positron polarization
+  ins >> fPolp;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZDDBases.ZModesLo","1"));      // Z decay mode lo
@@ -816,8 +821,10 @@ void ZDDBases::SelectHelicities(Double_t &weight)
    Double_t helm = (1. - fPole)/2.;
    if (fHelCombInitial < helm) {
       fJCombI = 0;
+      weight *= (1. + fPolp)/2.;
    } else {
       fJCombI = 1;
+      weight *= (1. - fPolp)/2.;
    }
    fHelInitial[0] = kIHelComb[fJCombI][0];
    fHelInitial[1] = kIHelComb[fJCombI][1];
@@ -827,5 +834,5 @@ void ZDDBases::SelectHelicities(Double_t &weight)
    fHelFinal  [1] = kFHelComb[fJCombF][1];
    fHelFinal  [2] = kFHelComb[fJCombF][2];
    fHelFinal  [3] = kFHelComb[fJCombF][3];
-   weight = kNf;
+   weight *= kNf;
 }
