@@ -42,20 +42,19 @@ C*    95/03/12  K.Fujii		Modiifed to HELAS V204.
 C*
 CC**********************************************************************
  
-#ifndef ANOM_HVV
       SUBROUTINE AMPWWZ(GAL,GZN,GZL,GWF,GZH,GWH,GW,GWWZ,
-     .                  AME,AMW,GMW,AMZ,GMZ,AMH,GMH,
-     .                  VCT,EIN,EOT, AMPSUM)
-#else
-      SUBROUTINE AMPWWZ(GAL,GZN,GZL,GWF,GZH,GWH,GW,GWWZ,
+#ifdef ANOM_HVV
      .                  ALAM,A,B,BTILDE,
+#endif
      .                  AME,AMW,GMW,AMZ,GMZ,AMH,GMH,
      .                  VCT,EIN,EOT, AMPSUM)
-#endif
  
       IMPLICIT   REAL*4  ( A-H, O-Z )
       REAL   *4  GAL(2), GZN(2), GZL(2), GWF(2), GZH, GWH,
      .           GW, GWWZ,
+#ifdef ANOM_HVV
+     .           ALAM, A, B, BTILDE
+#endif
      .           AME, AMW, GMW, AMZ, GMZ, AMH, GMH
       COMPLEX*8  EIN(6), EOT(6), VCT(6,3), AMPSUM(0:2)
 C--
