@@ -14,6 +14,9 @@ C*				EPSL.Now use INSMCN instead of CONINT.
 #include "BSHUFL.inc"
       PARAMETER  ( NP = 8, NHEL = 2 )
       REAL   *4   SG, PV(0:3,NP), QV(0:3,5)
+#if 1
+      real   *4   phv(0:3,np), qhv(0:3,5), v(3,5)
+#endif
       REAL   *8   WAT, WATS
 C--
       INTEGER*4  IHEL(NP,2*NHEL)
@@ -166,7 +169,7 @@ C--
 C-- Z.
       XZ = XZ0MN + Z(22)*(XZ0MX-XZ0MN)
       DO 100 IMD = IMD3MN, IMD3MX
-         IF ( XZ.LT.BRVDK(IMD,2) )               GO TO 110
+         IF ( XZ.LE.BRVDK(IMD,2) )               GO TO 110
 100   CONTINUE
 C--
 110   IDPTCL(1,7) = MDVDK(1,IMD,2)
@@ -183,7 +186,7 @@ C
 C-- W-.
       XW1 = XW1MN + ((XZ-BRVDK(IMD-1,2))/BRZ)*(XW1MX-XW1MN)
       DO 200 IMD = IMD1MN, IMD1MX
-         IF ( XW1.LT.BRVDK(IMD,1) )              GO TO 210
+         IF ( XW1.LE.BRVDK(IMD,1) )              GO TO 210
 200   CONTINUE
 C--
 210   IDPTCL(1,3) = MDVDK(2,IMD,1)
@@ -200,7 +203,7 @@ C
 C-- W+.
       XW2 = XW2MN + ((XW1-BRVDK(IMD-1,1))/BRW1)*(XW2MX-XW2MN)
       DO 300 IMD = IMD2MN, IMD2MX
-         IF ( XW2.LT.BRVDK(IMD,1) )              GO TO 310
+         IF ( XW2.LE.BRVDK(IMD,1) )              GO TO 310
 300   CONTINUE
 C--
 310   IDPTCL(1,5) = MDVDK(2,IMD,1)
@@ -381,8 +384,34 @@ C--
       phif1 = XPHASE(3,3)
       cosf2 = XPHASE(2,4)
       phif2 = XPHASE(3,4)
+#if 0
       dphi  = phif1 + phif2
       if (dphi>x2PI) dphi = dphi - x2PI
+#else
+#if 0
+      dphi  = phif1 - phif2
+      if (dphi<0.) dphi = dphi + x2PI
+      if (dphi>x2PI) dphi = dphi - x2PI
+#else
+      call psumxx(qv(0,4),qv(0,5),qv(0,3))
+      call pmirrx(qv(0,3),qhv(0,3))
+      do ip = 3, 6
+         call boostx(pv(0,ip),qhv(0,3),phv(0,ip))
+      end do
+      call boostx(qv(0,4),qhv(0,3),qhv(0,4))
+      call boostx(qv(0,5),qhv(0,3),qhv(0,5))
+      call unrmv3(qhv(1,4),v(1,4))
+      call unrmv3(phv(1,3),v(1,3))
+      call unrmv3(phv(1,5),v(1,5))
+      call uncros(v(1,3),v(1,4),v(1,1))
+      call uncros(v(1,5),v(1,4),v(1,2))
+      call ucross(v(1,1),v(1,2),v(1,3))
+      sn = udot3 (v(1,3),v(1,4))
+      cs = undot3(v(1,1),v(1,2))
+      dphi = atan2(sn,cs)
+      if (dphi<0.) dphi = dphi + x2pi
+#endif
+#endif
       CALL XHFILL( 'h10', DBLE(dphi*RDDG)  ,FUNC )
       CALL XHFILL( 'h11', DBLE(cosf1)      ,FUNC )
       CALL XHFILL( 'h12', DBLE(cosf2)      ,FUNC )

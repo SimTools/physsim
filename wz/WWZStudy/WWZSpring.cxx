@@ -206,9 +206,9 @@ WWZBases::WWZBases(const char *name, const char *title)
   sscanf(gJSF->Env()->GetValue("WWZBases.MassHiggs","9999."),"%lg",&fMassHiggs);
   sscanf(gJSF->Env()->GetValue("WWZBases.MassTop","170."),"%lg",&fMassTop);  
   sscanf(gJSF->Env()->GetValue("WWZBases.Lambda","500."),"%lg",&fLambda);  
-  sscanf(gJSF->Env()->GetValue("WWZBases.A","1."),"%lg",&fA);  
-  sscanf(gJSF->Env()->GetValue("WWZBases.B","1."),"%lg",&fB);  
-  sscanf(gJSF->Env()->GetValue("WWZBases.Btilde","1."),"%lg",&fBtilde);  
+  sscanf(gJSF->Env()->GetValue("WWZBases.A","0."),"%lg",&fA);  
+  sscanf(gJSF->Env()->GetValue("WWZBases.B","0."),"%lg",&fB);  
+  sscanf(gJSF->Env()->GetValue("WWZBases.Btilde","0."),"%lg",&fBtilde);  
 }
 
 
