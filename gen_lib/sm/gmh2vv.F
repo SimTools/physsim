@@ -16,7 +16,12 @@ C
 C========< Entry Point >================================================
 C
 C--
-C  Calculate beta.
+C  Initialize constants.
+C--
+      GF     = xPI*xALF/xSIN2W/xCOS2W/xSQRT2/AMZ**2
+      FACT   = GF/16/xSQRT2/xPI
+C--
+C  Calculate width.
 C--
       EW = AMH/2
       BT = (EW-AMV)*(EW+AMV)
@@ -26,18 +31,7 @@ C--
       ELSE
          BT   = SQRT(BT)/EW
       ENDIF
-C--
-C  Calculate width.
-C--
-#if 0
-      GF     = xPI*xALF/xSIN2W/xCOS2W/xSQRT2/AMZ**2
-      FACT   = GF/16/xSQRT2/xPI
       GM = FACT*AMH**3*BT*( 1 - 4*(AMV/AMH)**2 + 12*(AMV/AMH)**4 )
-#else
-      fact = (1/(16*xpi))*(4*xpi*xalf)*amv
-      gm   = fact*bt*(amh/amv)**4/4
-     .              *( 1 - 4*(AMV/AMH)**2 + 12*(AMV/AMH)**4 )
-#endif
 C--
 C  That's it.
 C--

@@ -147,8 +147,8 @@ C--
       GMH2C  = C*GMH2C
       GMH2B  = C*GMH2B
       GMH2T  = C*GMH2T
-      GMH2W  = GMH2W
-      GMH2Z  = GMH2Z/xCOS2W/2
+      GMH2W  = 2*GMH2W
+      GMH2Z  = GMH2Z/xCOS2W
       GMHTOT = GMH2TU + GMH2C + GMH2B + GMH2T + GMH2W + GMH2Z
 C--
       PRINT *, '        '
