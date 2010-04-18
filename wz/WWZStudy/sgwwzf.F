@@ -97,7 +97,7 @@ C
      .            QV(0,2),QV(0,3),BT1,EA)
       IF ( BT1.EQ.0. )                           GO TO 9999
 C
-C-- Z --> f+f-bar
+C-- Z --> f-bar+f
 C
       AM12 = AMF(IDP(1,7),IDP(2,7),IDP(3,7))**2
       AM22 = AMF(IDP(1,8),IDP(2,8),IDP(3,8))**2
@@ -113,11 +113,6 @@ C
      .            QV(0,4),QV(0,5),BT3,EB)
       IF ( BT3.EQ.0. )                           GO TO 9999
       CALL UVCOPY(9,EB,EA)
-#if 0
-      CALL USCLM3(-1,EA(1,1),EA(1,1))
-      CALL USCLM3(-1,EA(1,2),EA(1,2))
-      CALL USCLM3(-1,EA(1,3),EA(1,3))
-#endif
 C
 C-- W- --> f(d) + f(u)-bar
 C

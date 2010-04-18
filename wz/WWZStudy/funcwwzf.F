@@ -14,9 +14,7 @@ C*				EPSL.Now use INSMCN instead of CONINT.
 #include "BSHUFL.inc"
       PARAMETER  ( NP = 8, NHEL = 2 )
       REAL   *4   SG, PV(0:3,NP), QV(0:3,5)
-#if 1
       real   *4   phv(0:3,np), qhv(0:3,5), v(3,5)
-#endif
       REAL   *8   WAT, WATS
 C--
       INTEGER*4  IHEL(NP,2*NHEL)
@@ -58,7 +56,7 @@ C--
          GMH   = GMHTOT
          AMGH  = AMH*GMH
          AMH2  = AMH*AMH
-         AMGH2 = AMHZ*AMHZ
+         AMGH2 = AMGH*AMGH
 C--
          AME   = AMF(1,2,1)
          xALF0 = 1/137.0359895E0
@@ -277,13 +275,13 @@ C-- Z.
       WAT   = WAT*(TH2MX-TH2MN)*( (Q22-AMZ2)**2 + AMGZ2 )/AMGZ
 C-- W-W+.
 #ifdef HIGGSONLY
-      Q32MN = Q4+Q5
-      Q32MX = MAX( RS-Q2, Q32MN )
-      TH32MN = ATAN((Q32MN-AMH)*(Q32MN+AMH)/AMGH)
-      TH32MX = ATAN((Q32MX-AMH)*(Q32MX+AMH)/AMGH)
-      TH32   = TH32MN + (TH32MX-TH32MN)*Z(11)
-      Q32    = AMGH*TAN(TH32) + AMH2
-      WAT   = WAT*(TH32MX-TH32MN)*( (Q32-AMH2)**2 + AMGH2 )/AMGH
+      Q3MN  = Q4+Q5
+      Q3MX  = MAX( RS-Q2, Q3MN )
+      TH3MN = ATAN((Q3MN-AMH)*(Q3MN+AMH)/AMGH)
+      TH3MX = ATAN((Q3MX-AMH)*(Q3MX+AMH)/AMGH)
+      TH3   = TH3MN + (TH3MX-TH3MN)*Z(11)
+      Q32   = AMGH*TAN(TH3) + AMH2
+      WAT   = WAT*(TH3MX-TH3MN)*( (Q32-AMH2)**2 + AMGH2 )/AMGH
 #else
       Q32MN = (Q4+Q5)**2
       Q32MX = MAX( (RS-Q2)**2, Q32MN )
@@ -369,6 +367,7 @@ C--
       PHIZ  = XPHASE(3,1)
       COSWM = XPHASE(2,2)
       PHIWM = XPHASE(3,2)
+
       CALL XHFILL( 'h00', DBLE(RS)/ROOTS    ,FUNC )
       CALL XHFILL( 'h01', DBLE(COSZ)        ,FUNC )
       CALL XHFILL( 'h02', DBLE(PHIZ*RDDG)   ,FUNC )
@@ -379,20 +378,12 @@ C--
       CALL XHFILL( 'h07', DBLE(Q4)          ,FUNC )
       CALL XHFILL( 'h08', DBLE(Q5)          ,FUNC )
       CALL XHFILL( 'h09', DBLE(ICMB)        ,FUNC )
-#if 1
+
       cosf1 = XPHASE(2,3)
       phif1 = XPHASE(3,3)
       cosf2 = XPHASE(2,4)
       phif2 = XPHASE(3,4)
-#if 0
-      dphi  = phif1 + phif2
-      if (dphi>x2PI) dphi = dphi - x2PI
-#else
-#if 0
-      dphi  = phif1 - phif2
-      if (dphi<0.) dphi = dphi + x2PI
-      if (dphi>x2PI) dphi = dphi - x2PI
-#else
+
       call psumxx(qv(0,4),qv(0,5),qv(0,3))
       call pmirrx(qv(0,3),qhv(0,3))
       do ip = 3, 6
@@ -410,12 +401,10 @@ C--
       cs = undot3(v(1,1),v(1,2))
       dphi = atan2(sn,cs)
       if (dphi<0.) dphi = dphi + x2pi
-#endif
-#endif
+
       CALL XHFILL( 'h10', DBLE(dphi*RDDG)  ,FUNC )
       CALL XHFILL( 'h11', DBLE(cosf1)      ,FUNC )
       CALL XHFILL( 'h12', DBLE(cosf2)      ,FUNC )
-#endif
       CALL DHFILL( 'hd20', DBLE(EZ/EBM),  DBLE(COSZ)   , FUNC )
       CALL DHFILL( 'hd21', DBLE(EWM/EBM), DBLE(EWP/EBM), FUNC )
 C--
