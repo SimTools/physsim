@@ -43,9 +43,6 @@ OBJS	      = pltfb1se0.o \
 	LDDIRFLAG = -L
 	EXTRALIBS =
 #endif
-#ifdef PPCArchitecture
-	FFLAGS 	= -fno-automatic
-#endif
 #--
 #  Libraries to link.
 #--
