@@ -91,65 +91,68 @@ all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) \
 		$(PROGRAM7) $(PROGRAM8) $(PROGRAM9) \
 		$(PROGRAM10)
 
-$(PROGRAM1):     $(OBJS)
+$(PROGRAM1):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM1) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM1).exe
 		@echo "done"
 
-$(PROGRAM2):     $(OBJS)
+$(PROGRAM2):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM2) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM2).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM2).exe
 		@echo "done"
 
-$(PROGRAM3):     $(OBJS)
+$(PROGRAM3):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM3) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM3).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM3).exe
 		@echo "done"
 
-$(PROGRAM4):     $(OBJS)
+$(PROGRAM4):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM4) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM4).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM4).exe
 		@echo "done"
 
-$(PROGRAM5):     $(OBJS)
+$(PROGRAM5):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM5) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM5).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM5).exe
 		@echo "done"
 
-$(PROGRAM6):     $(OBJS)
+$(PROGRAM6):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM6) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM6).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM6).exe
 		@echo "done"
 
-$(PROGRAM7):     $(OBJS)
+$(PROGRAM7):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM7) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM7).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM7).exe
 		@echo "done"
 
-$(PROGRAM8):     $(OBJS)
+$(PROGRAM8):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM8) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM8).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM8).exe
 		@echo "done"
 
-$(PROGRAM9):     $(OBJS)
+$(PROGRAM9):    $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM9) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM9).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM9).exe
 		@echo "done"
 
-$(PROGRAM10):     $(OBJS)
+$(PROGRAM10):   $(GODIR) $(OBJS)
 		@echo "Linking $(PROGRAM10) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM10).o $(LIBS) \
 		-o $(GODIR)/$(PROGRAM10).exe
 		@echo "done"
+
+$(GODIR): 	
+		@mkdir -p $(GODIR)
 
 clean::;	@rm -f $(OBJS) core
 

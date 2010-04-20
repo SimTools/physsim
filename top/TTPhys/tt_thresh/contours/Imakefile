@@ -82,41 +82,44 @@ LD	      = $(F77)
 all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) \
 		$(PROGRAM4) $(PROGRAM5) $(PROGRAM6)
 
-$(PROGRAM1):    $(PROGRAM1).o
+$(PROGRAM1):    $(GODIR) $(PROGRAM1).o
 		@echo "Linking $(PROGRAM1) ..."
 		$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) $(ANLLIB) \
 		-o $(GODIR)/$(PROGRAM1).exe
 		@echo "done"
 
-$(PROGRAM2):    $(PROGRAM2).o
+$(PROGRAM2):    $(GODIR) $(PROGRAM2).o
 		@echo "Linking $(PROGRAM2) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM2).o $(LIBS) $(ANLLIB) \
 		-o $(GODIR)/$(PROGRAM2).exe
 		@echo "done"
 
-$(PROGRAM3):    $(PROGRAM3).o
+$(PROGRAM3):    $(GODIR) $(PROGRAM3).o
 		@echo "Linking $(PROGRAM3) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM3).o $(LIBS) $(ANLLIB) \
 		-o $(GODIR)/$(PROGRAM3).exe
 		@echo "done"
 
-$(PROGRAM4):    $(PROGRAM4).o
+$(PROGRAM4):    $(GODIR) $(PROGRAM4).o
 		@echo "Linking $(PROGRAM4) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM4).o $(LIBS) $(ANLLIB) \
 		-o $(GODIR)/$(PROGRAM4).exe
 		@echo "done"
 
-$(PROGRAM5):    $(PROGRAM5).o
+$(PROGRAM5):    $(GODIR) $(PROGRAM5).o
 		@echo "Linking $(PROGRAM5) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM5).o $(LIBS) $(ANLLIB) \
 		-o $(GODIR)/$(PROGRAM5).exe
 		@echo "done"
 
-$(PROGRAM6):    $(PROGRAM6).o
+$(PROGRAM6):    $(GODIR) $(PROGRAM6).o
 		@echo "Linking $(PROGRAM6) ..."
 		@$(LD) $(LDFLAGS) $(PROGRAM6).o $(LIBS) $(ANLLIB) \
 		-o $(GODIR)/$(PROGRAM6).exe
 		@echo "done"
+
+$(GODIR):	
+		@mkdir -p $(GODIR) 
 
 clean::;	@rm -f $(OBJS) core
 
