@@ -38,11 +38,14 @@ ROOTLIBS     += -lEGPythia6 -lEG -Wl,-u,pytest_ $(CERNLIBS)
 #if defined(MacOSXArchitecture) || defined(DarwinArchitecture)
 /* LIBG2C = -lg2c */
 ifneq ($(shell which gfortran 2>&1 | grep -vc 'no gfortran'),0)
+F77           = gfortran
 LIBG2C        = -lgfortran -lgfortranbegin
+LDFLAGS       = -m32 $(ANALLIB) -L/usr/local/lib $(LIBG2C)
 else
+F77           = g77
 LIBG2C        = -lg2c
-endif
 LDFLAGS       = $(ANALLIB) -L/usr/local/lib $(LIBG2C)
+endif
 ANALLIB	      = $(LDDIRFLAG)$(LCLIBDIR) -lFORTLIB -l$(HELASV204) $(EXTRALIBS)
 #else
 ANALLIB       = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \
