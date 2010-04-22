@@ -291,8 +291,8 @@ NNHHBases::NNHHBases(const char *name, const char *title)
   SetNoOfSample(80000);
 
   SetTuneValue (1.5);
-  SetIteration1(0.05, 10);
-  SetIteration2(0.05, 20);
+  SetIteration1(0.05, 20);
+  SetIteration2(0.05, 40);
 
 }
 // --------------------------
