@@ -53,7 +53,7 @@ void UserAnalysis()
 	            << parton->GetPx() << ","
 	            << parton->GetPy() << ","
 	            << parton->GetPz() << ")" << endl;
-    if (!parton->GetNDaughter()) continue;
+    if (parton->GetNDaughter()) continue;
     pcm += ANL4DVector(parton->GetPV());
   }
   cerr << " SpringParton : ";
