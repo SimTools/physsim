@@ -20,7 +20,7 @@
 
    double x[1000], y[1000], dy[1000];
    int npt = 0;
-   ifstream in("xsection.dat");
+   ifstream in("xsection.zhh.dat");
    while ((in >> x[npt] >> y[npt] >> dy[npt])) npt++;
    TGraph gr(npt, x, y);
    gr.Draw("same");
