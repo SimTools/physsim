@@ -20,7 +20,7 @@ void xsection(Double_t rsi)
   Double_t rs  = bases->GetEcmInit();
   Double_t sg  = bases->GetEstimate();
   Double_t dsg = bases->GetError();
-  ofstream outf("xsection.dat",std::ios::app);
+  ofstream outf("xsection.zhh.dat",std::ios::app);
   outf << rs << " " << sg << " " << dsg << endl;
 #endif
 
