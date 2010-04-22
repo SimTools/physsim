@@ -347,7 +347,6 @@ Double_t NNHBases::Func()
     return 0.;
   }
 
-  bsWeight = 1.;
   // --------------------------------------------
   //  Select helicity combination
   // --------------------------------------------
