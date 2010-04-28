@@ -80,10 +80,12 @@ NNH2JAnalysis::NNH2JAnalysis(const Char_t *name,
   //--
   gJSF->GetInput()->cd("/conf/init");
   NNHBases *bsp = static_cast<NNHBases *>(gROOT->FindObject("NNHBases"));
-  cerr << "------------------------------------" << endl
-       << " Ecm = " << bsp->GetEcmInit() << " GeV" << endl
-       << "------------------------------------" << endl;
-  SetEcm(bsp->GetEcmInit()); 
+  if (bsp) {
+    cerr << "------------------------------------" << endl
+         << " Ecm = " << bsp->GetEcmInit() << " GeV" << endl
+         << "------------------------------------" << endl;
+    SetEcm(bsp->GetEcmInit()); 
+  }
 }
 
 // Destructor
