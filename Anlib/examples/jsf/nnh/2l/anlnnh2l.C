@@ -13,11 +13,15 @@ Int_t freq = 10;
 Char_t *utils_so = "libS4Utils.so";
 Char_t *anlib_so = "libAnlib.so";
 Char_t *jsfanlib_so = "libJSFAnlib.so";
-Char_t *nnhspr_so = "../../../../../higgs/NNHStudy++/prod/NNHSpring.so";
 Char_t *procanl_so = "libNNH2LAnalysis.so";
-
-Char_t *outputfile = "jsf.root";	// A file to output histograms
+#if 1
+Char_t *nnhspr_so = "../../../../../higgs/NNHStudy++/prod/NNHSpring.so";
 Char_t *inputfile = "../../../../../higgs/NNHStudy++/prod/nnh2lsim.root";	// Input simulator file
+#else
+Char_t *nnhspr_so = "../../../../../wz/NNZStudy/prod/NNZSpring.so";
+Char_t *inputfile = "../../../../../wz/NNZStudy/prod/nnzsim.root";	// Input simulator file
+#endif
+Char_t *outputfile = "jsf.root";	// A file to output histograms
 
 
 int anlnnh2l()

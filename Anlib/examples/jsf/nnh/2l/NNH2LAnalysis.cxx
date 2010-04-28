@@ -58,6 +58,7 @@ ClassImp(NNH2LAnalysis)
 NNH2LAnalysis::NNH2LAnalysis(const Char_t *name,
 		             const Char_t *title)
              : JSFModule(name, title),
+               fEcm       (1000.),   // Ecm
                fNtracksCut(    2),   // No. of tracks
                fEtrackCut (  0.1),   // track energy
                fEvisLoCut (  0.0),   // Minimum visible energy
@@ -75,10 +76,12 @@ NNH2LAnalysis::NNH2LAnalysis(const Char_t *name,
   //--
   gJSF->GetInput()->cd("/conf/init");
   NNHBases *bsp = static_cast<NNHBases *>(gROOT->FindObject("NNHBases"));
-  cerr << "------------------------------------" << endl
-       << " Ecm = " << bsp->GetEcmInit() << " GeV" << endl
-       << "------------------------------------" << endl;
-  SetEcm(bsp->GetEcmInit()); 
+  if (bsp) {
+    cerr << "------------------------------------" << endl
+         << " Ecm = " << bsp->GetEcmInit() << " GeV" << endl
+         << "------------------------------------" << endl;
+    SetEcm(bsp->GetEcmInit()); 
+  }
 }
 
 // Destructor
