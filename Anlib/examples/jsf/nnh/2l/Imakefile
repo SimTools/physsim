@@ -1,0 +1,78 @@
+XCOMM ############################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for WW analysis.
+XCOMM ## (Update Record) 
+XCOMM ##    99/08/02  K.Fujii   Original version.
+XCOMM ############################################################################
+
+/*
+ * Template Files
+ *
+ */
+#define CXXPACKAGE 
+#include "config/kflib.tmpl"
+
+/*
+ * Headers
+ *
+ */
+
+INCPATH	= -I. -I../../../../../include \
+	  -I../../../../../higgs/NNHStudy++ \
+	  -I$(JSFROOT)/include \
+	  -I$(LEDAROOT)/include
+EXTRACXXOPT = $(INCPATH)
+
+/*
+ * Package Name
+ *
+ */
+ 
+LIBNAME	= NNH2LAnalysis
+
+OBJS		= $(LIBNAME).$(ObjSuf)
+SONAME		= lib$(LIBNAME).$(DllSuf).$(SOREV)
+JSFSOLIB	= $(SONAME)
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+DICTNAME	= $(LIBNAME)Dict
+
+ALLOBJS 	= $(OBJS) $(DICTNAME).$(ObjSuf)
+
+SRCS		= $(subst .$(ObjSuf),.$(SrcSuf),$(ALLOBJS))
+
+HDRS		= $(LIBNAME).h
+
+/*
+ * Make Targets
+ *
+ */
+
+all:: $(JSFSOLIB)
+
+$(JSFSOLIB): $(ALLOBJS)
+	$(LD) -o $@ $(SOFLAGS) $(ALLOBJS)
+	$(RM) $(subst .$(SOREV),,$@)
+	$(LN) $@ $(subst .$(SOREV),,$@)
+
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+
+clean:: 
+	@rm -f *.$(ObjSuf) core $(DICTNAME)*
+
+depend:: $(SRCS) $(HDRS)
+	for i in $(SRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
+
+distclean:: clean
+	@rm -f Makefile $(JSFSOLIB) *.$(SOEXT)
+	@rm -f *.root *.tdr *.out *~ core
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I$(JSFROOT)/include $(INCPATH) $(RCINTDEFINES) \
+		$(HDRS) LinkDef.h
