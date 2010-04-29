@@ -175,7 +175,7 @@ Bool_t ZZHSpringBuf::SetPartons()
 
   Int_t    islevz1 = color1 > 1. ? 101 : 0; 	  // shower level
   Int_t    icfz1   = 2;                           // color flux id
-  Double_t rq2z1   = pv[1].Mag();
+  Double_t rq2z1   = pv[5].Mag();
 
   // Z2
   Int_t    idf3    = bases->f3Ptr->GetPID   ();   // PDG code for f1
@@ -191,7 +191,7 @@ Bool_t ZZHSpringBuf::SetPartons()
 
   Int_t    islevz2 = color3 > 1. ? 201 : 0;  	  // shower level
   Int_t    icfz2   = 3;                           // color flux id
-  Double_t rq2z2   = pv[2].Mag();
+  Double_t rq2z2   = pv[6].Mag();
 
 #if 0
 //#ifdef __DEBUG__

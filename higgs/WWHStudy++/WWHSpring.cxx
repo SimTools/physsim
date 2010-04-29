@@ -173,25 +173,25 @@ Bool_t WWHSpringBuf::SetPartons()
   Double_t m2      = bases->f2Ptr->GetMass  ();   // f2 mass
   Int_t    hel2    = bases->fHelFinal[2];         // f2 helicity
 
-  Int_t    islevwm = color1 > 1. ? 201 : 0; 	  // shower level
+  Int_t    islevwm = color1 > 1. ? 101 : 0; 	  // shower level
   Int_t    icfwm   = 2;                           // color flux id
-  Double_t rq2wm   = pv[1].Mag();
+  Double_t rq2wm   = pv[5].Mag();
 
   // W+
-  Int_t    idf3    = bases->f1Ptr->GetPID   ();   // PDG code for f1
-  Double_t chrg3   = bases->f1Ptr->GetCharge();   // f1 charge
-  Double_t m3      = bases->f1Ptr->GetMass  ();   // f1 mass
-  Int_t    hel3    = bases->fHelFinal[1];         // f1 helicity
-  Double_t color3  = bases->f1Ptr->GetColor();    // color factor for f1
+  Int_t    idf3    = bases->f3Ptr->GetPID   ();   // PDG code for f1
+  Double_t chrg3   = bases->f3Ptr->GetCharge();   // f1 charge
+  Double_t m3      = bases->f3Ptr->GetMass  ();   // f1 mass
+  Int_t    hel3    = bases->fHelFinal[3];         // f1 helicity
+  Double_t color3  = bases->f3Ptr->GetColor();    // color factor for f1
 
-  Int_t    idf4    = bases->f2Ptr->GetPID   ();   // PDG code for f2
-  Double_t chrg4   = bases->f2Ptr->GetCharge();   // f2 charge
-  Double_t m4      = bases->f2Ptr->GetMass  ();   // f2 mass
-  Int_t    hel4    = bases->fHelFinal[2];         // f2 helicity
+  Int_t    idf4    = bases->f4Ptr->GetPID   ();   // PDG code for f2
+  Double_t chrg4   = bases->f4Ptr->GetCharge();   // f2 charge
+  Double_t m4      = bases->f4Ptr->GetMass  ();   // f2 mass
+  Int_t    hel4    = bases->fHelFinal[4];         // f2 helicity
 
   Int_t    islevwp = color3 > 1. ? 201 : 0;  	  // shower level
   Int_t    icfwp   = 3;                           // color flux id
-  Double_t rq2wp   = pv[2].Mag();
+  Double_t rq2wp   = pv[6].Mag();
 
 #if 0
 //#ifdef __DEBUG__
@@ -249,8 +249,8 @@ Bool_t WWHSpringBuf::SetPartons()
   new (partons[0]) JSFSpringParton( 1,  idh, mass,    0., *qp[0], 0, 0,  0,    0,    0,      0);
   new (partons[1]) JSFSpringParton( 2, -idw,rq2wm,   -1., *qp[5], 2, 4,  0,    0,    0,      0);
   new (partons[2]) JSFSpringParton( 3,  idw,rq2wp,   +1., *qp[6], 2, 6,  0,    0,    0,      0);
-  new (partons[3]) JSFSpringParton( 4, idf1,   m1, chrg1, *qp[1], 0, 0,  2, hel1,icfwm,islevwm);
-  new (partons[4]) JSFSpringParton( 5, idf2,   m2, chrg2, *qp[2], 0, 0,  2, hel2,icfwm,islevwm);
+  new (partons[3]) JSFSpringParton( 4,-idf1,   m1,-chrg1, *qp[1], 0, 0,  2, hel1,icfwm,islevwm);
+  new (partons[4]) JSFSpringParton( 5,-idf2,   m2,-chrg2, *qp[2], 0, 0,  2, hel2,icfwm,islevwm);
   new (partons[5]) JSFSpringParton( 6, idf3,   m3, chrg3, *qp[3], 0, 0,  3, hel3,icfwp,islevwp);
   new (partons[6]) JSFSpringParton( 7, idf4,   m4, chrg4, *qp[4], 0, 0,  3, hel4,icfwp,islevwp);
 
@@ -782,13 +782,13 @@ Complex_t WWHBases::FullAmplitude()
 
    HELScalar  hs(fP[0]); // higgs
 
-   HELFermion f1 (fP[1], fM[1], fHelFinal [1], +1, kIsOutgoing); // fd
-   HELFermion f2b(fP[2], fM[2], fHelFinal [2], -1, kIsIncoming); // fubar
-   HELVector  wm(f2b, f1, glw, grw, kM_w, gamw);                 // W-
+   HELFermion f1b(fP[1], fM[1], fHelFinal [1], -1, kIsIncoming); // fubar
+   HELFermion f2 (fP[2], fM[2], fHelFinal [2], +1, kIsOutgoing); // fd
+   HELVector  wm(f1b, f2, glw, grw, kM_w, gamw);                 // W-
 
-   HELFermion f3b(fP[3], fM[3], fHelFinal [3], -1, kIsIncoming); // fdbar
-   HELFermion f4 (fP[4], fM[4], fHelFinal [4], +1, kIsOutgoing); // fu
-   HELVector  wp(f3b, f4, glw, grw, kM_w, gamw);                 // W+
+   HELFermion f3 (fP[3], fM[3], fHelFinal [3], +1, kIsOutgoing); // fu
+   HELFermion f4b(fP[4], fM[4], fHelFinal [4], -1, kIsIncoming); // fdbar
+   HELVector  wp(f4b, f3, glw, grw, kM_w, gamw);                 // W+
 
    Complex_t amp = AmpEEtoWWH(em, ep, wm, wp, hs);
 
@@ -997,7 +997,7 @@ void WWHBases::SelectHelicities(Double_t &weight)
    static const Int_t kIHelComb[kNi][2] = {{-1, +1},
                                            {+1, -1}};
    static const Int_t kNf = 1;
-   static const Int_t kFHelComb[kNf][5] = {{0, -1, +1, +1, -1}};
+   static const Int_t kFHelComb[kNf][5] = {{0, +1, -1, -1, +1}};
    Double_t helm = (1. - fPole)/2.;
    if (fHelCombInitial < helm) {
       fJCombI = 0;

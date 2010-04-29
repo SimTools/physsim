@@ -47,8 +47,8 @@ void UserAnalysis()
          << " PID=" << parton->GetID()
          << " Q="   << parton->GetCharge()
          << " M="   << parton->GetMass()
-         << " M="   << parton->GetColorID()
-         << " M="   << parton->GetShowerInfo()
+         << " C="   << parton->GetColorID()
+         << " S="   << parton->GetShowerInfo()
 	 << " p=("  << parton->GetE() << ","
 	            << parton->GetPx() << ","
 	            << parton->GetPy() << ","
