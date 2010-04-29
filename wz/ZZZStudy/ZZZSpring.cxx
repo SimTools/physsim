@@ -156,15 +156,15 @@ ZZZBases::ZZZBases(const char *name, const char *title)
   Int_t fIOFF;
   if ( fISRBM == 1 ) {
   	fNDIM  = 17;
-  	fNWILD = 6;
+  	fNWILD = 10;
   	fIOFF  = 5;
   } else if ( fISRBM == 2 ) {
    	fNDIM  = 18;
-  	fNWILD = 7;
+  	fNWILD = 11;
   	fIOFF  = 4;
   } else if ( fISRBM == 3 ) {
   	fNDIM  = 22;
-  	fNWILD = 11;
+  	fNWILD = 15;
   	fIOFF  = 0;
   } else {
   	printf("ZZZBases: Invalid ISRBM = %d\n",fISRBM);
