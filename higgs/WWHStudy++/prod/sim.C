@@ -16,7 +16,7 @@ Int_t sim()
 {
   gROOT->Reset();
 
-  file=new TFile("nnhsim.root","RECREATE");  // Output file
+  file=new TFile("wwhsim.root","RECREATE");  // Output file
 
   // Define modules.  JSFLCFULL must be declared to use JSFHadronizer and 
   // JSFQuickSim, which uses LCLIB libraries.  Each modules are executed
