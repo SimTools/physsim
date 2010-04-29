@@ -6,6 +6,9 @@
    c1->SetBorderSize(2);
    c1->SetLeftMargin(0.1517368);
    c1->SetBottomMargin(0.1369863);
+   c1->SetGridx();
+   c1->SetGridy();
+   c1->SetLogy();
 
    TH2D frame("h","",10,240.,1500.,10,0.001,10);
    frame.SetStats(0);
@@ -17,26 +20,33 @@
    frame.GetYaxis()->SetLabelSize(0.05);
    frame.GetYaxis()->SetTitleSize(0.06);
    frame.GetYaxis()->SetTitleOffset(1.15);
-   frame.Draw("");
+   frame.Draw("c");
 
    double x[1000], y[1000], dy[1000];
    int npt = 0;
    ifstream in("xsection.nnhh.dat");
    while ((in >> x[npt] >> y[npt] >> dy[npt])) npt++;
    TGraph gr(npt, x, y);
-   gr.Draw("same");
+   gr.Draw("c same");
 
    npt = 0;
    in.close();
    in.open("xsection.zhh.dat");
    while ((in >> x[npt] >> y[npt] >> dy[npt])) npt++;
    TGraph gr2(npt, x, y);
-   gr2.Draw("same");
+   gr2.Draw("c same");
 
    npt = 0;
    in.close();
    in.open("xsection.wwh.dat");
    while ((in >> x[npt] >> y[npt] >> dy[npt])) npt++;
    TGraph gr3(npt, x, y);
-   gr3.Draw("same");
+   gr3.Draw("c same");
+
+   npt = 0;
+   in.close();
+   in.open("xsection.zzz.dat");
+   while ((in >> x[npt] >> y[npt] >> dy[npt])) npt++;
+   TGraph gr4(npt, x, y);
+   gr4.Draw("c same");
 }
