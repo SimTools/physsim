@@ -251,8 +251,8 @@ Bool_t WWHSpringBuf::SetPartons()
   new (partons[2]) JSFSpringParton( 3,  idw,rq2wp,   +1., *qp[6], 2, 6,  0,    0,    0,      0);
   new (partons[3]) JSFSpringParton( 4, idf1,   m1, chrg1, *qp[1], 0, 0,  2, hel1,icfwm,islevwm);
   new (partons[4]) JSFSpringParton( 5, idf2,   m2, chrg2, *qp[2], 0, 0,  2, hel2,icfwm,islevwm);
-  new (partons[5]) JSFSpringParton( 6, idf3,   m3, chrg3, *qp[3], 0, 0,  2, hel3,icfwp,islevwp);
-  new (partons[6]) JSFSpringParton( 7, idf4,   m4, chrg4, *qp[4], 0, 0,  2, hel4,icfwp,islevwp);
+  new (partons[5]) JSFSpringParton( 6, idf3,   m3, chrg3, *qp[3], 0, 0,  3, hel3,icfwp,islevwp);
+  new (partons[6]) JSFSpringParton( 7, idf4,   m4, chrg4, *qp[4], 0, 0,  3, hel4,icfwp,islevwp);
 
   return kTRUE ;
 }
