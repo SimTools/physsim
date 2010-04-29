@@ -173,21 +173,21 @@ Bool_t ZZHSpringBuf::SetPartons()
   Double_t m2      = bases->f2Ptr->GetMass  ();   // f2 mass
   Int_t    hel2    = bases->fHelFinal[2];         // f2 helicity
 
-  Int_t    islevz1 = color1 > 1. ? 201 : 0; 	  // shower level
+  Int_t    islevz1 = color1 > 1. ? 101 : 0; 	  // shower level
   Int_t    icfz1   = 2;                           // color flux id
   Double_t rq2z1   = pv[1].Mag();
 
   // Z2
-  Int_t    idf3    = bases->f1Ptr->GetPID   ();   // PDG code for f1
-  Double_t chrg3   = bases->f1Ptr->GetCharge();   // f1 charge
-  Double_t m3      = bases->f1Ptr->GetMass  ();   // f1 mass
-  Int_t    hel3    = bases->fHelFinal[1];         // f1 helicity
-  Double_t color3  = bases->f1Ptr->GetColor();    // color factor for f1
+  Int_t    idf3    = bases->f3Ptr->GetPID   ();   // PDG code for f1
+  Double_t chrg3   = bases->f3Ptr->GetCharge();   // f1 charge
+  Double_t m3      = bases->f3Ptr->GetMass  ();   // f1 mass
+  Int_t    hel3    = bases->fHelFinal[3];         // f1 helicity
+  Double_t color3  = bases->f3Ptr->GetColor();    // color factor for f1
 
-  Int_t    idf4    = bases->f2Ptr->GetPID   ();   // PDG code for f2
-  Double_t chrg4   = bases->f2Ptr->GetCharge();   // f2 charge
-  Double_t m4      = bases->f2Ptr->GetMass  ();   // f2 mass
-  Int_t    hel4    = bases->fHelFinal[2];         // f2 helicity
+  Int_t    idf4    = bases->f4Ptr->GetPID   ();   // PDG code for f2
+  Double_t chrg4   = bases->f4Ptr->GetCharge();   // f2 charge
+  Double_t m4      = bases->f4Ptr->GetMass  ();   // f2 mass
+  Int_t    hel4    = bases->fHelFinal[4];         // f2 helicity
 
   Int_t    islevz2 = color3 > 1. ? 201 : 0;  	  // shower level
   Int_t    icfz2   = 3;                           // color flux id
