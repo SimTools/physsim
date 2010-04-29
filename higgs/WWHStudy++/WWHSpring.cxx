@@ -581,7 +581,7 @@ Double_t WWHBases::Func()
 #endif
   bsWeight *= weight;
 
-  // HH system
+  // WW system
   Double_t rq2wp   = TMath::Sqrt(fQ2Wp);
   Double_t qww2min = TMath::Power(rq2wm + rq2wp,2);
   Double_t qww2max = TMath::Power(rs - mh,2);
