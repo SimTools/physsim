@@ -818,11 +818,12 @@ Complex_t WWHBases::AmpEEtoWWH(const HELFermion &em,
    Double_t  gamw  = fWmBosonPtr->GetWidth();
 
    Double_t  gwwz  = kGw*kCosW;
-   Double_t  gwwa  = kGe;
+   Double_t  gww3  = kGw;
    Double_t  glw   = -kGw*kSqh;
    Double_t  grw   = 0.;
 
    Double_t  gwwh  = kGw*kM_w;
+   Double_t  gzzh  = kGz*kM_z;
 
    Double_t  mne   = kMass[0][0][0];
    Double_t  gamne = 0.;
@@ -840,20 +841,13 @@ Complex_t WWHBases::AmpEEtoWWH(const HELFermion &em,
    // WWH Production Amplitude
    //---------------------------
    //--
-   // S-channel Z
+   // S-channel
    //--
-   HELVector zs(em, ep, glze, grze, kM_z, gamz); // s-channel   Z: backward-going
+   HELVector w3(em, ep, glae, grae, glze, grze, kM_z, gamz); // s-channel W3
    HELVector wmstar(wm, hs, gwwh, kM_w, gamw);
-   HELVertex ampwswz(wmstar, wp, zs, gwwz);
+   HELVertex ampwsw3(wmstar, wp, w3, gww3);
    HELVector wpstar(wp, hs, gwwh, kM_w, gamw);
-   HELVertex ampwwsz(wm, wpstar, zs, gwwz);
-
-   //--
-   // S-channel A
-   //--
-   HELVector as(em, ep, glae, grae,   0.,   0.); // s-channel gamma
-   HELVertex ampwswa(wmstar, wp, as, gwwa);
-   HELVertex ampwwsa(wm, wpstar, as, gwwa);
+   HELVertex ampwws3(wm, wpstar, w3, gww3);
 
    //--
    // T-channel ne
@@ -866,12 +860,11 @@ Complex_t WWHBases::AmpEEtoWWH(const HELFermion &em,
    //--
    // Higgs from Z
    //--
+   HELVector zs(em, ep, glze, grze, kM_z, gamz); // s-channel Z
    HELVector zf(wm, wp, gwwz, kM_z, gamz);
-   Double_t gzzh  = kGz*kM_z;
    Complex_t ampzh = HELVertex(zs, zf, hs, gzzh);
 
-   Complex_t amp = ampwswz + ampwwsz 
-	         + ampwswa + ampwwsa 
+   Complex_t amp = ampwsw3 + ampwws3 
 		 + amptwsw + amptwws
 		 + ampzh;
 #endif /* end __PHASESPACE__ */
