@@ -420,10 +420,10 @@ WWHBases::WWHBases(const char *name, const char *title)
   DefineVariable(fCosTheta   , fXL[0], fXU[0], 1, 1);
   DefineVariable(fPhi        , fXL[1], fXU[1], 0, 1);
   DefineVariable(fCosThetaW  , fXL[2], fXU[2], 1, 1);
-  DefineVariable(fPhiW       , fXL[3], fXU[3], 0, 1);
-  DefineVariable(fCosThetaWmF, fXL[4], fXU[4], 0, 1);
+  DefineVariable(fPhiW       , fXL[3], fXU[3], 1, 1);
+  DefineVariable(fCosThetaWmF, fXL[4], fXU[4], 1, 1);
   DefineVariable(fPhiWmF     , fXL[5], fXU[5], 0, 1);
-  DefineVariable(fCosThetaWpF, fXL[6], fXU[6], 0, 1);
+  DefineVariable(fCosThetaWpF, fXL[6], fXU[6], 1, 1);
   DefineVariable(fPhiWpF     , fXL[7], fXU[7], 0, 1);
 
   //--
@@ -432,8 +432,8 @@ WWHBases::WWHBases(const char *name, const char *title)
   if (fBeamStr == 1) {
     DefineVariable(fR_BW_m, 0., 1., 0, 1);
     DefineVariable(fR_BW_p, 0., 1., 0, 1);
-    DefineVariable(fR_BS_m, 0., 1., 0, 1);
-    DefineVariable(fR_BS_p, 0., 1., 0, 1);
+    DefineVariable(fR_BS_m, 0., 1., 1, 1);
+    DefineVariable(fR_BS_p, 0., 1., 1, 1);
   }
  
   //--
