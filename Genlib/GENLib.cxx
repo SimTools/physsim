@@ -377,8 +377,8 @@ void GENPDTZBoson::Initialize()
    //  Set decay modes
    //--
    for (Int_t ic=0; ic<2; ic++) {
-      for (Int_t ig=0; ig<3; ig++) {
-         for (Int_t it=0; it<2; it++) { 
+      for (Int_t it=0; it<2; it++) { 
+         for (Int_t ig=0; ig<3; ig++) {
             const Char_t   *name = kName[ic][it][ig];
                   Int_t     pid  = kPID [ic][it][ig];  
                   Double_t  t3   = (1 - 2*it)/2.;
