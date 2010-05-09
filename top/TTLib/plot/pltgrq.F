@@ -59,7 +59,8 @@ C--
 C  Energy range.
 C--
 #if 1
-      NE   = 70
+*     NE   = 70
+      NE   = 280
       EMIN =-20
       EMAX = 50
       DE   = (EMAX-EMIN)/NE

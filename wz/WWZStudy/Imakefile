@@ -27,6 +27,8 @@ XCOMM ##########################################################################
  *
  */
 EXTRADEFINES=-DHIGGSONLY -DANOM_HVV
+/*EXTRADEFINES=-DHIGGSONLY*/
+/*EXTRADEFINES=*/
 
 CXXFLAGS +=$(EXTRADEFINES)
 

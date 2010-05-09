@@ -1,5 +1,5 @@
-#ifndef __EEZSpring__
-#define __EEZSpring__
+#ifndef NNZSPRING_H
+#define NNZSPRING_H
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -15,15 +15,9 @@
 #include "TMath.h"
 #include "TDatime.h"
 
-#ifndef __JSFModule__
 #include "JSFModule.h"
-#endif
-#ifndef __JSFBases__
 #include "JSFBases.h"
-#endif
-#ifndef __JSFSpring__
 #include "JSFSpring.h"
-#endif
 
 
 // =====================================================================

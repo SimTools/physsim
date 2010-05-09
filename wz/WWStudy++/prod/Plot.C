@@ -27,9 +27,9 @@
    ifstream in("xsection.ww.dat");
    while ((in >> x[npt] >> y[npt] >> dy[npt])) npt++;
    TGraph gr(npt, x, y);
+   gr.Draw("c same");
 
 #if 0
-   gr.Draw("c same");
    npt = 0;
    in.close();
    in.open("xsection.ww.f.dat");

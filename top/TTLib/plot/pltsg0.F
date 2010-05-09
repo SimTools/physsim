@@ -16,7 +16,7 @@ C  sigma_tt0 for various alpha_s
 C
 C
       IMPLICIT REAL*8 ( A-H, O-Z )
-      PARAMETER     ( NPT = 70 )
+      PARAMETER     ( NPT = 280 )
       REAL*8        RDATA(2,0:NPT,0:10)
       CHARACTER*8   JOIN(0:3)
       DATA JOIN     / 'DOTDASH', 'SOLID', 'DASH', 'DOT' /
