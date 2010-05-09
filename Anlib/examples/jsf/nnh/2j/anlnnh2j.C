@@ -20,8 +20,8 @@ Char_t *outputfile = "jsf.root";	// A file to output histograms
 Char_t *nnhspr_so = "../../../../../higgs/NNHStudy++/prod/NNHSpring.so";
 Char_t *inputfile = "../../../../../higgs/NNHStudy++/prod/nnhsim.root";	// Input simulator file
 #else
-Char_t *nnhspr_so = "../../../../../wz/NNZStudyprod/NNZSpring.so";
-Char_t *inputfile = "../../../../../wz/NNZStudyprod/nnzsim.root";	// Input simulator file
+Char_t *nnhspr_so = "../../../../../wz/NNZStudy/prod/NNZSpring.so";
+Char_t *inputfile = "../../../../../wz/NNZStudy/prod/nnzsim.root";	// Input simulator file
 #endif
 
 
