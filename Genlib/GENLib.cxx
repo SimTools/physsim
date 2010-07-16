@@ -276,13 +276,11 @@ void GENPDTWBoson::Initialize()
             Double_t  md   = kMass[0][1][ig];
             Double_t  cf   = 1.;
             Double_t  vff  = 1.;
-      GENDecayMode *dmp;
-      GENPDTEntry  *d1p, *d2p;
-      d1p  = new GENPDTEntry(namu, pidu, qfu, spin, mu, ig+1,  t3u, cf);
-      d2p  = new GENPDTEntry(namd,-pidd,-qfd, spin, md, ig+1, -t3d, cf);
       Double_t gam  = GamToFF(mu, md, vff, cf);
       if (gam == 0.) continue;
-      dmp = new GENDecayMode(gam);
+      GENPDTEntry  *d1p = new GENPDTEntry(namu, pidu, qfu, spin, mu, ig+1,  t3u, cf);
+      GENPDTEntry  *d2p = new GENPDTEntry(namd,-pidd,-qfd, spin, md, ig+1, -t3d, cf);
+      GENDecayMode *dmp = new GENDecayMode(gam);
       dmp->Add(d1p);
       dmp->Add(d2p);
       Add(dmp); 
@@ -302,13 +300,11 @@ void GENPDTWBoson::Initialize()
                Double_t  md   = kMass[1][1][igd];
                Double_t  cf   = 3*(1. + kAlphaS/kPi);
                Double_t  vff  = kVkm [igu][igd];
-         GENDecayMode *dmp;
-         GENPDTEntry  *d1p, *d2p;
-         d1p  = new GENPDTEntry(namu, pidu, qfu, spin, mu, igu+1,  t3u, cf);
-         d2p  = new GENPDTEntry(namd,-pidd,-qfd, spin, md, igd+1, -t3d, cf);
          Double_t gam  = GamToFF(mu, md, vff, cf);
          if (gam == 0.) continue;
-         dmp = new GENDecayMode(gam);
+         GENPDTEntry  *d1p  = new GENPDTEntry(namu, pidu, qfu, spin, mu, igu+1,  t3u, cf);
+         GENPDTEntry  *d2p  = new GENPDTEntry(namd,-pidd,-qfd, spin, md, igd+1, -t3d, cf);
+         GENDecayMode *dmp = new GENDecayMode(gam);
          dmp->Add(d1p);
          dmp->Add(d2p);
          Add(dmp); 
@@ -632,12 +628,12 @@ ANL4DVector GENFrame::Transform(const ANL4DVector &pb)
 //  C-tor
 // --------------------------
 GENPhase2::GENPhase2(const ANL4DVector &q,
-                           Double_t       m12,
-                           Double_t       m22,
-                     const GENFrame      &eb,
-                           Double_t       costh,
-                           Double_t       phi,
-                           Int_t          mode)
+                           Double_t     m12,
+                           Double_t     m22,
+                     const GENFrame    &eb,
+                           Double_t     costh,
+                           Double_t     phi,
+                           Int_t        mode)
          : fQ(q), fM12(m12), fM22(m22), 
            fEb(eb), fEa(eb), 
            fCosTheta(costh), fPhi(phi),
