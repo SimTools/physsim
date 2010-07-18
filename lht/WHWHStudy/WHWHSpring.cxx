@@ -18,12 +18,22 @@
 #include <sstream>
 #include <iomanip>
 //#define __NODECAY__
+//#define __NOWDECAY__
 //#define __DEBUG__
-//#define __ZEROWIDTH__
+//#define __ZEROXWIDTH__
+//#define __ZEROWWIDTH__
 //#define __PAHSESPACE__
 #ifdef __NODECAY__
-#ifndef __ZEROWIDTH__
-#define __ZEROWIDTH__
+#ifndef __NOWDECAY__
+#define __NOWDECAY__
+#endif
+#ifndef __ZEROXWIDTH__
+#define __ZEROXWIDTH__
+#endif
+#endif
+#ifdef __NOWDECAY__
+#ifndef __ZEROWWIDTH__
+#define __ZEROWWIDTH__
 #endif
 #endif
 
@@ -521,7 +531,7 @@ Double_t WHWHBases::Func()
   Double_t weight = 1;
 
   fW1ModePtr = fW1BosonPtr->PickMode(fW1DecayMode, weight, fW1Mode);
-#ifndef __NODECAY__
+#ifndef __NOWDECAY__
   bsWeight *= weight;
 #endif
   f1Ptr = static_cast<GENPDTEntry *>(fW1ModePtr->At(0));
@@ -530,7 +540,7 @@ Double_t WHWHBases::Func()
   Double_t m2   = f2Ptr->GetMass();
 
   fW2ModePtr = fW2BosonPtr->PickMode(fW2DecayMode, weight, fW2Mode);
-#ifndef __NODECAY__
+#ifndef __NOWDECAY__
   bsWeight *= weight;
 #endif
   f4Ptr = static_cast<GENPDTEntry *>(fW2ModePtr->At(0));
@@ -561,7 +571,7 @@ Double_t WHWHBases::Func()
   Double_t rs   = fEcmIP;
   Double_t qmin = fMassDM + m1 + m2;
   Double_t qmax = rs - (fMassDM + m4 + m5);
-#ifndef __ZEROWIDTH__
+#ifndef __ZEROXWIDTH__
   fQ2X1 = fXBosonPtr->GetQ2BW(qmin, qmax, fXQ2X1, weight);
 #else
   fQ2X1 = TMath::Power(fXBosonPtr->GetMass(),2);
@@ -573,7 +583,7 @@ Double_t WHWHBases::Func()
   Double_t qx1 = TMath::Sqrt(fQ2X1);
   bsWeight *= weight;
 
-#ifndef __ZEROWIDTH__
+#ifndef __ZEROXWIDTH__
   qmin  = fMassDM + m4 + m5;
   qmax  = rs - qx1;
   fQ2X2 = fXBosonPtr->GetQ2BW(qmin, qmax, fXQ2X2, weight);
@@ -587,27 +597,27 @@ Double_t WHWHBases::Func()
   Double_t qx2 = TMath::Sqrt(fQ2X2);
   bsWeight *= weight;
 
-#ifndef __ZEROWIDTH__
+#ifndef __ZEROWWIDTH__
   qmin  = m1 + m2;
   qmax  = qx1 - fMassDM;
   fQ2W1 = fW1BosonPtr->GetQ2BW(qmin, qmax, fXQ2W1, weight);
 #else
   fQ2W1  = TMath::Power(fW1BosonPtr->GetMass(),2);
   weight = kPi*fW1BosonPtr->GetMass()*fW1BosonPtr->GetWidth();
-#ifdef __NODECAY__
+#ifdef __NOWDECAY__
   weight = 1.;
 #endif
 #endif
   bsWeight *= weight;
 
-#ifndef __ZEROWIDTH__
+#ifndef __ZEROWWIDTH__
   qmin  = m4 + m5;
   qmax  = qx2 - fMassDM;
   fQ2W2 = fW2BosonPtr->GetQ2BW(qmin, qmax, fXQ2W2, weight);
 #else
   fQ2W2  = TMath::Power(fW2BosonPtr->GetMass(),2);
   weight = kPi*fW2BosonPtr->GetMass()*fW2BosonPtr->GetWidth();
-#ifdef __NODECAY__
+#ifdef __NOWDECAY__
   weight = 1.;
 #endif
 #endif
@@ -814,10 +824,18 @@ Double_t WHWHBases::DSigmaDX(GENBranch &cmbranch)
   //  Put them together
   // -------------------
 #ifndef __NODECAY__
+#ifndef __NOWDECAY__
   static const Int_t    kNbr  = 5;
   static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr));
 #else
-  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3+4));
+  static const Int_t    kNbr  = 3;
+  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr+2));
+  betaf1 = 1.;
+  betaf2 = 1.;
+#endif
+#else
+  static const Int_t    kNbr  = 1;
+  static const Double_t kFact = k2Pi/(TMath::Power(k4Pi,3*kNbr+4));
   betaw1 = 1.;
   betaw2 = 1.;
   betaf1 = 1.;
@@ -842,7 +860,7 @@ Double_t WHWHBases::DSigmaDX(GENBranch &cmbranch)
 // --------------------------
 Double_t WHWHBases::AmpSquared(GENBranch &cmbranch)
 {
-#ifndef __NODECAY__
+#ifndef __NOWDECAY__
   Double_t  color = f1Ptr->GetColor() * f4Ptr->GetColor();
   Int_t     ig1   = f1Ptr->GetGenNo() - 1;
   Int_t     ig2   = f2Ptr->GetGenNo() - 1;
@@ -899,15 +917,25 @@ Complex_t WHWHBases::FullAmplitude()
 
 #ifndef __NODECAY__
    HELVector  dm1(fP[0], mdm  , fHelFinal[0], +1);
+#ifndef __NOWDECAY__
    HELFermion fd (fP[2], fM[2], fHelFinal[2], +1, kIsOutgoing);
    HELFermion fub(fP[1], fM[1], fHelFinal[1], -1, kIsIncoming);
    HELVector  wm(fub, fd, glw, grw, kM_w, gamw);
-   HELVector  xm(wm, dm1, gxdmw, mx, gamx);
+#else
+   ANL4DVector pwm = fP[1] + fP[2];
+   HELVector   wm(pwm, kM_w  , fHelFinal[1], +1);
+#endif
+   HELVector  xm(dm1, wm, gxdmw, mx, gamx);
 
    HELVector  dm2(fP[3], mdm  , fHelFinal[3], +1);
+#ifndef __NOWDECAY__
    HELFermion fu (fP[4], fM[4], fHelFinal[4], +1, kIsOutgoing);
    HELFermion fdb(fP[5], fM[5], fHelFinal[5], -1, kIsIncoming);
    HELVector  wp(fdb, fu, glw, grw, kM_w, gamw);
+#else
+   ANL4DVector pwp = fP[4] + fP[5];
+   HELVector   wp(pwp, kM_w  , fHelFinal[2], +1);
+#endif
    HELVector  xp(wp, dm2, gxdmw, mx, gamx);
 #else
    ANL4DVector pxm = fP[0] + fP[1] + fP[2];
@@ -1146,6 +1174,7 @@ void WHWHBases::SelectHelicities(Double_t &weight)
    static const Int_t kNi = 2;
    static const Int_t kIHelComb[kNi][2] = {{-1, +1},
                                            {+1, -1}};
+#if defined(__NODECAY__) || !defined(__NOWDECAY__)
    static const Int_t kNf = 9;
    static const Int_t kFHelComb[kNf][6] = {{-1, +1, -1, -1, -1, +1},
                                            {-1, +1, -1,  0, -1, +1},
@@ -1156,6 +1185,98 @@ void WHWHBases::SelectHelicities(Double_t &weight)
                                            {+1, +1, -1, -1, -1, +1},
                                            {+1, +1, -1,  0, -1, +1},
                                            {+1, +1, -1, +1, -1, +1}};
+#else
+   static const Int_t kNf = 81;
+   static const Int_t kFHelComb[kNf][6] = {{-1, +1, -1, -1, -1, +1},
+                                           {-1, +1, -1,  0, -1, +1},
+                                           {-1, +1, -1, +1, -1, +1},
+                                           {-1, +1,  0, -1, -1, +1},
+                                           {-1, +1,  0,  0, -1, +1},
+                                           {-1, +1,  0, +1, -1, +1},
+                                           {-1, +1, +1, -1, -1, +1},
+                                           {-1, +1, +1,  0, -1, +1},
+                                           {-1, +1, +1, +1, -1, +1},
+
+                                           {-1,  0, -1, -1, -1, +1},
+                                           {-1,  0, -1,  0, -1, +1},
+                                           {-1,  0, -1, +1, -1, +1},
+                                           {-1,  0,  0, -1, -1, +1},
+                                           {-1,  0,  0,  0, -1, +1},
+                                           {-1,  0,  0, +1, -1, +1},
+                                           {-1,  0, +1, -1, -1, +1},
+                                           {-1,  0, +1,  0, -1, +1},
+                                           {-1,  0, +1, +1, -1, +1},
+
+                                           {-1, -1, -1, -1, -1, +1},
+                                           {-1, -1, -1,  0, -1, +1},
+                                           {-1, -1, -1, +1, -1, +1},
+                                           {-1, -1,  0, -1, -1, +1},
+                                           {-1, -1,  0,  0, -1, +1},
+                                           {-1, -1,  0, +1, -1, +1},
+                                           {-1, -1, +1, -1, -1, +1},
+                                           {-1, -1, +1,  0, -1, +1},
+                                           {-1, -1, +1, +1, -1, +1},
+
+	                                   { 0, +1, -1, -1, -1, +1},
+                                           { 0, +1, -1,  0, -1, +1},
+                                           { 0, +1, -1, +1, -1, +1},
+                                           { 0, +1,  0, -1, -1, +1},
+                                           { 0, +1,  0,  0, -1, +1},
+                                           { 0, +1,  0, +1, -1, +1},
+                                           { 0, +1, +1, -1, -1, +1},
+                                           { 0, +1, +1,  0, -1, +1},
+                                           { 0, +1, +1, +1, -1, +1},
+
+                                           { 0,  0, -1, -1, -1, +1},
+                                           { 0,  0, -1,  0, -1, +1},
+                                           { 0,  0, -1, +1, -1, +1},
+                                           { 0,  0,  0, -1, -1, +1},
+                                           { 0,  0,  0,  0, -1, +1},
+                                           { 0,  0,  0, +1, -1, +1},
+                                           { 0,  0, +1, -1, -1, +1},
+                                           { 0,  0, +1,  0, -1, +1},
+                                           { 0,  0, +1, +1, -1, +1},
+
+                                           { 0, -1, -1, -1, -1, +1},
+                                           { 0, -1, -1,  0, -1, +1},
+                                           { 0, -1, -1, +1, -1, +1},
+                                           { 0, -1,  0, -1, -1, +1},
+                                           { 0, -1,  0,  0, -1, +1},
+                                           { 0, -1,  0, +1, -1, +1},
+                                           { 0, -1, +1, -1, -1, +1},
+                                           { 0, -1, +1,  0, -1, +1},
+                                           { 0, -1, +1, +1, -1, +1},
+					   
+	                                   {+1, +1, -1, -1, -1, +1},
+                                           {+1, +1, -1,  0, -1, +1},
+                                           {+1, +1, -1, +1, -1, +1},
+                                           {+1, +1,  0, -1, -1, +1},
+                                           {+1, +1,  0,  0, -1, +1},
+                                           {+1, +1,  0, +1, -1, +1},
+                                           {+1, +1, +1, -1, -1, +1},
+                                           {+1, +1, +1,  0, -1, +1},
+                                           {+1, +1, +1, +1, -1, +1},
+
+                                           {+1,  0, -1, -1, -1, +1},
+                                           {+1,  0, -1,  0, -1, +1},
+                                           {+1,  0, -1, +1, -1, +1},
+                                           {+1,  0,  0, -1, -1, +1},
+                                           {+1,  0,  0,  0, -1, +1},
+                                           {+1,  0,  0, +1, -1, +1},
+                                           {+1,  0, +1, -1, -1, +1},
+                                           {+1,  0, +1,  0, -1, +1},
+                                           {+1,  0, +1, +1, -1, +1},
+
+                                           {+1, -1, -1, -1, -1, +1},
+                                           {+1, -1, -1,  0, -1, +1},
+                                           {+1, -1, -1, +1, -1, +1},
+                                           {+1, -1,  0, -1, -1, +1},
+                                           {+1, -1,  0,  0, -1, +1},
+                                           {+1, -1,  0, +1, -1, +1},
+                                           {+1, -1, +1, -1, -1, +1},
+                                           {+1, -1, +1,  0, -1, +1},
+                                           {+1, -1, +1, +1, -1, +1}};
+#endif
    Double_t helm = (1. - fPole)/2.;
    if (fHelCombInitial < helm) {
       fJCombI = 0;
@@ -1260,7 +1381,7 @@ Double_t WHBoson::GamToVV(Double_t m1, // 1st daughter mass
    ANL4DVector pdm(sqrt(p*p+m1*m1),0.,0.,-p);
    HELVector *xPtr[3], *dPtr[3], *wPtr[3];
    for (Int_t i=0; i<3; i++) {
-     xPtr[i] = new HELVector(px , fMass, i-1, +1);
+     xPtr[i] = new HELVector(px , fMass, i-1, -1);
      dPtr[i] = new HELVector(pdm, m1   , i-1, +1);
      wPtr[i] = new HELVector(pw , m2   , i-1, +1);
    } 
@@ -1276,6 +1397,10 @@ Double_t WHBoson::GamToVV(Double_t m1, // 1st daughter mass
    Double_t spin = 2*fSpin+1;
    Double_t fac  = 1./(16.*kPi)/fMass/spin;
    Double_t gam  = fac*amp2*beta;
+
+   for (Int_t i=0; i<3; i++) {
+     delete xPtr[i]; delete dPtr[i]; delete wPtr[i];
+   } 
 
    return gam;
 }
