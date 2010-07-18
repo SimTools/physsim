@@ -460,12 +460,12 @@ HELVector::HELVector(const HELVector  &v1,
    Double_t  s   = fP.Mag2();
    Double_t  vm2 = mv*mv;
    Complex_t v12 = v1[0]*v2[0] - v1[1]*v2[1] - v1[2]*v2[2] - v1[3]*v2[3];
-   Complex_t sv1 =  (v2.fP(0)-fP(0))*v1[0] -(v2.fP(1)-fP(1))*v1[1]
-                                           -(v2.fP(2)-fP(2))*v1[2] 
-                                           -(v2.fP(3)-fP(3))*v1[3];
-   Complex_t sv2 = -(v1.fP(0)-fP(0))*v2[0] +(v1.fP(1)-fP(1))*v2[1]
-                                           +(v1.fP(2)-fP(2))*v2[2] 
-                                           +(v1.fP(3)-fP(3))*v2[3];
+   Complex_t sv1 =  (v2.fP(0)+fP(0))*v1[0] -(v2.fP(1)+fP(1))*v1[1]
+                                           -(v2.fP(2)+fP(2))*v1[2] 
+                                           -(v2.fP(3)+fP(3))*v1[3];
+   Complex_t sv2 = -(v1.fP(0)+fP(0))*v2[0] +(v1.fP(1)+fP(1))*v2[1]
+                                           +(v1.fP(2)+fP(2))*v2[2] 
+                                           +(v1.fP(3)+fP(3))*v2[3];
    Complex_t j12[4];
    j12[0] = (v1.fP(0)-v2.fP(0))*v12 + sv1*v2[0] + sv2*v1[0];
    j12[1] = (v1.fP(1)-v2.fP(1))*v12 + sv1*v2[1] + sv2*v1[1];
@@ -488,10 +488,10 @@ HELVector::HELVector(const HELVector  &v1,
       Complex_t js  = (v12*(-m1+m2) + s11*s12 - s21*s22)/vm2;
       Double_t  mg  = TMath::Max(TMath::Sign(mv*gmv, s), 0.);
       Complex_t dg  = -g/Complex_t(s - vm2, mg);
-      (*this)[0] = dg * (j12[0] - fP(0)*js);
-      (*this)[1] = dg * (j12[1] - fP(1)*js);
-      (*this)[2] = dg * (j12[2] - fP(2)*js);
-      (*this)[3] = dg * (j12[3] - fP(3)*js);
+      (*this)[0] = dg * (j12[0] + fP(0)*js);
+      (*this)[1] = dg * (j12[1] + fP(1)*js);
+      (*this)[2] = dg * (j12[2] + fP(2)*js);
+      (*this)[3] = dg * (j12[3] + fP(3)*js);
    }
 }
 
