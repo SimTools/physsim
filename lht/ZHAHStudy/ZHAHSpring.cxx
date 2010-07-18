@@ -908,7 +908,7 @@ Double_t ZHBoson::GamToSV(Double_t m1, // 1st daughter mass
    HELScalar h(ph, +1);
    HELVector *xPtr[3], *dPtr[3];
    for (Int_t i=0; i<3; i++) {
-     xPtr[i] = new HELVector(px , fMass, i-1, +1);
+     xPtr[i] = new HELVector(px , fMass, i-1, -1);
      dPtr[i] = new HELVector(pdm, m2   , i-1, +1);
    } 
    Double_t amp2 = 0.;
