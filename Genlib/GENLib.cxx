@@ -224,6 +224,7 @@ void GENPDTEntry::DebugPrint(const Option_t *opt)
    }
    cerr << " --------------------------------------------------------- " << endl
         << " Gamma_tot = " << GetWidth() << " [GeV]"                     << endl
+        << " Mass      = " << GetMass()  << " [GeV]"                     << endl
 	<< endl;
 }
 
