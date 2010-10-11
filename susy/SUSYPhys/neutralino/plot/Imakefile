@@ -92,3 +92,8 @@ clean::;	@rm -f $(OBJS) core
 cleanall:: clean
 		@(cd $(GODIR); rm -f $(OBJS) *.exe core)
 
+
+.PHONY: dir
+
+dir:
+	mkdir -p prod

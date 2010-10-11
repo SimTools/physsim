@@ -74,7 +74,7 @@ KFLIB	      = $(LDDIRFLAG)$(KFLIBDIR) \
 #--
 #  Make options.
 #--
-all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4)
+all::		dir $(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4)
 
 $(LIBS):
 		cd ../lib; make
@@ -109,4 +109,9 @@ clean::;	@rm -f $(OBJS) core
 
 cleanall:: clean
 		@(cd $(GODIR); rm -f $(OBJS) *.exe core)
+
+.PHONY: dir
+
+dir:
+	mkdir -p prod
 
