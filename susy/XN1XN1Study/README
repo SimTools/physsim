@@ -1,0 +1,13 @@
+CAUTION:
+
+Currently chi^0_1 is supposed to decay via
+chi^0_1 --> tau^- + stau_1^+ or tau^+ + stau_1^-
+where stau_1^1 is assumed to be quasi-stable.
+
+Particle ID of stau_1 is set to 13 (mu) to force
+the hadronizer to treat it as a heavy muon.
+
+Model parameters such as (m0,mu,M2,tanb,Atau) should
+be adjusted as needed. Notice that in the convention
+used in this generator, mu is always positive and
+tanb may become negative.
