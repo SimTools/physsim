@@ -83,7 +83,7 @@ KFLIB	      = $(LDDIRFLAG)$(KFLIBDIR) \
 #--
 #  Make options.
 #--
-all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4) \
+all::		dir $(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4) \
 		$(PROGRAM5) $(PROGRAM6) $(PROGRAM7)
 
 $(LIBS):

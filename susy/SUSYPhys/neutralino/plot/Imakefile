@@ -68,7 +68,7 @@ KFLIB	      = $(LDDIRFLAG)$(KFLIBDIR) \
 #--
 #  Make options.
 #--
-all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4)
+all::		dir $(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4)
 
 $(LIBS):
 		cd ../lib; make

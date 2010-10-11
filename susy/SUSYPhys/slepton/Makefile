@@ -8,5 +8,5 @@ clean:
 
 cleanall:
 	(cd lib;      make clean)
-	(cd plot;     make cleanall)
+	(cd plot;     make cleanall distclean)
 

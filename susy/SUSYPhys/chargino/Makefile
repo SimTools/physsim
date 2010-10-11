@@ -8,6 +8,6 @@ clean:
 	rm -f *.o; rm -f *~ 
 
 cleanall:
-	(cd lib;      make clean)
-	(cd plot;     make cleanall)
+	(cd lib;      make clean distclean)
+	(cd plot;     make cleanall distclean)
 	rm -f *.o; rm -f *.a; rm -f *.exe; rm -f *~

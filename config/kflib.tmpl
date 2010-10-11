@@ -44,7 +44,7 @@ LIBG2C        = -lgfortran -lgfortranbegin
 else
 LIBG2C        = -lg2c
 endif
-LDFLAGS       = $(ANALLIB) -L/usr/local/lib $(LIBG2C)
+LDFLAGS       = -m32 $(ANALLIB) -L/usr/osxws/lib $(LIBG2C)
 ANALLIB	      = $(LDDIRFLAG)$(LCLIBDIR) -lFORTLIB -l$(HELASV204) $(EXTRALIBS)
 #else
 ANALLIB       = $(LDDIRFLAG)$(LCLIBDIR) -lGENUTIL -lLUHADR -lTAUOLA \

@@ -13,7 +13,7 @@ clean:
 	(cd rge; make clean)
 
 cleanall:
-	(cd lib;      make clean)
+	(cd lib;      make clean distclean)
 	(cd chargino; make cleanall)
 	(cd neutralino; make cleanall)
 	(cd slepton; make cleanall)
