@@ -1,0 +1,52 @@
+##############################################################################
+## (Description)
+##    Imake file for plotting SUSY figures.
+##    Executables are to be stored in prod/.
+##	exe 	   : to make an executable.
+##	all	   : to make executable.
+##	clean      : to clean the directory.
+##	cleanall   : to remove everything reproducible.
+## (Update Record) 
+##    95/01/11  K.Fujii 	Original.
+##    97/08/30  K.Fujii 	Use 97a.
+##
+##############################################################################
+
+#include "../../../../config/kflib.tmpl"
+
+#--
+#  Define the name of the executable. 
+#--
+COMMAND = plot
+GODIR	= .
+#--
+#  Routines to complie.
+#--
+OBJS	      = pltgut.o
+#--
+#  Directories containing library routines.
+#--
+#ifdef HPArchitecture
+	LDDIRFLAG = -Wl,-L
+	EXTRALIBS = -lU77 -lm
+#else
+	LDDIRFLAG = -L
+	EXTRALIBS =
+#endif
+
+LD = $(F77)
+#--
+#  Make options.
+#--
+all::		$(COMMAND)
+
+$(COMMAND):     $(OBJS) $(LIBS)
+		@echo "Linking $(COMMAND) ..."
+		@$(LD) $(LDFLAGS) $(OBJS) $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(COMMAND).exe
+		@echo "done"
+
+clean::;	@rm -f $(OBJS) core
+
+cleanall:: clean
+		@(cd $(GODIR); rm -f $(OBJS) *.exe core)

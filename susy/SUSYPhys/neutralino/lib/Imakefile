@@ -1,0 +1,31 @@
+##############################################################################
+## (Description)
+##    Imake file for Fujii's susy_phys_xc library.
+## (Update Record) 
+##    97/08/30  K.Fujii 	Original version.
+##############################################################################
+
+#include "../../../../config/kflib.tmpl"
+
+#--
+#  Define the name of the library.
+#--
+INSTALLDIR = .
+
+LIBNAME =  PHYSUSYXN
+
+#--
+#  Routines to compile.
+#--
+OBJS = dsgnxx.o \
+		sgnxxa.o
+
+#--
+#  Libraries
+#--
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(OBJS),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(OBJS) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))

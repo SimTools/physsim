@@ -1,0 +1,112 @@
+##############################################################################
+## (Description)
+##    Imake file for plotting chargino-related figures.
+##    Executables are to be stored in prod/.
+##	pltcntrcxx : to make an executable to draw contour plots.
+##	pltdscxx   : to make an executable to plot tree-level diff. X section.
+##	pltsgcxb   : to make an executable to plot effective X section.
+##	pltsgcxx   : to make an executable to plot tree level X section.
+##	all	   : to make all of the four above. 
+##	clean      : to clean the directory.
+##	cleanall   : to remove everything reproducible.
+## (Update Record) 
+##    95/01/11  K.Fujii 	Original.
+##    97/08/30  K.Fujii 	Use 97a.
+##
+##############################################################################
+
+#include "../../../../config/kflib.tmpl"
+
+#--
+#  Define the name of the executable. 
+#--
+PROGRAM1      = pltcntrcxx
+PROGRAM2      = pltdscxx
+PROGRAM3      = pltsgcxb
+PROGRAM4      = pltsgcxx
+
+#--
+#  Directory to store executables.
+#--
+GODIR	      = prod
+
+#--
+#  Routines to complie.
+#--
+OBJS	      = pltcntrcxx.o \
+		pltdscxx.o \
+		pltsgcxb.o \
+		pltsgcxx.o
+#--
+#  Directories containing library routines.
+#--
+#ifdef HPArchitecture
+	LDDIRFLAG = -Wl,-L
+	EXTRALIBS = -lU77 -lm
+#else
+	LDDIRFLAG = -L
+	EXTRALIBS =
+#endif
+
+LD = $(F77)
+#--
+#  Libraries to link.
+#--
+#   GBM_0 for ISR only
+#   GBM_N for ISR + beam energy spread
+#   GBM   for ISR + full beam effects
+#
+# BEAMLIB    	 = GBM_0
+BEAMLIB	         = GBM
+# BEAMLIB        = GBM_N
+
+#
+#   SUSY libraries
+#
+LIBS	      = ../lib/libPHYSUSYXC.a \
+		../../lib/libPHYSUSY.a
+
+ANALLIB	      = $(LDDIRFLAG)$(LCLIBDIR) \
+		-lFORTLIB
+
+KFLIB	      = $(LDDIRFLAG)$(KFLIBDIR) \
+		-l$(BEAMLIB)	
+#--
+#  Make options.
+#--
+all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4)
+
+$(LIBS):
+		cd ../lib; make
+		cd ../../lib; make
+
+
+$(PROGRAM1):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM1) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM1).exe
+		@echo "done"
+
+$(PROGRAM2):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM2) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM2).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM2).exe
+		@echo "done"
+
+$(PROGRAM3):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM3) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM3).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM3).exe
+		@echo "done"
+
+$(PROGRAM4):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM4) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM4).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM4).exe
+		@echo "done"
+
+clean::;	@rm -f $(OBJS) core
+
+cleanall:: clean
+		@(cd $(GODIR); rm -f $(OBJS) *.exe core)
+

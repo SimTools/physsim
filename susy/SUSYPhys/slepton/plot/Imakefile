@@ -1,0 +1,139 @@
+##############################################################################
+## (Description)
+##    Imake file for plotting slepton-related figures.
+##    Executables are to be stored in prod/.
+##	pltcntrsff : to make an executable to draw contour plots.
+##	pltdsese   : to make an executable to plot tree-level diff. X section.
+##	pltsgsee   : to make an executable to plot effective X section.
+##	pltsgseb   : to make an executable to plot tree level X section.
+##	pltsgsmm   : to make an executable to plot effective X section.
+##	pltsgsmb   : to make an executable to plot tree level X section.
+##	pltsgsww   : to make an executable to plot tree level X section.
+##	all	   : to make all of the above. 
+##	clean      : to clean the directory.
+##	cleanall   : to remove everything reproducible.
+## (Update Record) 
+##    95/01/11  K.Fujii 	Original.
+##    97/08/30  K.Fujii 	Use 97a.
+##
+##############################################################################
+
+#include "../../../../config/kflib.tmpl"
+
+#--
+#  Define the name of the executable. 
+#--
+PROGRAM1      = pltcntrsff
+PROGRAM2      = pltdsese
+PROGRAM3      = pltsgseb
+PROGRAM4      = pltsgsee
+PROGRAM5      = pltsgsmb
+PROGRAM6      = pltsgsmm
+PROGRAM7      = pltsgww
+
+#--
+#  Directory to store executables.
+#--
+GODIR	      = prod
+
+#--
+#  Routines to complie.
+#--
+OBJS	      = pltcntrsff.o \
+		pltdsese.o \
+		pltsgseb.o \
+		pltsgsee.o \
+		pltsgsmb.o \
+		pltsgsmm.o \
+		pltsgww.o
+#--
+#  Directories containing library routines.
+#--
+#ifdef HPArchitecture
+	LDDIRFLAG = -Wl,-L
+	EXTRALIBS = -lU77 -lm
+#else
+	LDDIRFLAG = -L
+	EXTRALIBS =
+#endif
+
+LD = $(F77)
+#--
+#  Libraries to link.
+#--
+#   GBM_0 for ISR only
+#   GBM_N for ISR + beam energy spread
+#   GBM   for ISR + full beam effects
+#
+BEAMLIB    	 = GBM_0
+# BEAMLIB	         = GBM
+# BEAMLIB        = GBM_N
+
+#
+#   SUSY libraries
+#
+LIBS	      = ../lib/libPHYSUSYSF.a \
+		../../lib/libPHYSUSY.a
+
+ANALLIB	      = $(LDDIRFLAG)$(LCLIBDIR) \
+		-lFORTLIB
+
+KFLIB	      = $(LDDIRFLAG)$(KFLIBDIR) \
+		-l$(BEAMLIB)	
+#--
+#  Make options.
+#--
+all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4) \
+		$(PROGRAM5) $(PROGRAM6) $(PROGRAM7)
+
+$(LIBS):
+		cd ../lib; make
+		cd ../../lib; make
+
+$(PROGRAM1):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM1) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM1).exe
+		@echo "done"
+
+$(PROGRAM2):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM2) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM2).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM2).exe
+		@echo "done"
+
+$(PROGRAM3):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM3) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM3).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM3).exe
+		@echo "done"
+
+$(PROGRAM4):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM4) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM4).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM4).exe
+		@echo "done"
+
+$(PROGRAM5):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM4) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM5).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM5).exe
+		@echo "done"
+
+$(PROGRAM6):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM6) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM6).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM6).exe
+		@echo "done"
+
+$(PROGRAM7):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM7) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM7).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM7).exe
+		@echo "done"
+
+clean::;	@rm -f $(OBJS) core
+
+cleanall:: clean
+		@(cd $(GODIR); rm -f $(OBJS) *.exe core)
+

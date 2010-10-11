@@ -1,0 +1,47 @@
+##############################################################################
+## (Description)
+##    Imake file for Fujii's susy_phys library.
+## (Update Record) 
+##    97/08/30  K.Fujii 	Original version.
+##############################################################################
+
+#include "../../../config/kflib.tmpl"
+
+#--
+#  Define the name of the library.
+#--
+INSTALLDIR = .
+
+LIBNAME =  PHYSUSY 
+
+#--
+#  Routines to compile.
+#--
+OBJS = couplsub.o \
+		dcy2body.o \
+		gtsfms.o \
+		hgsmix.o \
+		iniprm.o \
+		inodcy.o \
+		inomix.o \
+		insusy.o \
+		sf2br.o \
+		sfmass.o \
+		sfmmas.o \
+		sfmmix.o \
+		swpelm.o \
+		ucontr.o \
+		ugradx.o \
+		usortd.o \
+		xcmass.o \
+		xnmass.o
+
+#--
+#  Libraries
+#--
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(OBJS),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(OBJS) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))

@@ -1,0 +1,32 @@
+##############################################################################
+## (Description)
+##    Imake file for Fujii's susy_phys_sf library.
+## (Update Record) 
+##    97/08/30  K.Fujii 	Original version.
+##############################################################################
+
+#include "../../../../config/kflib.tmpl"
+
+#--
+#  Define the name of the library.
+#--
+INSTALLDIR = .
+
+LIBNAME =  PHYSUSYSF
+
+#--
+#  Routines to compile.
+#--
+OBJS = dssese.o \
+		sgsese.o \
+		sgsmsm.o
+
+#--
+#  Libraries
+#--
+#ifdef DOSHRLIB
+SharedLibraryTarget($(LIBNAME),$(SOREV),$(OBJS),.,.)
+InstallSharedLibrary($(LIBNAME),$(SOREV),$(INSTALLDIR))
+#endif
+NormalLibraryTarget($(LIBNAME), $(OBJS) )
+InstallLibrary($(LIBNAME),$(INSTALLDIR))

@@ -1,0 +1,94 @@
+##############################################################################
+## (Description)
+##    Imake file for plotting neutralino-related figures.
+##    Executables are to be stored in prod/.
+##	pltcntrnxx : to make an executable to draw contour plots.
+##	pltdsnxx   : to make an executable to plot tree-level diff. X section.
+##	all	   : to make both above. 
+##	clean      : to clean the directory.
+##	cleanall   : to remove everything reproducible.
+## (Update Record) 
+##    95/01/11  K.Fujii 	Original.
+##    97/08/30  K.Fujii 	Use 97a.
+##
+##############################################################################
+
+#include "../../../../config/kflib.tmpl"
+
+#--
+#  Define the name of the executable. 
+#--
+PROGRAM1      = pltcntrnxx
+PROGRAM2      = pltdsnxx
+
+#--
+#  Directory to store executables.
+#--
+GODIR	      = prod
+
+#--
+#  Routines to complie.
+#--
+OBJS	      = pltcntrnxx.o \
+		pltdsnxx.o
+
+#--
+#  Directories containing library routines.
+#--
+#ifdef HPArchitecture
+	LDDIRFLAG = -Wl,-L
+	EXTRALIBS = -lU77 -lm
+#else
+	LDDIRFLAG = -L
+	EXTRALIBS =
+#endif
+
+LD = $(F77)
+#--
+#  Libraries to link.
+#--
+#   GBM_0 for ISR only
+#   GBM_N for ISR + beam energy spread
+#   GBM   for ISR + full beam effects
+#
+# BEAMLIB    	 = GBM_0
+BEAMLIB	         = GBM
+# BEAMLIB        = GBM_N
+#
+#   SUSY libraries
+#
+LIBS	      = ../lib/libPHYSUSYXN.a \
+		../../lib/libPHYSUSY.a \
+
+ANALLIB	      = $(LDDIRFLAG)$(LCLIBDIR) \
+		-lFORTLIB
+
+KFLIB	      = $(LDDIRFLAG)$(KFLIBDIR) \
+		-l$(BEAMLIB)
+#--
+#  Make options.
+#--
+all::		$(PROGRAM1) $(PROGRAM2) $(PROGRAM3) $(PROGRAM4)
+
+$(LIBS):
+		cd ../lib; make
+		cd ../../lib; make
+		cd ../../../g_beam/lib; make
+
+$(PROGRAM1):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM1) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM1).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM1).exe
+		@echo "done"
+
+$(PROGRAM2):     $(OBJS) $(LIBS)
+		@echo "Linking $(PROGRAM2) ..."
+		@$(LD) $(LDFLAGS) $(PROGRAM2).o $(LIBS) $(KFLIB) $(ANALLIB) \
+		-o $(GODIR)/$(PROGRAM2).exe
+		@echo "done"
+
+clean::;	@rm -f $(OBJS) core
+
+cleanall:: clean
+		@(cd $(GODIR); rm -f $(OBJS) *.exe core)
+
