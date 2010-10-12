@@ -115,7 +115,9 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
            << "csx1:csx2:ex1:ex2"                                       << ":"
            << "mx1:mx2:mm:acop"                                         << ":"
 	   << "pj1e:pj1x:pj1y:pj1z:pj2e:pj2x:pj2y:pj2z"                 << ":"
-	   << "pj3e:pj3x:pj3y:pj3z:pj4e:pj4x:pj4y:pj4z"                 << ends;
+	   << "pj3e:pj3x:pj3y:pj3z:pj4e:pj4x:pj4y:pj4z"                 << ":"
+	   << "cstau1h:fitau1h:csstau1h:fistau1h"                       << ":"
+	   << "cstau2h:fitau2h:csstau2h:fistau2h"                       << ends;
 
     hEvt = new TNtupleD("hEvt", "", tupstr.str().data());
   }
@@ -511,6 +513,46 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   Double_t      ex1   = pvx1.E();
   Double_t      ex2   = pvx2.E();
   Double_t      acop  = pvx1.Acop(x2);
+  //--
+  // Calculate helicity angles.
+  //--
+  TVector3    ez     = TVector3(0., 0., 1.);
+  TVector3    ex1z   = pvx1.Vect().Unit();
+  TVector3    ex1x   = ex1z.Cross(ez).Unit();
+  TVector3    ex1y   = ex1z.Cross(ex1x);
+
+  TVector3    bstx1 = TVector3(0., 0., pvx1.Vect().Mag()/pvx1.E());
+  ANL4DVector k1h   = ANL4DVector(pvtau1.E(), pvtau1.Vect()*ex1x,
+                                              pvtau1.Vect()*ex1y,
+                                              pvtau1.Vect()*ex1z);
+  k1h.Boost(-bstx1);
+  Double_t    cstau1h = k1h.CosTheta();
+  Double_t    fitau1h = k1h.Phi();
+
+  ANL4DVector k2h   = ANL4DVector(pvstau1.E(), pvstau1.Vect()*ex1x,
+                                               pvstau1.Vect()*ex1y,
+                                               pvstau1.Vect()*ex1z);
+  k2h.Boost(-bstx1);
+  Double_t    csstau1h = k2h.CosTheta();
+  Double_t    fistau1h = k2h.Phi();
+
+  TVector3    ex2z   = pvx2.Vect().Unit();
+  TVector3    ex2x   = ex2z.Cross(ez).Unit();
+  TVector3    ex2y   = ex2z.Cross(ex2x);
+  TVector3    bstx2  = TVector3(0., 0., pvx2.Vect().Mag()/pvx2.E());
+  ANL4DVector p1h    = ANL4DVector(pvtau2.E(), pvtau2.Vect()*ex2x,
+                                                pvtau2.Vect()*ex2y,
+                                                pvtau2.Vect()*ex2z);
+  p1h.Boost(-bstx2);
+  Double_t    cstau2h = p1h.CosTheta();
+  Double_t    fitau2h = p1h.Phi();
+
+  ANL4DVector p2h   = ANL4DVector(pvstau2.E(), pvstau2.Vect()*ex2x,
+                                               pvstau2.Vect()*ex2y,
+                                               pvstau2.Vect()*ex2z);
+  p2h.Boost(-bstx2);
+  Double_t    csstau2h = p2h.CosTheta();
+  Double_t    fistau2h = p2h.Phi();
 
   Double_t data[100];
   data[ 0] = nev;
@@ -549,6 +591,15 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   data[33] = pvtau2.Px();
   data[34] = pvtau2.Py();
   data[35] = pvtau2.Pz();
+
+  data[36] = cstau1h;
+  data[37] = fitau1h;
+  data[38] = csstau1h;
+  data[39] = fistau1h;
+  data[40] = cstau2h;
+  data[41] = fitau2h;
+  data[42] = csstau2h;
+  data[43] = fistau2h;
 
   hEvt->Fill(data);
 
