@@ -32,8 +32,10 @@
 
 using namespace std;
 
-static const Double_t kMassX   = 150.0; // X mass
-static const Double_t kSigmaMx =  40.0;	// X mass resolution
+static const Double_t kMassTau  =   1.7; // tau mass
+static const Double_t kMassStau = 150.0; // stau mass
+static const Double_t kMassX    = 200.0; // X mass
+static const Double_t kSigmaMx  =  40.0; // X mass resolution
 
 typedef enum { kElectron = 11, kMuon = 13 } EPID;
 
@@ -215,7 +217,7 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
     Double_t econe = trk.GetConeEnergy(fCosConeCut, &tracks);
     if (econe <= fEconeCut) {
       lptracks.Add(trkp);
-      trk.SetE(TMath::Sqrt(trk.GetMag2()+kMassX*kMassX));
+      trk.SetE(TMath::Sqrt(trk.GetMag2()+kMassStau*kMassStau));
       nlptracks++;
       trk.Lock();
       lpcharge += trk.GetCharge();
@@ -320,14 +322,40 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   ANLPair *x1p, *x2p;
   while ((x1p = static_cast<ANLPair *>(x1candidates()))) {
     ANLPair &x1 = *x1p;
+#if 0
     Double_t x1mass = x1().GetMass();
+#else
+    ANL4DVector pvstau1 = x1(0);
+    ANL4DVector pvtau1  = x1(1);
+    Double_t etau1   = fEcm/2 - pvstau1(0);
+    Double_t apvtau1 = TMath::Sqrt((etau1-kMassTau)*(etau1+kMassTau));
+    Double_t apv1    = pvtau1.GetMag();
+    pvtau1(0)  = etau1;
+    pvtau1(1) *= apvtau1/apv1;
+    pvtau1(2) *= apvtau1/apv1;
+    pvtau1(3) *= apvtau1/apv1;
+    Double_t x1mass = (pvtau1 + pvstau1).GetMass();
+#endif
     if (TMath::Abs(x1mass - kMassX) > fM2jCut) continue;
     x1.LockChildren();
     ANLPairCombiner x2candidates(x1candidates);
     while ((x2p = static_cast<ANLPair*>(x2candidates()))) {
       ANLPair &x2 = *x2p;
       if (x2.IsLocked()) continue;
+#if 0
       Double_t x2mass = x2().GetMass();
+#else
+      ANL4DVector pvstau2 = x2(0);
+      ANL4DVector pvtau2  = x2(1);
+      Double_t etau2   = fEcm/2 - pvstau2(0);
+      Double_t apvtau2 = TMath::Sqrt((etau2-kMassTau)*(etau2+kMassTau));
+      Double_t apv2    = pvtau2.GetMag();
+      pvtau2(0)  = etau2;
+      pvtau2(1) *= apvtau2/apv2;
+      pvtau2(2) *= apvtau2/apv2;
+      pvtau2(3) *= apvtau2/apv2;
+      Double_t x2mass = (pvtau2 + pvstau2).GetMass();
+#endif
       if (TMath::Abs(x2mass - kMassX) > fM2jCut) continue;
       if (gDEBUG) {
         cerr << " M_X1 = " << x1mass << " M_X2 = " << x2mass << endl;
@@ -447,6 +475,28 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   ANLJet       &j21   = *static_cast<ANLJet  *>(x2[0]);
   ANLJet       &j22   = *static_cast<ANLJet  *>(x2[1]);
 
+  ANL4DVector   pvstau1 = j11;
+  ANL4DVector   pvtau1  = j12;
+  Double_t      etau1   = fEcm/2 - pvstau1(0);
+  Double_t      apvtau1 = TMath::Sqrt((etau1-kMassTau)*(etau1+kMassTau));
+  Double_t      apv1    = pvtau1.GetMag();
+  pvtau1(0)  = etau1;
+  pvtau1(1) *= apvtau1/apv1;
+  pvtau1(2) *= apvtau1/apv1;
+  pvtau1(3) *= apvtau1/apv1;
+  ANL4DVector pvx1 = pvstau1 + pvtau1;
+
+  ANL4DVector   pvstau2 = j21;
+  ANL4DVector   pvtau2  = j22;
+  Double_t      etau2   = fEcm/2 - pvstau2(0);
+  Double_t      apvtau2 = TMath::Sqrt((etau2-kMassTau)*(etau2+kMassTau));
+  Double_t      apv2    = pvtau2.GetMag();
+  pvtau2(0)  = etau2;
+  pvtau2(1) *= apvtau2/apv2;
+  pvtau2(2) *= apvtau2/apv2;
+  pvtau2(3) *= apvtau2/apv2;
+  ANL4DVector pvx2 = pvstau2 + pvtau2;
+
   //--
   // Now store this in the Ntuple.
   //--
@@ -454,13 +504,13 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   Int_t         nev   = gJSF->GetEventNumber();
   Double_t      ecm   = GetEcm();
   Double_t      chi2  = sol.GetQuality();
-  Double_t      mx1   = x1.GetMass();
-  Double_t      mx2   = x2.GetMass();
-  Double_t      csx1  = x1.CosTheta();
-  Double_t      csx2  = x2.CosTheta();
-  Double_t      ex1   = x1.E();
-  Double_t      ex2   = x2.E();
-  Double_t      acop  = x1.Acop(x2);
+  Double_t      mx1   = pvx1.GetMass();
+  Double_t      mx2   = pvx2.GetMass();
+  Double_t      csx1  = pvx1.CosTheta();
+  Double_t      csx2  = pvx2.CosTheta();
+  Double_t      ex1   = pvx1.E();
+  Double_t      ex2   = pvx2.E();
+  Double_t      acop  = pvx1.Acop(x2);
 
   Double_t data[100];
   data[ 0] = nev;
@@ -483,22 +533,22 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   data[17] = mx2;
   data[18] = mm;
   data[19] = acop;
-  data[20] = j11.E();
-  data[21] = j11.Px();
-  data[22] = j11.Py();
-  data[23] = j11.Pz();
-  data[24] = j12.E();
-  data[25] = j12.Px();
-  data[26] = j12.Py();
-  data[27] = j12.Pz();
-  data[28] = j21.E();
-  data[29] = j21.Px();
-  data[30] = j21.Py();
-  data[31] = j21.Pz();
-  data[32] = j22.E();
-  data[33] = j22.Px();
-  data[34] = j22.Py();
-  data[35] = j22.Pz();
+  data[20] = pvstau1.E();
+  data[21] = pvstau1.Px();
+  data[22] = pvstau1.Py();
+  data[23] = pvstau1.Pz();
+  data[24] = pvtau1.E();
+  data[25] = pvtau1.Px();
+  data[26] = pvtau1.Py();
+  data[27] = pvtau1.Pz();
+  data[28] = pvstau2.E();
+  data[29] = pvstau2.Px();
+  data[30] = pvstau2.Py();
+  data[31] = pvstau2.Pz();
+  data[32] = pvtau2.E();
+  data[33] = pvtau2.Px();
+  data[34] = pvtau2.Py();
+  data[35] = pvtau2.Pz();
 
   hEvt->Fill(data);
 
