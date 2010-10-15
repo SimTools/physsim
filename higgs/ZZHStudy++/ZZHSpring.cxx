@@ -346,6 +346,22 @@ ZZHBases::ZZHBases(const char *name, const char *title)
   ins >> fPole;
 
   ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZZHBases.Z1ModesLo","1"));     // Z1ModesLo
+  ins >> fZ1ModesLo;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZZHBases.Z1ModesHi","12"));     // Z1ModesHi
+  ins >> fZ1ModesHi;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZZHBases.Z2ModesLo","1"));     // Z2ModesLo
+  ins >> fZ2ModesLo;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZZHBases.Z2ModesHi","12"));     // Z2ModesHi
+  ins >> fZ2ModesHi;
+
+  ins.clear();
   ins.str(gJSF->Env()->GetValue("ZZHBases.CosthRange","-1.0 1.0"));
   ins >> fXL[0] >> fXU[0];
 
