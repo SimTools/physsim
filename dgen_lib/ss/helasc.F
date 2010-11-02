@@ -24,14 +24,14 @@ C
       FVI(5) = FI(5)-VC(5)
       FVI(6) = FI(6)-VC(6)
 C
-      PF(0)=REAL( FVI(5))
-      PF(1)=REAL( FVI(6))
-      PF(2)=AIMAG(FVI(6))
-      PF(3)=AIMAG(FVI(5))
-      CI=CMPLX(0.D0,1.D0)
+      PF(0)=DBLE( FVI(5))
+      PF(1)=DBLE( FVI(6))
+      PF(2)=DIMAG(FVI(6))
+      PF(3)=DIMAG(FVI(5))
+      CI=DCMPLX(0.D0,1.D0)
       PF2=PF(0)**2-(PF(1)**2+PF(2)**2+PF(3)**2)
 C
-      D=-1.D0/CMPLX( PF2-FMASS**2 , MAX(SIGN( FMASS*FWIDTH ,PF2),0.D0) )
+      D=-1.D0/DCMPLX(PF2-FMASS**2,DMAX1(DSIGN(FMASS*FWIDTH,PF2),0.D0))
       SL1= (VC(1)+   VC(4))*FI(1)
      &    +(VC(2)-CI*VC(3))*FI(2)
       SL2= (VC(2)+CI*VC(3))*FI(1)
@@ -88,14 +88,14 @@ C
       FVO(5) = FO(5)+VC(5)
       FVO(6) = FO(6)+VC(6)
 C
-      PF(0)=REAL( FVO(5))
-      PF(1)=REAL( FVO(6))
-      PF(2)=AIMAG(FVO(6))
-      PF(3)=AIMAG(FVO(5))
-      CI=CMPLX(0.D0,1.D0)
+      PF(0)=DBLE( FVO(5))
+      PF(1)=DBLE( FVO(6))
+      PF(2)=DIMAG(FVO(6))
+      PF(3)=DIMAG(FVO(5))
+      CI=DCMPLX(0.D0,1.D0)
       PF2=PF(0)**2-(PF(1)**2+PF(2)**2+PF(3)**2)
 C
-      D=-1.D0/CMPLX( PF2-FMASS**2 , MAX(SIGN( FMASS*FWIDTH ,PF2),0.D0) )
+      D=-1.D0/DCMPLX(PF2-FMASS**2,DMAX1(DSIGN(FMASS*FWIDTH,PF2),0.D0))
       SL1= (VC(1)+   VC(4))*FO(3)
      &    +(VC(2)+CI*VC(3))*FO(4)
       SL2= (VC(2)-CI*VC(3))*FO(3)
@@ -159,10 +159,10 @@ C
       COMPLEX*16 GC,VC(6),S1(3),S2(3),VERTEX
       REAL*8    P(0:3)
 C
-      P(0)=REAL( S1(2)-S2(2))
-      P(1)=REAL( S1(3)-S2(3))
-      P(2)=AIMAG(S1(3)-S2(3))
-      P(3)=AIMAG(S1(2)-S2(2))
+      P(0)=DBLE( S1(2)-S2(2))
+      P(1)=DBLE( S1(3)-S2(3))
+      P(2)=DIMAG(S1(3)-S2(3))
+      P(3)=DIMAG(S1(2)-S2(2))
 C
       VERTEX = GC*S1(1)*S2(1)
      &        *(VC(1)*P(0)-VC(2)*P(1)-VC(3)*P(2)-VC(4)*P(3))
@@ -193,12 +193,12 @@ C>>>
 C
       VERTEX =  G(1)*( (FO(3)*FI(1)+FO(4)*FI(2))*VC(1)
      &                +(FO(3)*FI(2)+FO(4)*FI(1))*VC(2)
-     &                -(FO(3)*FI(2)-FO(4)*FI(1))*VC(3)*CMPLX(0.D0,1.D0)
+     &                -(FO(3)*FI(2)-FO(4)*FI(1))*VC(3)*DCMPLX(0.D0,1.D0)
      &                +(FO(3)*FI(1)-FO(4)*FI(2))*VC(4)             )
       IF (ABS(G(2)).NE.0.D0) VERTEX = VERTEX
      &        + G(2)*( (FO(1)*FI(3)+FO(2)*FI(4))*VC(1)
      &                -(FO(1)*FI(4)+FO(2)*FI(3))*VC(2)
-     &                +(FO(1)*FI(4)-FO(2)*FI(3))*VC(3)*CMPLX(0.D0,1.D0)
+     &                +(FO(1)*FI(4)-FO(2)*FI(3))*VC(3)*DCMPLX(0.D0,1.D0)
      &                -(FO(1)*FI(3)-FO(2)*FI(4))*VC(4)             )
 C
       RETURN
