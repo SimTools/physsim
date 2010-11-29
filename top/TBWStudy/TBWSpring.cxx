@@ -281,20 +281,20 @@ void TBWBases::Userin()
 
   // Define histograms
 
-  Xhinit("h01", -1.0,  1.0, 50,"cos(theta_t)  ");
-  Xhinit("h02",  0.0, 360., 50,"phi_t         ");
-  Xhinit("h03", -1.0,  1.0, 50,"cos(theta_b_bar) ");
-  Xhinit("h04",  0.0, 360., 50,"phi_b_bar        ");
-  Xhinit("h05", -1.0,  1.0, 50,"cos(theta_b)  ");
-  Xhinit("h06",  0.0, 360., 50,"phi_b         ");
-  Xhinit("h07",  0.0,   1., 50,"RS/ROOTS      ");
-  Xhinit("h08",  0.0, 500., 50,"M(tbbar)      ");
-  Xhinit("h09",  0.0, 500., 50,"M(bW+)        ");
-  Xhinit("h10",  0.0, 500., 50,"M(bbarW-)     ");
-  Xhinit("h11",  0.0, 250., 50,"|p|_cm        ");
-  Xhinit("h12",  0.0, 250., 50,"|p|_lab       ");
-  Xhinit("h13",  1.0,  13., 12,"W- decay mode ");
-  Xhinit("h14",  1.0,  13., 12,"W+ decay mode ");
+  Xhinit("h01", -1.0,  1.0, 500,"cos(theta_t)  ");
+  Xhinit("h02",  0.0, 360., 500,"phi_t         ");
+  Xhinit("h03", -1.0,  1.0, 500,"cos(theta_b_bar) ");
+  Xhinit("h04",  0.0, 360., 500,"phi_b_bar        ");
+  Xhinit("h05", -1.0,  1.0, 500,"cos(theta_b)  ");
+  Xhinit("h06",  0.0, 360., 500,"phi_b         ");
+  Xhinit("h07",  0.0,   1., 500,"RS/ROOTS      ");
+  Xhinit("h08",  0.0, 500., 500,"M(tbbar)      ");
+  Xhinit("h09",  0.0, 500.,2000,"M(bW+)        ");
+  Xhinit("h10",  0.0, 500.,2000,"M(bbarW-)     ");
+  Xhinit("h11",  0.0, 250., 500,"|p|_cm        ");
+  Xhinit("h12",  0.0, 250., 500,"|p|_lab       ");
+  Xhinit("h13",  1.0,  13.,  12,"W- decay mode ");
+  Xhinit("h14",  1.0,  13.,  12,"W+ decay mode ");
 }
 
 //_____________________________________________________________________________
