@@ -288,13 +288,18 @@ void TBWBases::Userin()
   Xhinit("h05", -1.0,  1.0, 500,"cos(theta_b)  ");
   Xhinit("h06",  0.0, 360., 500,"phi_b         ");
   Xhinit("h07",  0.0,   1., 500,"RS/ROOTS      ");
-  Xhinit("h08",  0.0, 500., 500,"M(tbbar)      ");
-  Xhinit("h09",  0.0, 500.,2000,"M(bW+)        ");
-  Xhinit("h10",  0.0, 500.,2000,"M(bbarW-)     ");
-  Xhinit("h11",  0.0, 250., 500,"|p|_cm        ");
-  Xhinit("h12",  0.0, 250., 500,"|p|_lab       ");
-  Xhinit("h13",  1.0,  13.,  12,"W- decay mode ");
-  Xhinit("h14",  1.0,  13.,  12,"W+ decay mode ");
+  Xhinit("h08",  0.0, 500.,2000,"M(bW+)        ");
+  Xhinit("h09",  0.0, 500.,2000,"M(bbarW-)     ");
+  Xhinit("h10",  0.0, 250., 500,"|p|_cm        ");
+  Xhinit("h11",  0.0, 250., 500,"|p|_lab       ");
+  Xhinit("h12", -1.0,  1.0, 500,"cos(theta_W-) ");
+  Xhinit("h13", -1.0,  1.0, 500,"cos(theta_W+) ");
+  Xhinit("h14",  0.0, 500., 500,"M(tbbar)      ");
+  Xhinit("h15",  0.0, 500., 500,"M(tbarb)      ");
+  Xhinit("h16",  0.0, 250., 500,"|p_W-|_lab    ");
+  Xhinit("h17",  0.0, 250., 500,"|p_W+|_lab    ");
+  Xhinit("h18",  1.0,  13.,  12,"W- decay mode ");
+  Xhinit("h19",  1.0,  13.,  12,"W+ decay mode ");
 }
 
 //_____________________________________________________________________________

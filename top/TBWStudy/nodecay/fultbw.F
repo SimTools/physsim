@@ -92,7 +92,7 @@ C        (1) = tt part
 C        (2) = bb part.
 C        (3) = ww part.
 C--
-      CALL AMPTBW(GAL,GAU,GAD,GZL,GZU,GZD,GWF,AMSW,GAMW,AMSZ,GAMZ,
+      CALL AMPTBW(GAL,GAU,GAD,GZL,GZU,GZD,GWF,GW,AMSW,GAMW,AMSZ,GAMZ,
      .            AMST,GAMT,AMSB,GAMB,
      .            SPINOR(1, 1), SPINOR(1, 2),
      .            SPINOR(1, 3), SPINOR(1, 4), WM, AMP)

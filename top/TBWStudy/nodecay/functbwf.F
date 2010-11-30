@@ -227,6 +227,8 @@ C--
       CALL UVCOPY(2*4,PVOUT(0,4),QV(0,4))
       CALL RDOTxx(QV(0,9),QV(0,9),QTBB2)
       QTBB = SQRT(QTBB2)
+      PW   = SQRT(PVOUT(1,5)**2+PVOUT(2,5)**2+PVOUT(3,5)**2)
+      CSWM = PVOUT(3,5)/PW
 
       PT1  = SQRT(QV(1,3)**2+QV(2,3)**2+QV(3,3)**2)
       PT2  = SQRT(QV(1,4)**2+QV(2,4)**2+QV(3,4)**2)
@@ -243,6 +245,7 @@ C--
       CALL XHFILL( 'h12', PT1               ,FUNC )
       CALL XHFILL( 'h13', PT2               ,FUNC )
       CALL XHFILL( 'h14', JCMB + .1D0       ,FUNC )
+      CALL XHFILL( 'h15', CSWM              ,FUNC )
 C--
 C  That's it.
 C--

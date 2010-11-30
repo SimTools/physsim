@@ -8,8 +8,7 @@
 
 INCPATH	= -I. -I$(KFLIBROOT)/dgen_lib/sm/include \
 	-I$(KFLIBROOT)/dgen_lib/bm/include \
-	-I$(KFLIBROOT)/gen_lib/bs/include \
-	-I$(LCDIR)/simjlc/src -I$(LCDIR)/util/fortlib/src 
+	-I$(KFLIBROOT)/gen_lib/bs/include
 
 /*
  * Libraries
