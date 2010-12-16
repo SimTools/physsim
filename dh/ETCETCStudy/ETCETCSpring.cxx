@@ -26,6 +26,7 @@
 #define __ZEROWIDTH__
 #endif
 #endif
+#define TEMP_H
 
 //*----------------------------------------------------------------------
 //*     Numerical and Natural Constants
@@ -620,6 +621,9 @@ Double_t ETCETCBases::Func()
   //  Fill plots
   // --------------------------------------------
 
+#ifdef TEMP_H
+  H1Fill("h02", fCosTheta   , (bsWeight*sigma));
+#endif
   Xh_fill( 1, fEcmIP            , (bsWeight*sigma));
   Xh_fill( 2, fCosTheta         , (bsWeight*sigma));
   Xh_fill( 3, fPhi              , (bsWeight*sigma));
@@ -976,6 +980,7 @@ Complex_t ETCETCBases::AmpEEtoXX(const HELFermion &em,
 // --------------------------
 void ETCETCBases::Userin()
 {
+  TDirectory *last = gDirectory;
   // --------------------------------------------
   //  Open beamstrahlung data
   // --------------------------------------------
@@ -1016,6 +1021,7 @@ void ETCETCBases::Userin()
            << endl;        
     } // check the energy homogeneity
   } // if beamstrahlung is on
+  last->cd();
 
   // --------------------------------------------
   //  Initialize Z decay table
@@ -1072,6 +1078,9 @@ void ETCETCBases::Userin()
   Xh_init(17,     0.,     2.,        2, "Helot " );
   Xh_init(18,     0.,    12.,       12, "W- mode");
   Xh_init(19,     0.,    12.,       12, "W+ mode");
+#ifdef TEMP_H
+  H1Init("h02", "cos(theta_X)",200,-1.,+1.0);
+#endif
 }
 
 //_____________________________________________________________________________
