@@ -8,5 +8,6 @@
 #pragma link C++ class ZDDSpringBuf+;
 #pragma link C++ class ZDDBases+;
 #pragma link C++ class DMBoson+;
+#pragma link C++ class HBoson+;
 
 #endif

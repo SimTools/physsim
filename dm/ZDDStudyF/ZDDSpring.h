@@ -23,6 +23,7 @@
 #include "GENLib.h"
 
 class DMFermion;
+class HBoson;
 
 //_______________________________________________________________________
 // =====================
@@ -47,6 +48,7 @@ public:
   // ----------------------
   Double_t GetMass     ()           const { return fMass;      }
   Double_t GetMassH    ()           const { return fMassH;     }
+  Double_t GetGammaH   ()           const { return fGammaH;    }
   Double_t GetEcmInit  ()           const { return fEcmInit;   }
 
   Double_t GetQ2ZDD    ()           const { return fQ2ZDD;     }
@@ -63,6 +65,7 @@ public:
 
   void     SetMass     (Double_t m      ) { fMass      = m;    }
   void     SetMassH    (Double_t m      ) { fMassH     = m;    }
+  void     SetGammaH   (Double_t g      ) { fGammaH    = g;    }
   void     SetEcmInit  (Double_t ecm    ) { fEcmInit   = ecm;  }
   void     SetISR      (Bool_t b = kTRUE) { fISR       = b;    }
   void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr   = b;    }
@@ -102,6 +105,7 @@ private:
   // ----------------
   Double_t fMass;           // m_DM   : mass  of DM
   Double_t fMassH;          // m_h    : mass  of H
+  Double_t fGammaH;         // gamma_h: width of H
 
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?
@@ -119,6 +123,7 @@ private:
   // ----------------
   DMFermion    *fDMFermionPtr;    //! PD table entry of "DM"
   GENPDTZBoson *fZBosonPtr;       //! PD table entry of "Z"
+  HBoson       *fHBosonPtr;       //! PD table entry of "H"
 
   // ----------------
   //  Event info
@@ -270,5 +275,20 @@ public:
    virtual ~DMFermion() {}
 
    ClassDef(DMFermion, 1)  // eta_I boson class
+};
+
+//_______________________________________________________________________
+// =====================
+//  class HBoson
+// =====================
+//-----------------------------------------------------------------------
+
+class HBoson: public GENPDTEntry {
+public:
+   HBoson(Double_t m      = 120.,
+          Double_t g      = 0.1);
+  virtual ~HBoson() {}
+
+   ClassDef(HBoson, 1)  // eta_I boson class
 };
 #endif
