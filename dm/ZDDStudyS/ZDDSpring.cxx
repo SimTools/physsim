@@ -190,6 +190,7 @@ ZDDBases::ZDDBases(const char *name, const char *title)
          : JSFBases   (name, title), 
            fMass      ( 62.),
            fMassH     ( 120.),
+           fGammaH    ( 0.01),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
@@ -200,6 +201,7 @@ ZDDBases::ZDDBases(const char *name, const char *title)
            fZModesHi  (12),
 	   fCs        (0.105),
            fZBosonPtr ( 0),
+           fHBosonPtr ( 0),
            fZBoost    (0.),
            fEcmIP     (fEcmInit),
            fQ2ZDD     (0.),
@@ -258,6 +260,10 @@ ZDDBases::ZDDBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZDDBases.MassH","120.")); 	 // M_h [GeV]
   ins >> fMassH;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZDDBases.GammaH","0.1")); 	 // Gamma_h [GeV]
+  ins >> fGammaH;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZDDBases.MassDM","62.")); 	 // M_x [GeV]
@@ -361,6 +367,7 @@ ZDDBases::ZDDBases(const char *name, const char *title)
 ZDDBases::~ZDDBases()
 {
   delete fZBosonPtr;
+  delete fHBosonPtr;
 }
 
 //_____________________________________________________________________________
@@ -464,10 +471,17 @@ Double_t ZDDBases::Func()
   bsWeight *= weight;
 
   // DD system
+#if 0
   Double_t qhh2min = TMath::Power(2*fMass,2);
   Double_t qhh2max = TMath::Power(rs - TMath::Sqrt(fQ2Z),2);
            fQ2HH   = qhh2min + (qhh2max - qhh2min)*fXQ2HH;
   bsWeight *= qhh2max - qhh2min;
+#else
+  Double_t qhhmin = 2*fMass;
+  Double_t qhhmax = rs - TMath::Sqrt(fQ2Z);
+  fQ2HH = fHBosonPtr->GetQ2BW(qhhmin, qhhmax, fXQ2HH, weight);
+  bsWeight *= weight;
+#endif
 
   // --------------------------------------------
   //  Calcuate differential cross section
@@ -706,7 +720,8 @@ Complex_t ZDDBases::AmpEEtoZDD(const HELFermion &em,
    Double_t gddh  = -fCs * v;
    Double_t gzzh  = kGz*kM_z;
 
-   HELScalar hh(h1, h2, gddh, fMassH, 0.);
+   Double_t gamh  = 0.1;
+   HELScalar hh(h1, h2, gddh, fMassH, fGammaH);
    HELVertex amp1(zs, zf, hh, gzzh);         // HHH self-coupling
 
    Complex_t amp  = amp1;
@@ -775,6 +790,8 @@ void ZDDBases::Userin()
   }
   fZBosonPtr->DebugPrint();
 
+  if (!fHBosonPtr) fHBosonPtr = new HBoson();
+
   // --------------------------------------------
   //  Define some plots
   // --------------------------------------------
@@ -836,4 +853,28 @@ void ZDDBases::SelectHelicities(Double_t &weight)
    fHelFinal  [2] = kFHelComb[fJCombF][2];
    fHelFinal  [3] = kFHelComb[fJCombF][3];
    weight *= kNf;
+}
+
+//-----------------------------------------------------------------------------
+// ==============================
+//  class HBoson
+// ==============================
+//_____________________________________________________________________________
+// --------------------------
+//  C-tor
+// --------------------------
+HBoson::HBoson(Double_t m,
+               Double_t g)
+{
+   fName    = TString("H");
+   fPID     = 25; // LSP code for JSFHadronizer.
+   fCharge  =  0.0;
+   fSpin    =  0.0;
+   fMass    =    m;
+   fGen     =    0;
+   fIsoSpin = -0.5;
+   fColor   =  1.0;
+
+   GENDecayMode *dmp = new GENDecayMode(g);
+   Add(dmp); 
 }
