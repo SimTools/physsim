@@ -720,7 +720,6 @@ Complex_t ZDDBases::AmpEEtoZDD(const HELFermion &em,
    Double_t gddh  = -fCs * v;
    Double_t gzzh  = kGz*kM_z;
 
-   Double_t gamh  = 0.1;
    HELScalar hh(h1, h2, gddh, fMassH, fGammaH);
    HELVertex amp1(zs, zf, hh, gzzh);         // HHH self-coupling
 
