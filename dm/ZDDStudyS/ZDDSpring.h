@@ -269,7 +269,7 @@ public:
 class HBoson: public GENPDTEntry {
 public:
    HBoson(Double_t m      = 120.,
-          Double_t g      = 0.01);
+          Double_t g      = 0.1);
   virtual ~HBoson() {}
 
    ClassDef(HBoson, 1)  // eta_I boson class

@@ -190,7 +190,7 @@ ZDDBases::ZDDBases(const char *name, const char *title)
          : JSFBases   (name, title), 
            fMass      ( 62.),
            fMassH     ( 120.),
-           fGammaH    ( 0.01),
+           fGammaH    ( 0.1),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
