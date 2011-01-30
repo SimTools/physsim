@@ -78,6 +78,10 @@ C>>>
          GSNX(2,1) = GCESNL(2,1)
          GSNX(1,2) = CONJG(GCESNL(2,1))
          GSNX(2,2) = CONJG(GCESNL(1,1))
+#if 1
+         print *, 'gwx=(', gwx(1,1), ', ', gwx(2,1), ')'
+         print *, 'gzx=(', gzx(1), ', ', gzx(2), ')'
+#endif
       ENDIF
 C--
 C  Set masses and couplings depending on final states.
@@ -226,8 +230,19 @@ C--
 C--
 C  Calculate amplitude**2.
 C--
+#if 1
+      print *, '----'
+      print *, 'XIN=(', XIN(1),',',XIN(2),',',XIN(3),',',XIN(4),')'
+      print *, 'XOT=(', XIN(1),',',XIN(2),',',XIN(3),',',XIN(4),')'
+#endif
       CALL AMPCXX (GAL,GAX,GZL,GZX,GSNX,SFM(1),GMSF(1),AMSZ,GAMZ,
      .             EIN,EOT,XIN,XOT,AMP)
+#if 1
+      print *, 'APM(0)=', AMP(0)
+      print *, 'APM(1)=', AMP(1)
+      print *, 'APM(2)=', AMP(2)
+      print *, 'APM(3)=', AMP(3)
+#endif
       FACT    = (3*QCD)**(IDP(3,4)+IDP(3,7)-2)
      .          * VKM( IDP(1,4), IDP(1,5), IDP(3,4) )**2
      .          * VKM( IDP(1,7), IDP(1,8), IDP(3,7) )**2

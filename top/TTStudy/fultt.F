@@ -111,7 +111,7 @@ C  Calculate QCD correction.
 C--
       IF ( NRQCD.EQ.0 ) THEN
          FQCD = 1
-         PQCD = 1
+         PQCD = 0
       ELSE
          CALL PSUMxx(PV(0,1),PV(0, 2),QV(0,1))
          CALL PSUMxx(PV(0,3),PV(0, 4),QV(0,2))

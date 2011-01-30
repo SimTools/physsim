@@ -229,7 +229,7 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   if (gDEBUG) cerr << "nlptracks = " << nlptracks << endl;
 
   //--
-  // Require only two Isolated Leptons.
+  // Require only two Isolated sLeptons.
   //--
   if (nlptracks != 2 || lpcharge) { return kFALSE; }
   hStat->Fill(++selid);

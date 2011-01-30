@@ -191,7 +191,7 @@ C--
          QED = ( 1 + 3*BTE/4 )*( 1 + 2*xALF0/xPI*( xPI**2/6 - 1/4.D0 ) )
          ZG  = Z(3)**(1/BTE)
          RS  = SQRT(1-ZG)*RS
-         IZE = Z(1)*1.E4
+         IZE = Z(1)*1.E6
          IF ( MOD(IZE,2).EQ.0 ) THEN
             EMBM = (1-ZG)*EMBM
          ELSE
