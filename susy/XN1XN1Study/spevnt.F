@@ -206,7 +206,7 @@ C--
 C  (4) sfermion from X0_i.
 C--
       IPT = 4
-#if 0
+#if 1
       IDPDG = 1000015
 #else
       IDPDG = 13
@@ -277,7 +277,7 @@ C--
 C  (6) sfermion from X0_i.
 C--
       IPT = 6
-#if 0
+#if 1
       IDPDG = 1000015
 #else
       IDPDG = 13
