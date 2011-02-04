@@ -138,6 +138,7 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   JSFSIMDSTBuf  *evtp    = static_cast<JSFSIMDSTBuf *>(sdsp->EventBuf());
   Int_t          ntrks   = evtp->GetNLTKCLTracks(); 	// No. of tracks 
   TObjArray     *trks    = evtp->GetLTKCLTracks(); 	// combined tracks
+  TClonesArray  *genps   = evtp->GetGeneratorParticles(); // generator particle bank
 
   //--
   // Select good tracks
@@ -213,9 +214,29 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   Double_t lpcharge = 0.;
   while ((trkp = static_cast<ANLTrack *>(nexttrk()))) {
     ANLTrack &trk = *trkp;
-    if (! trk.IsLepton()) continue;
-    Double_t elepton = trk.E();
-    if (elepton < fEleptonCut) continue;
+    if (trk.GetCharge() == 0.) continue; // skip neutral tracks.
+#if 0
+    // Should use P, dE/dx, and TOF to ID long-lived staus.
+#else
+    // Cheating using MCTruth to ID long-lived staus.
+    JSFLTKCLTrack        *ltkclp = trk.GetLTKCLTrack();
+    JSFCDCTrack          *cdcp   = static_cast<JSFCDCTrack *>(ltkclp->GetCDC());
+    Int_t                 genid  = cdcp->GetGenID();
+    JSFGeneratorParticle *gpp    = static_cast<JSFGeneratorParticle *>(genps->UncheckedAt(genid-1));
+    Int_t                 momid  = gpp->GetMother();
+    Double_t              mass   = gpp->GetMass();
+    Double_t              Eb4    = trk.E();
+    trk.E() = TMath::Sqrt(mass*mass + trk.GetMag2());
+#endif
+    if (momid != -4 && momid != -6) continue; // skip non-staus.
+#if 0
+    cerr << " momid = " << momid
+         << " mass = " << mass
+	 << " Eb4  = " << Eb4
+	 << " Eaft = " << trk.E() << endl;
+#endif
+    Double_t eslepton = trk.E();
+    if (eslepton < fEleptonCut) continue;
     Double_t econe = trk.GetConeEnergy(fCosConeCut, &tracks);
     if (econe <= fEconeCut) {
       lptracks.Add(trkp);
@@ -231,7 +252,11 @@ Bool_t XN1XN12SL2JAnalysis::Process(Int_t ev)
   //--
   // Require only two Isolated sLeptons.
   //--
+#if 0
   if (nlptracks != 2 || lpcharge) { return kFALSE; }
+#else
+  if (nlptracks != 2) { return kFALSE; } // there can be same sign staus.
+#endif
   hStat->Fill(++selid);
   if (gNgoods == 0) {
     gCutName[(Int_t)selid] << "Nslptracks = 2" << ends;
