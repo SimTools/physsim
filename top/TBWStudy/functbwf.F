@@ -232,7 +232,7 @@ C--
 C-- t_bar.
       Q3MN  = AM3 + AM4 + AM5 + EPS
       Q3MX  = RS - (AM6+AM7+AM8+EPS)
-#if 0
+#if 1
       TH3MN = ATAN((Q3MN-AMT)*(Q3MN+AMT)/AMGT)
       TH3MX = ATAN((Q3MX-AMT)*(Q3MX+AMT)/AMGT)
       TH3   = TH3MN + (TH3MX-TH3MN)*Z(5)
@@ -249,7 +249,7 @@ C-- t_bar.
 C-- t.
       Q4MN  = AM6 + AM7 + AM8 + EPS
       Q4MX  = RS - Q3
-#if 0
+#if 1
       TH4MN = ATAN((Q4MN-AMT)*(Q4MN+AMT)/AMGT)
       TH4MX = ATAN((Q4MX-AMT)*(Q4MX+AMT)/AMGT)
       TH4   = TH4MN + (TH4MX-TH4MN)*Z(6)
