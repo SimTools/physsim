@@ -7,6 +7,9 @@
  
   spring = new STUSTUSpring();
   spring->ReadBases("bases.root");
+#if 0
+  STUSTUBases::EnableStauDecay(kFALSE);
+#endif
 
   printf(" Roots is %g\n",((STUSTUBases*)spring->GetBases())->GetEcmInit());
 
