@@ -100,15 +100,15 @@ Bool_t STUSTUSpringBuf::SetPartons()
     GENFrame    cmframe;
     Double_t cosm = gRandom->Uniform(-1.,+1.);
     Double_t phim = gRandom->Uniform(0.,2.*TMath::Pi());
-    Double_t m32  = mtau*mtau;
-    Double_t m42  = mdm*mdm;
+    Double_t m32  = mdm*mdm;
+    Double_t m42  = mtau*mtau;
     GENPhase2 phaseStauM(pv[0], m32, m42, cmframe, cosm, phim, 1);
     pv[2] = phaseStauM.GetFourMomentum(0);
     pv[3] = phaseStauM.GetFourMomentum(1);
     Double_t cosp = gRandom->Uniform(-1.,+1.);
     Double_t phip = gRandom->Uniform(0.,2.*TMath::Pi());
-    Double_t m52  = mtau*mtau;
-    Double_t m62  = mdm*mdm;
+    Double_t m52  = mdm*mdm;
+    Double_t m62  = mtau*mtau;
     GENPhase2 phaseStauP(pv[1], m52, m62, cmframe, cosp, phip, 1);
     pv[4] = phaseStauP.GetFourMomentum(0);
     pv[5] = phaseStauP.GetFourMomentum(1);
@@ -149,20 +149,33 @@ Bool_t STUSTUSpringBuf::SetPartons()
   Int_t    iddm    = 1000022;                     // PDG code for neutralino
   Int_t    idtu    = bases->fFPtr->GetPID();      // PDG code for tau-
   Double_t chrg    = bases->fFPtr->GetCharge();   // stau charge
-  Double_t htm     = bases->fHelTauM;             // tau- helicity
-  Double_t htp     = bases->fHelTauP;             // tau+ helicity
+  Double_t helm    = (1. - bases->fHelTauM)/2.;   // tau- helicity
+  Double_t help    = (1. - bases->fHelTauP)/2.;   // tau- helicity
+  Double_t htm     = 0;
+  Double_t htp     = 0;
+  if (gRandom->Uniform() < helm) {
+    htm = -1.;
+  } else {
+    htm = +1.;
+  }
+  if (gRandom->Uniform() < help) {
+    htp = -1.;
+  } else {
+    htp = +1.;
+  }
+  Double_t ctau   = bases->fCTau;
 
   //                                 No. PID   Mass  Charge   pv    Nd 1st Mom hel col shower
   if (!STUSTUBases::fgEnableStauDecay) {
     new (partons[0]) JSFSpringParton(1, idstu, mstau,  chrg, *qp[0], 0, 0,  0,  0., 0, 0);
     new (partons[1]) JSFSpringParton(2,-idstu, mstau, -chrg, *qp[1], 0, 0,  0,  0., 0, 0);
   } else {
-    new (partons[0]) JSFSpringParton(1, idstu, mstau,  chrg, *qp[0], 2, 3,  0,  0., 0, 0);
-    new (partons[1]) JSFSpringParton(2,-idstu, mstau, -chrg, *qp[1], 2, 5,  0,  0., 0, 0);
-    new (partons[2]) JSFSpringParton(3,  idtu,  mtau,  chrg, *qp[2], 0, 0,  1, htm, 0, 0);
-    new (partons[3]) JSFSpringParton(4,  iddm,   mdm,    0., *qp[3], 0, 0,  1,  0., 0, 0);
-    new (partons[4]) JSFSpringParton(5, -idtu,  mtau, -chrg, *qp[4], 0, 0,  2, htp, 0, 0);
-    new (partons[5]) JSFSpringParton(6,  iddm,   mdm,    0., *qp[5], 0, 0,  2,  0., 0, 0);
+    new (partons[0]) JSFSpringParton(1, idstu, mstau,  chrg, *qp[0], 2, 3,  0,  0., 0, 0, ctau);
+    new (partons[1]) JSFSpringParton(2,-idstu, mstau, -chrg, *qp[1], 2, 5,  0,  0., 0, 0, ctau);
+    new (partons[2]) JSFSpringParton(3,  iddm,   mdm,    0., *qp[3], 0, 0,  1,  0., 0, 0);
+    new (partons[3]) JSFSpringParton(4,  idtu,  mtau,  chrg, *qp[2], 0, 0,  1, htm, 0, 0);
+    new (partons[4]) JSFSpringParton(5,  iddm,   mdm,    0., *qp[5], 0, 0,  2,  0., 0, 0);
+    new (partons[5]) JSFSpringParton(6, -idtu,  mtau, -chrg, *qp[4], 0, 0,  2, htp, 0, 0);
   }
 
   return kTRUE ;

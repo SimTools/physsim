@@ -43,16 +43,7 @@ void UserAnalysis()
   TIter next(partons);
   JSFSpringParton *parton;
   while ((parton = (JSFSpringParton *)next())) {
-    cerr << parton->GetSerial() << " "
-         << " PID=" << parton->GetID()
-         << " Q="   << parton->GetCharge()
-         << " M="   << parton->GetMass()
-         << " M="   << parton->GetColorID()
-         << " M="   << parton->GetShowerInfo()
-	 << " p=("  << parton->GetE() << ","
-	            << parton->GetPx() << ","
-	            << parton->GetPy() << ","
-	            << parton->GetPz() << ")" << endl;
+    parton->ls("form2");
     if (parton->GetNDaughter()) continue;
     pcm += ANL4DVector(parton->GetPV());
   }
@@ -78,7 +69,7 @@ void UserAnalysis()
   for(Int_t i=0;i<sdb->GetNGeneratorParticles();i++){
     JSFGeneratorParticle *g=gen->UncheckedAt(i);
     Int_t ndau=g->GetNDaughter();
-#if 0
+#if 1
     g->ls();
 #endif
     if( ndau != 0 ) continue;
