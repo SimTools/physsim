@@ -1,0 +1,22 @@
+Tools to generate STDHEP files with DBD standard conditions.
+
+(1) Configuration
+  Many configuration parameters are defined by files in conf directory.
+  Especially, do not forget following files.
+   conf/common/setup.bash  : Setup environment parameters to run physsim
+   conf/common/common.defs : User dependant parameters for Bases, Spring, etc.
+   conf/common/process.list : Define processID, process name, final states, polarization, etc.
+            This file is used to create run directory.
+   dbs/common.defs   : host dependant entries for database records.
+
+(2) Create directories to run job.
+  At any place, do 
+
+  $(KFLIBROOT)/dbd/genprod/bin/mkjobs.sh 
+  
+  Replies to questions.  With the default setting, directories to run jobs
+  are created under jobs/ directory.  jobs/allsub.sh can be used to submit 
+  jobs in all directories to LSF batch system.
+
+  
+ 

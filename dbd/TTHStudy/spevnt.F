@@ -1,0 +1,544 @@
+CC**********************************************************************
+C*
+C*===================----==
+C* Subroutine SPEVNT(IRET)
+C*===================----==
+C* (Purpose)
+C*   To enerate One event.
+C* (Output)
+C*   IRET :(I*4): = 0     Normal return.
+C*                > 0     Warning, continue processing.
+C*                < 0     Error, skip the rest.
+C*                > -999  terminates the job imediately.
+C* (Update Record)
+C*   95/03/28  K.Fujii          Original version for TTH.
+C*
+CC**********************************************************************
+ 
+      SUBROUTINE SPEVNT(IRET)
+ 
+      IMPLICIT    REAL*4 ( A-H, O-Z )
+C--
+C  Arguments.
+C--
+      INTEGER*4   IRET
+C--
+C  Commons.
+C--
+#include "TTZCNF.inc"
+#include "SMCONS.inc"
+#include "SMPTAB.inc"
+#include "USRPRM.inc"
+C--
+C  Junk commons.
+C--
+      COMMON /SSWORK/ IBUF(10000)
+      REAL   *4       RBUF(10000)
+      EQUIVALENCE    (IBUF,RBUF)
+C--
+C  Local arrays.
+C--
+      REAL   *4       QV(0:3,10), QF(3,2,2)
+#ifdef WITH_DBD_STANDARD
+c      REAL   *8       z3ini, z4ini, qvd(0:3,4),ame
+c      REAL   *4       qvisr(0:3), qvtmp(0:3)
+#endif
+#if 0
+      common /event_number/ nseqevent
+#endif
+C--
+C  Initialize flags.
+C--
+      DATA NCALL      / 0 /
+      DATA NPRINT     /10 /
+CC      DATA NPRINT     /30000 /
+      DATA NEVENT     / 0 /
+C
+C========< Entry Point >================================================
+C
+C--
+C  Reset IRET.
+C--
+      IRET = 0
+C--
+C  Initialize constants.
+C--
+      IF ( NCALL.EQ.0 ) THEN
+         NCALL  = 1
+         DO 10 IG = 1, 3
+            QF(IG,1,1) =  0.
+            QF(IG,2,1) = -1.
+            QF(IG,1,2) =  2./3.
+            QF(IG,2,2) = -1./3.
+10       CONTINUE
+      ENDIF
+C--
+C  TBPUT 'Spring:Header'.
+C       Elm#1  IBUF(1) = Event #.
+C                  (2) = Date
+C                  (3) = Time
+C                  (4) = not used
+C                  (5) = E (e-)    MeV unit.
+C                  (6) = E (e+)    MeV unit.
+C                  (7) = Ebeam     MeV unit.
+C                  (8) = Pol (e-)
+C                  (9) = Pol (e+)
+C                 (10) = not used.
+C--
+      NEVENT = NEVENT + 1
+#if 1
+      nseqevent=NEVENT
+#endif
+      EBM = ROOTS/2
+      IBUF(1) = NEVENT
+      CALL UIDATE( IBUF(2) )
+      IBUF(3) = TIME()
+      IBUF(5) = EBM*1.E3
+      IBUF(6) = EBM*1.E3
+      IBUF(7) = EBM*1.E3
+      IBUF(8) = 0
+      IBUF(9) = 0
+      CALL TBPUT(1, 'Spring:Header', 1, 10, IBUF, IRT )
+C--
+C  TBPUT 'Spring:Parton_List'.
+C       Elm#i  RBUF(1) = Particle serial number.
+C                  (2) = Particle ID
+C                  (3) = Mass (GeV)
+C                  (4) = Charge
+C                  (5) = Px(GeV)
+C                  (6) = Py(GeV)
+C                  (7) = Pz(GeV)
+C                  (8) = E(GeV)
+C                  (9) =    not used
+C                 (10) =    not used
+C                 (11) =    not used
+C                 (12) = # daughter parton
+C                 (13) = particle serial # of the 1st daughter
+C                 (14) = particle serial # of the parent daughter
+C                 (15) =    not used
+C                 (16) =    not used
+C                 (17) = helicity
+C                 (18) = colour single group ID
+C                 (19) =    not used
+C                 (20) = PYJETS common location
+C--
+C     PVOUT(*,i) = 4-momentum of i-th parton
+C                    _
+C                  9 f               _
+C                    ! 10 f     /  3 b
+C                    ! /       /
+C                    !/       /      _
+C                   H!    _  /\W-/ 4 f(up)
+C      1 e-  \       !    t /  \/
+C             \  ######### /    \
+C             ###############    \ 5 f(down)
+C            #################
+C            #################       _
+C             ###############    / 8 f(down)
+C             / ########## \    /
+C      2 e+  /             t\  /\
+C                            \/W+\ 7 f(up)
+C                             \
+C                              \
+C                               \  6 b(down)
+C--
+      CALL PSUMxx(PVOUT(0,4),PVOUT(0,5),QV(0,7))
+      CALL PSUMxx(QV(0,7),PVOUT(0,3),QV(0,3))
+      CALL PSUMxx(PVOUT(0,7),PVOUT(0,8),QV(0,8))
+      CALL PSUMxx(QV(0,8),PVOUT(0,6),QV(0,4))
+      CALL PSUMxx(PVOUT(0,9),PVOUT(0,10),QV(0,5))
+
+C--
+      NPT = 0
+      IS_REMNANTS=NS_REMNANTS
+#ifdef WITH_DBD_STANDARD
+C--
+C Store initial electron, if NS_BEAMS==1
+C--
+      IRELOFF = 0
+      if( ns_beams .eq. 1 ) then
+        if( NS_REMNANTS .NE. 0 ) then
+          print *,'Fatal error in spevnt  NS_REMNANTS should be 1',
+     >   ' when NS_BEAMS=1'
+          stop
+        end if
+
+        npt=npt+1
+        call uvzero( 20, rbuf)
+        rbuf( 1) = npt
+        rbuf( 2) = -11
+        rbuf( 3) = AMF(1,2,1)
+        rbuf( 4) = -1.0
+        rbuf( 7) = SQRT( (BMENGY(3)+AME)*(BMENGY(3)-AME))
+        rbuf( 8) = BMENGY(3) 
+        rbuf(12) = 1
+        rbuf(13) = 3
+        rbuf(14) = 0 
+        rbuf(20) = 600
+        call tbput(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
+        IF ( NEVENT.LE.NPRINT ) THEN
+           CALL SLPRNT(NEVENT,NPT,RBUF(1))
+        ENDIF
+
+C Positron beam
+
+        npt=npt+1
+        call uvzero( 20, rbuf)
+        rbuf( 1) = npt
+        rbuf( 2) = 11
+        rbuf( 3) = AMF(1,2,1)
+        rbuf( 4) = 1.0
+        rbuf( 7) = SQRT( (BMENGY(4)+AME)*(BMENGY(4)-AME))
+        rbuf( 8) = BMENGY(4) 
+        rbuf(12) = 4
+        rbuf(13) = 4
+        rbuf(14) = 0
+        rbuf(20) = 601
+        call tbput(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
+        IF ( NEVENT.LE.NPRINT ) THEN
+           CALL SLPRNT(NEVENT,NPT,RBUF(1))
+        ENDIF
+
+        IRELOFF=IRELOFF+2
+      endif
+C--
+C Store beam remnant, if NS_REMNANTS==1
+C--  
+      is_remnants = 0
+      
+      if( ns_remnants .eq. 1 ) then
+C output ISR Photons
+        call uvzero( 20, rbuf)
+	npt=npt+1
+        rbuf( 1) = npt
+        rbuf( 2) = 22
+        rbuf( 3) = 0.0
+        rbuf( 4) = 0.0
+        rbuf( 5) = pvout(1,13)
+        rbuf( 6) = pvout(2,13)
+        rbuf( 7) = pvout(3,13)
+        rbuf( 8) = pvout(0,13)
+        rbuf(20) = 600 + IRELOFF
+	if( NS_BEAMS .EQ. 1 ) rbuf(14)=1
+        call tbput(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
+        IF ( NEVENT.LE.NPRINT ) THEN
+           CALL SLPRNT(NEVENT,NPT,RBUF(1))
+        ENDIF
+
+        call uvzero( 20, rbuf)
+        npt=npt+1
+        rbuf( 1) = npt
+        rbuf( 2) = 22
+        rbuf( 3) = 0.0
+        rbuf( 4) = 0.0
+        rbuf( 5) = pvout(1,14)
+        rbuf( 6) = pvout(2,14)
+        rbuf( 7) = pvout(3,14)
+        rbuf( 8) = pvout(0,14)
+        rbuf(20) = 601 + IRELOFF
+        if( NS_BEAMS .EQ. 1 ) rbuf(14)=2
+        call tbput(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
+        IF ( NEVENT.LE.NPRINT ) THEN
+           CALL SLPRNT(NEVENT,NPT,RBUF(1))
+        ENDIF
+        IRELOFF=IRELOFF+2
+
+      endif
+#endif
+C--      _
+C  Store t.
+C--
+      CALL RDOTxx(QV(0,3),QV(0,3),VMT2)
+      CALL UVZERO( 20, RBUF )
+      NPT      =   NPT + 1
+      RBUF( 1) =   NPT
+      RBUF( 2) =   -6
+      RBUF( 3) =   SQRT(VMT2)
+      RBUF( 4) =   -2./3.
+      RBUF( 5) = QV(1,3)
+      RBUF( 6) = QV(2,3)
+      RBUF( 7) = QV(3,3)
+      RBUF( 8) = QV(0,3)
+c      call fill_fourv(qv(0,3), qvisr, is_remnants, rbuf(5))
+      RBUF(12) =   2
+      RBUF(13) =   4+IRELOFF
+      RBUF(14) =   0
+      IF(NS_BEAMS.EQ.1.AND.NS_REMNANTS.EQ.1) RBUF(14)=2
+      RBUF(18) =   1
+      RBUF(20) =  -10
+      CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
+      IF ( NEVENT.LE.NPRINT ) THEN
+         CALL SLPRNT(NEVENT,NPT,RBUF(1))
+      ENDIF
+C--
+C  Store t.
+C--
+      CALL RDOTxx(QV(0,4),QV(0,4),VMT2)
+      CALL UVZERO( 20, RBUF )
+      NPT      =   NPT + 1
+      RBUF( 1) =   NPT
+      RBUF( 2) =    6
+      RBUF( 3) =   SQRT(VMT2)
+      RBUF( 4) =    2./3.
+      RBUF( 5) = QV(1,4)
+      RBUF( 6) = QV(2,4)
+      RBUF( 7) = QV(3,4)
+      RBUF( 8) = QV(0,4)
+C      call fill_fourv(qv(0,4), qvisr, is_remnants, rbuf(5))
+      RBUF(12) =   2
+      RBUF(13) =   6+IRELOFF
+      RBUF(14) =   0
+      IF(NS_BEAMS.EQ.1.AND.NS_REMNANTS.EQ.1) RBUF(14)=2
+      RBUF(18) =   1
+      RBUF(20) =  -10
+      CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
+      IF ( NEVENT.LE.NPRINT ) THEN
+         CALL SLPRNT(NEVENT,NPT,RBUF(1))
+      ENDIF
+C--
+C  Store H.
+C--
+      CALL RDOTxx(QV(0,5),QV(0,5),VMT2)
+      CALL UVZERO( 20, RBUF )
+      NPT      =   NPT + 1
+      RBUF( 1) =   NPT
+      RBUF( 2) =   25
+      RBUF( 3) =   SQRT(VMT2)
+      RBUF( 4) =   0
+      RBUF( 5) = QV(1,5)
+      RBUF( 6) = QV(2,5)
+      RBUF( 7) = QV(3,5)
+      RBUF( 8) = QV(0,5)
+c      call fill_fourv(qv(0,5), qvisr, is_remnants, rbuf(5))
+#ifdef NO_H_DECAY
+      RBUF(12) =   0
+      RBUF(13) =   0
+#else
+      RBUF(12) =   2
+      RBUF(13) =  12+IRELOFF
+#endif
+      RBUF(14) =   0
+      IF(NS_BEAMS.EQ.1.AND.NS_REMNANTS.EQ.1) RBUF(14)=2
+      RBUF(18) =   5
+      RBUF(20) =  606 + IRELOFF
+      CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
+      IF ( NEVENT.LE.NPRINT ) THEN
+         CALL SLPRNT(NEVENT,NPT,RBUF(1))
+      ENDIF
+C--      _      _
+C  Store q from t.
+C--
+      CALL IDK2PD(IDPTCL(1,3),IDPDG)
+      IG = IDPTCL(1,3)
+      IT = IDPTCL(2,3)
+      LQ = IDPTCL(3,3)
+      NF = -1
+      CALL UVZERO( 20, RBUF )
+      NPT      =   NPT + 1
+      RBUF( 1) =   NPT
+      RBUF( 2) =   NF*IDPDG
+      RBUF( 3) =   AMF(IG,IT,LQ)
+      RBUF( 4) =   NF*QF(IG,IT,LQ)
+      RBUF( 5) =   PVOUT(1,3)
+      RBUF( 6) =   PVOUT(2,3)
+      RBUF( 7) =   PVOUT(3,3)
+      RBUF( 8) =   PVOUT(0,3)
+C      call fill_fourv(pvout(0,3), qvisr, is_remnants, rbuf(5))
+      RBUF(12) =   0
+      RBUF(13) =   0
+      RBUF(14) =   1+IRELOFF
+      RBUF(17) =   IHLCMB(3)
+      RBUF(18) =   2
+      RBUF(19) =   101
+      RBUF(20) =  601 + IRELOFF
+      CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
+      IF ( NEVENT.LE.NPRINT ) THEN
+         CALL SLPRNT(NEVENT,NPT,RBUF(1))
+      ENDIF
+C--              _
+C  Store W- from t.
+C--
+      CALL RDOTxx(QV(0,7),QV(0,7),VMT2)
+      CALL UVZERO( 20, RBUF )
+      NPT      =   NPT + 1
+      RBUF( 1) =   NPT
+      RBUF( 2) =  -24
+      RBUF( 3) =   SQRT(VMT2)
+      RBUF( 4) =  -1.
+      RBUF( 5) = QV(1,7)
+      RBUF( 6) = QV(2,7)
+      RBUF( 7) = QV(3,7)
+      RBUF( 8) = QV(0,7)
+C      call fill_fourv(qv(0,7), qvisr, is_remnants, rbuf(5))
+      RBUF(12) =   2
+      RBUF(13) =   8+IRELOFF
+      RBUF(14) =   1+IRELOFF
+      RBUF(18) =   3
+      RBUF(19) =   101
+      RBUF(20) =  -10
+      CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
+      IF ( NEVENT.LE.NPRINT ) THEN
+         CALL SLPRNT(NEVENT,NPT,RBUF(1))
+      ENDIF
+C--
+C  Store q from t.
+C--
+      CALL IDK2PD(IDPTCL(1,6),IDPDG)
+      IG = IDPTCL(1,6)
+      IT = IDPTCL(2,6)
+      LQ = IDPTCL(3,6)
+      NF = +1
+      CALL UVZERO( 20, RBUF )
+      NPT      =   NPT + 1
+      RBUF( 1) =   NPT
+      RBUF( 2) =   NF*IDPDG
+      RBUF( 3) =   AMF(IG,IT,LQ)
+      RBUF( 4) =   NF*QF(IG,IT,LQ)
+      RBUF( 5) =   PVOUT(1,6)
+      RBUF( 6) =   PVOUT(2,6)
+      RBUF( 7) =   PVOUT(3,6)
+      RBUF( 8) =   PVOUT(0,6)
+C     call fill_fourv(pvout(0,6), qvisr, is_remnants, rbuf(5))
+      RBUF(12) =   0
+      RBUF(13) =   0
+      RBUF(14) =   2+IRELOFF
+      RBUF(17) =   IHLCMB(6)
+      RBUF(18) =   2
+      RBUF(19) =   102
+      RBUF(20) =  600 + IRELOFF
+      CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
+      IF ( NEVENT.LE.NPRINT ) THEN
+         CALL SLPRNT(NEVENT,NPT,RBUF(1))
+      ENDIF
+C--
+C  Store W+ from t.
+C--
+      CALL RDOTxx(QV(0,8),QV(0,8),VMT2)
+      CALL UVZERO( 20, RBUF )
+      NPT      =   NPT + 1
+      RBUF( 1) =   NPT
+      RBUF( 2) =   24
+      RBUF( 3) =   SQRT(VMT2)
+      RBUF( 4) =   1.
+      RBUF( 5) =   QV(1,8)
+      RBUF( 6) =   QV(2,8)
+      RBUF( 7) =   QV(3,8)
+      RBUF( 8) =   QV(0,8)
+C      call fill_fourv(qv(0,8), qvisr, is_remnants, rbuf(5))
+      RBUF(12) =   2
+      RBUF(13) =  10+IRELOFF
+      RBUF(14) =   2+IRELOFF
+      RBUF(18) =   4
+      RBUF(19) =   102
+      RBUF(20) =  -10
+      CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
+      IF ( NEVENT.LE.NPRINT ) THEN
+         CALL SLPRNT(NEVENT,NPT,RBUF(1))
+      ENDIF
+C--
+C  fermions from W-.
+C--
+      NF = 1
+      DO 200 IPT = 4, 5
+         CALL IDK2PD(IDPTCL(1,IPT),IDPDG)
+         IG = IDPTCL(1,IPT)
+         IT = IDPTCL(2,IPT)
+         LQ = IDPTCL(3,IPT)
+         NF = -NF
+         CALL UVZERO( 20, RBUF )
+         NPT      =   NPT + 1
+         RBUF( 1) =   NPT
+         RBUF( 2) =   NF*IDPDG
+         RBUF( 3) =   AMF(IG,IT,LQ)
+         RBUF( 4) =   NF*QF(IG,IT,LQ)
+         RBUF( 5) =   PVOUT(1,IPT)
+         RBUF( 6) =   PVOUT(2,IPT)
+         RBUF( 7) =   PVOUT(3,IPT)
+         RBUF( 8) =   PVOUT(0,IPT)
+C         call fill_fourv(pvout(0,ipt), qvisr, is_remnants, rbuf(5))
+         RBUF(12) =   0
+         RBUF(13) =   0
+         RBUF(14) =   5+IRELOFF
+         RBUF(17) =   IHLCMB(IPT)
+         RBUF(18) =   3
+         RBUF(19) =   (LQ-1)*201
+         RBUF(20) =  605 + IRELOFF
+         IF( IPT .EQ. 5 ) RBUF(20) = 604 + IRELOFF
+         CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
+         IF ( NEVENT.LE.NPRINT ) THEN
+            CALL SLPRNT(NEVENT,NPT,RBUF(1))
+         ENDIF
+200   CONTINUE
+C--
+C  fermions from W+.
+C--
+      NF = -1
+      DO 300 IPT = 7, 8
+         CALL IDK2PD(IDPTCL(1,IPT),IDPDG)
+         IG = IDPTCL(1,IPT)
+         IT = IDPTCL(2,IPT)
+         LQ = IDPTCL(3,IPT)
+         NF = -NF
+         CALL UVZERO( 20, RBUF )
+         NPT      =   NPT + 1
+         RBUF( 1) =   NPT
+         RBUF( 2) =   NF*IDPDG
+         RBUF( 3) =   AMF(IG,IT,LQ)
+         RBUF( 4) =   NF*QF(IG,IT,LQ)
+         RBUF( 5) =   PVOUT(1,IPT)
+         RBUF( 6) =   PVOUT(2,IPT)
+         RBUF( 7) =   PVOUT(3,IPT)
+         RBUF( 8) =   PVOUT(0,IPT)
+C        call fill_fourv(pvout(0,ipt), qvisr, is_remnants, rbuf(5))
+         RBUF(12) =   0
+         RBUF(13) =   0
+         RBUF(14) =   7+IRELOFF
+         RBUF(17) =   IHLCMB(IPT)
+         RBUF(18) =   4
+         RBUF(19) =   (LQ-1)*301
+         RBUF(20) =  IPT-5 + IRELOFF+600
+         CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
+         IF ( NEVENT.LE.NPRINT ) THEN
+            CALL SLPRNT(NEVENT,NPT,RBUF(1))
+         ENDIF
+300   CONTINUE
+C--
+C  Fermions from H.
+C--
+#ifndef NO_H_DECAY
+      NF =  1
+      DO 400 IPT = 9, 10
+         CALL IDK2PD(IDPTCL(1,IPT),IDPDG)
+         IG = IDPTCL(1,IPT)
+         IT = IDPTCL(2,IPT)
+         LQ = IDPTCL(3,IPT)
+         NF = -NF
+         CALL UVZERO( 20, RBUF )
+         NPT      =   NPT + 1
+         RBUF( 1) =   NPT
+         RBUF( 2) =   NF*IDPDG
+         RBUF( 3) =   AMF(IG,IT,LQ)
+         RBUF( 4) =   NF*QF(IG,IT,LQ)
+         RBUF( 5) =   PVOUT(1,IPT)
+         RBUF( 6) =   PVOUT(2,IPT)
+         RBUF( 7) =   PVOUT(3,IPT)
+         RBUF( 8) =   PVOUT(0,IPT)
+C         call fill_fourv(pvout(0,ipt), qvisr, is_remnants, rbuf(5))
+         RBUF(12) =   0
+         RBUF(13) =   0
+         RBUF(14) =   3
+         RBUF(17) =   IHLCMB(IPT)
+         RBUF(18) =   5
+         RBUF(19) =   (LQ-1)*401
+         RBUF(20) =  -10
+         CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
+         IF ( NEVENT.LE.NPRINT ) THEN
+            CALL SLPRNT(NEVENT,NPT,RBUF(1))
+         ENDIF
+400   CONTINUE
+#endif
+C--
+C  That's it.
+C--
+      RETURN
+      END

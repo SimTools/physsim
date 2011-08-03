@@ -1,0 +1,49 @@
+Mother - daughter relation
+No-remnants, No-beams
+ser        mother   1st_dau  N_Dau
+1   tbar    0         4       2
+2   t       0         6       2
+3   H       0         0       0
+4   qbar    1         0       0
+5   W-      1         8       2
+6   q       2         0       0
+7   W+      2        10       2
+8   f1      5         0       0
+9   f2      5         0       0  
+10  f3      7         0       0
+11  f4      7         0       0
+
+With remnants, No-beams
+ser        mother   1st_dau  N_Dau
+1   gamma   0         0       0
+2   gamma   0         0       0
+3   tbar    0         6       2
+4   t       0         8       2
+5   H       0         0       0
+6   qbar    3         0       0
+7   W-      3        10       2
+8   q       4         0       0
+9   W+      4        12       2
+10  f1      7         0       0
+11  f2      7         0       0  
+12  f3      9         0       0
+13  f4      9         0       0
+ 
+With remnants, with-beams
+ser        mother   1st_dau  N_Dau
+1   e-      0         3       1
+2   e+      0         4       4 
+3   gamma   1         0       0
+4   gamma   2         0       0
+5   tbar    2         8       2
+6   t       2        10       2
+7   H       2         0       0
+8   qbar    5         0       0
+9   W-      5        12       2
+10  q       6         0       0
+11  W+      6        14       2
+12  f1      9         0       0
+13  f2      9         0       0  
+14  f3     11         0       0
+15  f4     11         0       0
+
