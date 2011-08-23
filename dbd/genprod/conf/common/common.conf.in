@@ -1,0 +1,182 @@
+# ==============================================
+# @@BasesName@@ specific parameters
+# =============================================
+@@BasesName@@.ISRBM:        @@ISRBM@@
+#!isrbm
+@@BasesName@@.FinalStatesMix: @@FinalStateMix@@
+#!dmode
+
+
+@@BasesName@@.WmModesLo:    @@WmModesLo@@
+#!wmmodeslo
+@@BasesName@@.WmModesHi:    @@WmModesHi@@
+#!wmmodeshi
+@@BasesName@@.WpModesLo:    @@WpModesLo@@
+#!wpmodeslo
+@@BasesName@@.WpModesHi:    @@WpModesHi@@
+#!wpmodeshi
+
+@@BasesName@@.ACC1:         @@ACC1@@
+#!acc1
+@@BasesName@@.ACC2:         @@ACC2@@
+#!acc2
+@@BasesName@@.ITMX1:        @@ITMX1@@
+#!itmx1
+@@BasesName@@.ITMX2:        @@ITMX2@@
+#!itmx2
+@@BasesName@@.NCALL:        @@NCALL@@
+#!ncall
+@@BasesName@@.Roots:        @@ROOTS@@
+#!roots
+@@BasesName@@.PolElectron:   @@PolElectron@@
+#!pele
+@@BasesName@@.PolPositron:   @@PolPositron@@
+#!ppos
+@@BasesName@@.SigmaEbeam:   0.005
+@@BasesName@@.Alphai:       128.
+@@BasesName@@.Alphas:       0.120
+@@BasesName@@.MassW:                80.0
+@@BasesName@@.MassZ:                91.18
+@@BasesName@@.MassHiggs:    @@HiggsMass@@
+@@BasesName@@.MassTop:      175.
+
+@@BasesName@@.ISR_LLA_Order:        @@ISR_LLA_ORDER@@
+#!lla_order
+@@BasesName@@.Store_Remnants:       @@STORE_REMNANTS@@
+#!store_remnants
+@@BasesName@@.Store_Beams:          @@STORE_BEAMS@@
+#!store_beams
+@@BasesName@@.LumiFileDirectory:   @@LumiFileDir@@
+#!lumifile
+
+
+# ====================================================
+# Spring info
+# ====================================================
+JSFGUI.Spring.SharedLibrary:    @@SpringModuleName@@.so
+JSF.SharedLibraries:    libJSFReadStdHep.so:libJSFBeamGeneration.so:@@SpringModuleName@@.so:libS4Utils.so:libAnlib.so:libJSFAnlib.so
+JSFGUI.Spring.ModuleName:@@SpringModuleName@@
+
+# =======================================================
+# Core parameters
+# =======================================================
+## Use RunMode=1 and EventType=2 to run spring by "jsf gui.C"
+JSFGUI.RunMode:  1
+#  runmode = 1 to generate events
+JSFGUI.EventType: 2
+#  EventType 0=Pythia, 1=debug generator 2=Bases/Spring generator
+
+JSFGUI.SimulationType: 0
+#!simtype
+# Do not run simulation, if simtype=0
+
+JSFGUI.OutputFileName:/dev/null
+#!OutputFile
+
+JSFGUI.NEventsAnalize: @@MAXEVENTS@@
+#!maxevt
+
+JSFGUI.Spring.BasesFile:bases.root
+#!basesfile
+# A file name of bases data.
+
+JSFQuickSim.ParameterFile:$(LCLIBROOT)/simjlc/param/gld_v4p.com
+
+#####################################################################
+#  BSParameters
+####################################################################
+JSFBeamGeneration.FileName:/nfs/g/ilc/soft/samples/gen/bsdata/sb2009_1000_wTF.root
+#!bsfile
+JSFBeamGeneration.ParName:500_nominal
+#!bsname
+JSFBeamGeneration.Width:0.0005
+JSFBeamGeneration.IBType:2
+#!bstype
+JSFBeamGeneration.WidthEPlus:0.0004
+#!bswEplus
+JSFBeamGeneration.WidthEMinus:0.0011
+#!bswEminus
+
+
+####################################################
+# Optional parameters for JSFWriteJSF class
+####################################################
+JSFWriteStdHep.OutputSizePerFileInkB:@@OutputSizePerFileInkB@@
+
+JSFWriteStdHep.MaxNumberOfFiles:10
+
+JSFWriteStdHep.OutputFileName:@@StdhepFileName@@
+#!stdhep
+
+JSFWriteStdHep.OutputTitle:@@StdhepTitle@@
+#!stdhep-title
+# Title of data, which is written in the stdhep file.
+
+JSFWriteStdHep.NTries:@@MAXEVENTS@@
+#!stdhep-ntries
+# Number of events in this file.
+
+JSFWriteStdHep.DebugLevel:0
+#!stdhep-debug
+#  Debug level of JSFWriteStdHep class
+
+JSFWriteStdHep.EventSource: 4
+# generator input data
+#  =0 : /hepevt/ common block
+#  =1 : /jetset/ are converted to /hepevt/ and written to stdhep
+#  =2 : JSFGeneratorBuf are stored to /hepevt/, then written to
+#       stdhep file.
+
+
+JSFWriteStdHep.ProcessID:@@ProcessID@@
+#!processid
+#  ProcessID which is written to then file, when HEPEV4
+#  is not prepared.
+#
+
+# =============================================
+# JSFHadronizer parameters
+# =============================================
+JSFHadronizer.Type: 2   # (1,2)=(0ld,new)
+JSFHadronizer.ParameterSet: 1 # Pythia parameter set (0=default, 1=DBD standard)
+
+###### CAUTION ################################################
+# The Mh should be set consistently with ZHHBases.MassH here
+# to allow Pythia to calculate branching fractions correctly!
+###############################################################
+JSFHadronizer.HiggsMass: @@HiggsMass@@    # Higgs mass for Hadronizer
+#!hmass
+JSFHadronizer.HiggsWidth: @@HiggsWidth@@  # Higgs Width for Hadronizer
+#!hwidth
+JSFHadronizer.LoadPythia:  0    # (0,1) = (not load, load) libPythia6.so
+
+JSFHadronizer.ExitOnError: 0
+JSFHadronizer.PrintDecayModeTable: 0
+#!print_decay_mode
+# To print out decay mode table activate the following line
+
+# H decay mode
+# mdcyh =  0;     // H --> all (default)
+#       =  1;     // H --> d dbar
+#       =  2;     // H --> u ubar
+#       =  3;     // H --> s sbar
+#       =  4;     // H --> c cbar
+#       =  5;     // H --> b bbar
+#       =  6;     // H --> t tbar
+#       =  7;     // H --> b' b'bar
+#       =  8;     // H --> t' t'bar
+#       =  9;     // H --> e- e+
+#       = 10;     // H --> mu- mu+
+#       = 11;     // H --> tau- tau+
+#       = 12;     // H --> tau'- tau'+
+#       = 13;     // H --> glue glue
+#       = 14;     // H --> gamma gamma
+#       = 15;     // H --> gamma Z0
+#       = 16;     // H --> Z0 Z0
+#       = 17;     // H --> W+ W-
+JSFHadronizer.DecayModeForH: @@DecayModeForH@@
+
+
+
+
+

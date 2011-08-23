@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Coy necessary files to rundirectory
+#
+
+ln -s ${TOPDIR}/@@SpringModuleDir@@/@@SpringModuleName@@.so .
+
+rm -f common.defs common.conf.in run.defs common.conf
+rm -f *~
+
+

@@ -1,0 +1,3 @@
+
+bsub -o bsub.log -J B@@ProcessID@@ "(./runBases.sh > bases.log 2>&1 )"
+
