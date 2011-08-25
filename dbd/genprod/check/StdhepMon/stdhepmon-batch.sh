@@ -1,8 +1,9 @@
 #!/bin/bash
 
-RUNINFODIR=/home/ilc/miyamoto/soft/physsim2/genprod/runinfo
+RUNINFODIR=/home/ilc/miyamoto/DBS/runinfo
 PROCIDPREFIX=p
 DATADIR=/home/ilc/miyamoto/soft/physsim2/genprod/data
+DATADIR=/nfs/g/ilc/soft/samples/gen/CDS/1000
 ISHPSS=0
 DOANAL=1
 MKFIGS=1
@@ -64,6 +65,8 @@ for i in `seq $1 $2 ` ; do
   runinfo=${RUNINFODIR}/${pid}.txt
   if [ -e ${runinfo} ] ; then
     runone ${pid}
+  else
+    echo "$runinfo does not exist"
   fi
 done
 
