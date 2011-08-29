@@ -1,0 +1,11 @@
+program_name_version=physsim_110706
+pythia_version=6.422
+stdhep_version=5-06-01
+OS_version_build=2.6.18-164.el5;x86_64/GNU/Linux
+OS_version_run=2.6.18-164.el5;x86_64/GNU/Linux
+libc_version=glibc-2.5-58.el5_6.2.x86_64
+fortran_version=gfortran-4.4.0.20090414
+hadronisation_tune=OPAL
+tau_decay=tauola
+beam_particle1=e1
+beam_particle2=E1
