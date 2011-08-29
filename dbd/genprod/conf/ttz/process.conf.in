@@ -1,0 +1,10 @@
+# ==============================================
+# TTBB specific parameters
+# =============================================
+
+TTZBases.ZModesLo:	@@ZModesLo@@
+#!zmodeslo
+TTZBases.ZModesHi:	@@ZModesHi@@
+#!zmodeshi
+
+
