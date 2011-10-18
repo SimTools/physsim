@@ -149,7 +149,7 @@ C--
 C-- W.
       XW1 = XW1MN + Z(13)*(XW1MX-XW1MN)
       DO 200 IMD = IMDMN, IMDMX
-         IF ( XW1.LT.BRVDK(IMD,1) )              GO TO 210
+         IF ( XW1.LE.BRVDK(IMD,1) )              GO TO 210
 200   CONTINUE
 C--
 210   IDPTCL(1,5) = MDVDK(2,IMD,1)
@@ -215,6 +215,7 @@ C-- q^2_W.
 C-- Xi_lo.
       XILO  = LOG( (Q3-AME)*(Q3+AME)/S )
       XIHI  = LOG( 1 - 2*AME/RS )
+      XILO  = MIN(XIHI,XILO)
       XI    = XILO + (XIHI-XILO)*Z(5)
       WAT   = WAT*(XIHI-XILO)
       EXPXI = EXP(XI)
