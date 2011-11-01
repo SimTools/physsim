@@ -61,6 +61,26 @@ mkrunfiles()
   rm -f ${sedfile}
 }
 
+
+#====================================================
+polstr()
+{
+cat <<EOF | python - $1
+import sys
+argvs=sys.argv
+polstr="R"
+epol=float(argvs[1])
+if epol < 0.0 :
+  polstr="L"
+polval=int(abs(epol)*100.0)
+if polval > 99 :
+  print polstr
+else :
+  print polstr+str(polval)
+EOF
+
+}
+
 # =============================================
 mkrundef()
 {
@@ -68,6 +88,11 @@ mkrundef()
   echo "ProcessID=${pid}" > ${out}
   echo "PolElectron=${epol}" >> ${out}
   echo "PolPositron=${ppol}" >> ${out}
+
+  beampara="E1000-Aug312010"
+  genvers="Gp01-02"
+  epolstr=e`polstr ${epol}`
+  ppolstr=p`polstr ${ppol}`
 
   case "${ttmodes}" in 
     "all") echo "WmModesLo=1" >> ${out} ;
@@ -118,8 +143,10 @@ mkrundef()
       exit -1
    esac
 
-   echo "StdhepTitle=physsim-${process}-${ttmodes}_${hmodes}" >> ${out}
-   echo "StdhepFileName=p${pid}" >> ${out}
+   prstr=${process}-${ttmodes}-${hmodes}
+   echo "StdhepTitle=physsim-${prstr}" >> ${out}
+#   echo "StdhepFileName=p${pid}" >> ${out}
+   echo "StdhepFileName=${beampara}.P${prstr}.${epolstr}.${ppolstr}.${genvers}.I${pid}"
    echo "MAXEVENTS=${_MAXEVENTS}" >> ${out}
 }
 
@@ -170,7 +197,7 @@ while read line ; do
   if [ "x${line:0:1}" == "x#" -o "x${line:0:1}" == "x" ] ; then continue ; fi
   echo "mkfiles ${line}"
   mkfiles ${line}
-done < ${CONFDIR}/common/process.list
+done < ${processlist}
 
 ( 
 cd ${JOBDIR} 
