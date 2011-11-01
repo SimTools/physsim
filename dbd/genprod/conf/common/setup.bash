@@ -10,12 +10,12 @@
 
 export LC_RELEASE=1.46
 # export LC_RELEASE_DIR=/proj/soft/Release/$LC_RELEASE
-export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/110421
-export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/110706
+# export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/110421
+export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/110829
 #
 utildir=/nfs/g/ilc/soft/utils64
 . ${utildir}/gf44.setup
-export ROOTSYS=${utildir}/root/5.26.00c
+export ROOTSYS=${utildir}/root/5.28.00c
 export G4INSTALL=${utildir}/g4/geant4.9.3.p02
 # export LCIO=${utildir}/../ilcsoft/x86_64-sl5/v01-09/lcio/v01-51-02
 export LCIO=${utildir}/lcio/v01-51-02
@@ -38,6 +38,8 @@ export URANUSROOT=$LC_RELEASE_DIR/Uranus
 export SOSYMLINK=true
 
 
+# Define following environment parameters to build JSF with Whizard 
+# for DBD studies
 export WHIZDIR=/home/ilc/miyamoto/soft/whizard/Whizard_1.95
 # export utiltau=/home/ilc/miyamoto/soft/physsim2
 export utils=/nfs/g/ilc/soft/utils64
