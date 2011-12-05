@@ -9,7 +9,8 @@
 //*    e+e- -> STUSTU generator
 //*
 //* (Update Record)
-//*    2011/02/13  K.Fujii	Original version.
+//*    2011/02/13  K.Fujii      Original version.
+//*    2011/12/05  T.Suehara    Option to set random seed
 //*
 //*****************************************************************************
 
@@ -39,6 +40,11 @@ public:
   STUSTUBases(const char *name  = "STUSTUBases", 
               const char *title = "STUSTU Bases");
   virtual ~STUSTUBases();
+
+  // ----------------------
+  //  Set random seed
+  // ----------------------
+  void SetSeed(int seed){GetRan1()->SetSeed(seed);}
 
   // ----------------------
   //  Getters and Setters
