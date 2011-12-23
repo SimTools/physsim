@@ -85,7 +85,7 @@ ZHHSpring::ZHHSpring(const char *name, const char *title,
 //_____________________________________________________________________________
 ZHHSpring::~ZHHSpring()
 {
-  if( !fEventBuf ) delete fEventBuf;
+  //if( !fEventBuf ) delete fEventBuf;
 }
 
 

@@ -58,8 +58,8 @@ WWHSpring::WWHSpring(const char *name,
 // --------------------------
 WWHSpring::~WWHSpring()
 {
-  delete fEventBuf;
-  delete GetBases();
+  //delete fEventBuf;
+  //delete GetBases();
 }
 
 //_____________________________________________________________________________

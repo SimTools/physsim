@@ -58,8 +58,8 @@ ZZHSpring::ZZHSpring(const char *name,
 // --------------------------
 ZZHSpring::~ZZHSpring()
 {
-  delete fEventBuf;
-  delete GetBases();
+  //delete fEventBuf;
+  //delete GetBases();
 }
 
 //_____________________________________________________________________________

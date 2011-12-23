@@ -55,8 +55,8 @@ NNHSpring::NNHSpring(const char      *name,
 // --------------------------
 NNHSpring::~NNHSpring()
 {
-  delete fEventBuf;
-  delete GetBases();
+  //delete fEventBuf;
+  //delete GetBases();
 }
 
 //_____________________________________________________________________________
