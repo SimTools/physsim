@@ -70,8 +70,8 @@ ZHSpring::ZHSpring(const char      *name,
 // --------------------------
 ZHSpring::~ZHSpring()
 {
-  delete fEventBuf;
-  delete GetBases();
+  //delete fEventBuf;   // JSFSpring takes care of deleting these
+  //delete GetBases();
 }
 
 //_____________________________________________________________________________
