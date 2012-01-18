@@ -16,7 +16,9 @@ Initialize()
   if [ "x${jobdir}" != "x" ] ; then JOBDIR=${jobdir} ; fi
 
   CONFDIR=${TOPDIR}/genprod/conf
-  processlist=${CONFDIR}/common/process.list
+#   processlist=${CONFDIR}/common/process.list
+  processlist=${PWD}/process.list
+
   read -p "Process list file ? [${processlist}] : " processlist_in
   if [ "x${processlist_in}" != "x" ] ; then processlist=${processlist_in} ; fi
   
@@ -85,12 +87,15 @@ EOF
 mkrundef()
 {
   out=$1
+  conffile=$2
   echo "ProcessID=${pid}" > ${out}
   echo "PolElectron=${epol}" >> ${out}
   echo "PolPositron=${ppol}" >> ${out}
 
-  beampara="E1000-Aug312010"
-  genvers="Gp01-02"
+#  beampara="E1000-Aug312010"
+#  genvers="Gp01-02"
+  beampara=`grep beampara ${conffile} | cut -d"=" -f2 `
+  genvers=`grep genvers ${conffile} | cut -d"=" -f2`
   epolstr=e`polstr ${epol}`
   ppolstr=p`polstr ${ppol}`
 
@@ -145,8 +150,7 @@ mkrundef()
 
    prstr=${process}-${ttmodes}-${hmodes}
    echo "StdhepTitle=physsim-${prstr}" >> ${out}
-#   echo "StdhepFileName=p${pid}" >> ${out}
-   echo "StdhepFileName=${beampara}.P${prstr}.${epolstr}.${ppolstr}.${genvers}.I${pid}"
+   echo "StdhepFileName=${beampara}.P${prstr}.${epolstr}.${ppolstr}.${genvers}.I${pid}" >> ${out}
    echo "MAXEVENTS=${_MAXEVENTS}" >> ${out}
 }
 
@@ -164,7 +168,7 @@ mkfiles()
   hmodes=`echo $Hmodes | tr [:upper:] [:lower:]`
   ttmodes=`echo $Ttmodes | tr [:upper:] [:lower:]`
 
-  processstr=p${pid}
+  processstr=${pid}
   rundir=${JOBDIR}/${processstr}
   origdir=`pwd`
 
@@ -180,16 +184,20 @@ mkfiles()
   cd ${rundir}
 
   cp -rp ${CONFDIR}/common/* ./  
+  rm -rf CVS
   cat ${CONFDIR}/${process}/process.conf.in \
       ${CONFDIR}/common/common.conf.in > jsf.conf.in
-  cp -p  ${CONFDIR}/dbs/common.defs  runinfo_common.defs
-  mkrundef run.defs 
+  genvers=`grep genvers ${CONFDIR}/common/common.defs | cut -d"=" -f2`
+  sed -e "s/@@genvers@@/${genvers:2}/" ${CONFDIR}/dbs/common.defs.in > runinfo_common.defs 
+#    cp -p  ${CONFDIR}/dbs/common.defs  runinfo_common.defs
+  mkrundef run.defs ${CONFDIR}/common/common.defs
   mkrunfiles ${CONFDIR}/${process}/process.defs ${CONFDIR}/common/common.defs run.defs
 
   cd ${origdir}
 
 }
 
+# ===========================================================================
 
 Initialize
 
@@ -201,6 +209,6 @@ done < ${processlist}
 
 ( 
 cd ${JOBDIR} 
-  echo "for d in p* ; do ( cd \${d} && . subAll.sh ) ; done " > allsub.sh 
+  echo "for d in 1* ; do ( cd \${d} && . subAll.sh ) ; done " > allsub.sh 
 )
 
