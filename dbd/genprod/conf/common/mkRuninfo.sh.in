@@ -62,6 +62,6 @@ anallog()
   echo "logurl=${runinfo_logurl}/p${processID}"
 }
 
-anallog `pwd` @@RUNINFO_FILEURL@@  @@RUNINFO_LOGURL@@  > p@@ProcessID@@.txt
+anallog `pwd` @@RUNINFO_FILEURL@@  @@RUNINFO_LOGURL@@  > @@ProcessID@@.txt
 
 

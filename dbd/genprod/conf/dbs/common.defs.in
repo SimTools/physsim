@@ -1,4 +1,4 @@
-program_name_version=physsim_110706
+program_name_version=physsim_@@genvers@@
 pythia_version=6.422
 stdhep_version=5-06-01
 OS_version_build=2.6.18-164.el5;x86_64/GNU/Linux

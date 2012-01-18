@@ -9,12 +9,10 @@
 #######################################################
 
 export LC_RELEASE=1.46
-# export LC_RELEASE_DIR=/proj/soft/Release/$LC_RELEASE
-# export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/110421
-export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/110829
-#
+export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/120111
 utildir=/nfs/g/ilc/soft/utils64
 . ${utildir}/gf44.setup
+#
 export ROOTSYS=${utildir}/root/5.28.00c
 export G4INSTALL=${utildir}/g4/geant4.9.3.p02
 # export LCIO=${utildir}/../ilcsoft/x86_64-sl5/v01-09/lcio/v01-51-02
