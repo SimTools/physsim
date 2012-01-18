@@ -169,12 +169,13 @@ C
           rbuf( 1) = npt
           rbuf( 2) = -11
           rbuf( 4) = -1.0
+          rbuf( 3) = AMF(1,2,1)
+          rbuf( 7) = SQRT( (BMENGY(ipe)+AME)*(BMENGY(ipe)-AME))
           if( ipe.eq.2 .or. ipe.eq.4 ) then
             rbuf(2)=11
             rbuf( 4)=1.0
+            rbuf( 7)= -rbuf(7)
           endif
-          rbuf( 3) = AMF(1,2,1)
-          rbuf( 7) = SQRT( (BMENGY(ipe)+AME)*(BMENGY(ipe)-AME))
           rbuf( 8) = BMENGY(ipe)
           rbuf(12) = 0
           rbuf(13) = 0
