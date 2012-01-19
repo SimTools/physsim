@@ -4,6 +4,11 @@ RUNINFODIR=/home/ilc/miyamoto/DBS/runinfo
 PROCIDPREFIX=p
 DATADIR=/home/ilc/miyamoto/soft/physsim2/genprod/data
 DATADIR=/nfs/g/ilc/soft/samples/gen/CDS/1000
+
+PROCIDPREFIX=
+DATADIR=/nfs/g/ilc/soft/samples/gen/CDS/1000-2
+DATADIR=/home/ilc/miyamoto/work/120111-physsim/jobs/stdhep
+
 ISHPSS=0
 DOANAL=1
 MKFIGS=1
@@ -31,14 +36,16 @@ if [ $ISHPSS -eq 1 ] ; then
   file0=`ls scratch | grep $pid`
   file=scratch/${file0}
 else
-  file=${DATADIR}/${pid}_01.stdhep
+  filename=`/bin/ls ${DATADIR} | grep ${pid}_01.stdhep`
+  file=${DATADIR}/${filename}
+  fnpref=`basename ${filename} .stdhep` 
 fi
 
 echo $file
 
 if [ $DOANAL -eq 1 ] ; then
   mkdir -p root
-  outfile=root/${pid}.root
+  outfile=root/${fnpref}.root
   jsf -b -q --maxevt=1000000000 --stdhep=${file} \
     --runinfo=${RUNINFODIR} \
     --OutputFile=${outfile} gui.C
@@ -50,7 +57,7 @@ fi
 if [ $MKFIGS -eq 1 ] ; then
   runinfo=${RUNINFODIR}/${pid}.txt
   procname=`grep process_name ${runinfo} | cut -d"=" -f2 | sed -e "s/ *//g" `
-  jsf -b -q "plotfig.C(\"$pid\",\"$procname\")" 
+  jsf -b -q "plotfig.C(\"$pid\",\"$procname\",\"${fnpref}\")" 
 #    rm -f ${outfile}
 fi
 
