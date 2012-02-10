@@ -151,6 +151,7 @@ C--
 C Store initial electron, if NS_BEAMS==1
 C--
       IRELOFF = 0
+      IRELOFFPY = 0
       if( ns_beams .eq. 1 ) then
 C        if( NS_REMNANTS .NE. 0 ) then
 C          print *,'Fatal error in spevnt  NS_REMNANTS should be 1',
@@ -167,12 +168,12 @@ C
           npt=npt+1
           call uvzero( 20, rbuf)
           rbuf( 1) = npt
-          rbuf( 2) = -11
+          rbuf( 2) = 11
           rbuf( 4) = -1.0
           rbuf( 3) = AMF(1,2,1)
           rbuf( 7) = SQRT( (BMENGY(ipe)+AME)*(BMENGY(ipe)-AME))
           if( ipe.eq.2 .or. ipe.eq.4 ) then
-            rbuf(2)=11
+            rbuf(2)=-11
             rbuf( 4)=1.0
             rbuf( 7)= -rbuf(7)
           endif
@@ -186,7 +187,7 @@ C
             CALL SLPRNT(NEVENT,NPT,RBUF(1))
           ENDIF
 6020    continue
-CC         IRELOFF=IRELOFF+2
+        IRELOFF=IRELOFF+2
       endif
 
 C--
@@ -205,7 +206,7 @@ C output ISR Photons
         rbuf( 6) = pvout(2,13)
         rbuf( 7) = pvout(3,13)
         rbuf( 8) = pvout(0,13)
-        rbuf(20) = 600 + IRELOFF
+        rbuf(20) = 600 + IRELOFFPY
         if( NS_BEAMS .EQ. 1 ) rbuf(14)=1
         call tbput(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
         IF ( NEVENT.LE.NPRINT ) THEN
@@ -222,13 +223,14 @@ C output ISR Photons
         rbuf( 6) = pvout(2,14)
         rbuf( 7) = pvout(3,14)
         rbuf( 8) = pvout(0,14)
-        rbuf(20) = 601 + IRELOFF
+        rbuf(20) = 601 + IRELOFFPY
         if( NS_BEAMS .EQ. 1 ) rbuf(14)=2
         call tbput(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
         IF ( NEVENT.LE.NPRINT ) THEN
            CALL SLPRNT(NEVENT,NPT,RBUF(1))
         ENDIF
         IRELOFF=IRELOFF+2
+        IRELOFFPY= IRELOFFPY+2
 
       endif
 #endif
@@ -339,7 +341,7 @@ C--
          RBUF(18) =   2
          RBUF(19) =   101
       ENDIF
-      RBUF(20) = 601 + IRELOFF
+      RBUF(20) = 601 + IRELOFFPY
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -397,7 +399,7 @@ C--
          RBUF(18) =   2
          RBUF(19) =   102
       ENDIF
-      RBUF(20)    = 600 + IRELOFF
+      RBUF(20)    = 600 + IRELOFFPY
       CALL TBPUT(1,'Spring:Parton_List',NPT, 20, RBUF, IRT )
       IF ( NEVENT.LE.NPRINT ) THEN
          CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -457,8 +459,8 @@ C--
          RBUF(17) =   IHLCMB(IPT)
          RBUF(18) =   3
          RBUF(19) =   (LQ-1)*201
-         RBUF(20) =   605 + IRELOFF
-         IF( IPT .EQ. 5 ) RBUF(20) = 604 + IRELOFF
+         RBUF(20) =   605 + IRELOFFPY
+         IF( IPT .EQ. 5 ) RBUF(20) = 604 + IRELOFFPY
          CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
          IF ( NEVENT.LE.NPRINT ) THEN
             CALL SLPRNT(NEVENT,NPT,RBUF(1))
@@ -490,7 +492,7 @@ C--
          RBUF(17) =   IHLCMB(IPT)
          RBUF(18) =   4
          RBUF(19) =   (LQ-1)*301
-         RBUF(20) = IPT-5+IRELOFF+600
+         RBUF(20) = IPT-5+IRELOFFPY+600
          CALL TBPUT(1,'Spring:Parton_List',NPT,20,RBUF,IRT)
          IF ( NEVENT.LE.NPRINT ) THEN
             CALL SLPRNT(NEVENT,NPT,RBUF(1))

@@ -260,16 +260,12 @@ void ShowTitle()
 
 // ==================================================================
 // Int_t plotfig(const char* procid="w100689", const char* procname="ssbb_o")
-Int_t plotfig(const char* procid="w100375", const char* procname="n1e1e1n1_o",
-	      const char* fnpref="")
+Int_t plotfig(const char* procid="w100375", const char* procname="n1e1e1n1_o")
 {
-
-  JSFSteer *gJSF=JSFSteer::Instance();
 
   gDBSDir=std::string(gJSF->Env()->GetValue("RunInfoDir","/home/ilc/miyamoto/DBS/runinfo"));
 
-//   ginfile=root_dir+string(procid)+string(".root");
-  ginfile=root_dir+string(fnpref)+string(".root");
+  ginfile=root_dir+string(procid)+string(".root");
   gprocinfo=string(procid)+string(" ")+string(procname);
   gprocid=string(procid);
 

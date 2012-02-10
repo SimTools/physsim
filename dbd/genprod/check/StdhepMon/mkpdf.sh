@@ -1,8 +1,8 @@
 #!/bin/bash
 
-SEQBGN=106301
-SEQEND=106352
-PREF=
+SEQBGN=106001
+SEQEND=106052
+PREF=p
 
 mkpdf()
 {
