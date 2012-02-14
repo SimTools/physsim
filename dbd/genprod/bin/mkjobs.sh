@@ -4,8 +4,9 @@
 Initialize()
 {
   TOPDIR=${KFLIBROOT}/dbd
+  TOPDIR=`pwd`/dbd
   JOBDIR=${TOPDIR}/jobs
-  _MAXEVENTS=50000
+  _MAXEVENTS=51000
 
   echo "mkjob.sh : creates directories to run physsim jobs."
   echo "All path should be given in absolute path. Otherwise it may not run correctly."
@@ -92,12 +93,16 @@ mkrundef()
   echo "PolElectron=${epol}" >> ${out}
   echo "PolPositron=${ppol}" >> ${out}
 
-#  beampara="E1000-Aug312010"
-#  genvers="Gp01-02"
   beampara=`grep beampara ${conffile} | cut -d"=" -f2 `
   genvers=`grep genvers ${conffile} | cut -d"=" -f2`
-  epolstr=e`polstr ${epol}`
-  ppolstr=p`polstr ${ppol}`
+  epolw=`polstr ${epol}`
+  ppolw=`polstr ${ppol}`
+  echo "PolElectron=${epolw}" >> ${out}
+  echo "PolPositron=${ppolw}" >> ${out}
+  echo "BeamPara=${beampara}" >> ${out}
+
+  epolstr=e${epolw}
+  ppolstr=p${ppolw}
 
   case "${ttmodes}" in 
     "all") echo "WmModesLo=1" >> ${out} ;
@@ -150,7 +155,7 @@ mkrundef()
 
    prstr=${process}-${ttmodes}-${hmodes}
    echo "StdhepTitle=physsim-${prstr}" >> ${out}
-   echo "StdhepFileName=${beampara}.P${prstr}.${epolstr}.${ppolstr}.${genvers}.I${pid}" >> ${out}
+   echo "StdhepFileName=${beampara}.P${prstr}.${epolstr}.${ppolstr}.Gphyssim_${genvers}.I${pid}" >> ${out}
    echo "MAXEVENTS=${_MAXEVENTS}" >> ${out}
 }
 
@@ -188,9 +193,10 @@ mkfiles()
   cat ${CONFDIR}/${process}/process.conf.in \
       ${CONFDIR}/common/common.conf.in > jsf.conf.in
   genvers=`grep genvers ${CONFDIR}/common/common.defs | cut -d"=" -f2`
-  sed -e "s/@@genvers@@/${genvers:2}/" ${CONFDIR}/dbs/common.defs.in > runinfo_common.defs 
+  sed -e "s/@@genvers@@/${genvers}/" ${CONFDIR}/dbs/common.defs.in > runinfo_common.defs 
 #    cp -p  ${CONFDIR}/dbs/common.defs  runinfo_common.defs
   mkrundef run.defs ${CONFDIR}/common/common.defs
+#   echo "ProcessName=${process}" >> run.defs
   mkrunfiles ${CONFDIR}/${process}/process.defs ${CONFDIR}/common/common.defs run.defs
 
   cd ${origdir}

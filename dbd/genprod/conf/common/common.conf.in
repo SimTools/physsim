@@ -103,7 +103,7 @@ JSFBeamGeneration.WidthEMinus:0.0011
 ####################################################
 JSFWriteStdHep.OutputSizePerFileInkB:@@OutputSizePerFileInkB@@
 
-JSFWriteStdHep.MaxNumberOfFiles:10
+JSFWriteStdHep.MaxNumberOfFiles:50
 
 JSFWriteStdHep.OutputFileName:@@StdhepFileName@@
 #!stdhep
@@ -137,6 +137,7 @@ JSFWriteStdHep.ProcessID:@@ProcessID@@
 JSFWriteStdHep.CrossingAngle: 10.0
 #!xangle
 
+JSFWriteStdHep.FileExtentionSeparator:.0
 
 # =============================================
 # JSFHadronizer parameters

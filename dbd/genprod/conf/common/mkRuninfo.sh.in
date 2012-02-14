@@ -8,8 +8,9 @@ getNumberOfEvents()
   typeset -i ibgn iout inow
   local loop=0
   ibgn=0
-#  grep "Last event number" ${logfile} | sed -e "s/of this file is/:/g" | cut -d":" -f2 | \
-  grep "Number of write events" ${logfile} | cut -d":" -f2 | \
+#   grep "Number of write events" ${logfile} | cut -d":" -f2 | \
+#
+  grep "Last event number" ${logfile} | sed -e "s/of this file is/:/g" | cut -d":" -f2 | \
   while read inow ; do
      iout=${inow}-${ibgn}
      if [ $loop -eq 0 ] ; then 
@@ -21,6 +22,35 @@ getNumberOfEvents()
      ibgn=${inow}
   done
 }
+
+#====================================================
+polstr()
+{
+cat <<EOF | python - $1
+import sys
+argvs=sys.argv
+polstr="R"
+epol=float(argvs[1])
+if epol < 0.0 :
+  polstr="L"
+polval=int(abs(epol)*100.0)
+if polval > 99 :
+  print polstr
+else :
+  print polstr+str(polval)
+EOF
+
+}
+
+#=====================================================
+edit_filenames()
+{
+  alllog=$1
+  grep stdhep ${alllog} | grep "Output file" | cut -d" " -f8 \
+  while read filename ; do 
+   
+
+
 
 # =====================================================================
 anallog()
@@ -36,8 +66,10 @@ anallog()
   echo "process_type=`grep Stdhep ${alllog} | grep "Output File Title" | cut -d":" -f2 | sed -e "s/^ *//" `"
   echo "CM_energy_in_GeV=`grep ROOTS ${alllog} | head -1 | cut -d"=" -f2 | sed -e "s/^ *//"`"
   cat runinfo_common.defs
-  echo "polarization1=`grep PolElectron ${alllog} | head -1 | cut -d'=' -f 2 | sed -e 's/^ *//'` "
-  echo "polarization2=`grep -e PolPositorn -e PolPositron ${alllog} | head -1 | cut -d'=' -f 2 | sed -e 's/^ *//'` "
+  pol1=`grep PolElectron ${alllog} | head -1 | cut -d'=' -f 2 | sed -e 's/^ *//'` 
+  pol2=`grep -e PolPositorn -e PolPositron ${alllog} | head -1 | cut -d'=' -f 2 | sed -e 's/^ *//'`
+  echo "polarization1=`polstr ${pol1}`"
+  echo "polarization2=`polstr ${pol2}`"
   xsecstr=`grep "Total Cross section" ${alllog} | cut -d'=' -f 2 | sed -e 's/^ *//'` 
   xsecdat=`echo ${xsecstr} | cut -d" " -f 1`
   xsecerr=`echo ${xsecstr} | cut -d" " -f 3`
@@ -48,10 +80,11 @@ anallog()
   echo "cross_section_in_fb=${xsecdat}"
   echo "cross_section_error_in_fb=${xsecerr}"
   lumidir=`grep "Lumi File Directory" ${alllog} | head -1 | cut -d":" -f2 | sed -e "s/^ *//g" `
-  luminum=`grep "(ISRBM)" ${alllog} | head -1 | sed -e "s/=1/=0/" | cut -d"=" -f2 `
+  luminum=`grep "(ISRBM)" ${alllog} | head -1 | sed -e "s/=1/=0/" | cut -d"=" -f2 | sed -e "s/^0*//" `
 
-  echo "lumi_file=${lumidir}/lumi_linker_${luminum}"
-  echo "file_type=stdhep"
+#  echo "lumi_file=${lumidir}/lumi_linker_${luminum}"
+  echo "lumi_linker_number=${luminum}"
+  echo "file_type=stdhep24"
   echo "total_number_of_events=${nevtotal}"
   numfiles=`grep " Last file number " ${alllog} | cut -d":" -f2 | sed -e "s/^ //g" `
   echo "number_of_files=${numfiles}"
@@ -62,6 +95,6 @@ anallog()
   echo "logurl=${runinfo_logurl}/p${processID}"
 }
 
-anallog `pwd` @@RUNINFO_FILEURL@@  @@RUNINFO_LOGURL@@  > @@ProcessID@@.txt
+anallog `pwd` @@RUNINFO_FILEURL@@  @@RUNINFO_LOGURL@@  > @@StdhepFileName@@.txt
 
 

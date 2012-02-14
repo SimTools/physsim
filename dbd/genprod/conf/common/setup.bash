@@ -9,7 +9,7 @@
 #######################################################
 
 export LC_RELEASE=1.46
-export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/120111
+export LC_RELEASE_DIR=/home/ilc/miyamoto/soft/MyRelease/120214
 utildir=/nfs/g/ilc/soft/utils64
 . ${utildir}/gf44.setup
 #
