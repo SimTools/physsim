@@ -17,7 +17,6 @@ Initialize()
   if [ "x${jobdir}" != "x" ] ; then JOBDIR=${jobdir} ; fi
 
   CONFDIR=${TOPDIR}/genprod/conf
-#   processlist=${CONFDIR}/common/process.list
   processlist=${PWD}/process.list
 
   read -p "Process list file ? [${processlist}] : " processlist_in
@@ -178,7 +177,6 @@ mkfiles()
   origdir=`pwd`
 
   if [ -e ${rundir} ] ; then
-#    rm -rf ${rundir}
     echo "Output directory, ${rundir}, exist already."
     echo "Delete output directory first."
     exit
@@ -194,13 +192,12 @@ mkfiles()
       ${CONFDIR}/common/common.conf.in > jsf.conf.in
   genvers=`grep genvers ${CONFDIR}/common/common.defs | cut -d"=" -f2`
   sed -e "s/@@genvers@@/${genvers}/" ${CONFDIR}/dbs/common.defs.in > runinfo_common.defs 
-#    cp -p  ${CONFDIR}/dbs/common.defs  runinfo_common.defs
   mkrundef run.defs ${CONFDIR}/common/common.defs
-#   echo "ProcessName=${process}" >> run.defs
   mkrunfiles ${CONFDIR}/${process}/process.defs ${CONFDIR}/common/common.defs run.defs
+  stdhepfilename=`grep StdhepFileName run.defs | cut -d"=" -f2 `
 
   cd ${origdir}
-
+  mv ${rundir} ${JOBDIR}/${stdhepfilename}
 }
 
 # ===========================================================================
@@ -215,6 +212,6 @@ done < ${processlist}
 
 ( 
 cd ${JOBDIR} 
-  echo "for d in 1* ; do ( cd \${d} && . subAll.sh ) ; done " > allsub.sh 
+  echo "for d in E* ; do ( cd \${d} && . subAll.sh ) ; done " > allsub.sh 
 )
 

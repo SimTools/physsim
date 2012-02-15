@@ -42,16 +42,6 @@ EOF
 
 }
 
-#=====================================================
-edit_filenames()
-{
-  alllog=$1
-  grep stdhep ${alllog} | grep "Output file" | cut -d" " -f8 \
-  while read filename ; do 
-   
-
-
-
 # =====================================================================
 anallog()
 {
@@ -92,7 +82,7 @@ anallog()
   echo "file_names=${fnames}"
   echo "number_of_events_in_files=`getNumberOfEvents ${alllog}` "
   echo "fileurl=${runinfo_fileurl}"
-  echo "logurl=${runinfo_logurl}/p${processID}"
+  echo "logurl=${runinfo_logurl}/@@StdhepFileName@@"
 }
 
 anallog `pwd` @@RUNINFO_FILEURL@@  @@RUNINFO_LOGURL@@  > @@StdhepFileName@@.txt

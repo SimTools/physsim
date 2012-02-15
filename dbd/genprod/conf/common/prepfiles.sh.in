@@ -5,7 +5,8 @@
 
 ln -s ${TOPDIR}/@@SpringModuleDir@@/@@SpringModuleName@@.so .
 
-rm -f common.defs common.conf.in run.defs common.conf
+# rm -f common.defs common.conf.in run.defs common.conf
+rm -f common.defs common.conf.in common.conf
 rm -f *~
 
 
