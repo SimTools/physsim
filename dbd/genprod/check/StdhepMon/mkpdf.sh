@@ -1,8 +1,8 @@
 #!/bin/bash
 
-SEQBGN=106001
-SEQEND=106052
-PREF=p
+SEQBGN=106401
+SEQEND=106452
+PREF=
 
 mkpdf()
 {
@@ -17,14 +17,17 @@ mkpdf()
 }
 
 mkdir -p pdf
+filelist=`pwd`/filelist.txt
 
 (
 cd log
 for i in `seq $SEQBGN $SEQEND` ; do
   pid=${PREF}${i}
+  echo $pid
   if [ -e ${pid}-part.png ] ; then
     mkpdf ${pid}
-    mv -v ${pid}.pdf ../pdf
+    newname=`grep I${pid} $filelist`
+    mv -v ${pid}.pdf ../pdf/${newname}.pdf
   fi
 done
 )

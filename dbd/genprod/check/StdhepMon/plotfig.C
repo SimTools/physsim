@@ -8,7 +8,7 @@ string logfile_dir=string("log/");
 string gprocinfo;
 string ginfile;
 string gprocid;
-string gDBSdir("/home/ilc/miyamoto/DBS/runinfo/");
+string gDBSDir("/home/ilc/miyamoto/DBS/runinfo/");
 
 vector<string> gFigs;
 
@@ -234,23 +234,24 @@ Int_t Plotfig_part()
 }
 
 // ==================================================================
-void ShowTitle()
+void ShowTitle(const char* fnpref)
 {
-  string runinfo=gDBSdir+gprocid+string(".txt");
+//  string runinfo=gDBSdir+gprocid+string(".txt");
+  string runinfo=gDBSDir+string("/")+string(fnpref)+string(".txt");
   ifstream ifs(runinfo.data());
   string line;
   TCanvas *ct=new TCanvas("ct","Title",1000,800);
 
   string titlemsg=string("Generator file information: ") + gprocinfo;
-  TLatex *tx0=new TLatex(0.05,0.95,titlemsg.data());
+  TLatex *tx0=new TLatex(0.01,0.95,titlemsg.data());
   tx0->Draw();
 
-  Double_t xpos=0.1;
+  Double_t xpos=0.01;
   Double_t ypos=0.90;
   Double_t dy=0.03;
   while ( ifs && getline(ifs,line) ) {
     TLatex *txt=new TLatex(xpos,ypos,line.data());
-    txt->SetTextSize(0.03); 
+    txt->SetTextSize(0.02); 
     txt->Draw();
     ypos-=dy;
   }
@@ -260,16 +261,19 @@ void ShowTitle()
 
 // ==================================================================
 // Int_t plotfig(const char* procid="w100689", const char* procname="ssbb_o")
-Int_t plotfig(const char* procid="w100375", const char* procname="n1e1e1n1_o")
+Int_t plotfig(const char* procid="w100375", const char* procname="n1e1e1n1_o",
+	      const char* fnpref="")
 {
+
+  JSFSteer *gJSF=new JSFSteer();
 
   gDBSDir=std::string(gJSF->Env()->GetValue("RunInfoDir","/home/ilc/miyamoto/DBS/runinfo"));
 
-  ginfile=root_dir+string(procid)+string(".root");
+  ginfile=root_dir+string(fnpref)+string(".root");
   gprocinfo=string(procid)+string(" ")+string(procname);
   gprocid=string(procid);
 
-  ShowTitle();
+  ShowTitle(fnpref);
   Plotfig_part();
   Plotfig_event();
 
