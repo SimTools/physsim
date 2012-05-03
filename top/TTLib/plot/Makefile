@@ -2,7 +2,7 @@ PROGRAM1 = pltgrq
 PROGRAM2 = pltsg0
 OBJS     = sgtt0.o gmthet.o gqtabl.o
 
-FC = gfortran -m32
+FC = $(shell jsf-config --fc) $(shell jsf-config --bits)
 FFLAGS = -fno-automatic
 
 all: $(PROGRAM1) $(PROGRAM2)
