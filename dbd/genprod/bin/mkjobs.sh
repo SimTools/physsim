@@ -137,13 +137,13 @@ mkrundef()
   
   case "${hmodes}" in
     "zqq") echo "ZModesLo=7" >> ${out} ;  echo "ZModesHi=12" >> ${out} ;
-	   echo "DecayModesForH=0" >> ${out} ;;
+	   echo "DecayModeForH=0" >> ${out} ;;
     "zll") echo "ZModesLo=4" >> ${out} ;  echo "ZModesHi=6" >> ${out} ;
-	   echo "DecayModesForH=0" >> ${out} ;;
+	   echo "DecayModeForH=0" >> ${out} ;;
     "znn") echo "ZModesLo=1" >> ${out} ;  echo "ZModesHi=3" >> ${out} ;
-	   echo "DecayModesForH=0" >> ${out} ;;
-    "gbb") echo "DecayModesForH=0" >> ${out} ;;
-    "hbb") echo "DecayModesForH=5" >> ${out} ;;
+	   echo "DecayModeForH=0" >> ${out} ;;
+    "gbb") echo "DecayModeForH=0" >> ${out} ;;
+    "hbb") echo "DecayModeForH=5" >> ${out} ;;
     "hnonbb") echo "DecayModeForH=105" >> ${out} ;;
     "all") echo "DecayModeForH=0" >> ${out} ;
            echo "ZModesLo=1" >> ${out} ; echo "ZModesHi=12" >> ${out} ;;

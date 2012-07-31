@@ -1,3 +1,3 @@
 
-bsub -o ssub.log -J S@@ProcessID@@ "(./runSpring.sh > spring.log 2>&1 )"
+bsub -o ssub.log -q l -J S@@ProcessID@@ "(./runSpring.sh > spring.log 2>&1 )"
 

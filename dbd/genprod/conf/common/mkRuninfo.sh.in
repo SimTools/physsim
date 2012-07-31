@@ -43,6 +43,36 @@ EOF
 }
 
 # =====================================================================
+getXsect()
+{
+  alllog=$1
+  process_name=$2
+  xsecstr=`grep "Total Cross section" ${alllog} | cut -d'=' -f 2 | sed -e 's/^ *//'`
+  xsecdat=`echo ${xsecstr} | cut -d" " -f 1`
+  xsecerr=`echo ${xsecstr} | cut -d" " -f 3`
+  brrats=( `grep "  214  " $alllog | grep "b               bbar" ` )
+  brrat=${brrats[3]}
+
+  if [ `echo $process_name | grep -c hbb` -ne 0 ] ; then 
+    temp1=`echo "print ${xsecdat}*${brrat}" | python - `
+    xsecdat=${temp1}
+    temp2=`echo "print ${xsecerr}*${brrat}" | python - `
+    xsecerr=${temp2}
+  elif [ `echo $process_name | grep -c hnonbb` -ne 0 ] ; then 
+    temp1=`echo "print ${xsecdat}*(1-${brrat})" | python - `
+    xsecdat=${temp1}
+    temp2=`echo "print ${xsecerr}*(1-${brrat})" | python - `
+    xsecerr=${temp2}
+  fi  
+  nevtotal=`grep "Number of write events" ${alllog} | tail -1 | cut -d":" -f2 | sed -e "s/^ *//g" `
+  luminosity=`perl -e "print ${nevtotal}/${xsecdat}"`
+  echo "luminosity=${luminosity}"
+  echo "cross_section_in_fb=${xsecdat}"
+  echo "cross_section_error_in_fb=${xsecerr}"
+
+}
+
+# =====================================================================
 anallog()
 {
   local rundir=$1
@@ -52,8 +82,10 @@ anallog()
   processID=`grep Stdhep ${alllog} | grep "ProcessID" | cut -d":" -f2 | sed -e "s/^ *//"`
   echo "process_id=${processID}"
   echo "`grep job_date_time ${alllog}`-GMT+0900"
-  echo "process_name=`grep Stdhep ${alllog} | grep "Output File Title" | cut -d":" -f2 | sed -e "s/^ *//" `"
-  echo "process_type=`grep Stdhep ${alllog} | grep "Output File Title" | cut -d":" -f2 | sed -e "s/^ *//" `"
+  local processname=`grep Stdhep ${alllog} | grep "Output File Title" | cut -d":" -f2 | sed -e "s/^ *//" `
+  echo "process_name=$processname"
+  process_type=`grep Stdhep ${alllog} | grep "Output File Title" | cut -d":" -f2 | sed -e "s/^ *//" `
+  echo "process_type=${process_type}"
   echo "CM_energy_in_GeV=`grep ROOTS ${alllog} | head -1 | cut -d"=" -f2 | sed -e "s/^ *//"`"
   cat runinfo_common.defs
   pol1=`grep PolElectron ${alllog} | head -1 | cut -d'=' -f 2 | sed -e 's/^ *//'` 
@@ -61,19 +93,22 @@ anallog()
   echo "polarization1=`polstr ${pol1}`"
   echo "polarization2=`polstr ${pol2}`"
   xsecstr=`grep "Total Cross section" ${alllog} | cut -d'=' -f 2 | sed -e 's/^ *//'` 
-  xsecdat=`echo ${xsecstr} | cut -d" " -f 1`
-  xsecerr=`echo ${xsecstr} | cut -d" " -f 3`
-  nevtotal=`grep "Number of write events" ${alllog} | tail -1 | cut -d":" -f2 | sed -e "s/^ *//g" `
-  luminosity=`perl -e "print ${nevtotal}/${xsecdat}"`
+  getXsect ${alllog} ${processname}
   
-  echo "luminosity=${luminosity}"
-  echo "cross_section_in_fb=${xsecdat}"
-  echo "cross_section_error_in_fb=${xsecerr}"
+#  xsecdat=`echo ${xsecstr} | cut -d" " -f 1`
+#  xsecerr=`echo ${xsecstr} | cut -d" " -f 3`
+#  nevtotal=`grep "Number of write events" ${alllog} | tail -1 | cut -d":" -f2 | sed -e "s/^ *//g" `
+#  luminosity=`perl -e "print ${nevtotal}/${xsecdat}"`
+#  echo "luminosity=${luminosity}"
+#  echo "cross_section_in_fb=${xsecdat}"
+#  echo "cross_section_error_in_fb=${xsecerr}"
+  
   lumidir=`grep "Lumi File Directory" ${alllog} | head -1 | cut -d":" -f2 | sed -e "s/^ *//g" `
   luminum=`grep "(ISRBM)" ${alllog} | head -1 | sed -e "s/=1/=0/" | cut -d"=" -f2 | sed -e "s/^0*//" `
 
 #  echo "lumi_file=${lumidir}/lumi_linker_${luminum}"
   echo "lumi_linker_number=${luminum}"
+  echo "machine_configuration=@@Machine_Configuration@@"
   echo "file_type=stdhep24"
   echo "total_number_of_events=${nevtotal}"
   numfiles=`grep " Last file number " ${alllog} | cut -d":" -f2 | sed -e "s/^ //g" `
@@ -83,6 +118,12 @@ anallog()
   echo "number_of_events_in_files=`getNumberOfEvents ${alllog}` "
   echo "fileurl=${runinfo_fileurl}"
   echo "logurl=${runinfo_logurl}/@@StdhepFileName@@"
+
+  # Add aditional infor for tth process
+  if [ `echo ${process_type} | grep -c tth ` -ne 0 ] ; then
+    echo "higgs_mass=@@HiggsMass@@"
+  fi
+
 }
 
 anallog `pwd` @@RUNINFO_FILEURL@@  @@RUNINFO_LOGURL@@  > @@StdhepFileName@@.txt

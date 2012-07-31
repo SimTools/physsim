@@ -1,4 +1,4 @@
 
-bsub -o bssub.log -J BS@@ProcessID@@ \
+bsub -o bssub.log -q l -J BS@@ProcessID@@ \
 "( ./runAll.sh > all.log 2>&1 )" 
 

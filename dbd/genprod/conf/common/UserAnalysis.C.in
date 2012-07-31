@@ -33,10 +33,13 @@ Int_t   gStoreBeams=0;
 //______
 void UserAnotherModules()
 {
-  cerr << "UserModuleDefine was called." <<endl;
+//  cerr << "UserModuleDefine was called." <<endl;
   stdhep=new JSFWriteStdHep();
 
+  SetPythiaParameters();
+
 }
+
 
 //_________________________________________________________
 void UserInitialize()
@@ -162,7 +165,40 @@ void DrawHist()
 
 }
 
+//_________________________________________________________
+void SetPythiaParameters()
+{
+//  std::cout << "SetPythiaParameters ... was called." << std::endl;
 
+  TPythia6 *py=TPythia6::Instance();
 
+ py->SetPMAS(25, 1, @@HiggsMass@@);  // Higgs mass
+ py->SetPMAS(25, 2, @@HiggsWidth@@); // Higgs width
+
+// Note that mass and width set here will be overraid by jsf.conf inputs in JSFHadronizer
+
+//  MWID(25) : Take total width and branching ratio from PMAS(KC,2) and BRDAT(IDC)
+//  MDME(IDC,1) On/Off switch of decay channel
+  py->SetMWID(25, 2);
+//  py->SetMDME(219,1)=0 ;      // Suppress h-> mu mu decay
+
+//  py->SetBRAT(210)=     ;  // h -> d d
+//  py->SetBRAT(211)=     ;  // h -> u u
+  py->SetBRAT(212, @@HiggsBr2ss@@);  // h -> s s
+  py->SetBRAT(213, @@HiggsBr2cc@@);   // h -> c c
+  py->SetBRAT(214, @@HiggsBr2bb@@);    // h -> b b
+
+//  py->SetBRAT(218)=      ;  // h -> e e
+  py->SetBRAT(219, @@HiggsBr2mumu@@);  // h -> mu mu
+  py->SetBRAT(220, @@HiggsBr2tautau@@);    // h -> tau tau
+  py->SetBRAT(222, @@HiggsBr2gg@@);    // h -> g g
+  py->SetBRAT(223, @@HiggsBr2gammagamma@@);    // h -> gamma gamma
+  py->SetBRAT(224, @@HiggsBr2gammaZ0@@);   // h -> gamma Z0
+  py->SetBRAT(225, @@HiggsBr2Z0Z0@@);    // h -> Z0 Z0
+  py->SetBRAT(226, @@HiggsBr2WW@@);     // h -> W+ W-
+
+  std::cout << "Higgs mass, total width and decay branching ratio were set according to the LHC info." << std::endl;
+
+}
 
 
