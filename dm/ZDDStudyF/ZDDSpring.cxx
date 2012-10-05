@@ -803,7 +803,7 @@ void ZDDBases::Userin()
   if (!fDMFermionPtr) fDMFermionPtr = new DMFermion(fMass);
   fDMFermionPtr->DebugPrint();
 
-  if (!fHBosonPtr) fHBosonPtr = new HBoson();
+  if (!fHBosonPtr) fHBosonPtr = new HBoson(fMassH,fGammaH);
 
   // --------------------------------------------
   //  Define some plots

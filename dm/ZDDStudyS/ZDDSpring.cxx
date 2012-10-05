@@ -789,7 +789,7 @@ void ZDDBases::Userin()
   }
   fZBosonPtr->DebugPrint();
 
-  if (!fHBosonPtr) fHBosonPtr = new HBoson();
+  if (!fHBosonPtr) fHBosonPtr = new HBoson(fMassH,fGammaH);
 
   // --------------------------------------------
   //  Define some plots
