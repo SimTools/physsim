@@ -14,6 +14,8 @@ C*
  
       IMPLICIT REAL*4 ( A-H, O-Z )
       REAL*8   ZZ(50), Z(50)
+      REAL*8   EPS
+      DATA     EPS / 4.D-2 /
 C--
 C  Generator COMMON's.
 C--
@@ -236,8 +238,12 @@ C--
       AM7   = AMF(IDPTCL(1,7),IDPTCL(2,7),IDPTCL(3,7))
       AM8   = AMF(IDPTCL(1,8),IDPTCL(2,8),IDPTCL(3,8))
 C-- t_bar.
-      Q3MN  = AM3 + AM4 + AM5
-      Q3MX  = RS - (AM6+AM7+AM8)
+      Q3MN  = AM3 + AM4 + AM5 + 3*EPS
+      Q3MX  = RS - (AM6+AM7+AM8) - 3*EPS
+      IF (Q3MX .LE. Q3MN) THEN
+         FUNC = 0
+         RETURN
+      ENDIF
       TH3MN = ATAN((Q3MN-AMT)*(Q3MN+AMT)/AMGT)
       TH3MX = ATAN((Q3MX-AMT)*(Q3MX+AMT)/AMGT)
       TH3   = TH3MN + (TH3MX-TH3MN)*Z(5)
@@ -245,8 +251,12 @@ C-- t_bar.
       Q3    = SQRT(Q32)
       WAT   = WAT*(TH3MX-TH3MN)*( (Q32-AMT2)**2 + AMGT2 )/AMGT
 C-- t.
-      Q4MN  = AM6 + AM7 + AM8
-      Q4MX  = RS - Q3
+      Q4MN  = AM6 + AM7 + AM8 + 3*EPS
+      Q4MX  = RS - Q3 - 3*EPS
+      IF (Q4MX .LE. Q4MN) THEN
+         FUNC = 0
+         RETURN
+      ENDIF
       TH4MN = ATAN((Q4MN-AMT)*(Q4MN+AMT)/AMGT)
       TH4MX = ATAN((Q4MX-AMT)*(Q4MX+AMT)/AMGT)
       TH4   = TH4MN + (TH4MX-TH4MN)*Z(6)
@@ -254,16 +264,24 @@ C-- t.
       Q4    = SQRT(Q42)
       WAT   = WAT*(TH4MX-TH4MN)*( (Q42-AMT2)**2 + AMGT2 )/AMGT
 C-- W-.
-      Q7MN  = AM4 + AM5
-      Q7MX  = Q3 - AM3
+      Q7MN  = AM4 + AM5 + 2*EPS
+      Q7MX  = Q3 - AM3 - 2*EPS
+      IF (Q7MX .LE. Q7MN) THEN
+         FUNC = 0
+         RETURN
+      ENDIF
       TH7MN = ATAN((Q7MN-AMW)*(Q7MN+AMW)/AMGW)
       TH7MX = ATAN((Q7MX-AMW)*(Q7MX+AMW)/AMGW)
       TH7   = TH7MN + (TH7MX-TH7MN)*Z(7)
       Q72   = AMGW*TAN(TH7) + AMW2
       WAT   = WAT*(TH7MX-TH7MN)*( (Q72-AMW2)**2 + AMGW2 )/AMGW
 C-- W+.
-      Q8MN  = AM7 + AM8
-      Q8MX  = Q4 - AM6
+      Q8MN  = AM7 + AM8 + 2*EPS
+      Q8MX  = Q4 - AM6 - 2*EPS
+      IF (Q8MX .LE. Q8MN) THEN
+         FUNC = 0
+         RETURN
+      ENDIF
       TH8MN = ATAN((Q8MN-AMW)*(Q8MN+AMW)/AMGW)
       TH8MX = ATAN((Q8MX-AMW)*(Q8MX+AMW)/AMGW)
       TH8   = TH8MN + (TH8MX-TH8MN)*Z(8)
