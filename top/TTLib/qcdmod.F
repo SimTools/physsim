@@ -180,9 +180,13 @@ C--
       ELSE
          DQ  = DQRGN(ME,IRGN)
          IQ  = QR/DQ
-         F   = (QR-IQ*DQ)/DQ
-         GQ  = GQDAT(IQ,ME,IRGN)
+         IF( IQ.LT.NQ ) THEN 
+           F= (QR-IQ*DQ)/DQ
+           GQ  = GQDAT(IQ,ME,IRGN)
      .          + (GQDAT(IQ+1,ME,IRGN)-GQDAT(IQ,ME,IRGN))*F
+         ELSE
+           GQ = GQDAT(NQ,ME,IRGN)
+         ENDIF 
       ENDIF
 C--
 C  Calculate Green function.
