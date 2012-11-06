@@ -26,7 +26,8 @@ C =======================================================================
       REAL*8   Z1, Z2
 #include "SMCONS.inc"
 #include "SMPTAB.inc"
-      REAL*8   BTE, QED, ZG, AME
+      REAL*8   BTE, ZG, AME
+      REAL*4   QED
       INTEGER*4 IZE
 
       AME = AMF(1,2,1)
@@ -46,7 +47,5 @@ C =======================================================================
       QV(2)=0
       QV(3)=EMBM-EPBM
       RS   = 2*SQRT(EMBM*EPBM)
-
       RETURN 
       END
-
