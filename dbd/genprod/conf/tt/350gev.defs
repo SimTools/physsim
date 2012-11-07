@@ -1,5 +1,5 @@
-ISRBM=118
-ROOTS=1000.0
+ISRBM=123
+ROOTS=350.0
 ACC1=0.02
 ACC2=0.005
 ITMX1=100
@@ -12,12 +12,12 @@ OutputSizePerFileInkB=500000
 MaxNulberOfFiles=20
 NTRIES=10
 LumiFileDir=/group/ilc/soft/utils64/energy_spread
-RUNINFO_FILEURL=lfn:/grid/ilc/prod/ilc/mc-dbd/generated/1000-B1b_ws/tth
-RUNINFO_LOGURL=http://www-jlc.kek.jp/~miyamoto/CDS/1000-B1b_ws/run_output
-genvers=dbd-01-01
-beampara=E1000-B1b_ws
-Machine_Configuration=B1b_ws
-SetupFile=/home/ilc/miyamoto/soft/MyRelease/120711/setup.bash
+RUNINFO_FILEURL=lfn:/grid/ilc/prod/ilc/mc-dbd/generated/350-TDR_ws/tt
+RUNINFO_LOGURL=http://www-jlc.kek.jp/~miyamoto/CDS/mc-dbd.log/generated/350-TDR_ws/tt
+genvers=dbd-01-02
+beampara=E350-TDR_ws
+Machine_Configuration=TDR_ws
+SetupFile=/home/ilc/miyamoto/soft/MyRelease/121030/setup.bash
 
 TT_DELTA_ROOTS=2.0
 TT_NRQCD=3

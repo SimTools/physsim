@@ -7,6 +7,7 @@ Initialize()
   TOPDIR=`pwd`/dbd
   JOBDIR=${TOPDIR}/jobs
   _MAXEVENTS=51000
+  _INTLUMI=1
 
   echo "mkjob.sh : creates directories to run physsim jobs."
   echo "All path should be given in absolute path. Otherwise it may not run correctly."
@@ -17,20 +18,29 @@ Initialize()
   if [ "x${jobdir}" != "x" ] ; then JOBDIR=${jobdir} ; fi
 
   CONFDIR=${TOPDIR}/genprod/conf
+  COMMON_DEFS=${CONFDIR}/common/common.defs
+  read -p "Files to define common parameters, common.defs ? [${COMMON_DEFS}] : " common_defs
+  if [ "x${common_defs}" != "x" ] ; then COMMON_DEFS=`echo ${common_defs}` ; fi
+
   processlist=${PWD}/process.list
 
   read -p "Process list file ? [${processlist}] : " processlist_in
   if [ "x${processlist_in}" != "x" ] ; then processlist=${processlist_in} ; fi
   
-  read -p "Number of events to generate ? [${_MAXEVENTS}] : " maxevents
+  read -p "Minimum number of events to generate ? [${_MAXEVENTS}] : " maxevents
   if [ "x${maxevents}" != "x" ] ; then _MAXEVENTS=${maxevents} ; fi
+
+  read -p "Integrated luminosity to generate [${_INTLUMI}] fb-1: " intlumi
+  if [ "x${intlumi}" != "x" ] ; then _INTLUMI=${intlumi} ; fi
 
   echo " ------------------------------------------ "
   echo " Top directory : ${TOPDIR}"
   echo " Job directory : ${JOBDIR}"
   echo " Conf directory : ${CONFDIR}"
+  echo " Common.def file : ${COMMON_DEFS}"
   echo " Process list file : ${processlist}"
-  echo " Max number of events to generate : ${_MAXEVENTS} "
+  echo " Minimum number of events to generate : ${_MAXEVENTS} "
+  echo " Integrated luminosity to generate : ${_INTLUMI} fb-1 "
   read -p "OK to continue ? (CTRL-C to break)" ans
   
 }
@@ -147,15 +157,22 @@ mkrundef()
     "hnonbb") echo "DecayModeForH=105" >> ${out} ;;
     "all") echo "DecayModeForH=0" >> ${out} ;
            echo "ZModesLo=1" >> ${out} ; echo "ZModesHi=12" >> ${out} ;;
+    "none") echo "DecayModeForH=0" >> ${out} ;
+           echo "ZModesLo=1" >> ${out} ; echo "ZModesHi=12" >> ${out} ;;
     *)
       echo "Fatal error : hmodes ${hmodes} is not defined."
       exit -1
    esac
 
    prstr=${process}-${ttmodes}-${hmodes}
+   if [ "${hmodes}" == "none" ] ; then 
+     prstr=${process}-${ttmodes}
+   fi
    echo "StdhepTitle=physsim-${prstr}" >> ${out}
    echo "StdhepFileName=${beampara}.P${prstr}.${epolstr}.${ppolstr}.Gphyssim_${genvers}.I${pid}" >> ${out}
    echo "MAXEVENTS=${_MAXEVENTS}" >> ${out}
+   echo "GEN_LUMINOSITY=${_INTLUMI}" >> ${out}
+
 }
 
 # =============================================
@@ -190,10 +207,10 @@ mkfiles()
   rm -rf CVS
   cat ${CONFDIR}/${process}/process.conf.in \
       ${CONFDIR}/common/common.conf.in > jsf.conf.in
-  genvers=`grep genvers ${CONFDIR}/common/common.defs | cut -d"=" -f2`
+  genvers=`grep genvers ${COMMON_DEFS} | cut -d"=" -f2`
   sed -e "s/@@genvers@@/${genvers}/" ${CONFDIR}/dbs/common.defs.in > runinfo_common.defs 
-  mkrundef run.defs ${CONFDIR}/common/common.defs
-  mkrunfiles ${CONFDIR}/${process}/process.defs ${CONFDIR}/common/common.defs run.defs
+  mkrundef run.defs ${COMMON_DEFS}
+  mkrunfiles ${CONFDIR}/${process}/process.defs ${COMMON_DEFS} run.defs
   stdhepfilename=`grep StdhepFileName run.defs | cut -d"=" -f2 `
 
   cd ${origdir}

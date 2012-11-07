@@ -1,0 +1,11 @@
+# ==============================================
+# TTH specific parameters
+# =============================================
+
+TTBases.DeltaRoots: @@TT_DELTA_ROOTS@@
+
+TTBases.VkmTB:          1.
+TTBases.BetaH:          1.
+#TTBases.NRQCD:         3
+TTBases.NRQCD:      @@TT_NRQCD@@    
+

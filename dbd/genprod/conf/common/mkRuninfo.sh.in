@@ -123,6 +123,10 @@ anallog()
   if [ `echo ${process_type} | grep -c tth ` -ne 0 ] ; then
     echo "higgs_mass=@@HiggsMass@@"
   fi
+  # Add aditional info for tt process
+  if [ `echo ${process_type} | grep -c "tt-"` -ne 0 ] ; then 
+    echo "top_mass=@@TopMass@@"
+  fi
 
 }
 

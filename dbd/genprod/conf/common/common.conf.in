@@ -38,7 +38,7 @@
 @@BasesName@@.MassW:                80.0
 @@BasesName@@.MassZ:                91.18
 @@BasesName@@.MassHiggs:    @@HiggsMass@@
-@@BasesName@@.MassTop:      175.
+@@BasesName@@.MassTop:      @@TopMass@@
 
 @@BasesName@@.ISR_LLA_Order:        @@ISR_LLA_ORDER@@
 #!lla_order
