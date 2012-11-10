@@ -8,7 +8,7 @@
 
 extern "C" {
   void isr_function_( double *factor, double *x, double *eps, int *LLA_order);
-  void isr_remnant_(double *x, double *x0, double *sqrts, double pmom[4]);
+  void isr_remnant_(double *x, double *x0, double *xpt, double *xphi, double *sqrts, double pmom[4]);
 };
 
 int main()
@@ -30,10 +30,12 @@ int main()
   double pmom[4];
   for (int i=0;i<nevt;i++) {
     double x=gRandom->Rndm();
+    double xpt=gRandom->Rndm();
+    double xphi=gRandom->Rndm();
     double factor=1.0e0;
 
     isr_function_(&factor, &x, &eps, &LLA_order);
-    isr_remnant_(&x, &x0, &ene, pmom);
+    isr_remnant_(&x, &x0, &xpt, &xphi, &ene, pmom);
 //    std::cout << " factor=" << factor << " x=" << x << std::endl;
     double eisr=pmom[0];
     double ptisr=TMath::Sqrt(pmom[1]*pmom[1]+pmom[2]*pmom[2]);

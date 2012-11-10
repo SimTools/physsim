@@ -21,7 +21,7 @@
       call isr_function(factor, x, eps, LLA_order)
       print *,' factor=',factor,' x=',x
    
-      call isr_remnant(x, x0, sqrts, pmom)  
+      call isr_remnant(x, x0, x, x0, sqrts, pmom)  
       
       print *,' pmom=',(pmom(k),k=0,3)
       

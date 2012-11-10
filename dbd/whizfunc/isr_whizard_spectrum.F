@@ -31,13 +31,24 @@ C ---------------------------------------------------------------
       REAL*8   EPSISR, FISR3, FISR4, Z3, Z4, Z3INI, Z4INI, AME
       INTEGER*4  LORDER,KK
       REAL*4   ROOTS, RS, RSSQ
+#if 0
 #include "SMCONS.inc"
 #include "SMPTAB.inc"
 
 C  Generate ISR spectrum a la Whizard
        AME = AMF(1,2,1)
-
+#else
+       REAL*8  xPI
+       INTEGER*4 NCALL
+       DATA NCALL /0/
+       IF (NCALL .EQ.0) THEN
+          NCALL = 1
+          xPI = DACOS(-1.D0)
+          AME = 0.5110034D-3
+       ENDIF
+#endif
           EPSISR=xALF0/xPI*2*log(RS/AME)
+
           Z3INI=EMBM/ROOTS*2
           Z3   =Z1
           FISR3=1.0D0
@@ -46,7 +57,7 @@ C  Generate ISR spectrum a la Whizard
           Z4   =Z2
           FISR4=1.0D0
           CALL ISR_FUNCTION(FISR4, Z4, EPSISR, LORDER)
-          WAT=WAT*FISR3*FISR4
+          WAT=WAT*FISR3*FISR 4
 
          CALL ISR_REMNANT(Z3,Z3INI,ZE1,ZF1,DBLE(ROOTS),PISR(0,1))
          CALL ISR_REMNANT(Z4,Z4INI,ZE2,ZF2,DBLE(ROOTS),PISR(0,2))

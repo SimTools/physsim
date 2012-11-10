@@ -7,7 +7,7 @@
       use user, only : spectrum_double
 
 !-- variables for Tim's luminosity function
-      real(4) :: roots
+      real(4) :: roots, ebm, dpdebm, embm, epbm
       real(8) :: z1,z2
       complex(8), dimension(-2:2,-2:2,2), save :: rhoin_a6f, rhoout_a6f
       real(8) :: dpdebm_dbl 
