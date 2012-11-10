@@ -1,7 +1,9 @@
 FC=gfortran
+CXX=g++
 CERN_ROOT=/nfs/g/ilc/soft/utils64/cernlib_64/2005
+#CERN_ROOT=/cern/2006
 
-FFLAGS=-fPIC -I$(KFLIBROOT)/gen_lib/sm/include 
+FFLAGS=-fno-automatic -fPIC -I$(KFLIBROOT)/gen_lib/sm/include 
 LIBSRC=isr_function.o isr_remnant.o whizard_spectrum.o \
 	isr_simple_spectrum.o isr_whizard_spectrum.o 
 

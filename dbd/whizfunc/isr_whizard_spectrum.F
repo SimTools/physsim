@@ -30,7 +30,7 @@ C ---------------------------------------------------------------
       REAL*4   xALF0, EMBM, EPBM, QV(0:3) 
       REAL*8   EPSISR, FISR3, FISR4, Z3, Z4, Z3INI, Z4INI, AME
       INTEGER*4  LORDER,KK
-      REAL*4   ROOTS, RS, RSSQ
+      REAL*4   ROOTS, RS, RSSQ, PA
 #if 0
 #include "SMCONS.inc"
 #include "SMPTAB.inc"
@@ -57,7 +57,7 @@ C  Generate ISR spectrum a la Whizard
           Z4   =Z2
           FISR4=1.0D0
           CALL ISR_FUNCTION(FISR4, Z4, EPSISR, LORDER)
-          WAT=WAT*FISR3*FISR 4
+          WAT=WAT*FISR3*FISR4
 
          CALL ISR_REMNANT(Z3,Z3INI,ZE1,ZF1,DBLE(ROOTS),PISR(0,1))
          CALL ISR_REMNANT(Z4,Z4INI,ZE2,ZF2,DBLE(ROOTS),PISR(0,2))
@@ -72,7 +72,12 @@ C
           QV(1)=-PISR(1,1)+PISR(1,2)
           QV(2)=-PISR(2,1)+PISR(2,2)
           QV(3)=EMBM - EPBM - PISR(3,1)-PISR(3,2)
+#if 0
           RSSQ=QV(0)**2-QV(1)**2-QV(2)**2-QV(3)**2
+#else
+          PA=SQRT(QV(1)*QV(1)+QV(2)*QV(2)+QV(3)*QV(3))
+          RSSQ=(QV(0)-PA)*(QV(0)+PA)
+#endif
           IF( RSSQ .LE. 0.0 ) THEN
             RS=-SQRT(-RSSQ)
             RETURN
