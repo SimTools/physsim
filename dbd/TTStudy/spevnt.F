@@ -347,8 +347,8 @@ C--
       RBUF( 7) =   QV(3,7)
       RBUF( 8) =   QV(0,7)
       RBUF(12) =   2
-      RBUF(13) =   7
-      RBUF(14) =   1
+      RBUF(13) =   7 + IRELOFF
+      RBUF(14) =   1 + IRELOFF
       RBUF(18) =   3
       RBUF(19) =   101
       RBUF(20) =  -10

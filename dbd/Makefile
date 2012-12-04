@@ -1,5 +1,5 @@
 
-SUBDIR = TTHStudy TTZStudy TTBBStudy
+SUBDIR = TTHStudy TTZStudy TTBBStudy TTStudy
 
 all:
 	( cd whizfunc && make )
