@@ -37,7 +37,7 @@ C ---------------------------------------------------------------
 C  Generate ISR spectrum a la Whizard
        AME = AMF(1,2,1)
 
-          EPSISR=xALF0/xPI*2*log(RS/AME)
+          EPSISR=xALF0/xPI*2*log(ROOTS/AME)
           Z3INI=EMBM/ROOTS*2
           Z3   =Z1
           FISR3=1.0D0
