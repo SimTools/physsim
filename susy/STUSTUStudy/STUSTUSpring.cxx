@@ -29,7 +29,8 @@ ClassImp(STUSTUSpring)
 ClassImp(STUSTUSpringBuf)
 ClassImp(STUSTUBases)
 
-Bool_t STUSTUBases::fgEnableStauDecay = kTRUE;
+//Bool_t STUSTUBases::fgEnableStauDecay = kTRUE;
+Bool_t STUSTUBases::fgEnableStauDecay = kFALSE;
 
 //-----------------------------------------------------------------------------
 // ==============================
@@ -272,7 +273,7 @@ STUSTUBases::STUSTUBases(const char *name, const char *title)
   ins >> fISR;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("STUSTUBases.Pole","0."));         // electron polarization
+  ins.str(gJSF->Env()->GetValue("STUSTUBases.PolElectron","0."));         // electron polarization
   ins >> fPole;
 
   // --------------------------------------------
