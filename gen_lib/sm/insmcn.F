@@ -163,7 +163,9 @@ C--
 C--
 C  Initialize top width.
 C--
-      VFF = (VKM(3,3,2))**2
+C 2013/12/08 K.Fujii Bug fix
+C     VFF = (VKM(3,3,2))**2
+      VFF = VKM(3,3,2)
       CALL GMT2QW(AMST,AMSB,AMSW,VFF,GM)
       GMF(3,1,2) = GM
 C--
