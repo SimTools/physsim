@@ -51,7 +51,8 @@ C     PARAMETER    ( NE = 300, NQ = 5000 )
       INTEGER*4    NBN(3)
 C>>> 20090817
 C     DATA NBN     /   13, 35, 300 /
-      DATA NBN     /   46, 35, 600 /
+C     DATA NBN     /   46, 35, 600 /
+      DATA NBN     /   46, 560, 600 /
 C<<< 20090817
       REAL   *8    ERGN(0:3), DERGN(3), DQRGN(0:NE,3)
       DATA ERGN    / -30.D0, -7.D0, 0.D0, 60.D0 /

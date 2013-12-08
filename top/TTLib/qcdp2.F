@@ -55,12 +55,16 @@ C    INPUT VARIABLES
 
 C    OUTPUT VARIABLES
 
+#if 0
       real*8  x_L(5000), x_S(5000)
       complex*16  y1_L(5000), y2_L(5000)
       complex*16  y1_S(5000), y2_S(5000)
       integer num_L, num_S
       common/PFIRSTL/ x_L, y1_L, y2_L, num_L
       common/PFIRSTS/ x_S, y1_S, y2_S, num_S
+#else
+#include "pfirst.inc"
+#endif
 
       integer  step1
 
@@ -81,6 +85,10 @@ C    OTHER VARIABLES
 C    MAXIMUM NUMBER OF STEPS ALLOWED
       parameter( maxstps = 400000 )
 C      parameter( maxstps = 40000 )
+#if 1
+      integer    n_mx
+      parameter( n_mx = 45000 )
+#endif
 
 C      write(*,*)
       write(*,*) 'P-wave: E=', E
@@ -114,8 +122,13 @@ C    DO LOOP FOR X > 0.01  CONTINUED WHILE  ( CRITERION > EPS )
       dx = dr
       num = 1
 
+#if 0
       do while ( ( criterion .gt. eps ) .or.
      -                       ( n .lt. 500 ) )
+#else
+      do while ( ( criterion .gt. eps ) .or.
+     -                       ( n .lt. n_mx ) )
+#endif
 
         do k = 1, 2
 
@@ -133,7 +146,9 @@ C    DO LOOP FOR X > 0.01  CONTINUED WHILE  ( CRITERION > EPS )
 	      x = x + dx
 
               n = n + 1
-
+#if 1
+              if (n.ge.n_mx) goto 90
+#endif
           end do
 
   	  num = num + 1
@@ -147,7 +162,9 @@ C          write(*,*) y1_L(num)
 C          write(*,*) y2_L(num)
 
         end do
-
+#if 1
+90      continue
+#endif
 C    CALCULATE CRITERION
 
         B_new = - y1/y2
@@ -427,20 +444,28 @@ C      g_P = ( - eff_mt*( enerP + imag*Gammat - Vc_tab_118_3(x) )
 
 C    INPUT VARIABLES
 
+#if 0
       real*8  x_L(5000), x_S(5000)
       complex*16  y1_L(5000), y2_L(5000)
       complex*16  y1_S(5000), y2_S(5000)
       integer num_L, num_S
       common/PFIRSTL/ x_L, y1_L, y2_L, num_L
       common/PFIRSTS/ x_S, y1_S, y2_S, num_S
+#else
+#include "pfirst.inc"
+#endif
 
 
 C    OUTPUT VARIABLES
 
+#if 0
       real  dst_P(5000)
       complex  f(5000)
       integer num_max
       common/PSECOND/ dst_P, f, num_max
+#else
+#include "psecond.inc"
+#endif
 
       integer  step2
 
@@ -574,10 +599,14 @@ C      write(*,*) num_S+num_L, num_max
 
 C    INPUT VARIABLES
 
+#if 0
       real  dst_P(5000)
       complex  f(5000)
       integer num_max
       common/PSECOND/ dst_P, f, num_max
+#else
+#include "psecond.inc"
+#endif
 
       real*8  mt, alfz, E, y_cut,
      -        drS, drP, epsS, epsP
@@ -602,8 +631,12 @@ C    OUTPUT VARIABLES
       complex  tilf(0:5000)
       common/PTHIRD/ p_P, tilf
 
+#if 0
       complex*8  array_GP(0:40,0:800)
       common/tabulateGP/array_GP
+#else
+#include "tabgp.inc"
+#endif
 
 C    OTHER VARIABLES
 

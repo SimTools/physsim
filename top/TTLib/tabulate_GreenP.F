@@ -233,14 +233,26 @@ C      include 'Vc_tab_118_3.for'
      -	   stepS2_old, stepP2_old
 
       integer  n, n_E
+#if 1
+#include "nmax.inc"
+#include "elimit.inc"
+      real*8   dE
+#endif
 
 
 C    START
 
+#if 0
       do n = -12, 20
 
           E = real(n)/2.
           n_E = n + 12
+#else
+      dE    = (E_max - E_min)/n_max
+      do n_E = 0, n_max
+
+          E = E_min + n_E*dE
+#endif
 
           call  QCD_P1(E,drP,epsP,stepP1)
 

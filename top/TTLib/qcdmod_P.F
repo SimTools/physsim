@@ -76,15 +76,20 @@ C--
 
       implicit none
 
-
       real*4  ener, p
 
       integer  n_ener, n_p
 
       real*4  dx, dy, dp
 
+#if 0
       complex*8  array_GP(0:40,0:800)
       common/tabulateGP/array_GP
+#else
+#include "tabgp.inc"
+#include "elimit.inc"
+      real*8     dE
+#endif
 
       real*8  mt, alfz, E, y_cut,
      -        drS, drP, epsS, epsP
@@ -104,9 +109,14 @@ C--
       common/size/n_green
 
 
+#if 0
       n_ener = int( 2.*(ener+6.) )
       dx = ( ener + 6. - real(n_ener)/2. )/0.5
-
+#else
+      dE    = (E_max - E_min)/n_max
+      n_ener = (ener - E_min)/dE
+      dx = ( ener - E_min - n_ener*dE )/dE
+#endif
       dp = 2.*Lambda/n_green
       n_p = int( p/dp )
       dy = ( p - real(n_p)*dp )/dp
