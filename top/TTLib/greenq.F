@@ -156,8 +156,8 @@ C--
       X     = R0
       DXMIN = .01D0/(AMT**3/7000)
 #if 0
-      XMAX  = 5/SQRT(AMT*GAM)
-      DXMAX = XMAX/5000 * MAX(1.D0,SQRT(ABS(E+3)))
+      XMAX  = 5/SQRT(AMT*GAM) * MAX(1.D0,(E+2)/1.5D0)
+      DXMAX = XMAX/15000 * MAX(1.D0,SQRT(ABS(E+2)))
 #else
       XMAX  = 150/SQRT(AMT*GAM)
       DXMAX = XMAX/150000 * MAX(1.D0,SQRT(ABS(E+3)))

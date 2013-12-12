@@ -84,7 +84,13 @@ C--
          GAMT   =  GMT
          AMSH   =  AMH
          BETH   =  BTH
+#if 0
          VFF    =  1
+#else
+         VFF    =  1
+         CALL GTGAMT(ALP,SN2W,AMSW,AMSB,AMST,VFF,GAMV1)
+         VFF    = SQRT(GAMT/GAMV1)
+#endif
          QCDVTX =  ABS( 1 - 8*ALFS/3/PI )
 C--
          PRINT *, 'QCDMOD now tabulates GQ for'
