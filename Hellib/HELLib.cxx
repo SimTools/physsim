@@ -568,6 +568,55 @@ HELScalar::HELScalar(const HELVector  &v1,
 
    this->Complex_t::operator=(dg * (v1[0]*v2[0] - v1[1]*v2[1] - v1[2]*v2[2] - v1[3]*v2[3]));
 }
+// For anomalous VVh coupling
+HELScalar::HELScalar(const HELVector  &v1,
+                     const HELVector  &v2,
+                           Double_t    g1, // gvh + 2*mv^2*(a/Lamda)
+                           Double_t    g2, // -2*(b/Lambda)
+                           Double_t    g3, // -4*(btilde/Lambda)
+                           Double_t    m,
+                           Double_t    gm)
+          : fP(v1.fP + v2.fP),
+            fNSS(1)
+{
+   Double_t  q2  = fP.Mag2();
+   Double_t  mg  = TMath::Max(TMath::Sign(m*gm, q2), 0.);
+   Complex_t d  = Complex_t(-1.,0.)/Complex_t(q2 - m*m, mg);
+
+   Double_t  p1p2 = v1.fP*v2.fP;
+   Complex_t p1v2 = v1.fP(0)*v2[0]-v1.fP(1)*v2[1]-v1.fP(2)*v2[2]-v1.fP(3)*v2[3];
+   Complex_t p2v1 = v2.fP(0)*v1[0]-v2.fP(1)*v1[1]-v2.fP(2)*v1[2]-v2.fP(3)*v1[3];
+   Complex_t v1v2 = v1[0]*v2[0]-v1[1]*v2[1]-v1[2]*v2[2]-v1[3]*v2[3];
+
+   Complex_t ans  = g1*v1v2;
+             ans += g2*(p1p2*v1v2-p1v2*p2v1);
+             ans += g3*(v1.fP(0)*v1[1]*v2.fP(2)*v2[3]
+                       -v1.fP(0)*v1[1]*v2.fP(3)*v2[2]
+                       -v1.fP(0)*v1[2]*v2.fP(1)*v2[3]
+                       +v1.fP(0)*v1[2]*v2.fP(3)*v2[1]
+                       +v1.fP(0)*v1[3]*v2.fP(1)*v2[2]
+                       -v1.fP(0)*v1[3]*v2.fP(2)*v2[1]
+                       -v1.fP(1)*v1[0]*v2.fP(2)*v2[3]
+                       +v1.fP(1)*v1[0]*v2.fP(3)*v2[2]
+                       +v1.fP(1)*v1[2]*v2.fP(0)*v2[3]
+                       -v1.fP(1)*v1[2]*v2.fP(3)*v2[0]
+                       -v1.fP(1)*v1[3]*v2.fP(0)*v2[2]
+                       +v1.fP(1)*v1[3]*v2.fP(2)*v2[0]
+                       +v1.fP(2)*v1[0]*v2.fP(1)*v2[3]
+                       -v1.fP(2)*v1[0]*v2.fP(3)*v2[1]
+                       -v1.fP(2)*v1[1]*v2.fP(0)*v2[3]
+                       +v1.fP(2)*v1[1]*v2.fP(3)*v2[0]
+                       +v1.fP(2)*v1[3]*v2.fP(0)*v2[1]
+                       -v1.fP(2)*v1[3]*v2.fP(1)*v2[0]
+                       -v1.fP(3)*v1[0]*v2.fP(1)*v2[2]
+                       +v1.fP(3)*v1[0]*v2.fP(2)*v2[1]
+                       +v1.fP(3)*v1[1]*v2.fP(0)*v2[2]
+                       -v1.fP(3)*v1[1]*v2.fP(2)*v2[0]
+                       -v1.fP(3)*v1[2]*v2.fP(0)*v2[1]
+                       +v1.fP(3)*v1[2]*v2.fP(1)*v2[0]);
+             ans *= d;
+   this->Complex_t::operator=(ans);
+}
 
 //----------
 // HIOXXX()
@@ -637,6 +686,47 @@ HELVertex::HELVertex(const HELVector &v1,
            cerr << " ---- " << endl;
 	   cerr << " vvs =(" << (*this) << endl;
 #endif
+}
+// For anomalous VVh coupling
+HELVertex::HELVertex(const HELVector  &v1,
+                     const HELVector  &v2,
+                     const HELScalar  &sc,
+                           Double_t    g1, // gvh + 2*mv^2*(a/Lamda)
+                           Double_t    g2, // -2*(b/Lambda)
+                           Double_t    g3) // -4*(btilde/Lambda)
+{
+   Double_t  p1p2 = v1.fP*v2.fP;
+   Complex_t p1v2 = v1.fP(0)*v2[0]-v1.fP(1)*v2[1]-v1.fP(2)*v2[2]-v1.fP(3)*v2[3];
+   Complex_t p2v1 = v2.fP(0)*v1[0]-v2.fP(1)*v1[1]-v2.fP(2)*v1[2]-v2.fP(3)*v1[3];
+   Complex_t v1v2 = v1[0]*v2[0]-v1[1]*v2[1]-v1[2]*v2[2]-v1[3]*v2[3];
+
+   Complex_t ans  = g1*v1v2;
+             ans += g2*(p1p2*v1v2-p1v2*p2v1);
+             ans += g3*(v1.fP(0)*v1[1]*v2.fP(2)*v2[3]
+                       -v1.fP(0)*v1[1]*v2.fP(3)*v2[2]
+                       -v1.fP(0)*v1[2]*v2.fP(1)*v2[3]
+                       +v1.fP(0)*v1[2]*v2.fP(3)*v2[1]
+                       +v1.fP(0)*v1[3]*v2.fP(1)*v2[2]
+                       -v1.fP(0)*v1[3]*v2.fP(2)*v2[1]
+                       -v1.fP(1)*v1[0]*v2.fP(2)*v2[3]
+                       +v1.fP(1)*v1[0]*v2.fP(3)*v2[2]
+                       +v1.fP(1)*v1[2]*v2.fP(0)*v2[3]
+                       -v1.fP(1)*v1[2]*v2.fP(3)*v2[0]
+                       -v1.fP(1)*v1[3]*v2.fP(0)*v2[2]
+                       +v1.fP(1)*v1[3]*v2.fP(2)*v2[0]
+                       +v1.fP(2)*v1[0]*v2.fP(1)*v2[3]
+                       -v1.fP(2)*v1[0]*v2.fP(3)*v2[1]
+                       -v1.fP(2)*v1[1]*v2.fP(0)*v2[3]
+                       +v1.fP(2)*v1[1]*v2.fP(3)*v2[0]
+                       +v1.fP(2)*v1[3]*v2.fP(0)*v2[1]
+                       -v1.fP(2)*v1[3]*v2.fP(1)*v2[0]
+                       -v1.fP(3)*v1[0]*v2.fP(1)*v2[2]
+                       +v1.fP(3)*v1[0]*v2.fP(2)*v2[1]
+                       +v1.fP(3)*v1[1]*v2.fP(0)*v2[2]
+                       -v1.fP(3)*v1[1]*v2.fP(2)*v2[0]
+                       -v1.fP(3)*v1[2]*v2.fP(0)*v2[1]
+                       +v1.fP(3)*v1[2]*v2.fP(1)*v2[0]);
+   this->Complex_t::operator=(ans);
 }
 
 //----------
