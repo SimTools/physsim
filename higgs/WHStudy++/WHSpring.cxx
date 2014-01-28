@@ -247,7 +247,7 @@ WHBases::WHBases(const char *name, const char *title)
            fBeamWidth (0.002),
            fPole      (0.),
            fPolp      (0.),
-	   fFixedCP   ( 1),
+	   fFixCP     ( 1),
            fWModesLo  ( 1),
            fWModesHi  (12),
            fWBosonPtr ( 0),
@@ -333,8 +333,8 @@ WHBases::WHBases(const char *name, const char *title)
   ins >> fPolp;
 
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("WHBases.FixedCP","1"));      // CP combination (W+H-,W-H+)=(1,-1)
-  ins >> fFixedCP;
+  ins.str(gJSF->Env()->GetValue("WHBases.FixCP","1"));         // CP combination (W+H-,W-H+)=(1,-1)
+  ins >> fFixCP;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("WHBases.WModesLo","1"));      // Z decay mode lo
@@ -465,9 +465,9 @@ Double_t WHBases::Func()
   //  Select final state CP
   // --------------------------------------------
   Double_t weight = 1.;
-  if (fFixedCP > 0) {
+  if (fFixCP > 0) {
      fCP = +1;
-  } else if (fFixedCP < 0) {
+  } else if (fFixCP < 0) {
      fCP = -1;
   } else {
      if (fCPFinal < 0.5) {

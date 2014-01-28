@@ -109,7 +109,7 @@ private:
   Double_t fBeamWidth;      // Beam width relative to Ebm(nominal)
   Double_t fPole;           // electron polarization
   Double_t fPolp;           // positron polarization
-  Double_t fFixedCP;        // CP combination (W+H-,W-H+)=(1,-1)
+  Double_t fFixCP;          // CP combination (W+H-,W-H+)=(1,-1)
   Int_t    fWModesLo;       // W decay mode lo;
   Int_t    fWModesHi;       // W decay mode hi;
 
