@@ -58,6 +58,7 @@ public:
   Double_t GetPhiF     ()           const { return fPhiF;      }
   Double_t GetZBoost   ()           const { return fZBoost;    }
   Double_t GetEcmIP    ()           const { return fEcmIP;     }
+  Int_t    GetCP       ()           const { return fCP;        }
 
   void     SetMass     (Double_t m      ) { fMass      = m;    }
   void     SetFhwz     (Double_t f      ) { fFhwz      = f;    }
@@ -124,6 +125,7 @@ private:
   Double_t       fEcmIP;          // Ecm after B-strahlung
   Double_t       fQ2WH;           // q^2 of WH system
   Double_t       fQ2W;            // q^2 of final state W
+  Int_t          fCP;             // CP combination of final state (W+H-,W-H+)=(+1,-1)
   GENDecayMode  *fWModePtr;       // pointer to W decay mode
   GENPDTEntry   *f3Ptr;           // point to 1st W daughter (up type fermion)
   GENPDTEntry   *f4Ptr;           // point to 2nd W daughter (down type anti-fermion)
@@ -141,6 +143,7 @@ private:
   // ----------------
   Double_t       fHelCombInitial; // initial state helicity combination
   Double_t       fHelCombFinal;   // final   state helicity combination
+  Double_t       fCPFinal;        // final   state CP combination
   Double_t       fWDecayMode;     // decay mode selector for W
   Double_t       fCosTheta;       // cos(theta_x) in cm  frame
   Double_t       fPhi;            // phi_x        in cm  frame

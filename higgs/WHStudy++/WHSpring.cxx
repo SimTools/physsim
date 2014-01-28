@@ -161,19 +161,20 @@ Bool_t WHSpringBuf::SetPartons()
     q(2) = pv[i].Py();
     q(3) = pv[i].Pz();
   }
-  Int_t    idh     = 37;                          // PDG code for H+
-  Int_t    idw     = 24;                          // PDG code for W+
-  Int_t    idf3    = bases->f3Ptr->GetPID   ();   // PDG code for f
-  Double_t chrg3   = bases->f3Ptr->GetCharge();   // F charge
-  Double_t m3      = bases->f3Ptr->GetMass  ();   // F mass
-  Int_t    idf4    = bases->f4Ptr->GetPID   ();   // PDG code for f
-  Double_t chrg4   = bases->f4Ptr->GetCharge();   // F charge
-  Double_t m4      = bases->f4Ptr->GetMass  ();   // F mass
-  Int_t    hel1    = bases->fHelFinal[0];         // f1 helicity
-  Int_t    hel2    = bases->fHelFinal[1];         // f2 helicity
-  Double_t color   = bases->f3Ptr->GetColor();    // color factor
-  Int_t    islev   = color > 1. ? 201 : 0;  	  // shower level
-  Int_t    icf     = 2;                           // color flux id
+  Int_t    cp      = bases->GetCP();               // (W+H-,W-H+)=(+1,-1)
+  Int_t    idh     = 37*cp;                        // PDG code for H+
+  Int_t    idw     = 24*cp;                        // PDG code for W+
+  Int_t    idf3    = bases->f3Ptr->GetPID   ()*cp; // PDG code for f
+  Double_t chrg3   = bases->f3Ptr->GetCharge()*cp; // F charge
+  Double_t m3      = bases->f3Ptr->GetMass  ();    // F mass
+  Int_t    idf4    = bases->f4Ptr->GetPID   ()*cp; // PDG code for f
+  Double_t chrg4   = bases->f4Ptr->GetCharge()*cp; // F charge
+  Double_t m4      = bases->f4Ptr->GetMass  ();    // F mass
+  Int_t    hel1    = bases->fHelFinal[0];          // f1 helicity
+  Int_t    hel2    = bases->fHelFinal[1];          // f2 helicity
+  Double_t color   = bases->f3Ptr->GetColor();     // color factor
+  Int_t    islev   = color > 1. ? 201 : 0;  	   // shower level
+  Int_t    icf     = 2;                            // color flux id
   Double_t rq2w    = pv[1].Mag();
 
   Double_t mass    = bases->GetMass();
@@ -219,8 +220,8 @@ Bool_t WHSpringBuf::SetPartons()
 #endif
 
   //                               No. PID  Mass  Charge   pv    Nd 1st  Mom hel  col shower
-  new (partons[0]) JSFSpringParton(1, idh, mass,     -1., *qp[0], 0, 0,  0,    0,   0,     0);
-  new (partons[1]) JSFSpringParton(2, idw, rq2w,     +1., *qp[1], 2, 3,  0,    0,   0,     0);
+  new (partons[0]) JSFSpringParton(1, idh, mass,     -cp, *qp[0], 0, 0,  0,    0,   0,     0);
+  new (partons[1]) JSFSpringParton(2, idw, rq2w,      cp, *qp[1], 2, 3,  0,    0,   0,     0);
   new (partons[2]) JSFSpringParton(3, idf3,   m3,  chrg3, *qp[2], 0, 0,  2, hel1, icf, islev);
   new (partons[3]) JSFSpringParton(4, idf4,   m4,  chrg4, *qp[3], 0, 0,  2, hel2, icf, islev);
 
@@ -254,6 +255,7 @@ WHBases::WHBases(const char *name, const char *title)
            fEcmIP     (fEcmInit),
            fQ2WH      (0.),
            fQ2W       (0.),
+	   fCP        (1),
            fWModePtr  (0),
            f3Ptr      (0),
            f4Ptr      (0),
@@ -343,10 +345,11 @@ WHBases::WHBases(const char *name, const char *title)
   //--
   //  Initial state helicity combination
   //--
-  DefineVariable(fHelCombInitial, 0., 1., 0, 1);
+  DefineVariable(fHelCombInitial, 0., 1., 1, 1);
   DefineVariable(fHelCombFinal  , 0., 1., 0, 1);
   DefineVariable(fWDecayMode    , 0., 1., 0, 1);
   DefineVariable(fXQ2W          , 0., 1., 0, 1);
+  DefineVariable(fCPFinal       , 0., 1., 0, 1);
   //--
   //  cos(theta) and phi
   //--
@@ -454,10 +457,18 @@ Double_t WHBases::Func()
   fZBoost = eminus - eplus; // P_z of the cm system after ISR and beamstrahlung
 
   // --------------------------------------------
+  //  Select final state CP
+  // --------------------------------------------
+  if (fCPFinal < 0.5) {
+     fCP = +1;
+  } else {
+     fCP = -1;
+  }
+  Double_t weight = 2.;
+  bsWeight *= weight;
+  // --------------------------------------------
   //  Select final state
   // --------------------------------------------
-  Double_t weight = 1;
-
   GENDecayMode *fWModePtr = fWBosonPtr->PickMode(fWDecayMode, weight, fWMode);
   bsWeight *= weight;
   f3Ptr = static_cast<GENPDTEntry *>(fWModePtr->At(0));
@@ -531,6 +542,7 @@ Double_t WHBases::Func()
   Xh_fill( 7, (Double_t)fJCombI, (bsWeight*sigma));
   Xh_fill( 8, (Double_t)fJCombF, (bsWeight*sigma));
   Xh_fill( 9, (Double_t)fWMode , (bsWeight*sigma));
+  Xh_fill(10, (Double_t)(fCP+1)/2, (bsWeight*sigma));
 
   return (bsWeight * sigma);
 }
@@ -669,8 +681,14 @@ Complex_t WHBases::FullAmplitude()
 
    HELScalar  xf(fP[0]);
 
-   HELFermion f (fP[1], fM[1], fHelFinal [0], +1, kIsOutgoing);
-   HELFermion fb(fP[2], fM[2], fHelFinal [1], -1, kIsIncoming);
+   Int_t i1 = 1;
+   Int_t i2 = 2;
+   if (fCP < 0) {
+      i1 = 2;
+      i2 = 1;
+   }
+   HELFermion f (fP[i1], fM[i1], fHelFinal [i1-1], +1, kIsOutgoing);
+   HELFermion fb(fP[i2], fM[i2], fHelFinal [i2-1], -1, kIsIncoming);
    HELVector  wf(fb, f, glw, grw, kM_w, gamw);
 
    Complex_t amp = AmpEEtoWH(em, ep, xf, wf);
@@ -802,6 +820,7 @@ void WHBases::Userin()
   Xh_init( 7,     0.,     2.,        2, "Helin ");
   Xh_init( 8,     0.,     2.,        2, "Helot ");
   Xh_init( 9,     0.,    12.,       12, "W mode");
+  Xh_init(10,     0.,     2.,        2, "CP    ");
 #ifdef TEMP_H
   if (!hMh)   hMh   = new TH1F("hMh"  ,"", 200,115.,135.);
   if (!hRSH)  hRSH  = new TH1F("hRSH" ,"",1100,  0.,fEcmInit*1.1);
@@ -856,7 +875,7 @@ void WHBases::SelectHelicities(Double_t &weight)
    fHelInitial[1] = kIHelComb[fJCombI][1];
    fJCombF = (Int_t)(fHelCombFinal*kNf);
    fJCombF = TMath::Min(fJCombF, kNf-1);
-   fHelFinal  [0] = kFHelComb[fJCombF][0];
-   fHelFinal  [1] = kFHelComb[fJCombF][1];
+   fHelFinal  [0] = kFHelComb[fJCombF][0]*fCP;
+   fHelFinal  [1] = kFHelComb[fJCombF][1]*fCP;
    weight *= kNf;
 }
