@@ -247,6 +247,7 @@ WHBases::WHBases(const char *name, const char *title)
            fBeamWidth (0.002),
            fPole      (0.),
            fPolp      (0.),
+	   fFixedCP   ( 1),
            fWModesLo  ( 1),
            fWModesHi  (12),
            fWBosonPtr ( 0),
@@ -330,6 +331,10 @@ WHBases::WHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("WHBases.Polp","0."));         // positron polarization
   ins >> fPolp;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WHBases.FixedCP","1"));      // CP combination (W+H-,W-H+)=(1,-1)
+  ins >> fFixedCP;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("WHBases.WModesLo","1"));      // Z decay mode lo
@@ -459,12 +464,19 @@ Double_t WHBases::Func()
   // --------------------------------------------
   //  Select final state CP
   // --------------------------------------------
-  if (fCPFinal < 0.5) {
+  Double_t weight = 1.;
+  if (fFixedCP > 0) {
      fCP = +1;
-  } else {
+  } else if (fFixedCP < 0) {
      fCP = -1;
+  } else {
+     if (fCPFinal < 0.5) {
+        fCP = +1;
+     } else {
+        fCP = -1;
+     }
+     weight = 2.;
   }
-  Double_t weight = 2.;
   bsWeight *= weight;
   // --------------------------------------------
   //  Select final state
