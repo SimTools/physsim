@@ -1,0 +1,57 @@
+/*
+ * Template Files
+ *
+ */
+
+#define CXXPACKAGE
+#include "config/kflib.tmpl"
+
+CXXFLAGS += -I../../../include -I$(LEDAROOT)/include
+
+PACKAGENAME   =  XBoson
+
+/*
+ * You don\'t have to edit anything below here
+ *
+ */
+
+SRCS          = XBoson.$(SrcSuf) \
+		GENVVStarDecay.$(SrcSuf)
+
+OBJS          = $(strip $(subst .$(SrcSuf),.$(ObjSuf),$(SRCS))) \
+		$(PACKAGENAME)Dict.$(ObjSuf)
+
+HDRS          = $(strip $(subst .$(SrcSuf),.$(HdrSuf),$(SRCS))) \
+
+DICTNAME      = $(PACKAGENAME)Dict
+
+SONAME	      = $(PACKAGENAME).$(DllSuf)
+
+JSFSOLIB      = prod/$(SONAME)
+
+/*
+ * Make Targets
+ *
+ */
+ 
+all::  $(JSFSOLIB)
+
+prod/$(SONAME): $(OBJS)
+	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS) -L../../../lib -lGENLib -lHELLib
+
+clean:: 
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
+
+depend:: $(SRCS) $(HDRS)
+	for i in $(SRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
+
+distclean:: clean
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~
+	@rm -f $(JSFSOLIB) *.root Makefile
+	@(cd prod; rm -f *.root *.tdr *.out *~ core)
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I../../../include -I$(LEDAROOT)/include -I$(JSFROOT)/include $(HDRS) LinkDef.h
