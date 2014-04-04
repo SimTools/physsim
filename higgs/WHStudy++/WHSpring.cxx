@@ -162,7 +162,7 @@ Bool_t WHSpringBuf::SetPartons()
     q(3) = pv[i].Pz();
   }
   Int_t    cp      = bases->GetCP();               // (W+H-,W-H+)=(+1,-1)
-  Int_t    idh     = 37*cp;                        // PDG code for H+
+  Int_t    idh     = -37*cp;                       // PDG code for H+
   Int_t    idw     = 24*cp;                        // PDG code for W+
   Int_t    idf3    = bases->f3Ptr->GetPID   ()*cp; // PDG code for f
   Double_t chrg3   = bases->f3Ptr->GetCharge()*cp; // F charge

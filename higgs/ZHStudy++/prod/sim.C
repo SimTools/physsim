@@ -25,7 +25,11 @@ Int_t sim()
   full   = new JSFLCFULL();
   spring = new ZHSpring(); 
   pythia = new JSFHadronizer();
+#if 1
   sim    = new JSFQuickSim();
+#else
+  stdhep=new JSFWriteStdHep();
+#endif
 
   //Int_t maxevt=10000;      // Number of event 
   Int_t maxevt=100;     // Number of event is 10.

@@ -124,7 +124,7 @@ private:
   Double_t       fCosH;           // cos(theta_H) in the HH frame
   Double_t       fPhiH;           // phi_h        in the HH frame
   Int_t          fHelInitial[2];  // initial state helicities
-  Int_t          fHelFinal  [3];  // final   state helicities
+  Int_t          fHelFinal  [4];  // final   state helicities
   Int_t          fJCombI;         // intial helicity combination
   Int_t          fJCombF;         // final  helicity combination
   ANL4DVector    fK[2];           // [0,1] = [e-, e+]

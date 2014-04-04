@@ -492,7 +492,7 @@ Double_t NNHHBases::DSigmaDX()
   Double_t cs12    = cs1*cs2 + sn1*sn2*TMath::Cos(fi2-fi1);
 
   Double_t x1, x2;
-  if (fEta1 > fEta2) {
+  if (fEta1 > -fEta2) {
     Double_t rximn = (qhh-m1+m2)*(qhh+m1+m2)/s;
     Double_t rximx = 1. - 2*m1/rs;
     x1    = 1. - rxi;

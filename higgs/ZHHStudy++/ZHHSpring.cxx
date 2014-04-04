@@ -683,7 +683,12 @@ Complex_t ZHHBases::AmpEEtoZHH(const HELFermion &em,
    HELVector zs(em, ep, glze, grze, kM_z, gamz);
 
    Double_t v     = 2.*kM_w/kGw;
+#if 1
    Double_t ghhh  = -TMath::Power(fMass,2)/v*3.; 
+#else
+   Double_t fact  =  -1.7;
+   Double_t ghhh  = -fact*TMath::Power(fMass,2)/v*3.; 
+#endif
    Double_t gzzh  = kGz*kM_z;
    Double_t gzzhh = kGz*kGz/2.; 
 

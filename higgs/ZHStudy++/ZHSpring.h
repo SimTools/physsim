@@ -45,6 +45,10 @@ public:
   // ----------------------
   Double_t GetMass     ()           const { return fMass;      }
   Double_t GetMassA    ()           const { return fMassA;     }
+  Double_t GetLambda   ()           const { return fLambda;    }
+  Double_t GetA        ()           const { return fA;         }
+  Double_t GetB        ()           const { return fB;         }
+  Double_t GetBtilde   ()           const { return fBtilde;    }
   Double_t GetEcmInit  ()           const { return fEcmInit;   }
 
   Double_t GetQ2ZH     ()           const { return fQ2ZH;      }
@@ -58,6 +62,10 @@ public:
 
   void     SetMass     (Double_t m      ) { fMass      = m;    }
   void     SetMassA    (Double_t m      ) { fMassA     = m;    }
+  void     SetLambda   (Double_t l      ) { fLambda    = l;    }
+  void     SetA        (Double_t a      ) { fA         = a;    }
+  void     SetB        (Double_t b      ) { fB         = b;    }
+  void     SetBtilde   (Double_t bt     ) { fBtilde    = bt;   }
   void     SetEcmInit  (Double_t ecm    ) { fEcmInit   = ecm;  }
   void     SetISR      (Bool_t b = kTRUE) { fISR       = b;    }
   void     SetBeamStr  (Bool_t b = kTRUE) { fBeamStr   = b;    }
@@ -97,6 +105,10 @@ private:
   // ----------------
   Double_t fMass;           // m_h    : mass  of H
   Double_t fMassA;          // m_A    : mass  of A
+  Double_t fLambda;         // Lambda : scale of anomalous couplings
+  Double_t fA;              // a
+  Double_t fB;              // b
+  Double_t fBtilde;         // b~
 
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?

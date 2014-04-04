@@ -24,6 +24,9 @@
 #ifdef __PHASESPACE__
 #define __NODECAY__
 #endif
+#ifdef __NODECAY__
+#define __ZEROWIDTH__
+#endif
 //#define TEMP_H
 #ifdef TEMP_H
 static TH1F *hMh       = 0;
@@ -279,6 +282,11 @@ Bool_t ZHSpringBuf::SetPartons()
 ZHBases::ZHBases(const char *name, const char *title)
          : JSFBases   (name, title), 
            fMass      ( 120.),
+           fMassA     (  0.2),
+           fLambda    (1000.),
+           fA         (   0.),
+           fB         (   0.),
+           fBtilde    (   0.),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
@@ -337,6 +345,22 @@ ZHBases::ZHBases(const char *name, const char *title)
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHBases.MassA","0.2")); 	 // M_A [GeV]
   ins >> fMassA;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHBases.Lambda","1000.")); 	 // Lambda [GeV]
+  ins >> fLambda;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHBases.A","0.")); 	 // a
+  ins >> fA;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHBases.B","0.")); 	 // b
+  ins >> fB;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("ZHBases.Btilde","0.")); 	 // btilde
+  ins >> fBtilde;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("ZHBases.EnableHtoAA","0")); 	 // H --> AA
@@ -749,8 +773,16 @@ Complex_t ZHBases::AmpEEtoZH(const HELFermion &em,
    // Higgs Production Amplitude
    //---------------------------
    HELVector zs(em, ep, glze, grze, kM_z, gamz);
-   Double_t gzzh  = kGz*kM_z;
+   Double_t gzzh   = kGz*kM_z;
+   Double_t g1     = gzzh + 2 * kM_z * kM_z * (fA/fLambda);
+   Double_t g2     = -2 * (fB/fLambda);
+   Double_t g3     = -4 * (fBtilde/fLambda);
+
+#ifndef ANOM_ZZH
    Complex_t amp = HELVertex(zs, zf, xf, gzzh);
+#else
+   Complex_t amp = HELVertex(zs, zf, xf, g1, g2, g3);
+#endif
 #endif /* end __PHASESPACE__ */
 
    return amp;

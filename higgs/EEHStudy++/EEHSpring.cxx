@@ -475,7 +475,7 @@ Double_t EEHBases::DSigmaDX()
   Double_t cs12    = cs1*cs2 + sn1*sn2*TMath::Cos(fi2-fi1);
 
   Double_t x1, x2;
-  if (fEta1 > fEta2) {
+  if (fEta1 > -fEta2) {
     Double_t rximn = (q3-m1+m2)*(q3+m1+m2)/s;
     Double_t rximx = 1. - 2*m1/rs;
     x1    = 1. - rxi;
@@ -663,7 +663,7 @@ void EEHBases::Userin()
   // --------------------------------------------
   //  Define some plots
   // --------------------------------------------
-  Double_t rs   = fEcmIP;
+  Double_t rs   = fEcmInit;
   Double_t s    = rs*rs;
   Double_t xilo = TMath::Log(fMass*fMass/s);
   Double_t xihi = 0.;
