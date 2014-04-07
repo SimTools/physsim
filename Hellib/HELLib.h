@@ -135,6 +135,17 @@ public:
 		   Double_t    g,
 		   Double_t    m,
 		   Double_t    gm);
+   HELVector (Double_t ebm, 
+              Double_t eef,
+	      Double_t sh,
+	      Double_t ch,
+	      Double_t fi,
+	      Int_t    helbm,
+	      Int_t    helef,
+	      Int_t    nsf,
+	      Double_t ge = TMath::Sqrt(4.*TMath::Pi()/128.),
+	      Double_t me = 0.510998902e-3);
+
    virtual ~HELVector() {}
 
    inline const ANL4DVector &GetFourMomentum() const  { return fP;   }

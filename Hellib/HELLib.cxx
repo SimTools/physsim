@@ -495,6 +495,66 @@ HELVector::HELVector(const HELVector  &v1,
    }
 }
 
+//----------
+// JEEXXX()
+//----------
+HELVector::HELVector (Double_t ebm, 
+                      Double_t eef,
+	              Double_t sh,
+	              Double_t ch,
+	              Double_t fi,
+	              Int_t    helbm,
+	              Int_t    helef,
+	              Int_t    nsf,
+		      Double_t ge,
+		      Double_t me)
+          : TVectorC(4),
+	    fM(0.),
+            fHel(0),
+            fNSV(0)
+{
+   Double_t hi  = helbm;
+   Double_t sf  = nsf;
+   Double_t sfh = helbm*nsf;
+   Double_t cs[2];
+   cs[(1+nsf)/2] = sh;
+   cs[(1-nsf)/2] = ch;
+
+   Double_t x   = eef/ebm;
+   Double_t me2 = me*me;
+   Double_t q2  = -4.*cs[1]*cs[1]*(eef*ebm-me2)
+	          + sf*(1.-x)*(1-x)/x*(sh+ch)*(sh-ch)*me2;
+   Double_t rfp = 1 + nsf;
+   Double_t rfm = 1 - nsf;
+   Double_t cfi = TMath::Cos(fi);
+   Double_t sfi = TMath::Sin(fi);
+
+   if (helbm == helef) {
+      Double_t  rxc   = 2.*x/(1.-x)*cs[0]*cs[0];
+      Complex_t coeff = ge*2.*ebm*TMath::Sqrt(x)*cs[1]/q2
+	               *(Complex_t(rfp,0.)-rfm*Complex_t(cfi, -sfi*hi))*0.5;
+      (*this)[0] =  Complex_t(0., 0.);
+      (*this)[1] =  coeff*Complex_t((1.+rxc)*cfi, -sfh*sfi);
+      (*this)[2] =  coeff*Complex_t((1.+rxc)*sfi,  sfh*cfi);
+      (*this)[3] =  coeff*(-sf*rxc/cs[0]*cs[1]);
+   } else {
+      Complex_t coeff = ge*me/q2/TMath::Sqrt(x)
+	               *(Complex_t(rfp,0.)+rfm*Complex_t(cfi, sfi*hi))*0.5*hi;
+      (*this)[0] = -coeff*(1.+x)*cs[1]*Complex_t(cfi, sfh*sfi);
+      (*this)[1] =  coeff*(1.-x)*cs[0];
+      (*this)[2] =  (*this)[1]*Complex_t(0., sfh);
+      (*this)[3] =  (*this)[0]*sf*(1.-x)/(1.+x);
+   }
+   Double_t cth = (ch+sh)*(ch-sh);
+   Double_t sth  = 2.*sh*ch;
+
+   fP(0) = -ebm*(1. - x);
+   fP(1) = ebm*x*sth*cfi;
+   fP(2) = ebm*x*sth*sfi;
+   fP(3) = -ebm*(sf - x*cth);
+}
+
+
 //-----------------------------------------------------------------------------
 // ==============================
 //  class HELScalar
