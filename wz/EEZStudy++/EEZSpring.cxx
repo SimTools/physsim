@@ -179,12 +179,12 @@ Bool_t EEZSpringBuf::SetPartons()
   cerr << "----" << endl;
 #endif
 
-  //                              No. PID   Mass  Charge   pv    Nd 1st Mom hel  col shower
+  //                              No. PID   Mass  Charge   pv   Nd 1st Mom hel  col shower
   new (partons[0]) JSFSpringParton(1, ide,   me,    qe, *qp[0], 0, 0,  0,    0,   0,     0);
   new (partons[1]) JSFSpringParton(2,-ide,   me,   -qe, *qp[1], 0, 0,  0,    0,   0,     0);
-  new (partons[2]) JSFSpringParton(3, idz, rq2z,    0., *qp[2], 0, 0,  0,    0,   0,     0);
-  new (partons[3]) JSFSpringParton(4, idf,   m3,  chrg, *qp[3], 0, 0,  2, hel1, icf, islev);
-  new (partons[4]) JSFSpringParton(5,-idf,   m4, -chrg, *qp[4], 0, 0,  2, hel2, icf, islev);
+  new (partons[2]) JSFSpringParton(3, idz, rq2z,    0., *qp[2], 2, 4,  0,    0,   0,     0);
+  new (partons[3]) JSFSpringParton(4, idf,   m3,  chrg, *qp[3], 0, 0,  3, hel1, icf, islev);
+  new (partons[4]) JSFSpringParton(5,-idf,   m4, -chrg, *qp[4], 0, 0,  3, hel2, icf, islev);
 
   return kTRUE ;
 }
