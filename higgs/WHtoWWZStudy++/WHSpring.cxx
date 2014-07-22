@@ -181,10 +181,10 @@ Bool_t WHSpringBuf::SetPartons()
     q(3) = pv[i].Pz();
   }
   Int_t    cp      = bases->GetCP();               // (W+H-,W-H+)=(+1,-1)
-  Int_t    idh     = -37*cp;                       // PDG code for H+
+  Int_t    idh     = -37*cp;                       // PDG code for H-
   Int_t    idw1    = 24*cp;                        // PDG code for W+
-  Int_t    idw2    = -24*cp;                       // PDG code for W+
-  Int_t    idz     = 23;                           // PDG code for W+
+  Int_t    idw2    = -24*cp;                       // PDG code for W-
+  Int_t    idz     = 23;                           // PDG code for Z
 
   Double_t rq2h    = pv[0].Mag();
 
@@ -201,11 +201,11 @@ Bool_t WHSpringBuf::SetPartons()
   Int_t    icf1    = 2;                            // color flux id
   Double_t rq2w1   = pv[1].Mag();
 
-  Int_t    idf3    = bases->f3Ptr->GetPID   ()*cp; // PDG code for u-fb from W2
-  Double_t chrg3   = bases->f3Ptr->GetCharge()*cp; // charge
+  Int_t    idf3    = -bases->f3Ptr->GetPID   ()*cp; // PDG code for u-fb from W2
+  Double_t chrg3   = -bases->f3Ptr->GetCharge()*cp; // charge
   Double_t m3      = bases->f3Ptr->GetMass  ();    // mass
-  Int_t    idf4    = bases->f4Ptr->GetPID   ()*cp; // PDG code for d-f from W2
-  Double_t chrg4   = bases->f4Ptr->GetCharge()*cp; // charge
+  Int_t    idf4    = -bases->f4Ptr->GetPID   ()*cp; // PDG code for d-f from W2
+  Double_t chrg4   = -bases->f4Ptr->GetCharge()*cp; // charge
   Double_t m4      = bases->f4Ptr->GetMass  ();    // mass
   Int_t    hel3    = bases->fHelFinal[2];          // f3 helicity
   Int_t    hel4    = bases->fHelFinal[3];          // f4 helicity
@@ -269,17 +269,17 @@ Bool_t WHSpringBuf::SetPartons()
                    << qcm[3] << ") " << endl;
 #endif
 
-  //                               No. PID  Mass  Charge   pv    Nd 1st  Mom hel  col shower
+  //                                No. PID  Mass   Charge   pv    Nd 1st  Mom hel  col shower
   new (partons[0]) JSFSpringParton( 1, idh ,  rq2h,    -cp, *qp[0], 2, 5,  0,    0,    0,      0);
   new (partons[1]) JSFSpringParton( 2, idw1, rq2w1,     cp, *qp[1], 2, 3,  0,    0,    0,      0);
   new (partons[2]) JSFSpringParton( 3, idf1,    m1,  chrg1, *qp[4], 0, 0,  2, hel1, icf1, islev1);
   new (partons[3]) JSFSpringParton( 4, idf2,    m2,  chrg2, *qp[5], 0, 0,  2, hel2, icf1, islev1);
   new (partons[4]) JSFSpringParton( 5, idw2, rq2w2,    -cp, *qp[2], 2, 7,  1,    0,    0,      0);
   new (partons[5]) JSFSpringParton( 6, idz , rq2z ,      0, *qp[3], 2, 9,  1,    0,    0,      0);
-  new (partons[6]) JSFSpringParton( 7, idf3,    m3,  chrg3, *qp[6], 0, 0,  2, hel3, icf2, islev2);
-  new (partons[7]) JSFSpringParton( 8, idf4,    m4,  chrg4, *qp[7], 0, 0,  2, hel4, icf2, islev2);
-  new (partons[8]) JSFSpringParton( 9, idf5,    m5,  chrg5, *qp[8], 0, 0,  2, hel5, icf3, islev3);
-  new (partons[9]) JSFSpringParton(10, idf6,    m6,  chrg6, *qp[9], 0, 0,  2, hel6, icf3, islev3);
+  new (partons[6]) JSFSpringParton( 7, idf3,    m3,  chrg3, *qp[6], 0, 0,  5, hel3, icf2, islev2);
+  new (partons[7]) JSFSpringParton( 8, idf4,    m4,  chrg4, *qp[7], 0, 0,  5, hel4, icf2, islev2);
+  new (partons[8]) JSFSpringParton( 9, idf5,    m5,  chrg5, *qp[8], 0, 0,  6, hel5, icf3, islev3);
+  new (partons[9]) JSFSpringParton(10, idf6,    m6,  chrg6, *qp[9], 0, 0,  6, hel6, icf3, islev3);
 
   return kTRUE ;
 }
