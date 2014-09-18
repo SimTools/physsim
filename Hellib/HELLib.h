@@ -152,6 +152,9 @@ public:
    inline       Double_t     GetMass        () const  { return fM;   }
    inline       Int_t        GetHelicity    () const  { return fHel; }
    inline       Int_t        GetNSV         () const  { return fNSV; }
+#if 1
+   void DebugPrint() const;
+#endif
    
 private:
    ANL4DVector fP;                // 4-momentum * fNSV
@@ -242,6 +245,28 @@ public:
              const HELVector  &v2,
              const HELVector  &v3,
                    Double_t    g);
+   HELVertex(const HELVector  &wm,
+             const HELVector  &w31,
+             const HELVector  &wp,
+             const HELVector  &w32,
+                   Double_t    g31,
+                   Double_t    g32,
+                   Double_t    mw,
+                   Double_t    gamw,
+                   Bool_t      mode);
+   HELVertex(const HELVector  &wm1,
+             const HELVector  &wp1,
+             const HELVector  &wm2,
+             const HELVector  &wp2,
+                   Double_t    gwwa,
+                   Double_t    gwwz,
+                   Double_t    mz,
+                   Double_t    gamz);
+   HELVertex(const HELVector  &v1,
+             const HELVector  &v2,
+             const HELVector  &v3,
+             const HELVector  &v4,
+                   Double_t     g);
    HELVertex(const HELVector  &vc,
              const HELScalar  &s1,
              const HELScalar  &s2,
