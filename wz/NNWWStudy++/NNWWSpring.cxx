@@ -1109,14 +1109,14 @@ void NNWWBases::Userin()
   // --------------------------------------------
   Double_t rs    = fEcmInit;
   Double_t s     = rs*rs;
-  Double_t xilo  = TMath::Log(fMass*fMass/s);
-  Double_t xihi  = 0.;
   Double_t mw    = fWmBosonPtr->GetMass();
+  Double_t xilo  = TMath::Log(4.*mw*mw/s);
+  Double_t xihi  = 0.;
   Double_t dm1   = mw*mw/s;
   Double_t dp1   = 1.;
   Double_t etlo  = -TMath::Log((1.+dm1)/dp1)/2.;
   Double_t ethi  =  TMath::Log((1.+dp1)/dm1)/2.;
-  Double_t qwwlo = 2*mw - 40.;
+  Double_t qwwlo = 0.; //2*mw - 40.;
   Double_t qwwhi = rs;
 
   Xh_init( 1,     0., fEcmInit*1.1, 50, "Ecm"   );
