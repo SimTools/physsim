@@ -1026,8 +1026,8 @@ HELVertex::HELVertex(const HELVector  &wm1,
 
    Double_t gwwa2 = gwwa*gwwa;
    Double_t gwwz2 = gwwz*gwwz;
-   Double_t gw2   = gwwa2*gwwz2;
-   Complex_t vertex = (v12*v34 + v14*v23 - 2.*v13*v24)*gw2
+   Double_t dgw2  = gwwa2 + gwwz2;
+   Complex_t vertex = (v12*v34 + v14*v23 - 2.*v13*v24)*dgw2
                     + (dzs*gwwz2 + das*gwwa2)*js - dzs*gwwz2*js12*js34/mz2
                     + (dzt*gwwz2 + dat*gwwa2)*jt - dzt*gwwz2*js14*js32/mz2;
 
