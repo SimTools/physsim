@@ -914,7 +914,7 @@ void NNZBases::SelectHelicities(Double_t &weight)
    static const Int_t kIHelComb[kNi][2] = {{-1, +1},
                                            {+1, -1}};
    static const Int_t kNf = 2;
-   static const Int_t kFHelComb[kNf][6] = {{-1, +1, -1, +1},
+   static const Int_t kFHelComb[kNf][4] = {{-1, +1, -1, +1},
                                            {-1, +1, +1, -1}};
    Double_t helm = (1. - fPole)/2.;
    if (fHelCombInitial < helm) {
