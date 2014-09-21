@@ -91,9 +91,6 @@ private:
   // ----------------
   //  Job parameters
   // ----------------
-  Double_t fMass;           // m_h    : mass  of H
-  Double_t fWidth;          // Gam_h  : width of H
-
   Double_t fEcmInit;        // Initial Ecm
   Int_t    fISR;            // ISR on?
   Int_t    fBeamStr;        // Beamstrahlung on?

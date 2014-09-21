@@ -204,8 +204,6 @@ Bool_t NNZSpringBuf::SetPartons()
 // --------------------------
 NNZBases::NNZBases(const char *name, const char *title)
          : JSFBases   (name, title), 
-           fMass      ( 125.),
-           fWidth     ( 0.004),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
