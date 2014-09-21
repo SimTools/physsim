@@ -154,7 +154,7 @@ Bool_t NNWWSpringBuf::SetPartons()
     q(2) = pv[i].Py();
     q(3) = pv[i].Pz();
   }
-  Int_t    idw     = 23;                          // PDG code for W+
+  Int_t    idw     = 24;                          // PDG code for W+
   Int_t    idne    = 12;                          // PDG code for nu_e
 
   // W-
