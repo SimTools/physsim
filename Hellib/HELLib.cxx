@@ -170,8 +170,8 @@ HELFermion::HELFermion(const HELFermion &f,
          (*this)[3] = gl * ((fP(0) + fP(3))*sl2 - (fP(1) - fP(2)*kI)*sl1)*d;
       } else {
          Complex_t sr1 =   (v[0] -    v[3])*f[0]
-                         - (v[1] - kI*v[2])*f[1];
-         Complex_t sr2 = - (v[1] + kI*v[2])*f[0]
+                         - (v[1] + kI*v[2])*f[1];
+         Complex_t sr2 = - (v[1] - kI*v[2])*f[0]
                          + (v[0] +    v[3])*f[1];
          (*this)[0] = ( gr * ((fP(0) + fP(3))*sr1 + (fP(1) + fP(2)*kI)*sr2)
                       + gl * m * sl1) * d;
