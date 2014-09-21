@@ -85,15 +85,15 @@ public:
 private:
   void     SelectHelicities(Double_t &weight);
 
-  Double_t  DSigmaDX     (GENBranch &wwbranch);
+  Double_t  DSigmaDX     (GENBranch &zzbranch);
   Double_t  AmpSquared   ();
   Complex_t FullAmplitude();
   Complex_t AmpEEtoNNZZ   (const HELFermion &em,
                            const HELFermion &ep,
                            const HELFermion &ne,
                            const HELFermion &neb,
-                           const HELVector  &wm,
-                           const HELVector  &wp);
+                           const HELVector  &z1,
+                           const HELVector  &z2);
   Complex_t AmpEEtoNNT    (const HELFermion &em,
                            const HELFermion &ep,
                            const HELFermion &ne,
