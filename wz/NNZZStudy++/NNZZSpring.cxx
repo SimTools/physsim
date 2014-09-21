@@ -1173,7 +1173,7 @@ void NNZZBases::Userin()
   Xh_init(15,    -1.,    +1.,       50, "CosF5" );
   Xh_init(16,     0.,   k2Pi,       50, "PhiF5" );
   Xh_init(17,     0.,     2.,        2, "Helin ");
-  Xh_init(18,     0.,     2.,        2, "Helot ");
+  Xh_init(18,     0.,     2.,        4, "Helot ");
   Xh_init(19,     0.,    12.,       12, "Z1 mode");
   Xh_init(20,     0.,    12.,       12, "Z2 mode");
 }
