@@ -540,6 +540,27 @@ Double_t ENWBases::Func()
   // --------------------------------------------
   //  Fill plots
   // --------------------------------------------
+  Double_t qwn2 = s*rxi + m1*m1;
+  Double_t qwn  = TMath::Sqrt(qwn2);
+  Double_t exp2et1 = TMath::Exp(2.*fEta1);
+  Double_t sh1     = TMath::Min(TMath::Sqrt((1.+dpe+dme)/(1.+exp2et1) - dme), 1.);
+  Double_t mw    = fWBosonPtr->GetMass();
+  Double_t dlt   = 2.*mw*mw/((qwn-mw)*(qwn+mw));
+  Double_t opdzt = TMath::Power(1. + 1./dlt, fEta2);
+  Double_t sh2   = TMath::Min(TMath::Sqrt(dlt*(opdzt - 1.)), 1.);
+  Double_t xe    = 1. + m1*m1/s - qwn2/s;
+  const Double_t kSqrt2 = TMath::Sqrt(2.);
+  Double_t cose  = (1. - kSqrt2*sh1)*(1. + kSqrt2*sh1);
+  Double_t cosn  = (1. - kSqrt2*sh2)*(1. + kSqrt2*sh2);
+  ANL4DVector ptee  = fP[0] - fK[0];
+  Double_t    aptee = ptee.P();
+  Double_t    aetee = ptee.E();
+  Double_t    tee   = (aetee-aptee)*(aetee+aptee);
+  ANL4DVector pw    = fP[2] + fP[3];
+  Double_t    xtw   = 2.*pw.Pt()/rs;
+  Double_t    xel   = 2.*fP[0].E()/rs;
+  Double_t    xnu   = 2.*fP[1].E()/rs;
+  Double_t    xwp   = 2.*pw.E()/rs;
 
   Xh_fill( 1, fEcmIP           , (bsWeight*sigma));
   Xh_fill( 2, fXi              , (bsWeight*sigma));
@@ -555,6 +576,14 @@ Double_t ENWBases::Func()
   Xh_fill(12, (Double_t)fJCombF, (bsWeight*sigma));
   Xh_fill(13, (Double_t)fWMode , (bsWeight*sigma));
   Xh_fill(14, (Double_t)fCP    , (bsWeight*sigma));
+  Xh_fill(15, cose             , (bsWeight*sigma));
+  Xh_fill(16, xe               , (bsWeight*sigma));
+  Xh_fill(17, cosn             , (bsWeight*sigma));
+  Xh_fill(18, xtw              , (bsWeight*sigma));
+  Xh_fill(19, xel              , (bsWeight*sigma));
+  Xh_fill(20, xnu              , (bsWeight*sigma));
+  Xh_fill(21, xwp              , (bsWeight*sigma));
+  Xh_fill(22, tee              , (bsWeight*sigma));
 
   return (bsWeight * sigma);
 }
@@ -587,7 +616,7 @@ Double_t ENWBases::DSigmaDX()
   Double_t dp1 = 1.;
 
   Double_t exp2et1 = TMath::Exp(2.*fEta1);
-  Double_t sh1     = TMath::Min(TMath::Sqrt((1.+dp1+dm1)/(1.+exp2et1)   - dm1), 1.);
+  Double_t sh1     = TMath::Min(TMath::Sqrt((1.+dp1+dm1)/(1.+exp2et1) - dm1), 1.);
   Double_t ch1     = TMath::Sqrt((1-sh1)*(1+sh1));
   static Double_t kSqrt2 = TMath::Sqrt(2.);
   Double_t cs1     = (1.-kSqrt2*sh1)*(1.+kSqrt2*sh1);
@@ -758,7 +787,7 @@ Complex_t ENWBases::AmpEEtoENW(const HELFermion &em,
    Complex_t amp = 1;
 #else
    //---------------------------
-   // Z Production Amplitude
+   // ENW Production Amplitude
    //---------------------------
    Double_t  mn    = kMass[0][0][0];
    Double_t  me    = kMass[0][1][0];
@@ -912,6 +941,14 @@ void ENWBases::Userin()
   Xh_init(12,     0.,     2.,        2, "Helot ");
   Xh_init(13,     0.,    12.,       12, "w mode");
   Xh_init(14,    -1.,    +1.,        2, "CP flg");
+  Xh_init(15,    -1.,    +1.,       50, "cos(e)");
+  Xh_init(16,     0.,     1.,       50, "xe    ");
+  Xh_init(17,    -1.,    +1.,       50, "cos(n)");
+  Xh_init(18,     0.,     1.,       50, "ptw/eb");
+  Xh_init(19,     0.,     1.,       50, "ee/eb ");
+  Xh_init(20,     0.,     1.,       50, "en/eb ");
+  Xh_init(21,     0.,     1.,       50, "eW/eb ");
+  Xh_init(22,     -s,     0.,       50, "tee   ");
 }
 
 //_____________________________________________________________________________
