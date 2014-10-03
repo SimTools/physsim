@@ -21,6 +21,7 @@ CC**********************************************************************
  
       SUBROUTINE UHSETF(P,EB,EA)
  
+      IMPLICIT REAL*8 ( A-H, O-Z )
       REAL*8     P(3), EB(3,3), EA(3,3)
       REAL*8     E(3,3), E2(3)
       DATA XMIN  / 1.D-12 /
