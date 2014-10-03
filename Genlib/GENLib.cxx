@@ -598,8 +598,8 @@ GENFrame::GENFrame(const ANL4DVector &q, const GENFrame &eb)
    Double_t ae2  = fEV[1].Mag();
    static const Double_t kXmin = 1.e-12;
    if (ae2 < kXmin) {
-      fEV[0] = eb.fEV[0]; fEV[1] = eb.fEV[1]; fEV[2] = eb.fEV[2];
       Double_t csth = fEV[2] * eb.fEV[2];
+      fEV[0] = eb.fEV[0]; fEV[1] = eb.fEV[1]; fEV[2] = eb.fEV[2];
       if (csth <= 0.) {
          fEV[2] = -eb.fEV[2];
       }
