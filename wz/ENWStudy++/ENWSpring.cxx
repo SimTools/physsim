@@ -16,6 +16,7 @@
 
 #include <sstream>
 #include <iomanip>
+//#define __ZEROWIDTH__
 //#define __DEBUG__
 //#define __PHASESPACE__
 
@@ -111,12 +112,12 @@ Bool_t ENWSpringBuf::SetPartons()
   pv[3] = bases->fP[2]; // fu  / fub
   pv[4] = bases->fP[3]; // fdb / fd
   pv[2] = pv[3] + pv[4];
-  for (Int_t i=0; i<fNparton; i++) pv[i] *= ((Double_t)fCP);
 
   // ----------------------------------------------
   //  Boost them to lab. frame
   // ----------------------------------------------
   fCP           = bases->GetCP();
+  for (Int_t i=0; i<fNparton; i++) pv[i] *= ((Double_t)fCP);
   fZBoost       = bases->GetZBoost();
   fEcmIP        = bases->GetEcmIP();
   fXi           = bases->GetXi();
@@ -149,7 +150,7 @@ Bool_t ENWSpringBuf::SetPartons()
   }
   Int_t    idw     = fCP*24;                          // PDG code for W+
   Int_t    ide     = fCP*11;                          // PDG code for e-
-  Int_t    idn     = fCP*12;                          // PDG code for e-
+  Int_t    idn     = fCP*(-12);                       // PDG code for e-
   Double_t mn      = 0.;                              // electron mass
   Double_t me      = kM_e;                            // electron mass
   Double_t chrgw   = fCP;
@@ -488,9 +489,9 @@ Double_t ENWBases::Func()
   // --------------------------------------------
 
   Double_t rs   = fEcmIP;
+#ifndef __ZEROWIDTH__
   Double_t qmin = m3 + m4;
   Double_t qmax = rs - (m1 + m2);
-#ifndef __ZEROWIDTH__
   fQ2W = fWBosonPtr->GetQ2BW(qmin, qmax, fXQ2W, weight);
 #else
   fQ2W = TMath::Power(fWBosonPtr->GetMass(),2);
@@ -996,10 +997,10 @@ void ENWBases::SelectHelicities(Double_t &weight)
       if (fHelCombInitial < helm || helm == 1.) {
          Double_t helcombi = fHelCombInitial/helm;
          if (helcombi < help) fJCombI = 3;
-         else                 fJCombI = 2;
+         else                 fJCombI = 1;
       } else {
          Double_t helcombi = (fHelCombInitial-helm)/(1.-helm);
-         if (helcombi < help) fJCombI = 1;
+         if (helcombi < help) fJCombI = 2;
          else                 fJCombI = 0;
       }
    }
