@@ -274,6 +274,22 @@ HELVector::HELVector(const ANL4DVector &p,
 #endif
 }
 
+HELVector::HELVector(Complex_t v0,
+                     Complex_t v1,
+                     Complex_t v2,
+                     Complex_t v3,
+                     const ANL4DVector &p)
+	  : fM(0),
+            fHel(0),
+            fNSV(0)
+{
+   (*this)[0] = v0;
+   (*this)[1] = v1;
+   (*this)[2] = v2;
+   (*this)[3] = v3;
+   fP = p;
+}
+
 //----------
 // JIOXXX()
 //----------

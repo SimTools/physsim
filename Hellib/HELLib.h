@@ -145,6 +145,11 @@ public:
 	      Int_t    nsf,
 	      Double_t ge = TMath::Sqrt(4.*TMath::Pi()/128.),
 	      Double_t me = 0.510998902e-3);
+   HELVector (Complex_t v0,
+              Complex_t v1,
+              Complex_t v2,
+              Complex_t v3,
+	      const ANL4DVector &p);
 
    virtual ~HELVector() {}
 
