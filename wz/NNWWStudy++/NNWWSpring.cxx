@@ -1136,7 +1136,7 @@ void NNWWBases::Userin()
   Xh_init(15,    -1.,    +1.,       50, "CosFub");
   Xh_init(16,     0.,   k2Pi,       50, "PhiFub");
   Xh_init(17,     0.,     2.,        2, "Helin ");
-  Xh_init(18,     0.,     2.,        2, "Helot ");
+  Xh_init(18,     0.,     1.,        1, "Helot ");
   Xh_init(19,     0.,    12.,       12, "W- mode");
   Xh_init(20,     0.,    12.,       12, "W+ mode");
 }

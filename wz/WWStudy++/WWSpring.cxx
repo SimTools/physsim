@@ -58,8 +58,8 @@ WWSpring::WWSpring(const char *name,
 // --------------------------
 WWSpring::~WWSpring()
 {
-  delete fEventBuf;
-  delete GetBases();
+  //delete fEventBuf;
+  //delete GetBases();
 }
 
 //_____________________________________________________________________________
@@ -873,7 +873,7 @@ void WWBases::Userin()
   Xh_init( 8, fXL[4], fXU[4],       50, "CosFdb" );
   Xh_init( 9, fXL[5], fXU[5],       50, "PhiFdb" );
   Xh_init(10,     0.,     2.,        2, "Helin " );
-  Xh_init(11,     0.,     1.,        2, "Helot " );
+  Xh_init(11,     0.,     1.,        1, "Helot " );
   Xh_init(12,     0.,    12.,       12, "W- mode");
   Xh_init(13,     0.,    12.,       12, "W+ mode");
 }

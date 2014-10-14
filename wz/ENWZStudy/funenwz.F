@@ -38,13 +38,13 @@ C--
       DATA ( ( JHEL(I,J,1),I=1,NP ), J= 1,NHEL )  /
      .             -1,+1,   -1, +1,   +1,-1, +1,-1,
      .             -1,+1,   -1, +1,   +1,-1, -1,+1,
-     .             -1,+1,   +1, +1,   +1,-1, +1,-1,
-     .             -1,+1,   +1, +1,   +1,-1, -1,+1/
+     .             +1,+1,   +1, +1,   +1,-1, +1,-1,
+     .             +1,+1,   +1, +1,   +1,-1, -1,+1/
       DATA ( ( JHEL(I,J,2),I=1,NP ), J= 1,NHEL )  /
      .             -1,-1,   -1, +1,   +1,-1, +1,-1,
      .             -1,-1,   -1, +1,   +1,-1, -1,+1,
-     .             -1,-1,   +1, +1,   +1,-1, +1,-1,
-     .             -1,-1,   +1, +1,   +1,-1, -1,+1/
+     .             +1,-1,   +1, +1,   +1,-1, +1,-1,
+     .             +1,-1,   +1, +1,   +1,-1, -1,+1/
 C--
       DATA NCALL /  0 /
       EXTERNAL   XHFILL, DHFILL
@@ -257,21 +257,33 @@ C-- q^2_WZ.
 C-- q^2_W+.
       Q4MN  = AM5 + AM6
       Q4MX  = Q3  - ( AM7 + AM8 )
+#ifndef __ZEROWIDTH__
       TH4MN = ATAN((Q4MN-AMW)*(Q4MN+AMW)/AMGW)
       TH4MX = ATAN((Q4MX-AMW)*(Q4MX+AMW)/AMGW)
       TH4   = TH4MN + (TH4MX-TH4MN)*Z(9)
       Q42   = AMGW*TAN(TH4) + AMW2
       Q4    = SQRT(Q42)
       WAT   = WAT*(TH4MX-TH4MN)*( (Q42-AMW2)**2 + AMGW2 )/AMGW
+#else
+      Q42   = AMW**2
+      Q4    = AMW
+      WAT   = WAT*xPI*AMGW
+#endif
 C-- q^2_Z0.
       Q5MN  = AM7 + AM8
       Q5MX  = Q3  - Q4
+#ifndef __ZEROWIDTH__
       TH5MN = ATAN((Q5MN-AMZ)*(Q5MN+AMZ)/AMGZ)
       TH5MX = ATAN((Q5MX-AMZ)*(Q5MX+AMZ)/AMGZ)
       TH5   = TH5MN + (TH5MX-TH5MN)*Z(10)
       Q52   = AMGZ*TAN(TH5) + AMZ2
       Q5    = SQRT(Q52)
       WAT   = WAT*(TH5MX-TH5MN)*( (Q52-AMZ2)**2 + AMGZ2 )/AMGZ
+#else
+      Q52   = AMZ**2
+      Q5    = AMZ
+      WAT   = WAT*xPI*AMGZ
+#endif
 C-- Xi_lo.
       XILO = LOG(Q3*(Q3+AM3+AM4)/S)
       XIHI = LOG(1-2*AM3/RS)

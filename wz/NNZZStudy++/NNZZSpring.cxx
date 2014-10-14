@@ -198,7 +198,7 @@ Bool_t NNZZSpringBuf::SetPartons()
          <<  pv[ip].Py() << ", "
          <<  pv[ip].Pz() << ") "
 	 << "m = " << pv[ip].GetMass() << endl;
-    qcm += pv[ip];
+    if (ip<fNparton-2) qcm += pv[ip];
   }
   cerr << "qcm = ("
        <<  qcm.E() << ", "

@@ -26,9 +26,9 @@ XCOMM ##########################################################################
  * The following line forces the amplitude to the ZH diagram only
  *
  */
-EXTRADEFINES=-DHIGGSONLY -DANOM_HVV
+/*EXTRADEFINES=-DHIGGSONLY -DANOM_HVV*/
 /*EXTRADEFINES=-DHIGGSONLY*/
-/*EXTRADEFINES=*/
+EXTRADEFINES=
 
 CXXFLAGS +=$(EXTRADEFINES)
 
