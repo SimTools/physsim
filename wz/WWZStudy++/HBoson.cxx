@@ -226,6 +226,10 @@ Complex_t HBoson::AmpUtils::FullAmplitude(ANL4DVector &k,
    Double_t glv2   = -kGw*kSqh;
    Double_t grv2   = 0;
 
+   Double_t g1     = ghvv + 2 * mv1 * mv2 * (fHBosonPtr->fA/fHBosonPtr->fLambda);
+   Double_t g2     = -2 * (fHBosonPtr->fB/fHBosonPtr->fLambda);
+   Double_t g3     = -4 * (fHBosonPtr->fBtilde/fHBosonPtr->fLambda);
+
    if (v1p->GetName().Contains("Z")) {
       Double_t qf     = f1p->GetCharge();
       Double_t t3f    = f1p->GetISpin();
@@ -236,6 +240,15 @@ Complex_t HBoson::AmpUtils::FullAmplitude(ANL4DVector &k,
                glv2   = -kGz*(t3f - qf*kSin2W);
                grv2   = -kGz*(    - qf*kSin2W);
 	       ghvv   = kGz*kM_z;
+#if 0
+               g1     = ghvv + 2 * mv1 * mv2 * (fA/fLambda);
+               g2     = -2 * (fB/fLambda);
+               g3     = -4 * (fBtilde/fLambda);
+#else
+               g1     = ghvv;
+               g2     = 0.;
+               g3     = 0.;
+#endif
    }
 
    static const Bool_t kIsIncoming = kTRUE;
@@ -251,7 +264,11 @@ Complex_t HBoson::AmpUtils::FullAmplitude(ANL4DVector &k,
 
    HELScalar  h(k);
 
+#ifndef ANOM_WWH
    Complex_t amp = HELVertex(v1f, v2f, h, ghvv);
+#else
+   Complex_t amp = HELVertex(v1f, v2f, h, g1, g2, g3);
+#endif
 
    return amp;
 }
