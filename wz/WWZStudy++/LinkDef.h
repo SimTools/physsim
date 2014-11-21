@@ -7,5 +7,7 @@
 #pragma link C++ class WWZSpring+;
 #pragma link C++ class WWZSpringBuf+;
 #pragma link C++ class WWZBases+;
+#pragma link C++ class HBoson+;
+#pragma link C++ class GENVVStarDecay+;
 
 #endif

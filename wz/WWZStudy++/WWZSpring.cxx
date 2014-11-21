@@ -13,6 +13,7 @@
 
 #include "JSFSteer.h"
 #include "WWZSpring.h"
+#include "HBoson.h"
 
 #include <sstream>
 #include <iomanip>
@@ -291,6 +292,11 @@ Bool_t WWZSpringBuf::SetPartons()
 // --------------------------
 WWZBases::WWZBases(const char *name, const char *title)
          : JSFBases    (name, title), 
+           fMass       (9999.),
+           fLambda     (1000.),
+           fA          (   0.),
+           fB          (   0.),
+           fBtilde     (   0.),
            fEcmInit    (500.),
            fISR        ( 1),
            fBeamStr    ( 1),
@@ -307,6 +313,7 @@ WWZBases::WWZBases(const char *name, const char *title)
 	   fACC2       (0.05),
 	   fITMX1      (20),
 	   fITMX2      (40),
+           fHBosonPtr  ( 0),
            fWmBosonPtr ( 0),
            fWpBosonPtr ( 0),
            fZBosonPtr  ( 0),
@@ -460,6 +467,31 @@ WWZBases::WWZBases(const char *name, const char *title)
 
   ins.str("");
   ins.clear();
+  ins.str(gJSF->Env()->GetValue("WWZBases.HiggsMass","9999."));  // m_H [GeV]
+  ins >> fMass;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WWZBases.Lambda","1000.")); 	 // Lambda [GeV]
+  ins >> fLambda;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WWZBases.A","0.")); 	 // a
+  ins >> fA;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WWZBases.B","0.")); 	 // b
+  ins >> fB;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("WWZBases.Btilde","0.")); 	 // btilde
+  ins >> fBtilde;
+
+  ins.str("");
+  ins.clear();
   ins.str(gJSF->Env()->GetValue("WWZBases.ACC1","0.05"));
   ins >> fACC1;
 
@@ -489,8 +521,8 @@ WWZBases::WWZBases(const char *name, const char *title)
   DefineVariable(fWpDecayMode   , 0., 1., 0, 1);
   DefineVariable(fZDecayMode    , 0., 1., 0, 1);
   DefineVariable(fXQ2WW         , 0., 1., 1, 1);
-  DefineVariable(fXQ2Wm         , 0., 1., 0, 1);
-  DefineVariable(fXQ2Wp         , 0., 1., 0, 1);
+  DefineVariable(fXQ2Wm         , 0., 1., 1, 1);
+  DefineVariable(fXQ2Wp         , 0., 1., 1, 1);
   DefineVariable(fXQ2Z          , 0., 1., 0, 1);
   //--
   //  cos(theta) and phi
@@ -550,6 +582,7 @@ WWZBases::WWZBases(const char *name, const char *title)
 // --------------------------
 WWZBases::~WWZBases()
 {
+  delete fHBosonPtr;
   delete fWmBosonPtr;
   delete fWpBosonPtr;
   delete fZBosonPtr;
@@ -658,8 +691,37 @@ Double_t WWZBases::Func()
   Double_t s      = fEcmIP*fEcmIP;
   Double_t rs     = fEcmIP;
 
+  Double_t qwwmin  = m1 + m2 + m3 + m4;
+  Double_t qwwmax  = rs - (m5 + m6);
+#ifndef HIGGS_ONLY
+  Double_t q2wwmin = qwwmin*qwwmin;
+  Double_t q2wwmax = qwwmax*qwwmax;
+  fQ2WW  = q2wwmin + (q2wwmax - q2wwmin)*fXQ2WW;
+  weight = q2wwmax - q2wwmin;
+#else
+#if 0
+  fQ2WW  = fHBosonPtr->GetQ2BW(qwwmin, qwwmax, fXQ2WW, weight);
+#else
+  // Zero width approx.
+  fQ2WW  = TMath::Power(fHBosonPtr->GetMass(),2);
+  weight = kPi*fHBosonPtr->GetMass()*fHBosonPtr->GetWidth();
+#endif
+#endif
+  bsWeight *= weight;
+
+  Double_t rq2ww  = TMath::Sqrt(fQ2WW);
+  Double_t qzmin  = m5 + m6;
+  Double_t qzmax  = rs - rq2ww;
+#ifndef __ZEROWIDTH__
+  fQ2Z = fZBosonPtr->GetQ2BW(qzmin, qzmax, fXQ2Z, weight);
+#else
+  fQ2Z = TMath::Power(fZBosonPtr->GetMass(),2);
+  weight = kPi*fZBosonPtr->GetMass()*fZBosonPtr->GetWidth();
+#endif
+  bsWeight *= weight;
+
   Double_t qwmmin = m1 + m2;
-  Double_t qwmmax = rs - (m3 + m4 + m5 + m6);
+  Double_t qwmmax = rq2ww - (m3 + m4);
 #ifndef __ZEROWIDTH__
   fQ2Wm = fWmBosonPtr->GetQ2BW(qwmmin, qwmmax, fXQ2Wm, weight);
 #else
@@ -670,33 +732,13 @@ Double_t WWZBases::Func()
 
   Double_t rq2wm  = TMath::Sqrt(fQ2Wm);
   Double_t qwpmin = m3 + m4;
-  Double_t qwpmax = rs - (rq2wm + m5 + m6);
+  Double_t qwpmax = rq2ww - rq2wm;
 #ifndef __ZEROWIDTH__
   fQ2Wp = fWpBosonPtr->GetQ2BW(qwpmin, qwpmax, fXQ2Wp, weight);
 #else
   fQ2Wp = TMath::Power(fWpBosonPtr->GetMass(),2);
   weight = kPi*fWpBosonPtr->GetMass()*fWpBosonPtr->GetWidth();
 #endif
-  bsWeight *= weight;
-
-  Double_t rq2wp  = TMath::Sqrt(fQ2Wp);
-  Double_t qzmin  = m5 + m6;
-  Double_t qzmax  = rs - (rq2wm + rq2wp);
-#ifndef __ZEROWIDTH__
-  fQ2Z = fZBosonPtr->GetQ2BW(qzmin, qzmax, fXQ2Z, weight);
-#else
-  fQ2Z = TMath::Power(fZBosonPtr->GetMass(),2);
-  weight = kPi*fZBosonPtr->GetMass()*fZBosonPtr->GetWidth();
-#endif
-  bsWeight *= weight;
-
-  Double_t rq2z    = TMath::Sqrt(fQ2Z);
-  Double_t qwwmin  = rq2wm + rq2wp;
-  Double_t qwwmax  = rs - rq2z;
-  Double_t q2wwmin = qwwmin*qwwmin;
-  Double_t q2wwmax = qwwmax*qwwmax;
-  fQ2WW  = q2wwmin + (q2wwmax - q2wwmin)*fXQ2WW;
-  weight = q2wwmax - q2wwmin;
   bsWeight *= weight;
 
   // --------------------------------------------
@@ -714,6 +756,33 @@ Double_t WWZBases::Func()
   // --------------------------------------------
   //  Fill plots
   // --------------------------------------------
+
+  ANL4DVector pwm = fP[0] + fP[1];
+  ANL4DVector pwp = fP[2] + fP[3];
+  ANL4DVector pz  = fP[4] + fP[5];
+  ANL4DVector ph  = pwm + pwp;
+  ANL4DVector phb(ph.E(), -ph.Px(), -ph.Py(), -ph.Pz());
+  TVector3 boostv = phb.BoostVector();
+  ANL4DVector qf[4];
+  for (Int_t i=0; i<4; i++) {
+	  qf[i] = fP[i];
+	  qf[i].Boost(boostv);
+  }
+  ANL4DVector qwm = pwm;
+  ANL4DVector qwp = pwp;
+  qwm.Boost(boostv);
+  qwp.Boost(boostv);
+  TVector3 vwm = qwm.Vect().Unit();
+  TVector3 v0  = qf[0].Vect().Unit();
+  TVector3 v2  = qf[2].Vect().Unit();
+  TVector3 vn1 = v0.Cross(vwm);
+  TVector3 vn2 = v2.Cross(vwm);
+  TVector3 vn3 = vn1.Cross(vn2);
+  Double_t sn = vwm*vn3;
+  Double_t cs = vn1*vn2;
+  Double_t phidiff = TMath::ATan2(sn,cs);
+  phidiff = phidiff < 0. ? phidiff + k2Pi : phidiff;
+  Double_t aqw = qwm.Vect().Mag();
 
   Xh_fill( 1, fEcmIP            , (bsWeight*sigma));
   Xh_fill( 2, fCosTheta         , (bsWeight*sigma));
@@ -735,6 +804,8 @@ Double_t WWZBases::Func()
   Xh_fill(18, (Double_t)fWmMode , (bsWeight*sigma));
   Xh_fill(19, (Double_t)fWpMode , (bsWeight*sigma));
   Xh_fill(20, (Double_t)fZMode  , (bsWeight*sigma));
+  Xh_fill(21, phidiff           , (bsWeight*sigma));
+  Xh_fill(22, aqw               , (bsWeight*sigma));
 
   return (bsWeight * sigma);
 }
@@ -976,8 +1047,8 @@ Complex_t WWZBases::AmpEEtoWWZ(const HELFermion &em,
 
    Double_t  ghzz  = kGz*kM_z;
    Double_t  ghww  = kGw*kM_w;
-   Double_t  mh    = 9999.;//125.;
-   Double_t  gamh  = 4.e-3;
+   Double_t  mh    = fMass;
+   Double_t  gamh  = fHBosonPtr->GetWidth();
 
    //--------------------------------------------------
    // Calculate Amplitudes
@@ -1031,7 +1102,14 @@ Complex_t WWZBases::AmpEEtoWWZ(const HELFermion &em,
    //--
    // (11)
    HELVector zs(em, ep, glze, grze, kM_z, gamz);
+#ifndef ANOM_WWH
    HELScalar hf(wm, wp, ghww, mh, gamh);
+#else
+   Double_t g1     = ghww + 2 * kM_w * kM_w * (fA/fLambda);
+   Double_t g2     = -2 * (fB/fLambda);
+   Double_t g3     = -4 * (fBtilde/fLambda);
+   HELScalar hf(wm, wp, g1, g2, g3, mh, gamh);
+#endif
    Complex_t amph = HELVertex(zs, zf, hf, ghzz);
 
    //--
@@ -1128,6 +1206,9 @@ void WWZBases::Userin()
   }
   fZBosonPtr->DebugPrint();
 
+  if (!fHBosonPtr) fHBosonPtr = new HBoson(fMass,fLambda,fA,fB,fBtilde);
+  fHBosonPtr->DebugPrint();
+
   // --------------------------------------------
   //  Define some plots
   // --------------------------------------------
@@ -1151,6 +1232,8 @@ void WWZBases::Userin()
   Xh_init(18,     0.,    12.,       12, "W- mode");
   Xh_init(19,     0.,    12.,       12, "W+ mode");
   Xh_init(20,     0.,    12.,       12, "Z  mode");
+  Xh_init(21, fXL[5], fXU[5],       50, "DPhi"   );
+  Xh_init(22,     0.,   150.,       50, "|qw|"   );
 }
 
 //_____________________________________________________________________________

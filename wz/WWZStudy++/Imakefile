@@ -7,8 +7,10 @@
 #include "config/kflib.tmpl"
 
 CXXFLAGS += -I../../include -I$(LEDAROOT)/include
+CXXFLAGS += -DANOM_WWH -DHIGGS_ONLY
 
 PACKAGENAME   = WWZSpring
+DICTNAME      = $(PACKAGENAME)Dict
 
 /*
  * You don\'t have to edit anything below here
@@ -16,14 +18,14 @@ PACKAGENAME   = WWZSpring
  */
 
 
-OBJS          = $(PACKAGENAME).$(ObjSuf) \
-		$(PACKAGENAME)Dict.$(ObjSuf)
+SRCS          = $(PACKAGENAME).$(SrcSuf) \
+                HBoson.$(SrcSuf) \
+		GENVVStarDecay.$(SrcSuf)
 
-SRCS          = $(PACKAGENAME).$(SrcSuf) 
+OBJS          = $(strip $(subst .$(SrcSuf),.$(ObjSuf),$(SRCS))) \
+		$(DICTNAME).$(ObjSuf)
 
-HDRS	      = $(PACKAGENAME).h
-
-DICTNAME      = $(PACKAGENAME)Dict
+HDRS          = $(strip $(subst .$(SrcSuf),.$(HdrSuf),$(SRCS))) \
 
 SONAME	      = $(PACKAGENAME).$(DllSuf)
 
