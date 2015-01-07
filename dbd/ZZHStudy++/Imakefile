@@ -1,0 +1,134 @@
+XCOMM ############################################################################
+XCOMM ## (Description)
+XCOMM ##    Imake file for ZZH generator.
+XCOMM ##	exe      : to make an executable.
+XCOMM ##	run      : to run the executalbe.
+XCOMM ##	clean    : to clean the directory.
+XCOMM ##	cleanall : to remove everything reproducible.
+XCOMM ## (Update Record) 
+XCOMM ##    95/03/12  K.Fujii 	Original version for HELAS V204.
+XCOMM ##    95/03/21  K.Fujii 	For BASES V5.1.
+XCOMM ##    95/06/12  K.Fujii 	Use 95a.
+XCOMM ##    97/08/30  K.Fujii 	Use 97a.
+XCOMM ##    99/05/20  K.Fujii	Modified for JSF.
+XCOMM ############################################################################
+
+/*
+ * Template Files
+ *
+ */
+
+#define CXXPACKAGE
+#include "config/kflib.tmpl"
+
+#define WITH_DBD_STANDARD
+
+INCPATH	= -I. -I$(KFLIBROOT)/gen_lib/sm/include \
+        -I$(KFLIBROOT)/gen_lib/sm \
+	-I$(KFLIBROOT)/gen_lib/bm/include \
+	-I$(KFLIBROOT)/gen_lib/bs/include \
+	-I$(LCLIBROOT)/simjlc/src -I$(LCLIBROOT)/util/fortlib/src 
+
+CXXFLAGS += -I$(KFLIBROOT)/include -I$(LEDAROOT)/include
+
+#ifdef WITH_DBD_STANDARD
+WHIZLIB = -L$(WHIZDIR)/lib -lwhizard -L$(WHIZDIR)/a6f/lib -linclude
+FFLAGS += -DWITH_DBD_STANDARD 
+CXXFLAGS += -DWITH_DBD_STANDARD
+#endif
+
+HELASV204 = HELASV204
+
+KFLIB	= $(LDDIRFLAG)$(KFLIBDIR) -lGENLIBSS -lGENLIBSM -lGENLIBHG\
+	-lGENLIBKN -lGENLIBBM -lFORTLIB -lANLLIB -lGENLib -lHELLib
+
+/*
+ * Fortran Objects
+ *
+ */
+#FOBJS = userin.o
+
+
+#ifdef WITH_DBD_STANDARD
+XCOMM FOBJS += beamutil.o
+XCOMM ## F95OBJS = whizard_spectrum.o
+XCOMM FFLAGS += -fbounds-check -frange-check
+XCOMM CXXFLAGS += 
+FFLAGS +=  -fbounds-check -frange-check
+CXXFLAGS += 
+LDFLAGS = -L$(LCLIBROOT)/lib -lHELASV204 -lFORTLIB $(shell root-config --libs)
+#LDFLAGS += $(KFLIBROOT)/dbd/whizfunc++/libwhizfunc.a $(WHIZLIB)
+LDFLAGS += ../whizfunc++/libwhizfunc.a $(WHIZLIB)
+#endif
+#LDFLAGS += $(LCLIBROOT)/util/fortlib/src/uidate.o
+#LDFLAGS += $(KFLIBROOT)/gen_lib/sm/insmcn.o
+
+PACKAGENAME   = ZZHSpring
+
+/*
+ * You don't have to edit anything below here
+ *
+ */
+
+FSRCS         = $(strip $(subst .o,.F,$(FOBJS)))
+
+OBJS          = $(PACKAGENAME).$(ObjSuf) \
+		$(PACKAGENAME)Dict.$(ObjSuf)
+
+SRCS          = $(PACKAGENAME).$(SrcSuf)
+
+HDRS	      = $(PACKAGENAME).h
+
+DICTNAME      = $(PACKAGENAME)Dict
+
+SONAME	      = $(PACKAGENAME).$(DllSuf)
+
+JSFSOLIB      = prod/$(SONAME)
+
+JSFPROGRAM    = prod/jsf
+
+/*
+ * Make Targets
+ *
+ */
+
+#if defined(hitachiArchitecture)
+all::  $(JSFPROGRAM)
+#else
+all::  $(JSFSOLIB)
+#endif
+
+$(JSFPROGRAM): $(OBJS) jsfmain.o $(FOBJS)
+	$(LD) -o $(JSFPROGRAM) jsfmain.o $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS)
+
+prod/$(SONAME): $(OBJS) $(FOBJS)
+	$(LD) $(SOFLAGS) -o prod/$(SONAME) $(FOBJS) $(OBJS) \
+	$(KFLIB) $(LDFLAGS) -L$(KFLIBROOT)/lib -lGENLib -lHELLib
+
+clean:: 
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
+
+depend:: $(SRCS) $(HDRS) $(FSRCS)
+	for i in $(SRCS) $(FSRCS); do \
+	rmkdepend -a -- $(CXXFLAGS) $(INCPATH) $(DEPENDFILES) -- $$i; done
+
+distclean:: clean
+	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~
+	@rm -f $(JSFPROGRAM) $(JSFSOLIB) *.root Makefile
+	@(cd prod; rm -f *.root *.tdr *.out *~ core)
+
+$(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	rootcint -f $(DICTNAME).$(SrcSuf) \
+ 		-c -I../../include -I$(LEDAROOT)/include -I$(JSFROOT)/include $(HDRS) LinkDef.h
+
+/*
+ * Suffix Rules
+ *
+ */
+
+.SUFFIXES: .$(SrcSuf)
+
+.$(SrcSuf).$(ObjSuf):
+	$(CXX) $(CXXFLAGS) -c $<
