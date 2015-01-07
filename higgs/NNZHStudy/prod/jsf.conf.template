@@ -1,0 +1,88 @@
+JSF.SharedLibraries: libS4Utils.so:libAnlib.so:libJSFAnlib.so:ETCETCSpring.so:libJSFReadStdHep.so
+JSFGUI.Spring.SharedLibrary: ETCETCSpring.so
+
+#JSFSteer.Nevent: 10              To be changed in sim.C
+ETCETCBases.CosthRange:     -1.0  1.0  
+ETCETCBases.PhiOverPiRange:  0.0  2.0  
+ETCETCBases.Ecm:                  500.
+ETCETCBases.MassX:           231.57
+ETCETCBases.MassDM:           	44.03 
+ETCETCBases.Pole:		0.0	
+ETCETCBases.WmModesLo: 1
+ETCETCBases.WmModesHi: 12
+ETCETCBases.WpModesLo: 1
+ETCETCBases.WpModesHi: 12
+ETCETCBases.PrintInfo:  FALSE  
+ETCETCBases.PrintHist:  FALSE  
+ETCETCBases.Beamstrahlung: 1
+ETCETCBases.BeamWidth: 0.002
+ETCETCBases.Bremsstrahlung: 1
+ETCETCBases.BeamstrahlungFilepath: /data5/soft/samples/qsprod01/bsdata/
+#ETCETCBases.BeamstrahlungFilepath: /proj/soft/jsf/share/bsdata/
+ETCETCBases.BeamstrahlungFilename: 500_nominal
+
+ETCETCBases.RandomSeed: %NUM%
+
+JSFGUI.EventType:2
+#!eventtype
+#  EventType = 0 Pythia generator
+#            = 1 debug generator
+#            = 2 Bases/Spring generator
+#            = 3 Read parton data
+#            = 4 Read HEPEVT data
+
+JSFGUI.Spring.ModuleName: ETCETCSpring
+# A module name of Spring
+
+JSFGUI.Spring.BasesFile: tmp/bases.root
+# A file name of bases data.
+
+JSFGUI.RunMode: 1
+JSFGUI.InputFileName: tmp/sim-%NUM%.root
+
+JSFGUI.SimulationType: 0 
+JSFGUI.OutputFileName:/dev/null
+
+JSFWriteStdHep.OutputFileName:etcetc-%NUM%.stdhep
+#!stdhep
+
+JSFWriteStdHep.OutputTitle:sample
+#!stdhep-title
+# Title of data, which is written in the stdhep file.
+
+JSFWriteStdHep.NTries:100000
+#!stdhep-ntries
+# Number of events in this file. 
+
+JSFWriteStdHep.DebugLevel:0
+#!stdhep-debug
+#  Debug level of JSFWriteStdHep class
+
+JSFWriteStdHep.EventSource: 3
+# generator input data
+#  =0 : /hepevt/ common block
+#  =1 : /jetset/ are converted to /hepevt/ and written to stdhep
+#  =2 : JSFGeneratorBuf are stored to /hepevt/, then written to 
+#       stdhep file.
+#
+
+JSFWriteStdHep.ProcessID:0
+#!processid
+#  ProcessID which is written to then file, when HEPEV4 
+#  is not prepared.
+#
+
+JSFGUI.NEventsAnalize: 100000
+#!maxevt
+
+JSFGUI.InitPythiaMacro: InitPythia.C
+JSFGUI.MacroFileName: UserAnalysis.C
+JSFGUI.ShowHist:  no
+JSFGUI.ShowHistFrequency: 1
+JSFGUI.FirstEvent: 1
+
+JSFBeamGeneration.FileName:/proj/soft/data5/samples/gen/bsdata/500_nominal.root
+#JSFBeamGeneration.FileName:/proj/soft/jsf/share/bsdata/500_nominal.root
+
+JSFBeamGeneration.ParName:500_nominal
+JSFBeamGeneration.Width:0.0005
