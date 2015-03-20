@@ -242,7 +242,7 @@ Complex_t HBoson::AmpUtils::FullAmplitude(ANL4DVector &k,
                glv2   = -kGz*(t3f - qf*kSin2W);
                grv2   = -kGz*(    - qf*kSin2W);
 	       ghvv   = kGz*kM_z;
-#if 0
+#if 1
                g1     = ghvv + 2 * mv1 * mv2 * (fA/fLambda);
                g2     = -2 * (fB/fLambda);
                g3     = -4 * (fBtilde/fLambda);
