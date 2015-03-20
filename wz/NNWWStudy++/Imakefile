@@ -7,8 +7,10 @@
 #include "config/kflib.tmpl"
 
 CXXFLAGS += -I../../include -I$(LEDAROOT)/include
+CXXFLAGS += -DANOM_WWH /* -DHIGGS_ONLY */
 
 PACKAGENAME   = NNWWSpring
+DICTNAME      = $(PACKAGENAME)Dict
 
 /*
  * You don\'t have to edit anything below here
@@ -16,12 +18,14 @@ PACKAGENAME   = NNWWSpring
  */
 
 
-OBJS          = $(PACKAGENAME).$(ObjSuf) \
-		$(PACKAGENAME)Dict.$(ObjSuf)
+SRCS          = $(PACKAGENAME).$(SrcSuf) \
+                HBoson.$(SrcSuf) \
+		GENVVStarDecay.$(SrcSuf)
 
-SRCS          = $(PACKAGENAME).$(SrcSuf) 
+OBJS          = $(strip $(subst .$(SrcSuf),.$(ObjSuf),$(SRCS))) \
+		$(DICTNAME).$(ObjSuf)
 
-HDRS	      = $(PACKAGENAME).h
+HDRS          = $(strip $(subst .$(SrcSuf),.$(HdrSuf),$(SRCS))) \
 
 DICTNAME      = $(PACKAGENAME)Dict
 

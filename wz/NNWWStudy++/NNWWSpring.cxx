@@ -13,11 +13,13 @@
 
 #include "JSFSteer.h"
 #include "NNWWSpring.h"
+#include "HBoson.h"
 
 #include <sstream>
 #include <iomanip>
 //#define __DEBUG__
 //#define __PHASESPACE__
+#define TEMP_H
 
 //*----------------------------------------------------------------------
 //*     Numerical and Natural Constants
@@ -232,7 +234,10 @@ Bool_t NNWWSpringBuf::SetPartons()
 NNWWBases::NNWWBases(const char *name, const char *title)
          : JSFBases   (name, title), 
            fMass      ( 125.),
-           fWidth     ( 0.004),
+           fLambda     (1000.),
+           fA          (   0.),
+           fB          (   0.),
+           fBtilde     (   0.),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
@@ -247,6 +252,7 @@ NNWWBases::NNWWBases(const char *name, const char *title)
 	   fACC2      (0.05),
 	   fITMX1     (20),
 	   fITMX2     (40),
+           fHBosonPtr  ( 0),
            fWmBosonPtr( 0),
            fWpBosonPtr( 0),
            fZBosonPtr ( 0),
@@ -293,8 +299,23 @@ NNWWBases::NNWWBases(const char *name, const char *title)
 
   ins.str("");
   ins.clear();
-  ins.str(gJSF->Env()->GetValue("NNWWBases.WidthH","0.006")); // M_x [GeV]
-  ins >> fWidth;
+  ins.str(gJSF->Env()->GetValue("NNWWBases.Lambda","1000.")); 	 // Lambda [GeV]
+  ins >> fLambda;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NNWWBases.A","0.")); 	 // a
+  ins >> fA;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NNWWBases.B","0.")); 	 // b
+  ins >> fB;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NNWWBases.Btilde","0.")); 	 // btilde
+  ins >> fBtilde;
 
   ins.str("");
   ins.clear();
@@ -429,6 +450,7 @@ NNWWBases::NNWWBases(const char *name, const char *title)
 // --------------------------
 NNWWBases::~NNWWBases()
 {
+  delete fHBosonPtr;
   delete fWmBosonPtr;
   delete fWpBosonPtr;
   delete fZBosonPtr;
@@ -526,9 +548,30 @@ Double_t NNWWBases::Func()
   // --------------------------------------------
   Double_t s      = fEcmIP*fEcmIP;
   Double_t rs     = fEcmIP;
+
+#ifdef HIGGS_ONLY
+  // H
+#if 0
+  // BW line shape
+  Double_t qwwmn = m3 + m4 + m5 + m6;
+  Double_t qwwmx = rs - (m1+m2);
+  fQ2WW  = fHBosonPtr->GetQ2BW(qwwmn, qwwmx, fXQ2WW, weight);
+  Double_t qww   = TMath::Sqrt(fQ2WW);
+#else
+  // Zero width approx.
+  fQ2WW  = TMath::Power(fHBosonPtr->GetMass(),2);
+  weight = kPi*fHBosonPtr->GetMass()*fHBosonPtr->GetWidth();
+  Double_t qww   = fMass;
+#endif
+  bsWeight *= weight;
+#endif
   // W-
   Double_t qwmmin = m3 + m4;
+#ifndef HIGGS_ONLY
   Double_t qwmmax = rs - (m1 + m2 + m5 + m6);
+#else
+  Double_t qwmmax = qww - (m5 + m6);
+#endif
 #ifndef __ZEROWIDTH__
   fQ2Wm = fWmBosonPtr->GetQ2BW(qwmmin, qwmmax, fXQ2Wm, weight);
 #else
@@ -540,7 +583,11 @@ Double_t NNWWBases::Func()
   // W+
   Double_t rq2wm  = TMath::Sqrt(fQ2Wm);
   Double_t qwpmin = m5 + m6;
+#ifndef HIGGS_ONLY
   Double_t qwpmax = rs - (rq2wm + m1 + m2);
+#else
+  Double_t qwpmax = qww - rq2wm;
+#endif
 #ifndef __ZEROWIDTH__
   fQ2Wp = fWpBosonPtr->GetQ2BW(qwpmin, qwpmax, fXQ2Wp, weight);
 #else
@@ -550,15 +597,25 @@ Double_t NNWWBases::Func()
   bsWeight *= weight;
   Double_t rq2wp  = TMath::Sqrt(fQ2Wp);
 
-  // --------------------------------------------
-  //  Handle kinematics here
-  // --------------------------------------------
+#ifndef HIGGS_ONLY
+  // H
+#if 0
   Double_t qww2mn = TMath::Power(rq2wm + rq2wp,2);
   Double_t qww2mx = TMath::Power(rs - (m1+m2),2);
   fQ2WW     = qww2mn + (qww2mx-qww2mn)*fXQ2WW;
   bsWeight *= qww2mx - qww2mn;
-
+#else
+  Double_t qwwmn = rq2wm + rq2wp;
+  Double_t qwwmx = rs - (m1+m2);
+  fQ2WW     = fHBosonPtr->GetQ2BW(qwwmn, qwwmx, fXQ2WW, weight);
+  bsWeight *= weight;
+#endif
   Double_t qww   = TMath::Sqrt(fQ2WW);
+#endif
+
+  // --------------------------------------------
+  //  Handle kinematics here
+  // --------------------------------------------
   Double_t xilo  = TMath::Log(qww*(qww+m1+m2)/s);
   Double_t xihi  = TMath::Log(1.-2.*TMath::Min(m1,m2)/rs);
   fXi       = xilo + (xihi-xilo)*fXXi;
@@ -613,7 +670,13 @@ Double_t NNWWBases::Func()
   // --------------------------------------------
   //  Fill plots
   // --------------------------------------------
+#ifdef TEMP_H
+  H1Fill("hMww"     , TMath::Sqrt(fQ2WW), (bsWeight*sigma));
+  H1Fill("hCosWm"   , fCosWm            , (bsWeight*sigma));
+  H1Fill("hRSH"     , fEcmIP            , (bsWeight*sigma));
+#endif
 
+#if 1
   Xh_fill( 1, fEcmIP            , (bsWeight*sigma));
   Xh_fill( 2, fXi               , (bsWeight*sigma));
   Xh_fill( 3, fEta1             , (bsWeight*sigma));
@@ -634,6 +697,7 @@ Double_t NNWWBases::Func()
   Xh_fill(18, (Double_t)fJCombF , (bsWeight*sigma));
   Xh_fill(19, (Double_t)fWmMode , (bsWeight*sigma));
   Xh_fill(20, (Double_t)fWpMode , (bsWeight*sigma));
+#endif
 
   return (bsWeight * sigma);
 }
@@ -938,7 +1002,7 @@ Complex_t NNWWBases::AmpEEtoNNWW(const HELFermion &em,
    Double_t  gw    = kGw;
 
    Double_t mh     = fMass;
-   Double_t gamh   = fWidth;
+   Double_t gamh   = fHBosonPtr->GetWidth();
    Double_t gwwh   = kGw*mw;
 
    //-----------
@@ -1011,6 +1075,7 @@ Complex_t NNWWBases::AmpEEtoNNWW(const HELFermion &em,
    //-----------
    // Higgs
    //-----------
+#ifndef ANOM_WWH
    // (20)
    HELScalar   ht(wm, w1, gwwh, mh, gamh);
    Complex_t amp20 = HELVertex(w2, wp, ht, gwwh);
@@ -1018,6 +1083,18 @@ Complex_t NNWWBases::AmpEEtoNNWW(const HELFermion &em,
    // (21)
    HELScalar   hs(wm, wp, gwwh, mh, gamh);
    Complex_t amp21 = HELVertex(w1, w2, hs, gwwh);
+#else
+   // (20)
+   Double_t g1     = gwwh + 2 * kM_w * kM_w * (fA/fLambda);
+   Double_t g2     = -2 * (fB/fLambda);
+   Double_t g3     = -4 * (fBtilde/fLambda);
+   HELScalar   ht(wm, w1, g1, g2, g3, mh, gamh);
+   Complex_t amp20 = HELVertex(w2, wp, ht, g1, g2, g3);
+
+   // (21)
+   HELScalar   hs(wm, wp, g1, g2, g3, mh, gamh);
+   Complex_t amp21 = HELVertex(w1, w2, hs, g1, g2, g3);
+#endif
 
    //--------------------------
    // Sum up all the amplitudes
@@ -1038,6 +1115,7 @@ Complex_t NNWWBases::AmpEEtoNNWW(const HELFermion &em,
 // --------------------------
 void NNWWBases::Userin()
 {
+  TDirectory *last = gDirectory;
   // --------------------------------------------
   //  Open beamstrahlung data
   // --------------------------------------------
@@ -1104,6 +1182,10 @@ void NNWWBases::Userin()
   if (!fZBosonPtr) fZBosonPtr = new GENPDTZBoson();
   fZBosonPtr->DebugPrint();
 
+  if (!fHBosonPtr) fHBosonPtr = new HBoson(fMass,fLambda,fA,fB,fBtilde);
+  fHBosonPtr->DebugPrint();
+
+  last->cd();
   // --------------------------------------------
   //  Define some plots
   // --------------------------------------------
@@ -1119,6 +1201,7 @@ void NNWWBases::Userin()
   Double_t qwwlo = 0.; //2*mw - 40.;
   Double_t qwwhi = rs;
 
+#if 1
   Xh_init( 1,     0., fEcmInit*1.1, 50, "Ecm"   );
   Xh_init( 2,   xilo,   xihi,       50, "xi"    );
   Xh_init( 3,   etlo,   ethi,       50, "eta1"  );
@@ -1139,6 +1222,12 @@ void NNWWBases::Userin()
   Xh_init(18,     0.,     1.,        1, "Helot ");
   Xh_init(19,     0.,    12.,       12, "W- mode");
   Xh_init(20,     0.,    12.,       12, "W+ mode");
+#endif
+#ifdef TEMP_H
+  H1Init("hMww"     ,"", 200,       0.,     fEcmInit);
+  H1Init("hCosWm"   ,"", 100,      -1.,          +1.);
+  H1Init("hRSH"     ,"",1100,       0., fEcmInit*1.1);
+#endif
 }
 
 //_____________________________________________________________________________
