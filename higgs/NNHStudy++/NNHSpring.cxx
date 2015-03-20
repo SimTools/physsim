@@ -8,6 +8,7 @@
 //*
 //* (Update Record)
 //*    2008/12/29  K.Fujii	Original version.
+//*    2015/03/21  K.Fujii	Implemented anomalous HWW couplings.
 //*
 //*****************************************************************************
 

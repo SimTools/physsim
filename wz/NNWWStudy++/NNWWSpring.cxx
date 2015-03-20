@@ -8,6 +8,7 @@
 //*
 //* (Update Record)
 //*    2014/09/19  K.Fujii	Original version.
+//*    2015/03/20  K.Fujii	Implemented anomalous HWW couplings.
 //*
 //*****************************************************************************
 
@@ -234,10 +235,10 @@ Bool_t NNWWSpringBuf::SetPartons()
 NNWWBases::NNWWBases(const char *name, const char *title)
          : JSFBases   (name, title), 
            fMass      ( 125.),
-           fLambda     (1000.),
-           fA          (   0.),
-           fB          (   0.),
-           fBtilde     (   0.),
+           fLambda    (1000.),
+           fA         (   0.),
+           fB         (   0.),
+           fBtilde    (   0.),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
