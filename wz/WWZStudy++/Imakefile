@@ -7,7 +7,7 @@
 #include "config/kflib.tmpl"
 
 CXXFLAGS += -I../../include -I$(LEDAROOT)/include
-CXXFLAGS += -DANOM_WWH -DHIGGS_ONLY
+CXXFLAGS += -DANOM_HVV -DHIGGS_ONLY
 
 PACKAGENAME   = WWZSpring
 DICTNAME      = $(PACKAGENAME)Dict

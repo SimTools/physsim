@@ -10,6 +10,7 @@
 //*
 //* (Update Record)
 //*    2014/09/16  K.Fujii	Original version.
+//*    2015/03/20  K.Fujii	Implemented anomalous HVV couplings.
 //*
 //*****************************************************************************
 

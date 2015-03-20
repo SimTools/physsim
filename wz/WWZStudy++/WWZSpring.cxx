@@ -8,6 +8,7 @@
 //*
 //* (Update Record)
 //*    2010/04/29  K.Fujii	Original version.
+//*    2015/03/20  K.Fujii	Implemented anomalous HVV couplings.
 //*
 //*****************************************************************************
 
@@ -1102,7 +1103,7 @@ Complex_t WWZBases::AmpEEtoWWZ(const HELFermion &em,
    //--
    // (11)
    HELVector zs(em, ep, glze, grze, kM_z, gamz);
-#ifndef ANOM_WWH
+#ifndef ANOM_HVV
    HELScalar hf(wm, wp, ghww, mh, gamh);
    Complex_t amph = HELVertex(zs, zf, hf, ghzz);
 #else
