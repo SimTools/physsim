@@ -1104,13 +1104,18 @@ Complex_t WWZBases::AmpEEtoWWZ(const HELFermion &em,
    HELVector zs(em, ep, glze, grze, kM_z, gamz);
 #ifndef ANOM_WWH
    HELScalar hf(wm, wp, ghww, mh, gamh);
+   Complex_t amph = HELVertex(zs, zf, hf, ghzz);
 #else
    Double_t g1     = ghww + 2 * kM_w * kM_w * (fA/fLambda);
    Double_t g2     = -2 * (fB/fLambda);
    Double_t g3     = -4 * (fBtilde/fLambda);
    HELScalar hf(wm, wp, g1, g2, g3, mh, gamh);
+
+   Double_t g1z    = ghzz + 2 * kM_z * kM_z * (fA/fLambda);
+   Double_t g2z    = -2 * (fB/fLambda);
+   Double_t g3z    = -4 * (fBtilde/fLambda);
+   Complex_t amph = HELVertex(zs, zf, hf, g1z, g2z, g3z);
 #endif
-   Complex_t amph = HELVertex(zs, zf, hf, ghzz);
 
    //--
    // Sum
