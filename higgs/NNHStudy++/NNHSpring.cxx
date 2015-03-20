@@ -182,6 +182,10 @@ Bool_t NNHSpringBuf::SetPartons()
 NNHBases::NNHBases(const char *name, const char *title)
          : JSFBases   (name, title), 
            fMass      ( 120.),
+           fLambda    (1000.),
+           fA         (   0.),
+           fB         (   0.),
+           fBtilde    (   0.),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
@@ -213,6 +217,26 @@ NNHBases::NNHBases(const char *name, const char *title)
   using namespace std;
   stringstream ins(gJSF->Env()->GetValue("NNHBases.MassH","120.")); // M_x [GeV]
   ins >> fMass;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NNHBases.Lambda","1000.")); 	 // Lambda [GeV]
+  ins >> fLambda;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NNHBases.A","0.")); 	 // a
+  ins >> fA;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NNHBases.B","0.")); 	 // b
+  ins >> fB;
+
+  ins.str("");
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("NNHBases.Btilde","0.")); 	 // btilde
+  ins >> fBtilde;
 
   ins.clear();
   ins.str(gJSF->Env()->GetValue("NNHBases.Ecm","500."));       // E_cm (1TeV)
@@ -587,7 +611,14 @@ Complex_t NNHBases::AmpEEtoNNH(const HELFermion &em,
    HELVector w2(neb, ep, glwf, grwf, mw, gamw);
 
    Double_t gwwh   = kGw*mw;
+#ifndef ANOM_HWW
    Complex_t amp = HELVertex(w1, w2, hs, gwwh);
+#else
+   Double_t g1     = gwwh + 2 * mw * mw * (fA/fLambda);
+   Double_t g2     = -2 * (fB/fLambda);
+   Double_t g3     = -4 * (fBtilde/fLambda);
+   Complex_t amp = HELVertex(w1, w2, hs, g1, g2, g3);
+#endif
 #endif /* end __PHASESPACE__ */
 
    return amp;
