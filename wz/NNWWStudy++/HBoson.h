@@ -73,6 +73,8 @@ private:
   Complex_t Fs(Double_t t); // J=0   loop
   Complex_t Ff(Double_t t); // J=1/2 loop
   Complex_t Fv(Double_t t); // J=1   loop
+  Double_t  GetLambdaQCD(Double_t alphas, Double_t q);
+  Double_t  GetAlphaS   (Double_t lambda, Double_t q);
 
 private:
   Double_t      fLambda;
