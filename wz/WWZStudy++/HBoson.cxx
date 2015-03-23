@@ -8,6 +8,7 @@
 //*
 //* (Update Record)
 //*    2014/11/21  K.Fujii	Original version.
+//*    2015/03/23  K.Fujii	Improved Gamma_H calculations.
 //*
 //*****************************************************************************
 
@@ -81,6 +82,7 @@ HBoson::HBoson(Double_t m,
       dmp->Add(d2p);
       Add(dmp);
    }
+#if 1
    //--
    // h --> ZZ*
    //--
@@ -97,6 +99,8 @@ HBoson::HBoson(Double_t m,
    //--
    // h --> ff
    //--
+   Double_t lamb = GetLambdaQCD(kAlphaS, kM_z);
+   Double_t alfs = GetAlphaS(lamb, fMass);
    for (Int_t ic=0; ic<2; ic++) {
       for (Int_t it=0; it<2; it++) { 
          for (Int_t ig=0; ig<3; ig++) {
@@ -111,6 +115,17 @@ HBoson::HBoson(Double_t m,
             GENPDTEntry  *d1p, *d2p;
             d1p  = new GENPDTEntry(name, pid, qf, spin, mass, ig+1,  t3, cf);
             d2p  = new GENPDTEntry(name,-pid,-qf, spin, mass, ig+1, -t3, cf);
+#if 1
+	    // Running mass
+	    if (ig == 2 && it == 1 && ic == 1) {
+		mass = 2.7645; // mb(MSbar)(mh)
+	    } else if (ig == 1 && it == 0 && ic == 1) {
+		mass = 0.61614; // mc(MSbar)(mh)
+	    } 
+	    if (cf > 1.) {
+		cf *= (1. + (17./3)*alfs/kPi); // QCD correction.
+	    }
+#endif
             gam = GammaToFF(mass, cf);
             if (gam == 0.) continue;
             dmp = new GENDecayMode(gam);
@@ -135,6 +150,7 @@ HBoson::HBoson(Double_t m,
    //--
    // h --> gamma gamma
    //--
+#endif
 }
 
 HBoson::~HBoson()
@@ -163,12 +179,17 @@ Double_t HBoson::GammaToFF(Double_t mf,
 
 Double_t HBoson::GammaToGG()
 {
-   Double_t fact = TMath::Power(kAlphaS*kGw/kM_w,2)
-	          *TMath::Power(fMass/k4Pi,3)/2.; 
-   Double_t mt   = kMass[1][0][2];
-   Double_t t    = 4.*TMath::Power(mt/fMass,2);
-   Double_t gam  = fact * TMath::Power(abs(Ff(t)),2);
-   //return gam;
+   Double_t lamb  = GetLambdaQCD(kAlphaS, kM_z);
+   Double_t alfs  = GetAlphaS(lamb, fMass/2);
+#if 0
+   Double_t mt    = kMass[1][0][2];
+#else
+   Double_t mt    = 169.22; // MSbar [GeV] at mh = 125GeV
+#endif
+   Double_t fact  = TMath::Power(alfs*kGw/kM_w,2)
+	           *TMath::Power(fMass/k4Pi,3)/8.; 
+   Double_t t     = 4.*TMath::Power(mt/fMass,2);
+   Double_t gam   = fact * TMath::Power(abs(Ff(t)),2);
    return gam;
 }
 
@@ -200,6 +221,31 @@ Complex_t HBoson::Fv(Double_t t) // J=1 loop
    return 2. + 3.*t + 3.*t*(2.-t)*F(t);
 }
 
+Double_t HBoson::GetLambdaQCD(Double_t alfs, Double_t q)
+{
+   Int_t    nf    = 5; // 5 flavors
+   Double_t beta0 = (33.-2.*nf)/6;
+   Double_t beta1 = (153.-19.*nf)/12;
+   Double_t a     = alfs/kPi;
+   Double_t ff1   = -1./beta0/a;
+   Double_t ff2   = beta1/(beta0*beta0)*TMath::Log(2./beta0*(1/a+beta1/beta0));
+   Double_t ans   = q*TMath::Exp(ff1*ff2);
+   return ans;
+}
+
+Double_t HBoson::GetAlphaS(Double_t lambda, Double_t q)
+{
+   Int_t    nf    = 5; // 5 flavors
+   Double_t beta0 = 11.-2.*nf/3.;
+   Double_t beta1 = 2*(51.-19.*nf/3.);
+   Double_t QovL = q/lambda;
+   Double_t ans  = 2.*TMath::Log(QovL) 
+	           + (beta1/(beta0*beta0))*TMath::Log(2*TMath::Log(QovL));
+            ans  = k4Pi/(beta0*ans);
+   cerr << "Lambda QCD = " << lambda << endl;
+   cerr << " Q = " << q << " alfs = " << ans << endl;
+   return ans;
+}
 //_____________________________________________________________________________
 // --------------------------
 //  FullAmplitude()
