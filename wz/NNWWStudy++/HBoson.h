@@ -10,6 +10,7 @@
 //*
 //* (Update Record)
 //*    2014/11/21  K.Fujii	Original version.
+//*    2015/03/23  K.Fujii	Improved Gamma_H calculations.
 //*
 //*****************************************************************************
 

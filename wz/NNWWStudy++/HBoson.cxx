@@ -8,6 +8,7 @@
 //*
 //* (Update Record)
 //*    2014/11/21  K.Fujii	Original version.
+//*    2015/03/23  K.Fujii	Improved Gamma_H calculations.
 //*
 //*****************************************************************************
 
@@ -118,7 +119,7 @@ HBoson::HBoson(Double_t m,
 	    // Running mass
 	    if (ig == 2 && it == 1 && ic == 1) {
 		mass = 2.7645; // mb(MSbar)(mh)
-	    } else if (ig == 1 && it == 0 && ic == 1) 
+	    } else if (ig == 1 && it == 0 && ic == 1) {
 		mass = 0.61614; // mc(MSbar)(mh)
 	    } 
 	    if (cf > 1.) {
