@@ -190,6 +190,7 @@ Double_t HBoson::GammaToGG()
 	           *TMath::Power(fMass/k4Pi,3)/8.; 
    Double_t t     = 4.*TMath::Power(mt/fMass,2);
    Double_t gam   = fact * TMath::Power(abs(Ff(t)),2);
+            gam  *= 1. + 18.*alfs/kPi; // NLO QCD correction.
    return gam;
 }
 
