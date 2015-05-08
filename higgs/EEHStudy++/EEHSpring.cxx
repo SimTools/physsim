@@ -184,6 +184,10 @@ Bool_t EEHSpringBuf::SetPartons()
 EEHBases::EEHBases(const char *name, const char *title)
          : JSFBases   (name, title), 
            fMass      ( 120.),
+           fLambda    (1000.),
+           fA         (   0.),
+           fB         (   0.),
+           fBtilde    (   0.),
            fEcmInit   (1000.),
            fISR       ( 1),
            fBeamStr   ( 1),
@@ -216,6 +220,22 @@ EEHBases::EEHBases(const char *name, const char *title)
   using namespace std;
   stringstream ins(gJSF->Env()->GetValue("EEHBases.MassH","120.")); // M_x [GeV]
   ins >> fMass;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("EEHBases.Lambda","1000.")); 	 // Lambda [GeV]
+  ins >> fLambda;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("EEHBases.A","0.")); 	 // a
+  ins >> fA;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("EEHBases.B","0.")); 	 // b
+  ins >> fB;
+
+  ins.clear();
+  ins.str(gJSF->Env()->GetValue("EEHBases.Btilde","0.")); 	 // btilde
+  ins >> fBtilde;
 
   ins.str("");
   ins.clear();
@@ -600,7 +620,15 @@ Complex_t EEHBases::AmpEEtoEEH(const HELFermion &em,
    HELVector z2(eb, ep, glze, grze, mz, gamz);
 
    Double_t  gzzh   = kGz*mz;
+   Double_t g1     = gzzh + 2 * kM_z * kM_z * (fA/fLambda);
+   Double_t g2     = -2 * (fB/fLambda);
+   Double_t g3     = -4 * (fBtilde/fLambda);
+
+#ifndef ANOM_ZZH
    Complex_t amp = HELVertex(z1, z2, hs, gzzh);
+#else
+   Complex_t amp = HELVertex(z1, z2, hs, g1, g2, g3);
+#endif
 #endif /* end __PHASESPACE__ */
 
    return amp;
