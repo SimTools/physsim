@@ -27,12 +27,14 @@
 #ifdef __NODECAY__
 #define __ZEROWIDTH__
 #endif
-//#define TEMP_H
+#define TEMP_H
 #ifdef TEMP_H
+#if 0
 static TH1F *hMh       = 0;
 static TH1F *hRSH      = 0;
 static TH1F *hEsum     = 0;
 static TH1F *hBSweight = 0;
+#endif
 #endif
 
 //*----------------------------------------------------------------------
@@ -575,11 +577,19 @@ Double_t ZHBases::Func()
   ANL4DVector qcm(fEcmInit,0.,0.,0.);
   ANL4DVector qmm = qcm - qz;
 
-  hMh  ->Fill(qmm.Mag()   , (bsWeight*sigma));
-  hRSH ->Fill(fEcmIP      , (bsWeight*sigma));
-  hEsum->Fill(eplus+eminus, (bsWeight*sigma));
-  hBSweight->Fill(eplus+eminus, (bsWeight));
+#if 1
+  H1Fill("hMh"      , qmm.Mag()        , (bsWeight*sigma));
+  H1Fill("hCosth"   , fCosTheta        , (bsWeight*sigma));
+  H1Fill("hPhi"     , fPhi             , (bsWeight*sigma));
+  H1Fill("hCosthF"  , fCosThetaF       , (bsWeight*sigma));
+  H1Fill("hPhiF"    , fPhiF            , (bsWeight*sigma));
+  H1Fill("hMz"      , TMath::Sqrt(fQ2Z), (bsWeight*sigma));
+  H1Fill("hRSH"     , fEcmIP           , (bsWeight*sigma));
+  H1Fill("hEsum"    , eplus+eminus     , (bsWeight*sigma));
+  H1Fill("hBSweight", eplus+eminus     , (bsWeight));
 #endif
+#endif
+#if 0
   Xh_fill( 1, fEcmIP           , (bsWeight*sigma));
   Xh_fill( 2, fCosTheta        , (bsWeight*sigma));
   Xh_fill( 3, fPhi             , (bsWeight*sigma));
@@ -589,6 +599,8 @@ Double_t ZHBases::Func()
   Xh_fill( 7, (Double_t)fJCombI, (bsWeight*sigma));
   Xh_fill( 8, (Double_t)fJCombF, (bsWeight*sigma));
   Xh_fill( 9, (Double_t)fZMode , (bsWeight*sigma));
+  Xh_fill(10, qmm.Mag()        , (bsWeight*sigma));
+#endif
 
   return (bsWeight * sigma);
 }
@@ -794,6 +806,7 @@ Complex_t ZHBases::AmpEEtoZH(const HELFermion &em,
 // --------------------------
 void ZHBases::Userin()
 {
+  TDirectory *last = gDirectory;
   // --------------------------------------------
   //  Open beamstrahlung data
   // --------------------------------------------
@@ -848,9 +861,11 @@ void ZHBases::Userin()
   }
   fZBosonPtr->DebugPrint();
 
+  last->cd();
   // --------------------------------------------
   //  Define some plots
   // --------------------------------------------
+#if 0
   Xh_init( 1,     0., fEcmInit*1.1, 50, "Ecm"   );
   Xh_init( 2, fXL[0], fXU[0],       50, "Costh" );
   Xh_init( 3, fXL[1], fXU[1],       50, "Phi"   );
@@ -861,10 +876,27 @@ void ZHBases::Userin()
   Xh_init( 8,     0.,     2.,        2, "Helot ");
   Xh_init( 9,     0.,    12.,       12, "Z mode");
 #ifdef TEMP_H
+  Xh_init(10, fMass-10., fMass+30.,100, "M_rec ");
+#endif
+#endif
+#ifdef TEMP_H
+#if 0
   if (!hMh)   hMh   = new TH1F("hMh"  ,"", 200,115.,135.);
   if (!hRSH)  hRSH  = new TH1F("hRSH" ,"",1100,  0.,fEcmInit*1.1);
   if (!hEsum) hEsum = new TH1F("hEsum","",1100,  0.,fEcmInit*1.1);
   if (!hBSweight) hBSweight = new TH1F("hBSweight","",1100,0,fEcmInit*1.1);
+#else
+  //H1Init("hMh"      ,"", 200,fMass-10.,    fMass+30.);
+  H1Init("hMh"      ,"", 500,     100.,         200.);
+  H1Init("hCosth"   ,"", 100,      -1.,          +1.);
+  H1Init("hPhi"     ,"", 100,       0.,         k2Pi);
+  H1Init("hCosthF"  ,"", 100,      -1.,          +1.);
+  H1Init("hPhiF"    ,"", 100,       0.,         k2Pi);
+  H1Init("hMz"      ,"", 200,      70.,         110.);
+  H1Init("hRSH"     ,"",1100,       0., fEcmInit*1.1);
+  H1Init("hEsum"    ,"",1100,       0., fEcmInit*1.1);
+  H1Init("hBSweight","",1100,       0., fEcmInit*1.1);
+#endif
 #endif
 }
 
@@ -882,10 +914,13 @@ void ZHBases::Userout()
                                     << GetError()     << " [fb]"  << endl
        << "Number of iterations = " << GetNoOfIterate()           << endl;
 #ifdef TEMP_H
+#if 0
   hMh  ->Write();
   hRSH ->Write();
   hEsum->Write();
   hBSweight->Write();
+#else
+#endif
 #endif
 }
 

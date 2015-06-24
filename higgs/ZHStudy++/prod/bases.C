@@ -15,7 +15,7 @@ Int_t bases()
   bs->Bases();
 
   file->cd();
-  bs->Bh_plot();
+  //bs->Bh_plot();
   printf(" Scalls is %d\n",bs->GetScalls());
   bs->Userout();
   bs->Write();
