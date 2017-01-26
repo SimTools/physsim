@@ -23,6 +23,7 @@ TTBases.MassW:		80.0
 TTBases.MassZ:		91.18
 TTBases.MassHiggs:	9999.
 TTBases.MassTop:	170.
+TTBases.Store_Remnants:  0
 JSFGUI.InputFileName: ttsim.root
 # JSFGUI.InputFileName: /:/ea0/simdst/hiux/zh300gev.1kev.root
 # DisplayType=0 Display LTKCLTrack in momentum display
